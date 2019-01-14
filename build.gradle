@@ -102,7 +102,7 @@ publishing {
       artifact sourcesJar
       artifact javadocJar
       groupId project.group
-      artifactId 'java-logging'
+      artifactId 'amlib'
       version project.version
     }
   }

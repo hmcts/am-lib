@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration debug="${LOGBACK_CONFIGURATION_DEBUG:-false}">
-   <include resource="reform-base.xml"/>
-
-    <root level="${ROOT_LOGGING_LEVEL:-INFO}">
-        <appender-ref ref="${ROOT_APPENDER:-ASYNC_CONSOLE}"/>
-    </root>
-
-</configuration>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="java-logging-appinsights_main" target="1.8" />
+      <module name="java-logging-appinsights_test" target="1.8" />
+      <module name="java-logging-httpcomponents_main" target="1.8" />
+      <module name="java-logging-httpcomponents_test" target="1.8" />
+      <module name="java-logging-spring_main" target="1.8" />
+      <module name="java-logging-spring_test" target="1.8" />
+      <module name="java-logging_main" target="1.8" />
+      <module name="java-logging_test" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

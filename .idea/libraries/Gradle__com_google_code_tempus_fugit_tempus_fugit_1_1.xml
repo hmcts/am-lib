@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.code.tempus-fugit:tempus-fugit:1.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.code.tempus-fugit/tempus-fugit/1.1/4f47af53091985a3e3581af60e432a556a69e2cd/tempus-fugit-1.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.code.tempus-fugit/tempus-fugit/1.1/a30e12eccadd1b5a0a9d94b185a8109285f6e048/tempus-fugit-1.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java-logging.iml" filepath="$PROJECT_DIR$/.idea/modules/java-logging.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java-logging-appinsights/java-logging-appinsights.iml" filepath="$PROJECT_DIR$/.idea/modules/java-logging-appinsights/java-logging-appinsights.iml" group="java-logging-appinsights" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java-logging-appinsights/java-logging-appinsights_main.iml" filepath="$PROJECT_DIR$/.idea/modules/java-logging-appinsights/java-logging-appinsights_main.iml" group="java-logging-appinsights" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java-logging-appinsights/java-logging-appinsights_test.iml" filepath="$PROJECT_DIR$/.idea/modules/java-logging-appinsights/java-logging-appinsights_test.iml" group="java-logging-appinsights" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java-logging-httpcomponents/java-logging-httpcomponents.iml" filepath="$PROJECT_DIR$/.idea/modules/java-logging-httpcomponents/java-logging-httpcomponents.iml" group="java-logging-httpcomponents" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java-logging-httpcomponents/java-logging-httpcomponents_main.iml" filepath="$PROJECT_DIR$/.idea/modules/java-logging-httpcomponents/java-logging-httpcomponents_main.iml" group="java-logging-httpcomponents" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java-logging-httpcomponents/java-logging-httpcomponents_test.iml" filepath="$PROJECT_DIR$/.idea/modules/java-logging-httpcomponents/java-logging-httpcomponents_test.iml" group="java-logging-httpcomponents" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java-logging-spring/java-logging-spring.iml" filepath="$PROJECT_DIR$/.idea/modules/java-logging-spring/java-logging-spring.iml" group="java-logging-spring" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java-logging-spring/java-logging-spring_main.iml" filepath="$PROJECT_DIR$/.idea/modules/java-logging-spring/java-logging-spring_main.iml" group="java-logging-spring" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java-logging-spring/java-logging-spring_test.iml" filepath="$PROJECT_DIR$/.idea/modules/java-logging-spring/java-logging-spring_test.iml" group="java-logging-spring" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java-logging_main.iml" filepath="$PROJECT_DIR$/.idea/modules/java-logging_main.iml" group="java-logging" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java-logging_test.iml" filepath="$PROJECT_DIR$/.idea/modules/java-logging_test.iml" group="java-logging" />
+    </modules>
+  </component>
+</project>

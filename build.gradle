@@ -205,8 +205,6 @@ task buildLib(type:Exec) {
 task copyLib(type:Exec) {
   workingDir '.'
 
-//  commandLine 'pwd'
-//  commandLine 'mkdir', './libs'
   //on linux
   commandLine 'cp', './am-lib/build/libs/am-lib-0.0.1.jar', '.'
 

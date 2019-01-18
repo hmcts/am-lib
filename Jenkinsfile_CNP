@@ -1,14 +1,13 @@
 #!groovy
+
 @Library("Infrastructure")
-import hudson.model.*
 
 def type = "java"
 def product = "am"
 def component = "api"
 
-
-withPipeline(type, product, component) {
-    dir("am-api") {
+sh("cd am-api") {
+    withPipeline(type, product, component) {
 
         echo env.CHANGE_TITLE
         if (env.CHANGE_TITLE && !env.CHANGE_TITLE.contains('[PREVIEW]')

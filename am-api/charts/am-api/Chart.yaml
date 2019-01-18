@@ -1,0 +1,4 @@
+description: Helm chart for the HMCTS am api service
+name: am-api
+home: https://github.com/hmcts/am-api
+version: 0.0.1

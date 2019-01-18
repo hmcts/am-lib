@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
+  <suppress>
+    <notes><![CDATA[
+   file name: groovy-xml-2.5.3.jar
+   ]]></notes>
+    <sha1>95d96ca9024c2f1d4eac28ac56196007821cd4e2</sha1>
+    <cpe>cpe:/a:apache:groovy</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: groovy-json-2.5.3.jar
+   ]]></notes>
+    <sha1>204b37d6ce8b210e2049a082576174bae0ac821c</sha1>
+    <cpe>cpe:/a:apache:groovy</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: groovy-2.5.3.jar
+   ]]></notes>
+    <sha1>b69558cc55b4679f6c401dfd1b54a8a5ffbd06b1</sha1>
+    <cpe>cpe:/a:apache:groovy</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: spring-security-rsa-1.0.7.RELEASE.jar
+   ]]></notes>
+    <gav regex="true">^org\.springframework\.security:spring-security-rsa:.*$</gav>
+    <cve>CVE-2011-2731</cve>
+  </suppress>
+</suppressions>

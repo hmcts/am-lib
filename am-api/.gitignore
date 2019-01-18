@@ -1,0 +1,27 @@
+.gradle
+gradle
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+### IntelliJ IDEA ###
+.idea
+/out
+*.iws
+*.iml
+*.ipr
+
+.DS_store
+*.log
+logs

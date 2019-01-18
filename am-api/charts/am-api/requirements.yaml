@@ -1,0 +1,8 @@
+dependencies:
+- name: postgresql
+  version: ~3.9.1
+  repository: '@stable'
+- name: java
+  version: 0.0.9
+  repository: '@hmcts'
+  alias: am-api

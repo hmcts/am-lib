@@ -1,0 +1,4 @@
+am-api:
+  image: ${IMAGE_NAME}
+  ingressHost: ${SERVICE_FQDN}
+  applicationPort: 2703

@@ -1,6 +1,6 @@
 #!groovy
-
 @Library("Infrastructure")
+import hudson.model.*
 
 def type = "java"
 def product = "am"

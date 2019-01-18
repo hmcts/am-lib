@@ -1,0 +1,30 @@
+#!groovy
+
+@Library("Infrastructure")
+
+def type = "java"
+def product = "am-lib-testing"
+def component = "api"
+
+dir("am-lib-testing-api") {
+    withPipeline(type, product, component) {
+
+        echo env.CHANGE_TITLE
+        if (env.CHANGE_TITLE && !env.CHANGE_TITLE.contains('[PREVIEW]')
+                && env.CHANGE_TITLE.contains('[AKS]')) {
+            setVaultName('am-lib-testing-api')
+            enableDockerBuild()
+            installCharts()
+        }
+
+        after('checkout') {
+            echo 'am-lib (am-lib-testing-api) checked out'
+            pwd()
+        }
+
+        before('buildinfra:prod') {
+            currentBuild.description = "Success!"
+            error 'Access management project should not be built on prod environment yet.'
+        }
+    }
+}

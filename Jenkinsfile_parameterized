@@ -1,0 +1,20 @@
+#!groovy
+@Library("Infrastructure") _
+
+def type = "java"
+def product = "am-lib"
+def component = "testing-api"
+
+dir("am-lib-testing-api") {
+    withPipeline(type, product, component) {
+        enableDbMigration()
+        echo env.CHANGE_TITLE
+        if (env.CHANGE_TITLE && !env.CHANGE_TITLE.contains('[PREVIEW]')
+                && env.CHANGE_TITLE.contains('[AKS]')) {
+            loadVaultSecrets(secrets)
+            setVaultName('am-lib-testing-api')
+            enableDockerBuild()
+            enableDeployToAKS()
+        }
+    }
+}

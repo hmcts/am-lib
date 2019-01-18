@@ -4,7 +4,7 @@
 
 def type = "java"
 def product = "am"
-def component = "am-lib-testing-service"
+def component = "lib-testing-service"
 
 withPipeline(type, product, component) {
 

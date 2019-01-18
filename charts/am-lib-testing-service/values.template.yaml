@@ -1,4 +1,4 @@
-am-api:
+am-lib-testing-service:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   applicationPort: 2703

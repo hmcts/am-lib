@@ -16,8 +16,8 @@ module "am-api" {
   subscription        = "${var.subscription}"
   is_frontend         = "${var.external_host_name != "" ? "1" : "0"}"
   additional_host_name = "${var.external_host_name != "" ? var.external_host_name : "null"}"
-  capacity            = "1"
-  instance_size       = "I2"
+  capacity            = "${var.capacity}"
+  instance_size       = "${var.instance_size}"
   common_tags         = "${var.common_tags}"
 
   app_settings = {

@@ -6,7 +6,7 @@ variable "product" {
 
 variable "component" {
   type = "string"
-  default = "api"
+  default = "am-lib-testing-service"
 }
 
 variable "location_app" {
@@ -24,6 +24,10 @@ variable "subscription" {}
 
 variable "capacity" {
   default = "1"
+}
+
+variable "instance_size" {
+  default = "I1"
 }
 
 variable "common_tags" {

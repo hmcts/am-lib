@@ -3,16 +3,14 @@
 
 def type = "java"
 def product = "am"
-def component = "api"
+def component = "am-lib-testing-service"
 
 withPipeline(type, product, component) {
-    enableDbMigration()
     echo env.CHANGE_TITLE
     if (env.CHANGE_TITLE && !env.CHANGE_TITLE.contains('[PREVIEW]')
         && env.CHANGE_TITLE.contains('[AKS]')) {
-        loadVaultSecrets(secrets)
         setVaultName('am')
         enableDockerBuild()
-        enableDeployToAKS()
+        installCharts()
     }
 }

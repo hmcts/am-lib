@@ -109,8 +109,8 @@ project.tasks['sonarqube'].dependsOn test, integration
 
 sonarqube {
   properties {
-    property "sonar.projectName", "Reform :: am-api"
-    property "sonar.projectKey", "uk.gov.hmcts.reform:am-api"
+    property "sonar.projectName", "Reform :: am-lib-testing-service"
+    property "sonar.projectKey", "uk.gov.hmcts.reform:am-lib-testing-service"
     property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
     property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
 
@@ -180,7 +180,7 @@ dependencies {
 mainClassName = 'uk.gov.hmcts.reform.amapi.Application'
 
 bootJar {
-  archiveName = 'am-api.jar'
+  archiveName = 'am-lib-testing-service.jar'
 
   manifest {
     attributes('Implementation-Version': project.version.toString())

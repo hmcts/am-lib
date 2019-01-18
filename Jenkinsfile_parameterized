@@ -5,8 +5,9 @@ def type = "java"
 def product = "am"
 def component = "api"
 
-dir("am-api") {
-    withPipeline(type, product, component) {
+
+withPipeline(type, product, component) {
+    dir("am-api") {
         enableDbMigration()
         echo env.CHANGE_TITLE
         if (env.CHANGE_TITLE && !env.CHANGE_TITLE.contains('[PREVIEW]')

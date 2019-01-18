@@ -2,17 +2,17 @@
 @Library("Infrastructure") _
 
 def type = "java"
-def product = "am-lib"
-def component = "testing-api"
+def product = "am"
+def component = "api"
 
-dir("am-lib-testing-api") {
+dir("am-api") {
     withPipeline(type, product, component) {
         enableDbMigration()
         echo env.CHANGE_TITLE
         if (env.CHANGE_TITLE && !env.CHANGE_TITLE.contains('[PREVIEW]')
                 && env.CHANGE_TITLE.contains('[AKS]')) {
             loadVaultSecrets(secrets)
-            setVaultName('am-lib-testing-api')
+            setVaultName('am')
             enableDockerBuild()
             enableDeployToAKS()
         }

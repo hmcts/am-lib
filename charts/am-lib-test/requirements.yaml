@@ -5,4 +5,4 @@ dependencies:
 - name: java
   version: 0.0.9
   repository: '@hmcts'
-  alias: am-lib-testing-service
+  alias: am-lib-test

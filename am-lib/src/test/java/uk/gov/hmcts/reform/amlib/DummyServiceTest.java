@@ -8,6 +8,6 @@ public class DummyServiceTest {
 
     @Test
     public void dummyTest() {
-        assertThat(new DummyService().getHello()).isEqualTo("Hello Dummy Service");
+        assertThat(new DummyService().getHello()).isEqualTo("Hello Dummy Service 2");
     }
 }

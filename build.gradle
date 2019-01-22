@@ -188,35 +188,21 @@ bootJar {
   }
 }
 
+task testLib(type:Exec) {
+  workingDir './am-lib'
+  commandLine './gradlew', 'test'
+}
+
 task buildLib(type:Exec) {
   workingDir './am-lib'
-
-  //on linux
-  commandLine './gradlew', 'build'
-
-  //store the output instead of printing to the console:
-  standardOutput = new ByteArrayOutputStream()
-
-  //extension method stopTomcat.output() can be used to obtain the output:
-  ext.output = {
-    return standardOutput.toString()
-  }
+  commandLine './gradlew', 'jar'
 }
 
 task copyLib(type:Exec) {
   workingDir '.'
-
-  //on linux
   commandLine 'cp', "./am-lib/build/libs/am-lib-${amLibJarVersion}.jar", '.'
-
-  //store the output instead of printing to the console:
-  standardOutput = new ByteArrayOutputStream()
-
-  //extension method stopTomcat.output() can be used to obtain the output:
-  ext.output = {
-    return standardOutput.toString()
-  }
 }
 
+test.dependsOn testLib
 compileJava.dependsOn copyLib
 copyLib.dependsOn buildLib

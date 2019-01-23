@@ -23,6 +23,13 @@ module "am-api" {
   app_settings = {
     LOGBACK_REQUIRE_ALERT_LEVEL = "false"
     LOGBACK_REQUIRE_ERROR_CODE  = "false"
+
+    AM_DB_HOST = "${module.postgres-am-api.host_name}"
+    AM_DB_PORT = "${module.postgres-am-api.postgresql_listen_port}"
+    AM_DB_NAME = "${module.postgres-am-api.postgresql_database}"
+    AM_DB_USERNAME = "${module.postgres-am-api.user_name}"
+    AM_DB_PASSWORD = "${module.postgres-am-api.postgresql_password}"
+    AM_DB_PARAMS = "?sslmode=require"
   }
 }
 

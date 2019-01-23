@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amapi.controllers;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,7 +13,14 @@ import static org.springframework.http.ResponseEntity.ok;
  */
 @RestController
 public class RootController {
+    @Value("${spring.datasource.url}")
+    private String dbUrl;
 
+    @Value("${spring.datasource.username}")
+    private String dbUsername;
+
+    @Value("${spring.datasource.password}")
+    private String dbPassword;
     /**
      * Root GET endpoint.
      *
@@ -24,6 +32,6 @@ public class RootController {
      */
     @GetMapping("/")
     public ResponseEntity<String> welcome() {
-        return ok(new DummyService().getHello());
+        return ok(new DummyService(dbUrl, dbUsername, dbPassword).getHello());
     }
 }

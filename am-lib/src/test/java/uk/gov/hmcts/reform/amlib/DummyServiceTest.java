@@ -8,6 +8,7 @@ public class DummyServiceTest {
 
     @Test
     public void dummyTest() {
-        assertThat(new DummyService().getHello()).isEqualTo("Hello Dummy Service 2");
+        String msg = new DummyService(null, null, null).getHello();
+        assertThat(msg).isEqualTo("db url or user or pass is null");
     }
 }

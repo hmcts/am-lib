@@ -12,7 +12,7 @@ public class ApplicationTests {
 
     @Test
     public void sample_test() {
-        assertThat(new DummyService().getHello().length()).isGreaterThan(1);
+        assertThat(new DummyService(null, null, null).getHello().length()).isGreaterThan(1);
     }
 
 }

@@ -14,13 +14,14 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 public class RootController {
     @Value("${spring.datasource.url}")
-    private String dbUrl;
+    private transient String dbUrl;
 
     @Value("${spring.datasource.username}")
-    private String dbUsername;
+    private transient String dbUsername;
 
     @Value("${spring.datasource.password}")
-    private String dbPassword;
+    private transient String dbPassword;
+
     /**
      * Root GET endpoint.
      *

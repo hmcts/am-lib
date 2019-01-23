@@ -19,3 +19,4 @@ git commit -m "Release ${NEW_VERSION}"
 
 echo -e "Version bumped\nPush your changes, send a PR and after merging run:"
 echo -e "git tag -a ${NEW_VERSION} -m \"Releasing version ${NEW_VERSION}\" "
+echo -e "\nRemember about updating amLibJarVersion in repoRootFolder/build.gradle"

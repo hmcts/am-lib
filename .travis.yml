@@ -12,20 +12,22 @@ cache:
 script:
 - cd am-lib && ./gradlew build
 deploy:
-- provider: script
-  script: "./gradlew bintrayUpload"
-  skip_cleanup: true
-  dry_run: true
-  on:
-    tags: true
-    repo: hmcts/am-lib
+#- provider: script
+#  script: "./gradlew bintrayUpload"
+#  skip_cleanup: true
+#  dry_run: true
+#  on:
+#    tags: true
+#    repo: hmcts/am-lib
 - provider: releases
   skip_cleanup: true
   api_key:
     secure: YNNf3uSvh+hZ1oz/HtLCiabD8H01VKm5JI5nYmbUNgrZI/PrFTKfGYjIfx3GbXv/sbxb+y3nyR1dybq7iaEGXV1Vfso80BGokyAsL/qHvnhG6tpc9SgU6BgupjrK5s355x07eKdBVY7gf7k5vYEtJjB2X7CNZ051NHjeoMInfysSkVrUr5YjbJFJQehCKXxwzDY742SH85j6kYP48YeVlEnhQYBvh1zvG5WhXmMn3GliJ9vWcRiSNviD3MMADpUfavR4qrOCwVrwPXDYQpRfeK4fKYawQc0Kha72+cmLOmqF29D0bie+xui+XEV6g79JZZxgO130NZzQVZzhk/ZqKAH1G0ZkcSMDbnCRSpFfjPzzsLjKWm0pq/U78Syv2Uz24t1ea8dWSulePGu/zECri2Utn2tJRgyAFBS8QUn3BhShJ3G80AkAyCzjCfTu625BGMo3QAmjhfgHlaJNfN5J8hX9ILP2rq/ClOPem5+4X1puc14gcii/GraveC4p0t2qCvqHEG+PtFqbo3lgAAiEKdK2tcB5FSPmSs/aa8r9zXvMLwihmYtt1zk3Cztq0GXVyX+uLiWdxjZMjFncHgUhWHepccCytUS0GGDnsbyWjAmbwMEss96m218rFV1m3yMrgj7/QceHDPPB1g4BVk32/YtwRejNPlHn2tpHwSDb0lM=
-  file: build/libs/am-lib*.jar
+  file: build/libs/am-lib-*.jar
+  draft: true
   on:
-    tags: true
+#    tags: true
+    branch: test-travis
     repo: hmcts/am-lib
 env:
   global:

@@ -10,13 +10,13 @@ management:
 spring:
   application:
     name: Access Management
-#  datasource:
-#    driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_OPTIONS:}
-#    username: ${DB_USER_NAME}
-#    password: ${DB_PASSWORD}
-#    properties:
-#      charSet: UTF-8
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${AM_DB_HOST:localhost}:${AM_DB_PORT:5433}/${AM_DB_NAME:am}${AM_DB_PARAMS:}
+    username: ${AM_DB_USERNAME:amuser}
+    password: ${AM_DB_PASSWORD:ampass}
+    properties:
+      charSet: UTF-8
 #    hikari:
 #      minimumIdle: 2
 #      maximumPoolSize: 10

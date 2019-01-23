@@ -37,7 +37,7 @@ services:
       - LOGBACK_REQUIRE_ALERT_LEVEL=false
       - LOGBACK_REQUIRE_ERROR_CODE=false
       - AM_DB_HOST=am-lib-testing-service-db
-      - AM_DB_PORT=5433
+      - AM_DB_PORT=5432
       - AM_DB_NAME=am
       - AM_DB_USERNAME=amuser
       - AM_DB_PASSWORD=ampass

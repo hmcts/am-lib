@@ -12,5 +12,6 @@ def product = "rpe"
 def component = "lib-test"
 
 withNightlyPipeline(type, product, component) {
+  enableDbMigration()
   enableSlackNotifications('#rpe-build-notices')
 }

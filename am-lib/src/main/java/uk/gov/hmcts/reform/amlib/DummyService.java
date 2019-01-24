@@ -9,7 +9,7 @@ public class DummyService {
     private String msg = "Hello Dummy Service 2";
 
     public DummyService(String dbUrl, String user, String password) {
-        if (dbUrl == null && user == null && password == null) {
+        if (dbUrl == null || user == null || password == null) {
             msg = "db url or user or pass is null";
         } else {
             jdbi = Jdbi.create(dbUrl, user, password);

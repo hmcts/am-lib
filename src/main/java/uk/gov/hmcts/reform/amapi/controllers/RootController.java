@@ -12,15 +12,16 @@ import static org.springframework.http.ResponseEntity.ok;
  * Default endpoints per application.
  */
 @RestController
+@SuppressWarnings("PMD")
 public class RootController {
     @Value("${spring.datasource.url}")
-    private transient String dbUrl;
+    private String dbUrl;
 
     @Value("${spring.datasource.username}")
-    private transient String dbUsername;
+    private String dbUsername;
 
     @Value("${spring.datasource.password}")
-    private transient String dbPassword;
+    private String dbPassword;
 
     /**
      * Root GET endpoint.

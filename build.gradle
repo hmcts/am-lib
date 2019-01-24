@@ -167,7 +167,6 @@ dependencies {
 
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.0.2.RELEASE'
-  compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
 
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
@@ -221,7 +220,6 @@ flyway {
 
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
   baselineOnMigrate = true
-  project.logger.lifecycle("Does it have dbUrl: " + project.hasProperty("dburl"))
   if (project.hasProperty("dburl")) {
     url = "jdbc:postgresql://${dburl}"
   }

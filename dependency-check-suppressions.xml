@@ -23,9 +23,37 @@
   </suppress>
   <suppress>
     <notes><![CDATA[
+   file name: guava-20.0.jar
+   ]]></notes>
+    <gav regex="true">^com\.google\.guava:guava:.*$</gav>
+    <cpe>cpe:/a:google:guava</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: spring-security-rsa-1.0.7.RELEASE.jar
+   ]]></notes>
+    <gav regex="true">^org\.springframework\.security:spring-security-rsa:.*$</gav>
+    <cpe>cpe:/a:vmware:springsource_spring_security</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: spring-security-rsa-1.0.7.RELEASE.jar
+   ]]></notes>
+    <gav regex="true">^org\.springframework\.security:spring-security-rsa:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
    file name: spring-security-rsa-1.0.7.RELEASE.jar
    ]]></notes>
     <gav regex="true">^org\.springframework\.security:spring-security-rsa:.*$</gav>
     <cve>CVE-2011-2731</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: groovy-xml-2.5.3.jar
+   ]]></notes>
+    <sha1>95d96ca9024c2f1d4eac28ac56196007821cd4e2</sha1>
+    <cpe>cpe:/a:apache:groovy</cpe>
   </suppress>
 </suppressions>

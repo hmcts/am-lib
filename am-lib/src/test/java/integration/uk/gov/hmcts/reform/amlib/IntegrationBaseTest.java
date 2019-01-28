@@ -7,6 +7,7 @@ import org.junit.BeforeClass;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SuppressWarnings("PMD")
 public abstract class IntegrationBaseTest {
 
     // According to H2 docs DB_CLOSE_DELAY is required in order to keep open connection to db (on close, h2 drops db)
@@ -21,7 +22,6 @@ public abstract class IntegrationBaseTest {
     }
 
     private static void initSchema() {
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
         FluentConfiguration configuration = new FluentConfiguration();
         configuration.dataSource(JDBC_URL, "sa", "");
         // Due sql migrations have to be in main resources, there are not added to classpath

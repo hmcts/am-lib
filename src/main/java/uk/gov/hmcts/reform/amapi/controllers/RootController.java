@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.amapi.controllers;
 
+import org.jdbi.v3.core.Jdbi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.amlib.DummyService;
+import uk.gov.hmcts.reform.amlib.AccessManagementService;
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -34,7 +35,7 @@ public class RootController {
      */
     @GetMapping("/")
     public ResponseEntity<Integer> welcome() {
-        DummyService dm = new DummyService(dbUrl, dbUsername, dbPassword);
+        AccessManagementService dm = new AccessManagementService(Jdbi.create(dbUrl, dbUsername, dbPassword));
         return ok(dm.getHello());
     }
 }

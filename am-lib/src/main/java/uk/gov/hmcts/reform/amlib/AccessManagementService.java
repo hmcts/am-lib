@@ -8,22 +8,14 @@ import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
 
 import java.util.List;
 
-public class DummyService {
+public class AccessManagementService {
     private Jdbi jdbi;
     private String msg = "Hello Dummy Service 2";
 
-    public DummyService(Jdbi jdbi) {
+    public AccessManagementService(Jdbi jdbi) {
         this.jdbi = jdbi;
-    }
 
-    public DummyService(String dbUrl, String user, String password) {
-        if (dbUrl == null || user == null || password == null) {
-            msg = "db url or user or pass is null";
-        } else {
-            jdbi = Jdbi.create(dbUrl, user, password);
-
-            jdbi.installPlugin(new SqlObjectPlugin());
-        }
+        this.jdbi.installPlugin(new SqlObjectPlugin());
     }
 
     public Integer getHello() {

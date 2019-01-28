@@ -216,7 +216,7 @@ flyway {
   url = 'jdbc:postgresql://localhost:5433/am'
   user = 'amuser'
   password = 'ampass'
-  locations = ["filesystem:am-lib/src/main/java/uk/gov/hmcts/reform/amlib/db/migrations"]
+  locations = ["filesystem:am-lib/src/main/java/uk/gov/hmcts/reform/amlib/db/db.migration"]
 }
 
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {

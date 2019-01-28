@@ -8,6 +8,10 @@ public class DummyService {
     private Jdbi jdbi;
     private String msg = "Hello Dummy Service 2";
 
+    public DummyService(Jdbi jdbi) {
+        this.jdbi = jdbi;
+    }
+
     public DummyService(String dbUrl, String user, String password) {
         if (dbUrl == null || user == null || password == null) {
             msg = "db url or user or pass is null";

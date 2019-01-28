@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.amapi.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
+import uk.gov.hmcts.reform.amlib.exceptions.AccessManagementException;
 
 import java.util.HashMap;
 
@@ -20,9 +20,8 @@ public class RootController {
 
     @Autowired AccessManagementService am;
 
-
     @PostMapping("/")
-    public ResponseEntity<Integer> welcome(@RequestBody HashMap<String, Object> amData) {
-        return ok(am.createResourceAccess(amData.get("resourceId").toString(), amData.get("accessorId").toString()));
+    public void createResourceAccess(@RequestBody HashMap<String, Object> amData) throws AccessManagementException {
+        am.createResourceAccess(amData.get("resourceId").toString(), amData.get("accessorId").toString());
     }
 }

@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure")
+@Library("Infrastructure@AM-51-add-perfTest-to-AKS-pipeline")
 
 def type = "java"
 def product = "am"
@@ -16,7 +16,7 @@ withPipeline(type, product, component) {
         installCharts()
     }
 
-//    enablePerformanceTest()
+    enablePerformanceTest()
 
     after('checkout') {
         echo 'am-lib-testing-service checked out'

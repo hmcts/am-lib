@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.amapi.config;
 
-import org.jdbi.v3.core.Jdbi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +19,6 @@ public class AccessManagementServiceConfiguration {
 
     @Bean
     public AccessManagementService getAccessManagementService() {
-        return new AccessManagementService(Jdbi.create(dbUrl, dbUsername, dbPassword));
+        return new AccessManagementService(dbUrl, dbUsername, dbPassword);
     }
 }

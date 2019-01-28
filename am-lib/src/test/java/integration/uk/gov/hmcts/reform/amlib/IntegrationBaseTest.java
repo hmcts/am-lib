@@ -7,7 +7,7 @@ import org.junit.BeforeClass;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public abstract class DAOTest {
+public abstract class IntegrationBaseTest {
 
     // According to H2 docs DB_CLOSE_DELAY is required in order to keep open connection to db (on close, h2 drops db)
     public static final String JDBC_URL = "jdbc:h2:mem:test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1";
@@ -15,7 +15,7 @@ public abstract class DAOTest {
     protected static Jdbi jdbi;
 
     @BeforeClass
-    public static void initDB() {
+    public static void initDatabase() {
         jdbi = Jdbi.create(JDBC_URL, "sa", "");
         initSchema();
     }

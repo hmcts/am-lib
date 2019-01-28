@@ -33,7 +33,7 @@ public class RootController {
      * @return Welcome message from the service.
      */
     @GetMapping("/")
-    public ResponseEntity<String> welcome() {
+    public ResponseEntity<Integer> welcome() {
         DummyService dm = new DummyService(dbUrl, dbUsername, dbPassword);
         return ok(dm.getHello());
     }

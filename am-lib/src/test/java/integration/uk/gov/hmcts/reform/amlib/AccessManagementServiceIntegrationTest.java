@@ -7,11 +7,20 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest {
 
     @Test
+    public void WhenCreatingResourceAccess_ResourceAccessAppearsInDatabase() {
+        String resourceId = "asd";
+
+        ams.createResourceAccess(resourceId, "dsa");
+
+        String actualResourceId = jdbi.open().createQuery("select \"resourceId\" from \"AccessManagement\"")
+                .mapTo(String.class)
+                .findOnly();
+
+        assertThat(resourceId).isEqualTo(actualResourceId);
+    }
+
+    @Test
     public void dummyTest() {
-//        jdbi.withHandle(handle -> handle.createUpdate("INSERT INTO access_control VALUES (2)").execute());
-//
-//        Integer msg = new DummyService(jdbi).getHello();
-//
-        assertThat(true).isTrue();
+        ams.createResourceAccess("asd", "dsa");
     }
 }

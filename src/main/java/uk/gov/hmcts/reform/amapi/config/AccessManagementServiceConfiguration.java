@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 
 @Configuration
+@SuppressWarnings("PMD")
 public class AccessManagementServiceConfiguration {
 
     @Value("${spring.datasource.url}")

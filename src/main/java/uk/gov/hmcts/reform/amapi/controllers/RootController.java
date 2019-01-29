@@ -18,7 +18,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 public class RootController {
 
-    @Autowired AccessManagementService am;
+    @Autowired private transient AccessManagementService am;
 
     /**
      * Root GET endpoint.

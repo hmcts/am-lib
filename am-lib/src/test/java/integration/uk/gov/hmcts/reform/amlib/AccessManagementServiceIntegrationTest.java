@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
-@SuppressWarnings("PMD")
 public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest {
 
     private String resourceId;

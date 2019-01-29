@@ -1,9 +1,9 @@
-CREATE TYPE SecurityClassification AS ENUM ('Public', 'Private', 'Restricted');
+CREATE TYPE "SecurityClassification" AS ENUM ('Public', 'Private', 'Restricted');
 
 CREATE TABLE "Roles" (
   "roleName" varchar(100) PRIMARY KEY,
   "roleType" VARCHAR (50) NOT NULL,
-  "securityClassification" SecurityClassification NOT NULL
+  "securityClassification" "SecurityClassification" NOT NULL
 );
 
 CREATE TABLE "Services" (
@@ -26,7 +26,7 @@ CREATE TABLE "ResourceAttributes" (
   "resourceType" varchar(100) NOT NULL,
   "resourceName" varchar(100) NOT NULL,
   "attribute" varchar(250) NOT NULL,
-  "defaultSecurityClassification" SecurityClassification NOT NULL,
+  "defaultSecurityClassification" "SecurityClassification" NOT NULL,
   PRIMARY KEY ("serviceName", "resourceType", "resourceName", "attribute"),
   CONSTRAINT "ResourceAttributes_fkey" FOREIGN KEY ("serviceName", "resourceType", "resourceName")
     REFERENCES "Resources" ("serviceName", "resourceType", "resourceName") MATCH FULL

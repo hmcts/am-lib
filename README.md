@@ -129,6 +129,8 @@ by executing the following command:
   docker-compose up
 ```
 
+// The port should be 2704, shouldn't it?
+
 This will start the API container exposing the application's port
 (set to `4550` in this template app).
 

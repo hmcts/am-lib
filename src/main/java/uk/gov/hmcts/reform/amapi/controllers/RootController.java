@@ -16,7 +16,6 @@ import static org.springframework.http.ResponseEntity.ok;
  * Default endpoints per application.
  */
 @RestController
-@SuppressWarnings("PMD")
 public class RootController {
 
     @Autowired AccessManagementService am;

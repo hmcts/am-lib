@@ -4,6 +4,8 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
 
+import java.util.List;
+
 public class AccessManagementService {
     private final Jdbi jdbi;
 
@@ -16,5 +18,13 @@ public class AccessManagementService {
     public void createResourceAccess(String resourceId, String accessorId) {
         jdbi.useExtension(AccessManagementRepository.class,
             dao -> dao.createAccessManagementRecord(resourceId, accessorId));
+    }
+
+    public List<String> checkAccess(UserDetails userDetails, String resourceId) {
+        return jdbi.withExtension(AccessManagementRepository.class, dao ->  {
+            List<String> userIds = dao.checkAccess(userDetails.getUserId(), resourceId);
+
+            return (userIds.isEmpty()) ? null : userIds;
+        });
     }
 }

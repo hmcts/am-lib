@@ -12,10 +12,10 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest {
 
     private String resourceId;
-    private JsonNode jsonObject = JsonNodeFactory.instance.objectNode();
+    private final JsonNode jsonObject = JsonNodeFactory.instance.objectNode();
 
     @Before
-    public void testSetup() {
+    public void setupTest() {
         resourceId = UUID.randomUUID().toString();
     }
 

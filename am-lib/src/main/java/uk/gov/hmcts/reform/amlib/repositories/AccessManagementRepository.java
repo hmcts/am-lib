@@ -9,5 +9,5 @@ public interface AccessManagementRepository {
     void createAccessManagementRecord(String resourceId, String accessorId);
 
     @SqlQuery("select exists(select 1 from \"AccessManagement\" where  \"accessorId\"=? and \"resourceId\"=?)")
-    boolean explicateAccessExist(String accessorId, String resourceId);
+    boolean explicitAccessExist(String accessorId, String resourceId);
 }

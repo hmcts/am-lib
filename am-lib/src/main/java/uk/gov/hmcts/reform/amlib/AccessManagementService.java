@@ -28,7 +28,7 @@ public class AccessManagementService {
      */
     public JsonNode filterResource(String userId, String resourceId, JsonNode resourceJSON) {
         boolean hasAccess = jdbi.withExtension(AccessManagementRepository.class,
-                dao -> dao.explicateAccessExist(userId, resourceId));
+                dao -> dao.explicitAccessExist(userId, resourceId));
 
         return (hasAccess) ? resourceJSON : null;
     }

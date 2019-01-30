@@ -48,3 +48,4 @@ CREATE TABLE default_permissions_for_roles (
     REFERENCES resource_attributes (service_name, resource_type, resource_name, attribute)
     ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+

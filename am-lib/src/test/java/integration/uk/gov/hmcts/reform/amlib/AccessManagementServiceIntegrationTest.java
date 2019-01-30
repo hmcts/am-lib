@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.amlib.UserDetails;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +13,9 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest {
 
     private String resourceId;
+    private static final String accessorId = "a";
+    private static final String otherAccessorId = "b";
+
     private JsonNode jsonObject = JsonNodeFactory.instance.objectNode();
 
     @Before
@@ -36,41 +38,34 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void whenCheckingAccess_ifUserHasAccess_ShouldReturnUserIds() {
-        ams.createResourceAccess(resourceId, "a");
-        ams.createResourceAccess(resourceId, "b");
+        ams.createResourceAccess(resourceId, accessorId);
+        ams.createResourceAccess(resourceId, otherAccessorId);
 
-        UserDetails userDetails = new UserDetails();
-        userDetails.setUserId("a");
 
-        List<String> list = ams.checkAccess(userDetails, resourceId);
+        List<String> list = ams.getAccessorsList(accessorId, resourceId);
 
-        assertThat(list).containsExactly("a", "b");
+        assertThat(list).containsExactly(accessorId, otherAccessorId);
     }
 
     @Test
     public void whenCheckingAccess_ifUserHasNoAccess_ShouldReturnNull() {
         ams.createResourceAccess(resourceId, "c");
-        ams.createResourceAccess(resourceId, "b");
+        ams.createResourceAccess(resourceId, otherAccessorId);
 
-        UserDetails userDetails = new UserDetails();
-        userDetails.setUserId("a");
 
-        List<String> list = ams.checkAccess(userDetails, resourceId);
+        List<String> list = ams.getAccessorsList(accessorId, resourceId);
 
         assertThat(list).isNull();
     }
 
     @Test
     public void whenCheckingAccess_ToNonExistingResource_ShouldReturnNull() {
-        ams.createResourceAccess(resourceId, "a");
-        ams.createResourceAccess(resourceId, "b");
+        ams.createResourceAccess(resourceId, accessorId);
+        ams.createResourceAccess(resourceId, otherAccessorId);
 
         final String nonExistingResourceId = "bbbbbbbb";
 
-        UserDetails userDetails = new UserDetails();
-        userDetails.setUserId("a");
-
-        List<String> list = ams.checkAccess(userDetails, nonExistingResourceId);
+        List<String> list = ams.getAccessorsList(accessorId, nonExistingResourceId);
 
         assertThat(list).isNull();
 
@@ -78,18 +73,16 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void filterResource_whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject() {
-        String userId = UUID.randomUUID().toString();
-        ams.createResourceAccess(resourceId, userId);
+        ams.createResourceAccess(resourceId, accessorId);
 
-        JsonNode result = ams.filterResource(userId, resourceId, jsonObject);
+        JsonNode result = ams.filterResource(accessorId, resourceId, jsonObject);
 
         assertThat(result).isEqualTo(jsonObject);
     }
 
     @Test
     public void filterResource_whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
-        String userId = "def";
-        ams.createResourceAccess(resourceId, userId);
+        ams.createResourceAccess(resourceId, accessorId);
         String nonExistingUserId = "ijk";
         String nonExistingResourceId = "lmn";
 

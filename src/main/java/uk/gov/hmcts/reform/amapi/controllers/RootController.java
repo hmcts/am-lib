@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.ResponseEntity.ok;
@@ -40,6 +41,11 @@ public class RootController {
     @PostMapping("/create-resource-access")
     public void createResourceAccess(@RequestBody Map<String, Object> amData) {
         am.createResourceAccess(amData.get("resourceId").toString(), amData.get("accessorId").toString());
+    }
+
+    @PostMapping("/get-accessors-list")
+    public List<String> getAccessorsList(@RequestBody Map<String, Object> amData) {
+        return am.getAccessorsList(amData.get("userId").toString(), amData.get("resourceId").toString());
     }
 
     @PostMapping("/filter-resource")

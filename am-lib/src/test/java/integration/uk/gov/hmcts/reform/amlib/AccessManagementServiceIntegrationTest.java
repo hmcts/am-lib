@@ -41,7 +41,6 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
         ams.createResourceAccess(resourceId, accessorId);
         ams.createResourceAccess(resourceId, otherAccessorId);
 
-
         List<String> list = ams.getAccessorsList(accessorId, resourceId);
 
         assertThat(list).containsExactly(accessorId, otherAccessorId);
@@ -51,7 +50,6 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     public void whenCheckingAccess_ifUserHasNoAccess_ShouldReturnNull() {
         ams.createResourceAccess(resourceId, "c");
         ams.createResourceAccess(resourceId, otherAccessorId);
-
 
         List<String> list = ams.getAccessorsList(accessorId, resourceId);
 
@@ -68,7 +66,6 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
         List<String> list = ams.getAccessorsList(accessorId, nonExistingResourceId);
 
         assertThat(list).isNull();
-
     }
 
     @Test

@@ -203,7 +203,7 @@ task testLib(type:Exec) {
 
 task buildLib(type:Exec) {
   workingDir './am-lib'
-  commandLine './gradlew', 'shadowJar'
+  commandLine './gradlew', 'build', 'shadowJar'
 }
 
 task copyLib(type:Exec) {

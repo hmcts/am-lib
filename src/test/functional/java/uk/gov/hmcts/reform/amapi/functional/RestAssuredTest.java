@@ -13,7 +13,7 @@ public class RestAssuredTest {
     public void before() {
         String appUrl = System.getenv("TEST_URL");
         if (appUrl == null) {
-            appUrl = "http://localhost:2704";
+            appUrl = "http://localhost:3704";
         }
 
         RestAssured.baseURI = appUrl;

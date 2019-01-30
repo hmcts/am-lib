@@ -1,5 +1,5 @@
 server:
-  port: 2703
+  port: 3703
 
 management:
   endpoints:

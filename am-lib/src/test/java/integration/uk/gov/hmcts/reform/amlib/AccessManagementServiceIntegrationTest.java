@@ -50,6 +50,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     public void whenCheckingAccess_ifUserHasNoAccess_ShouldReturnNull() {
         ams.createResourceAccess(resourceId, "c");
         ams.createResourceAccess(resourceId, otherAccessorId);
+        ams.createResourceAccess("otherResourceId", accessorId);
 
         List<String> list = ams.getAccessorsList(accessorId, resourceId);
 

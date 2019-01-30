@@ -17,7 +17,7 @@ CREATE TABLE resources (
   resource_name varchar(100) NOT NULL,
   PRIMARY KEY (service_name, resource_type, resource_name),
   CONSTRAINT resources_service_name_fkey FOREIGN KEY (service_name)
-    REFERENCES services (service_name) MATCH SIMPLE
+    REFERENCES services (service_name)
     ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
@@ -29,7 +29,7 @@ CREATE TABLE resource_attributes (
   default_security_classification securityclassification NOT NULL,
   PRIMARY KEY (service_name, resource_type, resource_name, attribute),
   CONSTRAINT resource_attributes_fkey FOREIGN KEY (service_name, resource_type, resource_name)
-    REFERENCES resources (service_name, resource_type, resource_name) MATCH FULL
+    REFERENCES resources (service_name, resource_type, resource_name)
     ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
@@ -42,6 +42,6 @@ CREATE TABLE default_permissions_for_roles (
   permissions smallint NOT NULL DEFAULT 0,
   UNIQUE (service_name, resource_type, resource_name, attribute, role_name),
   CONSTRAINT default_permissions_for_roles_roleName_fkey FOREIGN KEY (role_name)
-    REFERENCES roles (role_name) MATCH SIMPLE
+    REFERENCES roles (role_name)
     ON UPDATE NO ACTION ON DELETE NO ACTION
 );

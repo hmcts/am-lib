@@ -44,12 +44,12 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void filterResource_whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
-        String userIdA = "def";
-        ams.createResourceAccess(resourceId, userIdA);
-        String userIdB = "ijk";
-        String resourceIdB = "lmn";
+        String userId = "def";
+        ams.createResourceAccess(resourceId, userId);
+        String nonExistingUserId = "ijk";
+        String nonExistingResourceId = "lmn";
 
-        JsonNode result = ams.filterResource(userIdB, resourceIdB, jsonObject);
+        JsonNode result = ams.filterResource(nonExistingUserId, nonExistingResourceId, jsonObject);
 
         assertThat(result).isNull();
     }

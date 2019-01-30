@@ -20,7 +20,7 @@ public class AccessManagementService {
     }
 
     /**
-     * Returns `resourceJSON` when row with userId (accessorId) and resourceId is in Db, otherwise null
+     * Returns `resourceJSON` when record with userId and resourceId exist, otherwise null
      * @param userId (accessorId)
      * @param resourceId
      * @param resourceJSON

@@ -26,7 +26,6 @@ public class AccessManagementService {
      * @param resourceJson json
      * @return resourceJson or null
      */
-    @SuppressWarnings("PMD")
     public JsonNode filterResource(String userId, String resourceId, JsonNode resourceJson) {
         boolean hasAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.explicitAccessExist(userId, resourceId));

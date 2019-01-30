@@ -19,8 +19,8 @@ The template is a working application with a minimal setup. It contains:
  * Hystrix circuit breaker enabled
  * MIT license and contribution information
 
-The application exposes health endpoint (http://localhost:2703/health) and metrics endpoint
-(http://localhost:2703/metrics).
+The application exposes health endpoint (http://localhost:3703/health) and metrics endpoint
+(http://localhost:3703/metrics).
 
 ## Plugins
 
@@ -129,15 +129,12 @@ by executing the following command:
   docker-compose up
 ```
 
-// The port should be 2704, shouldn't it?
-
 This will start the API container exposing the application's port
-(set to `4550` in this template app).
 
 In order to test if the application is up, you can call its health endpoint:
 
 ```bash
-  curl http://localhost:4550/health
+  curl http://localhost:3704/health
 ```
 
 You should get a response similar to this:

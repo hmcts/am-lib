@@ -36,16 +36,16 @@ public class AccessManagementService {
     }
 
     /**
-     * Returns `resourceJSON` when record with userId and resourceId exist, otherwise null
+     * Returns `resourceJson` when record with userId and resourceId exist, otherwise null.
      * @param userId (accessorId)
-     * @param resourceId
-     * @param resourceJSON
-     * @return resourceJSON or null
+     * @param resourceId resource id
+     * @param resourceJson json
+     * @return resourceJson or null
      */
-    public JsonNode filterResource(String userId, String resourceId, JsonNode resourceJSON) {
+    public JsonNode filterResource(String userId, String resourceId, JsonNode resourceJson) {
         boolean hasAccess = jdbi.withExtension(AccessManagementRepository.class,
-                dao -> dao.explicitAccessExist(userId, resourceId));
+            dao -> dao.explicitAccessExist(userId, resourceId));
 
-        return (hasAccess) ? resourceJSON : null;
+        return hasAccess ? resourceJson : null;
     }
 }

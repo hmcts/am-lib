@@ -1,7 +1,7 @@
 am-lib-test:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
-  applicationPort: 2703
+  applicationPort: 3703
   environment:
     AM_DB_PORT: 5432
     AM_DB_NAME: am

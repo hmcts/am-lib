@@ -16,10 +16,10 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     private static final String accessorId = "a";
     private static final String otherAccessorId = "b";
 
-    private JsonNode jsonObject = JsonNodeFactory.instance.objectNode();
+    private final JsonNode jsonObject = JsonNodeFactory.instance.objectNode();
 
     @Before
-    public void testSetup() {
+    public void setupTest() {
         resourceId = UUID.randomUUID().toString();
     }
 

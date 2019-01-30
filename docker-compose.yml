@@ -43,7 +43,7 @@ services:
       - AM_DB_PASSWORD=ampass
       - ENABLE_DB_MIGRATE_IN_SERVICE=true
     ports:
-      - 2704:2703
+      - 3704:3703
     networks:
       - am-lib-testing-service-network
 networks:

@@ -12,7 +12,8 @@ public interface AccessManagementRepository {
     void createAccessManagementRecord(String resourceId, String accessorId);
 
     @SqlQuery("select \"accessorId\" from \"AccessManagement\" where exists "
-            + "(select 1 from \"AccessManagement\" where \"AccessManagement\".\"accessorId\" =  :accessorId) "
+            + "(select 1 from \"AccessManagement\" where \"AccessManagement\".\"accessorId\" = :accessorId "
+            + "and \"AccessManagement\".\"resourceId\" = :resourceId) "
             + "and \"AccessManagement\".\"resourceId\" = :resourceId")
     List<String> getAccessorsList(@Bind("accessorId") String accessorId, @Bind("resourceId") String resourceId);
 

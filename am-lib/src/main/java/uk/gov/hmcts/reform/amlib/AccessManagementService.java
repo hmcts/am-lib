@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amlib;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
@@ -21,10 +22,24 @@ public class AccessManagementService {
     }
 
     public List<String> checkAccess(UserDetails userDetails, String resourceId) {
-        return jdbi.withExtension(AccessManagementRepository.class, dao ->  {
+        return jdbi.withExtension(AccessManagementRepository.class, dao -> {
             List<String> userIds = dao.checkAccess(userDetails.getUserId(), resourceId);
 
             return (userIds.isEmpty()) ? null : userIds;
         });
+    }
+
+    /**
+     * Returns `resourceJSON` when record with userId and resourceId exist, otherwise null
+     * @param userId (accessorId)
+     * @param resourceId
+     * @param resourceJSON
+     * @return resourceJSON or null
+     */
+    public JsonNode filterResource(String userId, String resourceId, JsonNode resourceJSON) {
+        boolean hasAccess = jdbi.withExtension(AccessManagementRepository.class,
+                dao -> dao.explicitAccessExist(userId, resourceId));
+
+        return (hasAccess) ? resourceJSON : null;
     }
 }

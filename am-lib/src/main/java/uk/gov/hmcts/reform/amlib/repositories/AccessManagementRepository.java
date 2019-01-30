@@ -15,4 +15,7 @@ public interface AccessManagementRepository {
             + "(select 1 from \"AccessManagement\" where \"AccessManagement\".\"accessorId\" =  :accessorId) "
             + "and \"AccessManagement\".\"resourceId\" = :resourceId")
     List<String> checkAccess(@Bind("accessorId") String accessorId, @Bind("resourceId") String resourceId);
+
+    @SqlQuery("select exists(select 1 from \"AccessManagement\" where  \"accessorId\"=? and \"resourceId\"=?)")
+    boolean explicitAccessExist(String accessorId, String resourceId);
 }

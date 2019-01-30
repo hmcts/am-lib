@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.amapi.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 public class RootController {
 
+    @Autowired private ObjectMapper mapper;
     @Autowired private AccessManagementService am;
 
     /**
@@ -37,5 +40,15 @@ public class RootController {
     @PostMapping("/create-resource-access")
     public void createResourceAccess(@RequestBody Map<String, Object> amData) {
         am.createResourceAccess(amData.get("resourceId").toString(), amData.get("accessorId").toString());
+    }
+
+    @PostMapping("/filter-resource")
+    public JsonNode filterResource(@RequestBody Map<String, Object> amData) {
+        JsonNode jsonNode = mapper.valueToTree(amData.get("resourceJson"));
+        return am.filterResource(
+            amData.get("userId").toString(),
+            amData.get("resourceId").toString(),
+            jsonNode
+        );
     }
 }

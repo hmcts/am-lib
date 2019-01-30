@@ -34,20 +34,23 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void filterResource_whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject() {
-        String accessorId = UUID.randomUUID().toString();
-        ams.createResourceAccess(resourceId, accessorId);
+        String userId = UUID.randomUUID().toString();
+        ams.createResourceAccess(resourceId, userId);
 
-        JsonNode result = ams.filterResource(accessorId, resourceId, jsonObject);
+        JsonNode result = ams.filterResource(userId, resourceId, jsonObject);
 
         assertThat(result).isEqualTo(jsonObject);
     }
 
     @Test
     public void filterResource_whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
-        ams.createResourceAccess("abc", "def");
+        String userIdA = "def";
+        ams.createResourceAccess(resourceId, userIdA);
+        String userIdB = "ijk";
+        String resourceIdB = "lmn";
 
-        JsonNode result = ams.filterResource("ijk", "lmn", jsonObject);
+        JsonNode result = ams.filterResource(userIdB, resourceIdB, jsonObject);
 
-        assertThat(result).isEqualTo(null);
+        assertThat(result).isNull();
     }
 }

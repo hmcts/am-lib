@@ -1,0 +1,7 @@
+{
+  "resourceId": "${resourceId}",
+  "userId": "${accessorId}",
+  "resourceJson": {
+    "json": "resource"
+  }
+}

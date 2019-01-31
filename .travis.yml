@@ -25,6 +25,7 @@ deploy:
     secure: ZlXQNag/UCBep49GttAOd+4ceEKcXoCwtvhiataxcUEGgdDaof8GgKHvGCwXuhr+tdXQDTSZCV10WaEQOBfiexpdURjwd1RFqnJsfFDqFGOjiE8IOR+Iamt/TRUyX4xKbUsxQN9+HHxZ7zvkVrBVQMUI1xQhW2OuurPge8Y/3wTcSyA4khZc8RtTfakwZszjjdneDXOaLaG9YkDO3gWLmL1FzrLJRIVEsRObScVO9n0CXfSlSEjtbgIzbJ5S6+6iXTWpjok3o2gITWri8GocX4HGxTOM7di4pLrGx12eK0XTxK5YTIuUKnh3wZdMI/u/f5cNVP2K6R9VVYYM4/bzxdL8nccsmsWREGcvPLjNS6V7aEfHexGjZKR1hP8McaUeZRmnBEklgAH4qIcatmuXPe6rndf4LyMnQdHqVUzxS0LkhwrwTqKcTW5Lv/rrTBStEZjDWuZtposRuBpX5zeiAhrMto4vqf2td+VY9p1cJOc8ufw4/fkBk27lBu0HLebTMwYWOdcqVlHJLNTPnX9p6yjmuMN1eQl6/KiKvDgNUlA1ghicxDp2qhu373h0dPbYOatmyJ8eFu22z4vDEQPvusuQKEwSeymEjwL2xtUzJY9VLETOLN4wiBze/7dL67MB1b2FEEv1O9zIiC9TKxUCiMc95TDAd0b5ZuFrEqtdtMM=
   file: build/libs/am-lib-*-all.jar
   on:
+    tags: true
     repo: hmcts/am-lib
 env:
   global:

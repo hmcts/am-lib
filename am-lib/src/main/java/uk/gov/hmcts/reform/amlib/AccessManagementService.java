@@ -23,15 +23,15 @@ public class AccessManagementService {
 
     /**
      * Returns list of user ids who have access to resource or null if user has no access to this resource.
-     * @param userId
-     * @param resourceId
-     * @return
+     * @param userId (accessorId)
+     * @param resourceId resource Id
+     * @return List of user ids (accessor id) or null
      */
     public List<String> getAccessorsList(String userId, String resourceId) {
         return jdbi.withExtension(AccessManagementRepository.class, dao -> {
             List<String> userIds = dao.getAccessorsList(userId, resourceId);
 
-            return (userIds.isEmpty()) ? null : userIds;
+            return userIds.isEmpty() ? null : userIds;
         });
     }
 

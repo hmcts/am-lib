@@ -13,8 +13,8 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest {
 
     private String resourceId;
-    private static final String accessorId = "a";
-    private static final String otherAccessorId = "b";
+    private static final String ACCESSOR_ID = "a";
+    private static final String OTHER_ACCESSOR_ID = "b";
 
     private final JsonNode jsonObject = JsonNodeFactory.instance.objectNode();
 
@@ -38,49 +38,49 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void whenCheckingAccess_ifUserHasAccess_ShouldReturnUserIds() {
-        ams.createResourceAccess(resourceId, accessorId);
-        ams.createResourceAccess(resourceId, otherAccessorId);
+        ams.createResourceAccess(resourceId, ACCESSOR_ID);
+        ams.createResourceAccess(resourceId, OTHER_ACCESSOR_ID);
 
-        List<String> list = ams.getAccessorsList(accessorId, resourceId);
+        List<String> list = ams.getAccessorsList(ACCESSOR_ID, resourceId);
 
-        assertThat(list).containsExactly(accessorId, otherAccessorId);
+        assertThat(list).containsExactly(ACCESSOR_ID, OTHER_ACCESSOR_ID);
     }
 
     @Test
     public void whenCheckingAccess_ifUserHasNoAccess_ShouldReturnNull() {
         ams.createResourceAccess(resourceId, "c");
-        ams.createResourceAccess(resourceId, otherAccessorId);
-        ams.createResourceAccess("otherResourceId", accessorId);
+        ams.createResourceAccess(resourceId, OTHER_ACCESSOR_ID);
+        ams.createResourceAccess("otherResourceId", ACCESSOR_ID);
 
-        List<String> list = ams.getAccessorsList(accessorId, resourceId);
+        List<String> list = ams.getAccessorsList(ACCESSOR_ID, resourceId);
 
         assertThat(list).isNull();
     }
 
     @Test
     public void whenCheckingAccess_ToNonExistingResource_ShouldReturnNull() {
-        ams.createResourceAccess(resourceId, accessorId);
-        ams.createResourceAccess(resourceId, otherAccessorId);
+        ams.createResourceAccess(resourceId, ACCESSOR_ID);
+        ams.createResourceAccess(resourceId, OTHER_ACCESSOR_ID);
 
-        final String nonExistingResourceId = "bbbbbbbb";
+        String nonExistingResourceId = "bbbbbbbb";
 
-        List<String> list = ams.getAccessorsList(accessorId, nonExistingResourceId);
+        List<String> list = ams.getAccessorsList(ACCESSOR_ID, nonExistingResourceId);
 
         assertThat(list).isNull();
     }
 
     @Test
     public void filterResource_whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject() {
-        ams.createResourceAccess(resourceId, accessorId);
+        ams.createResourceAccess(resourceId, ACCESSOR_ID);
 
-        JsonNode result = ams.filterResource(accessorId, resourceId, jsonObject);
+        JsonNode result = ams.filterResource(ACCESSOR_ID, resourceId, jsonObject);
 
         assertThat(result).isEqualTo(jsonObject);
     }
 
     @Test
     public void filterResource_whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
-        ams.createResourceAccess(resourceId, accessorId);
+        ams.createResourceAccess(resourceId, ACCESSOR_ID);
         String nonExistingUserId = "ijk";
         String nonExistingResourceId = "lmn";
 

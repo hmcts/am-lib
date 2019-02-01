@@ -118,8 +118,8 @@ sonarqube {
     property "sonar.projectKey", "uk.gov.hmcts.reform:am-lib-testing-service"
     property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
     property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
-    property "sonar.exclusions", "**/config/**,**/*FlywayMigrator*,**/*Application*,**/*RootController*"
-    property "sonar.coverage.exclusions", "**/config/**,**/*FlywayMigrator*,**/*Application*,**/*RootController*"
+    property "sonar.exclusions", "**/config/**,**/*FlywayMigrator*,**/*Application*,**/*Controller*"
+    property "sonar.coverage.exclusions", "**/config/**,**/*FlywayMigrator*,**/*Application*,**/*Controller*"
   }
 }
 

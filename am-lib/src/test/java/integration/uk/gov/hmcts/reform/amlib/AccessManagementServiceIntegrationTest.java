@@ -34,7 +34,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
         ams.createResourceAccess(resourceId, "dsa", explicitReadCreateUpdatePermissions);
 
         int count = jdbi.open().createQuery(
-                "select count(1) from \"AccessManagement\" where \"resourceId\" = ?")
+                "select count(1) from access_management where resource_id = ?")
                 .bind(0, resourceId)
                 .mapTo(int.class)
                 .findOnly();

@@ -19,5 +19,5 @@ withNightlyPipeline(type, product, component) {
     env.TEST_URL = params.URL_TO_TEST
 
     enablePerformanceTest()
-    enableSlackNotifications('#rpe-build-notices')
+    enableSlackNotifications('#am-master-builds')
 }

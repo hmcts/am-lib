@@ -3,6 +3,6 @@ dependencies:
   version: ~3.9.1
   repository: '@stable'
 - name: java
-  version: >=0.0.10
+  version: 0.0.12
   repository: '@hmcts'
   alias: am-lib-test

@@ -1,0 +1,11 @@
+ALTER TABLE access_management
+    ADD COLUMN access_type varchar(100) NOT NULL,
+    ADD COLUMN service_name varchar(100) NOT NULL,
+    ADD COLUMN resource_type varchar(100) NOT NULL,
+    ADD COLUMN resource_name varchar(100) NOT NULL,
+    ADD COLUMN attribute varchar(20) NOT NULL,
+    ADD COLUMN security_classification securityclassification,
+    ADD CONSTRAINT access_management_resources_fkey FOREIGN KEY (service_name, resource_type, resource_name)
+        REFERENCES Resources (service_name, resource_type, resource_name)
+        ON UPDATE NO ACTION ON DELETE NO ACTION,
+    ADD CONSTRAINT access_management_unique UNIQUE (resource_id, accessor_id, access_type, attribute, resource_type, service_name, resource_name, security_classification);

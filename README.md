@@ -1,5 +1,6 @@
 # Spring Boot application template
 
+
 [![Build Status]( https://travis-ci.org/hmcts/am-api?branch=master)]( https://travis-ci.org/hmcts/am-api)
 
 ## Purpose

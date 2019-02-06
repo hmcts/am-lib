@@ -19,7 +19,7 @@ spring:
       charSet: UTF-8
   flyway:
     enabled: ${ENABLE_DB_MIGRATE_IN_SERVICE:true}
-    locations: classpath:uk.gov.hmcts.reform.amlib
+    locations: classpath:db.migration
 #    hikari:
 #      minimumIdle: 2
 #      maximumPoolSize: 10

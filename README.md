@@ -24,27 +24,55 @@ To build the project execute the following command:
   ./gradlew build
 ```
 
-### Running the application
+### Running the application locally
 
-Create the image of the application by executing the following command:
+Run database service in Docker:
+
+```bash
+  docker-compose up -d am-lib-testing-service-db
+```
+
+Run application locally:
+
+```bash
+  ./gradlew bootRun
+```
+
+This will start the API application exposing port `3703`.
+
+In order to test if the application is up, you can call its health endpoint:
+
+```bash
+  curl http://localhost:3703/health
+```
+
+You should get a response similar to this:
+
+```
+  {"status":"UP","diskSpace":{"status":"UP","total":249644974080,"free":137188298752,"threshold":10485760}}
+```
+
+### Running the application in Docker
+
+Build application artifact (JAR):
 
 ```bash
   ./gradlew assemble
 ```
 
-Create docker image:
+Create Docker image of application:
 
 ```bash
   docker-compose build
 ```
 
-Run the distribution (created in `build/libs` directory) by executing the following command:
+Run application and its dependencies in Docker:
 
 ```bash
   docker-compose up
 ```
 
-This will start the API container exposing the application's port
+This will start the API container exposing port `3704` (note change from the port mentioned in section above).
 
 In order to test if the application is up, you can call its health endpoint:
 
@@ -58,7 +86,7 @@ You should get a response similar to this:
   {"status":"UP","diskSpace":{"status":"UP","total":249644974080,"free":137188298752,"threshold":10485760}}
 ```
 
-### Alternative script to run application
+### Alternative script to run application in Docker
 
 To skip all the setting up and building, just execute the following command:
 

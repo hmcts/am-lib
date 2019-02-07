@@ -1,6 +1,4 @@
 plugins {
-    id 'org.owasp.dependencycheck' version '4.0.2'
-    id 'com.github.ben-manes.versions' version '0.20.0'
     id 'com.jfrog.bintray' version '1.8.4'
     id 'com.github.johnrengelman.shadow' version '4.0.4'
     id 'info.solidsoft.pitest' version '1.4.0'
@@ -9,9 +7,8 @@ plugins {
 group 'uk.gov.hmcts.reform'
 version "${version}"
 
-apply plugin: 'java'
 apply plugin: 'java-library'
-apply plugin: 'maven'
+//apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'checkstyle'
 apply plugin: 'com.jfrog.bintray'

@@ -38,7 +38,7 @@ public abstract class IntegrationBaseTest {
         configuration.dataSource(JDBC_URL, "sa", "");
         // Due sql migrations have to be in main resources, there are not added to classpath
         // so workaround is to pass relative path to them
-        configuration.locations("filesystem:src/main/java/uk/gov/hmcts/reform/amlib/db/migration/");
+        configuration.locations("filesystem:src/main/resources/db/migration");
         Flyway flyway = new Flyway(configuration);
         int noOfMigrations = flyway.migrate();
         assertThat(noOfMigrations).isGreaterThan(0);

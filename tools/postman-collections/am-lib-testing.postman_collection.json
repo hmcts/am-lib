@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9e54ccae-1353-484c-bac8-c6ad21df18f5",
+		"_postman_id": "7f96c77c-382f-472b-aa9d-7a732ee4ebf1",
 		"name": "am-lib-testing",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -34,7 +34,7 @@
 					"raw": "{\n\t\"userId\": \"user-A-id\",\n\t\"resourceId\": \"my-super-resource-id\"\n}"
 				},
 				"url": {
-					"raw": "http://localhost:3703/lib/get-accessors-list",
+					"raw": "http://localhost:3703/lib/get-accessors-list?",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -82,7 +82,7 @@
 					"raw": "{\n\t\"userId\": \"user-A-id\",\n\t\"resourceId\": \"my-super-resource-id\",\n\t\"resourceJson\": {\n\t\t\"someKey\":\"some-value\"\n\t}\n}"
 				},
 				"url": {
-					"raw": "http://localhost:3703/lib/filter-resource",
+					"raw": "http://localhost:3703/lib/filter-resource?",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -115,7 +115,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"resourceId\": \"my-super-resource-id\",\n\t\"accessorId\": \"user-A-id\",\n\t\"explicitPermissions\": {\"userPermissions\": [\"READ\", \"CREATE\", \"UPDATE\"]}\n}"
+					"raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorId\": \"UNIQUE-USER-ID\",\n    \"explicitPermissions\": {\n        \"userPermissions\": [\"READ\", \"CREATE\", \"UPDATE\"]\n    },\n    \"accessType\": \"user\",\n    \"serviceName\": \"Service 1\",\n    \"resourceType\": \"Resource Type 1\",\n    \"resourceName\": \"resource\",\n    \"attribute\": \"\",\n    \"securityClassification\": \"Public\"\n}"
 				},
 				"url": {
 					"raw": "localhost:3703/lib/create-resource-access",

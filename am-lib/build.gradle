@@ -56,6 +56,9 @@ repositories {
 }
 
 dependencies {
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+    
     compile group: 'org.jdbi', name: 'jdbi3-core', version: '3.6.0'
     compile group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.6.0'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'

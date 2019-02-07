@@ -5,8 +5,8 @@ plugins {
     id 'java'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.0.6.RELEASE'
-    id 'org.springframework.boot' version '2.1.0.RELEASE'
-    id 'org.sonarqube' version '2.6.2'
+    id 'org.springframework.boot' version '2.1.2.RELEASE'
+    id 'org.sonarqube' version '2.7'
     id 'org.owasp.dependencycheck' version '4.0.2'
     id 'com.github.ben-manes.versions' version '0.20.0'
     id "org.flywaydb.flyway" version "5.2.4"
@@ -88,13 +88,13 @@ task smoke(type: Test) {
 
 checkstyle {
     maxWarnings = 0
-    toolVersion = '8.14'
+    toolVersion = '8.17'
     // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
     configDir = new File(rootDir, 'config/checkstyle')
 }
 
 pmd {
-    toolVersion = "6.9.0"
+    toolVersion = "6.11.0"
     sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functional, sourceSets.integrationTest]
     reportsDir = file("$project.buildDir/reports/pmd")
     ruleSetFiles = files("config/pmd/ruleset.xml")
@@ -151,8 +151,8 @@ repositories {
 // it is important to specify logback classic and core packages explicitly as libraries like spring boot
 // enforces it's own (older) version which is not recommended.
 def versions = [
-        junit           : '5.3.1',
-        reformLogging   : '3.0.2',
+        junit           : '5.3.2',
+        reformLogging   : '4.0.1',
         springBoot      : springBoot.class.package.implementationVersion,
         springfoxSwagger: '2.9.2',
         flyway          : '5.2.4'
@@ -169,7 +169,7 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
 
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.0.2.RELEASE'
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.1.0.RELEASE'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     compile group: 'org.flywaydb', name: 'flyway-core', version: versions.flyway
 

@@ -13,8 +13,8 @@ import java.util.List;
 @SuppressWarnings("LineLength")
 public interface AccessManagementRepository {
 
-    @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, access_type, service_name, resource_type, resource_name, attribute, security_classification)"
-        + " values (:resourceId, :accessorId, :permissions, :accessType, :serviceName, :resourceType, :resourceName, :attribute, :securityClassification)")
+    @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, access_type, service_name, resource_type, resource_name, attribute, security_classification) "
+            + "values (:resourceId, :accessorId, :permissions, :accessType, :serviceName, :resourceType, :resourceName, :attribute, :securityClassification)")
     void createAccessManagementRecord(@BindBean ExplicitAccessRecord explicitAccessRecord);
 
     @SqlQuery("select accessor_id from access_management where exists "

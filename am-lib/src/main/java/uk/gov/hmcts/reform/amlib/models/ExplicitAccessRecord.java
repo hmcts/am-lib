@@ -4,13 +4,15 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.Permissions;
 
+import java.util.Set;
+
 @Data
 @Builder
 public class ExplicitAccessRecord {
 
     private final String resourceId;
     private final String accessorId;
-    private final ExplicitPermissions explicitPermissions;
+    private final Set<Permissions> explicitPermissions;
     private final String accessType;
     private final String serviceName;
     private final String resourceType;
@@ -20,7 +22,7 @@ public class ExplicitAccessRecord {
 
     public ExplicitAccessRecord(String resourceId,
                                 String accessorId,
-                                ExplicitPermissions explicitPermissions,
+                                Set<Permissions> explicitPermissions,
                                 String accessType,
                                 String serviceName,
                                 String resourceType,
@@ -39,6 +41,6 @@ public class ExplicitAccessRecord {
     }
 
     public int getPermissions() {
-        return Permissions.sumOf(explicitPermissions.getUserPermissions());
+        return Permissions.sumOf(explicitPermissions);
     }
 }

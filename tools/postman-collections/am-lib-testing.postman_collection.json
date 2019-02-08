@@ -115,7 +115,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorId\": \"UNIQUE-USER-ID\",\n    \"explicitPermissions\": {\n        \"userPermissions\": [\"READ\", \"CREATE\", \"UPDATE\"]\n    },\n    \"accessType\": \"user\",\n    \"serviceName\": \"Service 1\",\n    \"resourceType\": \"Resource Type 1\",\n    \"resourceName\": \"resource\",\n    \"attribute\": \"\",\n    \"securityClassification\": \"Public\"\n}"
+					"raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorId\": \"UNIQUE-USER-ID\",\n    \"explicitPermissions\": [\"READ\", \"CREATE\", \"UPDATE\"],\n    \"accessType\": \"user\",\n    \"serviceName\": \"Service 1\",\n    \"resourceType\": \"Resource Type 1\",\n    \"resourceName\": \"resource\",\n    \"attribute\": \"\",\n    \"securityClassification\": \"Public\"\n}"
 				},
 				"url": {
 					"raw": "localhost:3703/lib/create-resource-access",

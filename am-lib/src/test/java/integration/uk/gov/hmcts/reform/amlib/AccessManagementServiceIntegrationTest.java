@@ -6,10 +6,12 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.amlib.enums.Permissions;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
-import uk.gov.hmcts.reform.amlib.models.ExplicitPermissions;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
@@ -26,15 +28,14 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
 
     private final JsonNode jsonObject = JsonNodeFactory.instance.objectNode();
-    private ExplicitPermissions explicitReadCreateUpdatePermissions;
+    private Set<Permissions> explicitReadCreateUpdatePermissions;
 
 
     @Before
     public void setupTest() {
         resourceId = UUID.randomUUID().toString();
-        explicitReadCreateUpdatePermissions = new ExplicitPermissions(
-            Permissions.CREATE, Permissions.READ, Permissions.UPDATE
-        );
+        explicitReadCreateUpdatePermissions = Stream.of(Permissions.CREATE, Permissions.READ, Permissions.UPDATE)
+                .collect(Collectors.toSet());
     }
 
     @Test
@@ -144,7 +145,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
         ams.createResourceAccess(ExplicitAccessRecord.builder()
             .resourceId(resourceId)
             .accessorId(ACCESSOR_ID)
-            .explicitPermissions(new ExplicitPermissions(Permissions.UPDATE))
+            .explicitPermissions(Stream.of(Permissions.UPDATE).collect(Collectors.toSet()))
             .accessType(ACCESS_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)

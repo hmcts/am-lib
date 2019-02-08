@@ -5,7 +5,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.Permissions;
 import uk.gov.hmcts.reform.amlib.models.AccessManagement;
-import uk.gov.hmcts.reform.amlib.models.CreateResource;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
 
 import java.util.List;
@@ -20,13 +20,13 @@ public class AccessManagementService {
     }
 
     /**
-     * Returns void if method succeeds.
+     * Grants explicit access to resource accordingly to record configuration.
      *
-     * @param createResource createResource
+     * @param explicitAccessRecord a record that describes explicit access to resource
      */
-    public void createResourceAccess(CreateResource createResource) {
+    public void createResourceAccess(ExplicitAccessRecord explicitAccessRecord) {
         jdbi.useExtension(AccessManagementRepository.class,
-            dao -> dao.createAccessManagementRecord(createResource));
+            dao -> dao.createAccessManagementRecord(explicitAccessRecord));
     }
 
     /**

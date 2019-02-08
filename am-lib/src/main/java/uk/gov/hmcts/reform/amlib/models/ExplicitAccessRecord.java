@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.amlib.enums.Permissions;
 
 @Data
 @Builder
-public class CreateResource {
+public class ExplicitAccessRecord {
 
     private final String resourceId;
     private final String accessorId;
@@ -18,15 +18,15 @@ public class CreateResource {
     private final String attribute;
     private final String securityClassification;
 
-    public CreateResource(final String resourceId,
-                          final String accessorId,
-                          final ExplicitPermissions explicitPermissions,
-                          final String accessType,
-                          final String serviceName,
-                          final String resourceType,
-                          final String resourceName,
-                          final String attribute,
-                          final String securityClassification) {
+    public ExplicitAccessRecord(String resourceId,
+                                String accessorId,
+                                ExplicitPermissions explicitPermissions,
+                                String accessType,
+                                String serviceName,
+                                String resourceType,
+                                String resourceName,
+                                String attribute,
+                                String securityClassification) {
         this.resourceId = resourceId;
         this.accessorId = accessorId;
         this.explicitPermissions = explicitPermissions;

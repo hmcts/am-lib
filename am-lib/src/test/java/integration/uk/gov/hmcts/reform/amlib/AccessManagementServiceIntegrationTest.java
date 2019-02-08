@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.amlib.enums.Permissions;
-import uk.gov.hmcts.reform.amlib.models.CreateResource;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.ExplicitPermissions;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void createQuery_whenCreatingResourceAccess_ResourceAccessAppearsInDatabase() {
-        ams.createResourceAccess(CreateResource.builder()
+        ams.createResourceAccess(ExplicitAccessRecord.builder()
             .resourceId(resourceId)
             .accessorId(ACCESSOR_ID)
             .explicitPermissions(explicitReadCreateUpdatePermissions)
@@ -63,7 +63,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void whenCheckingAccess_ifUserHasAccess_ShouldReturnUserIds() {
-        ams.createResourceAccess(CreateResource.builder()
+        ams.createResourceAccess(ExplicitAccessRecord.builder()
             .resourceId(resourceId)
             .accessorId(ACCESSOR_ID)
             .explicitPermissions(explicitReadCreateUpdatePermissions)
@@ -75,7 +75,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
             .securityClassification(SECURITY_CLASSIFICATION)
             .build());
 
-        ams.createResourceAccess(CreateResource.builder()
+        ams.createResourceAccess(ExplicitAccessRecord.builder()
             .resourceId(resourceId)
             .accessorId(OTHER_ACCESSOR_ID)
             .explicitPermissions(explicitReadCreateUpdatePermissions)
@@ -111,7 +111,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void filterResource_whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject() {
-        ams.createResourceAccess(CreateResource.builder()
+        ams.createResourceAccess(ExplicitAccessRecord.builder()
             .resourceId(resourceId)
             .accessorId(ACCESSOR_ID)
             .explicitPermissions(explicitReadCreateUpdatePermissions)
@@ -141,7 +141,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void filterResource_whenRowExistsAndDoesntHaveReadPermissions_ReturnNull() {
-        ams.createResourceAccess(CreateResource.builder()
+        ams.createResourceAccess(ExplicitAccessRecord.builder()
             .resourceId(resourceId)
             .accessorId(ACCESSOR_ID)
             .explicitPermissions(new ExplicitPermissions(Permissions.UPDATE))

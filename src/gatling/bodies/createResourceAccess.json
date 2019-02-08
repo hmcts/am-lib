@@ -1,5 +1,11 @@
 {
   "resourceId": "${resourceId}",
   "accessorId": "${accessorId}",
-  "explicitPermissions": [ "CREATE", "READ", "UPDATE", "DELETE", "SHARE", "HIDE" ]
+  "explicitPermissions": [ "CREATE", "READ", "UPDATE", "DELETE", "SHARE", "HIDE" ],
+  "accessType": "user",
+  "serviceName": "Service 1",
+  "resourceType": "Resource Type 1",
+  "resourceName": "resource",
+  "attribute": "",
+  "securityClassification": "Public"
 }

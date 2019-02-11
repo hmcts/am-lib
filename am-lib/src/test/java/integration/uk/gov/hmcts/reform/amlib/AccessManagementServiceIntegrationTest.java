@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.amlib.enums.Permissions;
+import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.CreateResource;
 import uk.gov.hmcts.reform.amlib.models.ExplicitPermissions;
+import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +18,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest {
 
     private String resourceId;
+    private FilterResourceResponse expectedJson;
     private static final String ACCESSOR_ID = "a";
     private static final String OTHER_ACCESSOR_ID = "b";
     private static final String ACCESS_TYPE = "user";
@@ -23,7 +26,6 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     private static final String RESOURCE_TYPE = "Resource Type 1";
     private static final String RESOURCE_NAME = "resource";
     private static final String SECURITY_CLASSIFICATION = "Public";
-
 
     private final JsonNode jsonObject = JsonNodeFactory.instance.objectNode();
     private ExplicitPermissions explicitReadCreateUpdatePermissions;
@@ -33,8 +35,13 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     public void setupTest() {
         resourceId = UUID.randomUUID().toString();
         explicitReadCreateUpdatePermissions = new ExplicitPermissions(
-            Permissions.CREATE, Permissions.READ, Permissions.UPDATE
+            Permission.CREATE, Permission.READ, Permission.UPDATE
         );
+        expectedJson = FilterResourceResponse.builder()
+            .resourceId(resourceId)
+            .data(jsonObject)
+            .permissions(Arrays.asList(Permission.CREATE, Permission.READ, Permission.UPDATE))
+            .build();
     }
 
     @Test
@@ -123,9 +130,9 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
             .securityClassification(SECURITY_CLASSIFICATION)
             .build());
 
-        JsonNode result = ams.filterResource(ACCESSOR_ID, resourceId, jsonObject);
+        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, jsonObject);
 
-        assertThat(result).isEqualTo(jsonObject);
+        assertThat(result).isEqualTo(expectedJson);
     }
 
 
@@ -134,7 +141,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
         String nonExistingUserId = "ijk";
         String nonExistingResourceId = "lmn";
 
-        JsonNode result = ams.filterResource(nonExistingUserId, nonExistingResourceId, jsonObject);
+        FilterResourceResponse result = ams.filterResource(nonExistingUserId, nonExistingResourceId, jsonObject);
 
         assertThat(result).isNull();
     }
@@ -144,7 +151,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
         ams.createResourceAccess(CreateResource.builder()
             .resourceId(resourceId)
             .accessorId(ACCESSOR_ID)
-            .explicitPermissions(new ExplicitPermissions(Permissions.UPDATE))
+            .explicitPermissions(new ExplicitPermissions(Permission.UPDATE))
             .accessType(ACCESS_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
@@ -153,8 +160,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
             .securityClassification(SECURITY_CLASSIFICATION)
             .build());
 
-
-        JsonNode result = ams.filterResource(ACCESSOR_ID, resourceId, jsonObject);
+        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, jsonObject);
 
         assertThat(result).isNull();
     }

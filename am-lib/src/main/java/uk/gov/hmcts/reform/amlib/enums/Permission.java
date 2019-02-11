@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.amlib.enums;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 /**
@@ -11,7 +14,7 @@ import java.util.Set;
  * In order to determine which individual permissions a record has
  * the binary 'AND' operation is done (the 'hasPermissionTo' method).
  */
-public enum Permissions {
+public enum Permission {
     HIDE(0),
     CREATE(1),
     READ(2),
@@ -21,7 +24,7 @@ public enum Permissions {
 
     private int value;
 
-    Permissions(int value) {
+    Permission(int value) {
         this.value = value;
     }
 
@@ -29,10 +32,10 @@ public enum Permissions {
         return value;
     }
 
-    public static int sumOf(Set<Permissions> perms) {
+    public static int sumOf(Set<Permission> perms) {
         int sum = 0;
 
-        for (Permissions permission: perms) {
+        for (Permission permission : perms) {
             sum += permission.getValue();
         }
 
@@ -42,11 +45,31 @@ public enum Permissions {
 
     /**
      * Performs a binary AND operation to determine weather the 'permissions' value has suitable permissionToCheck.
-     * @param permissions the decimal value of permissions defined in Permissions enum
+     *
+     * @param permissions       the decimal value of permissions defined in Permission enum
      * @param permissionToCheck the permission to verify
      * @return Returns true if the binary AND of the provided 'permissions' and 'permissionToCheck' is true.
      */
-    public static boolean hasPermissionTo(int permissions, Permissions permissionToCheck) {
+    public static boolean hasPermissionTo(int permissions, Permission permissionToCheck) {
         return (permissions & permissionToCheck.getValue()) == permissionToCheck.getValue();
+    }
+
+    /**
+     * Builds a list of permissions based on decimal value.
+     *
+     * @param sumOfPermissionsValue the decimal value of permissions defined in Permission enum
+     * @return Returns a list of permissions.
+     */
+    public static List<Permission> buildPermissions(int sumOfPermissionsValue) {
+
+        if (sumOfPermissionsValue != 0) {
+            return Arrays.stream(Permission.values())
+                .filter(permission -> !HIDE.equals(permission) && hasPermissionTo(sumOfPermissionsValue, permission))
+                .collect(Collectors.toList());
+        }
+
+        return Arrays.stream(Permission.values())
+            .filter(permission -> hasPermissionTo(sumOfPermissionsValue, permission))
+            .collect(Collectors.toList());
     }
 }

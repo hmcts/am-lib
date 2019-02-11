@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.amlib.models;
 
 import lombok.Builder;
 import lombok.Data;
-import uk.gov.hmcts.reform.amlib.enums.Permissions;
+import uk.gov.hmcts.reform.amlib.enums.Permission;
 
 @Data
 @Builder
@@ -39,6 +39,6 @@ public class CreateResource {
     }
 
     public int getPermissions() {
-        return Permissions.sumOf(explicitPermissions.getUserPermissions());
+        return Permission.sumOf(explicitPermissions.getUserPermissions());
     }
 }

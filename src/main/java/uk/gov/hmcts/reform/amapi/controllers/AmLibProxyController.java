@@ -8,8 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
-import uk.gov.hmcts.reform.amlib.enums.Permissions;
+import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.CreateResource;
+import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.models.ExplicitPermissions;
 
 import java.util.LinkedHashMap;
@@ -35,9 +36,9 @@ public class AmLibProxyController {
     public void createResourceAccess(@RequestBody Map<String, Object> amData) {
         LinkedHashMap<String, List> rawExplicitPermissions = (LinkedHashMap) amData.get("explicitPermissions");
         List<String> userPermissions = rawExplicitPermissions.get("userPermissions");
-        Permissions[] permissions = userPermissions.stream()
-            .map(Permissions::valueOf)
-            .toArray(Permissions[]::new);
+        Permission[] permissions = userPermissions.stream()
+            .map(Permission::valueOf)
+            .toArray(Permission[]::new);
 
         ExplicitPermissions explicitPermissions = new ExplicitPermissions(permissions);
 
@@ -60,7 +61,7 @@ public class AmLibProxyController {
     }
 
     @PostMapping("/filter-resource")
-    public JsonNode filterResource(@RequestBody Map<String, Object> amData) {
+    public FilterResourceResponse filterResource(@RequestBody Map<String, Object> amData) {
         JsonNode jsonNode = mapper.valueToTree(amData.get("resourceJson"));
         return am.filterResource(
             amData.get("userId").toString(),

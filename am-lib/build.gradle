@@ -28,6 +28,10 @@ configurations {
     testOutput.extendsFrom(testCompile)
 }
 
+test {
+    useJUnitPlatform()
+}
+
 pitest {
     pitestVersion = '1.4.5'
     testPlugin = 'junit5'

@@ -23,14 +23,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringJUnitWebConfig
 @SpringBootTest
 @AutoConfigureMockMvc
-public class SwaggerPublisher {
+@SuppressWarnings("PMD")
+class SwaggerPublisher {
 
     @Autowired
     private transient MockMvc mvc;
 
     @DisplayName("Generate swagger documentation")
     @Test
-    public void generateDocs() throws Exception {
+    void generateDocs() throws Exception {
         byte[] specs = mvc.perform(get("/v2/api-docs"))
             .andExpect(status().isOk())
             .andReturn()

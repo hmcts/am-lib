@@ -80,8 +80,8 @@ task smoke(type: Test) {
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
 
-    useJUnit {
-        includeCategories 'uk.gov.hmcts.reform.amapi.functional.SmokeTest'
+    useJUnitPlatform {
+        includeTags = ['SmokeTest']
     }
 }
 
@@ -174,12 +174,15 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.0'
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
+    testCompile (group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot) {
+        exclude group: 'junit', module: 'junit'
+    }
 
     integrationTestCompile sourceSets.main.runtimeClasspath
     integrationTestCompile sourceSets.test.runtimeClasspath
 
     functionalCompile sourceSets.main.runtimeClasspath
+    functionalCompile sourceSets.test.runtimeClasspath
 }
 
 mainClassName = 'uk.gov.hmcts.reform.amapi.Application'
@@ -210,4 +213,16 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     if (project.hasProperty("dburl")) {
         url = "jdbc:postgresql://${dburl}"
     }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+integration {
+    useJUnitPlatform()
+}
+
+functional {
+    useJUnitPlatform()
 }

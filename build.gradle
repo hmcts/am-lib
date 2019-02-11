@@ -12,8 +12,8 @@ plugins {
 }
 
 subprojects {
-    apply plugin: 'com.github.ben-manes.versions'
     apply plugin: 'org.owasp.dependencycheck'
+    apply plugin: 'com.github.ben-manes.versions'
 }
 
 group = 'uk.gov.hmcts.reform'

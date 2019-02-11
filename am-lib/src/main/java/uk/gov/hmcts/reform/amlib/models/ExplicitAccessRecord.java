@@ -20,6 +20,7 @@ public class ExplicitAccessRecord {
     private final String attribute;
     private final String securityClassification;
 
+    @SuppressWarnings("squid:S00107") // Having so many arguments seems reasonable solution here
     public ExplicitAccessRecord(String resourceId,
                                 String accessorId,
                                 Set<Permissions> explicitPermissions,

@@ -2,7 +2,6 @@ plugins {
     id 'application'
     id 'checkstyle'
     id 'pmd'
-    id 'java'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.0.6.RELEASE'
     id 'org.springframework.boot' version '2.1.2.RELEASE'
@@ -12,16 +11,16 @@ plugins {
     id "org.flywaydb.flyway" version "5.2.4"
 }
 
+subprojects {
+    apply plugin: 'org.owasp.dependencycheck'
+    apply plugin: 'com.github.ben-manes.versions'
+}
+
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
-def amLibJarVersion = '0.0.8'
-def amLibJarName = "am-lib-${amLibJarVersion}-all.jar"
-
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-
-apply plugin: 'java'
 
 sourceSets {
     test {
@@ -159,12 +158,12 @@ def versions = [
 ]
 
 dependencies {
+    compile project(':am-lib')
+
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: versions.springBoot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-json', version: versions.springBoot
-    compile files(amLibJarName)
-    testCompile files(amLibJarName)
 
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
 
@@ -196,29 +195,10 @@ bootJar {
     }
 }
 
-task testLib(type: Exec) {
-    workingDir './am-lib'
-    commandLine './gradlew', 'test'
-}
-
 task pitest(type: Exec) {
     workingDir './am-lib'
     commandLine './gradlew', 'pitest', '--rerun-tasks'
 }
-
-task buildLib(type: Exec) {
-    workingDir './am-lib'
-    commandLine './gradlew', 'build', 'shadowJar'
-}
-
-task copyLib(type: Exec) {
-    workingDir '.'
-    commandLine 'cp', "./am-lib/build/libs/${amLibJarName}", '.'
-}
-
-test.dependsOn testLib
-compileJava.dependsOn copyLib
-copyLib.dependsOn buildLib
 
 //local flyway settings
 flyway {

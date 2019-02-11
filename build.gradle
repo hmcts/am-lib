@@ -11,6 +11,11 @@ plugins {
     id "org.flywaydb.flyway" version "5.2.4"
 }
 
+subprojects {
+    apply plugin: 'com.github.ben-manes.versions'
+    apply plugin: 'org.owasp.dependencycheck'
+}
+
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 

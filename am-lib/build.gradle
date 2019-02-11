@@ -8,12 +8,11 @@ group 'uk.gov.hmcts.reform'
 version "${version}"
 
 apply plugin: 'java-library'
-//apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'checkstyle'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'jacoco'
-apply plugin: 'com.github.ben-manes.versions'
+
 apply plugin: 'pmd'
 
 configurations {
@@ -63,26 +62,6 @@ dependencies {
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.11.1'
     testCompile group: 'com.h2database', name: 'h2', version: '1.4.197'
     testCompile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
-}
-
-dependencyUpdates.resolutionStrategy = {
-    componentSelection { rules ->
-        rules.all { ComponentSelection selection ->
-            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
-                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
-            }
-            if (rejected) {
-                selection.reject('Release candidate')
-            }
-        }
-    }
-}
-
-dependencyCheck {
-    // Specifies if the build should be failed if a CVSS score above a specified level is identified.
-    // range of 0-10 fails the build, anything greater and it doesn't fail the build
-    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
-    suppressionFile = "$rootDir/config/owasp/suppressions.xml"
 }
 
 task codeCoverageReport(type: JacocoReport, dependsOn: test) {

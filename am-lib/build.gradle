@@ -1,3 +1,14 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    configurations.maybeCreate('pitest')
+    dependencies {
+        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
+        pitest 'org.pitest:pitest-junit5-plugin:0.8'
+    }
+}
+
 plugins {
     id 'java-library'
     id 'maven-publish'
@@ -6,8 +17,9 @@ plugins {
     id 'jacoco'
     id 'com.jfrog.bintray' version '1.8.4'
     id 'com.github.johnrengelman.shadow' version '4.0.4'
-    id 'info.solidsoft.pitest' version '1.4.0'
 }
+
+apply plugin: 'info.solidsoft.pitest'
 
 group 'uk.gov.hmcts.reform'
 version "${version}"
@@ -17,6 +29,8 @@ configurations {
 }
 
 pitest {
+    pitestVersion = '1.4.5'
+    testPlugin = 'junit5'
     targetTests = ['integration.uk.gov.hmcts.reform.amlib.*']
     excludedTestClasses = ['integration.uk.gov.hmcts.reform.amlib.IntegrationBaseTest']
     excludedClasses = ['uk.gov.hmcts.reform.amlib.models.*']

@@ -5,7 +5,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.AccessManagement;
-import uk.gov.hmcts.reform.amlib.models.CreateResource;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
 
@@ -21,13 +21,13 @@ public class AccessManagementService {
     }
 
     /**
-     * Returns void if method succeeds.
+     * Grants explicit access to resource accordingly to record configuration.
      *
-     * @param createResource createResource
+     * @param explicitAccessRecord a record that describes explicit access to resource
      */
-    public void createResourceAccess(CreateResource createResource) {
+    public void createResourceAccess(ExplicitAccessRecord explicitAccessRecord) {
         jdbi.useExtension(AccessManagementRepository.class,
-            dao -> dao.createAccessManagementRecord(createResource));
+            dao -> dao.createAccessManagementRecord(explicitAccessRecord));
     }
 
     /**
@@ -62,10 +62,10 @@ public class AccessManagementService {
         }
 
         return Permission.hasPermissionTo(
-            explicitAccess.getPermissions(), Permission.READ) ? FilterResourceResponse.builder()
-            .resourceId(resourceId)
-            .data(resourceJson)
-            .permissions(Permission.buildPermissions(explicitAccess.getPermissions()))
-            .build() : null;
+                explicitAccess.getPermissions(), Permission.READ) ? FilterResourceResponse.builder()
+                .resourceId(resourceId)
+                .data(resourceJson)
+                .permissions(Permission.buildPermissions(explicitAccess.getPermissions()))
+                .build() : null;
     }
 }

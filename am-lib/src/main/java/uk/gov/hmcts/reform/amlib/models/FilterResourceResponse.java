@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -15,5 +15,5 @@ public class FilterResourceResponse {
     private JsonNode data;
 
     @JsonProperty("permissions")
-    private List<Permission> permissions;
+    private Set<Permission> permissions;
 }

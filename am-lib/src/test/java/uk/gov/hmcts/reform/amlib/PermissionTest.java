@@ -5,7 +5,6 @@ import uk.gov.hmcts.reform.amlib.enums.Permission;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -33,14 +32,14 @@ public class PermissionTest {
 
     @Test
     public void buildPermissions_sumOfPermissionsValueEqualsZero_returns_OnlyHideInArray() {
-        List<Permission> permissions = Permission.buildPermissions(0);
+        Set<Permission> permissions = Permission.buildPermissions(0);
 
         assertThat(permissions).containsOnly(Permission.HIDE);
     }
 
     @Test
     public void buildPermissions_sumOfPermissionsValueNotZero_ExpectArray() {
-        List<Permission> permissions = Permission.buildPermissions(7);
+        Set<Permission> permissions = Permission.buildPermissions(7);
 
         assertThat(permissions).containsOnly(Permission.CREATE, Permission.READ, Permission.UPDATE);
     }

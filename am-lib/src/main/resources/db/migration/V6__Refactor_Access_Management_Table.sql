@@ -18,7 +18,7 @@ ALTER TABLE access_management
 
 ALTER TABLE access_management
   ADD CONSTRAINT access_management_resources_fkey FOREIGN KEY (service_name, resource_type, resource_name)
-REFERENCES Resources (service_name, resource_type, resource_name)
+REFERENCES resources (service_name, resource_type, resource_name)
 ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 ALTER TABLE access_management

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.amlib.enums;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,16 +59,16 @@ public enum Permission {
      * @param sumOfPermissionsValue the decimal value of permissions defined in Permission enum
      * @return Returns a list of permissions.
      */
-    public static List<Permission> buildPermissions(int sumOfPermissionsValue) {
+    public static Set<Permission> buildPermissions(int sumOfPermissionsValue) {
 
         if (sumOfPermissionsValue != 0) {
             return Arrays.stream(Permission.values())
                 .filter(permission -> !HIDE.equals(permission) && hasPermissionTo(sumOfPermissionsValue, permission))
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
         }
 
         return Arrays.stream(Permission.values())
             .filter(permission -> hasPermissionTo(sumOfPermissionsValue, permission))
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
     }
 }

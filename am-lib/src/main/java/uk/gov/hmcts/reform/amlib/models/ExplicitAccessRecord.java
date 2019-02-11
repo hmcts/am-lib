@@ -4,13 +4,15 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
+import java.util.Set;
+
 @Data
 @Builder
-public class CreateResource {
+public class ExplicitAccessRecord {
 
     private final String resourceId;
     private final String accessorId;
-    private final ExplicitPermissions explicitPermissions;
+    private final Set<Permission> explicitPermissions;
     private final String accessType;
     private final String serviceName;
     private final String resourceType;
@@ -18,15 +20,16 @@ public class CreateResource {
     private final String attribute;
     private final String securityClassification;
 
-    public CreateResource(final String resourceId,
-                          final String accessorId,
-                          final ExplicitPermissions explicitPermissions,
-                          final String accessType,
-                          final String serviceName,
-                          final String resourceType,
-                          final String resourceName,
-                          final String attribute,
-                          final String securityClassification) {
+    @SuppressWarnings("squid:S00107") // Having so many arguments seems reasonable solution here
+    public ExplicitAccessRecord(String resourceId,
+                                String accessorId,
+                                Set<Permission> explicitPermissions,
+                                String accessType,
+                                String serviceName,
+                                String resourceType,
+                                String resourceName,
+                                String attribute,
+                                String securityClassification) {
         this.resourceId = resourceId;
         this.accessorId = accessorId;
         this.explicitPermissions = explicitPermissions;
@@ -39,6 +42,6 @@ public class CreateResource {
     }
 
     public int getPermissions() {
-        return Permission.sumOf(explicitPermissions.getUserPermissions());
+        return Permission.sumOf(explicitPermissions);
     }
 }

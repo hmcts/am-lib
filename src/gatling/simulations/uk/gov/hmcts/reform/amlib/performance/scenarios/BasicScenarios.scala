@@ -29,7 +29,7 @@ object BasicScenarios {
         .pause(1.second)
     )
 
-  val getAccessorsList: ScenarioBuilder = scenario("Filter Resource")
+  val getAccessorsList: ScenarioBuilder = scenario("Get Accessors List")
     .forever(
       feed(CreateResourceAccess.feed)
         .exec(AccessManagement.createResourceAssess)

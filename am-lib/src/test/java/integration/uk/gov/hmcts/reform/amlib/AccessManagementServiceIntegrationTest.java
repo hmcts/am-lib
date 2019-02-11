@@ -94,7 +94,6 @@ class AccessManagementServiceIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void filterResource_whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
-        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
         String nonExistingUserId = "ijk";
         String nonExistingResourceId = "lmn";
 

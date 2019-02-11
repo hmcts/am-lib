@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.enums.Permissions;
-import uk.gov.hmcts.reform.amlib.models.ExplicitPermissions;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Default endpoints per application.
@@ -24,23 +24,28 @@ public class AmLibProxyController {
 
     private static final String RESOURCE_ID_KEY = "resourceId";
 
-    @Autowired private ObjectMapper mapper;
-    @Autowired private AccessManagementService am;
+    @Autowired
+    private ObjectMapper mapper;
+    @Autowired
+    private AccessManagementService am;
 
     @SuppressWarnings("unchecked") // supressing compiler warning about casting from Object to List<String>
     @PostMapping("/create-resource-access")
     public void createResourceAccess(@RequestBody Map<String, Object> amData) {
-        LinkedHashMap<String, List> rawExplicitPermissions = (LinkedHashMap) amData.get("explicitPermissions");
-        List<String> userPermissions = rawExplicitPermissions.get("userPermissions");
-        Permissions[] permissions = userPermissions.stream()
-                .map(Permissions::valueOf)
-                .toArray(Permissions[]::new);
 
-        ExplicitPermissions explicitPermissions = new ExplicitPermissions(permissions);
-
-        am.createResourceAccess(amData.get(RESOURCE_ID_KEY).toString(),
-                amData.get("accessorId").toString(),
-                explicitPermissions);
+        am.createResourceAccess(ExplicitAccessRecord.builder()
+                .resourceId(amData.get(RESOURCE_ID_KEY).toString())
+                .accessorId(amData.get("accessorId").toString())
+                .explicitPermissions(((List<String>) amData.get("explicitPermissions")).stream()
+                        .map(Permissions::valueOf)
+                        .collect(Collectors.toSet()))
+                .accessType(amData.get("accessType").toString())
+                .serviceName(amData.get("serviceName").toString())
+                .resourceType(amData.get("resourceType").toString())
+                .resourceName(amData.get("resourceName").toString())
+                .attribute(amData.get("attribute").toString())
+                .securityClassification(amData.get("securityClassification").toString())
+                .build());
     }
 
     @PostMapping("/get-accessors-list")
@@ -52,9 +57,9 @@ public class AmLibProxyController {
     public JsonNode filterResource(@RequestBody Map<String, Object> amData) {
         JsonNode jsonNode = mapper.valueToTree(amData.get("resourceJson"));
         return am.filterResource(
-            amData.get("userId").toString(),
-            amData.get(RESOURCE_ID_KEY).toString(),
-            jsonNode
+                amData.get("userId").toString(),
+                amData.get(RESOURCE_ID_KEY).toString(),
+                jsonNode
         );
     }
 }

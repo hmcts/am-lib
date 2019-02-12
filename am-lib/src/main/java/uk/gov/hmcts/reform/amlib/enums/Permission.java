@@ -43,38 +43,37 @@ public enum Permission {
     }
 
     /**
-     * Performs a binary AND operation to determine weather the 'permissions' value has suitable permissionToCheck.
+     * Performs a binary AND operation to determine weather permission can be derived from the sum of permissions.
      *
-     * @param permissions       the decimal value of permissions defined in Permission enum
-     * @param permissionToCheck the permission to verify
-     * @return Returns true if the binary AND of the provided 'permissions' and 'permissionToCheck' is true.
+     * @param permissions       the numeric sum of permissions
+     * @return true if particular permission is included is sum of permissions, otherwise false
      */
-    public static boolean hasPermissionTo(int permissions, Permission permissionToCheck) {
-        return (permissions & permissionToCheck.getValue()) == permissionToCheck.getValue();
+    public boolean isGranted(int permissions) {
+        return (permissions & this.getValue()) == this.getValue();
     }
 
     /**
      * Builds a list of permissions based on integer value. HIDE is removed from values above 0, as HIDE only
      * permits itself as a lone permission.
      *
-     * @param sumOfPermissionsValue the decimal value of permissions defined in Permission enum
+     * @param sumOfPermissions the decimal value of permissions defined in Permission enum
      * @return Returns a list of permissions.
-     * @throws UnsupportedPermissionsException when sumOfPermissionsValue is negative or larger than 31.
+     * @throws UnsupportedPermissionsException when sumOfPermissions is negative or larger than 31.
      */
-    public static Set<Permission> buildPermissions(int sumOfPermissionsValue) throws UnsupportedPermissionsException {
+    public static Set<Permission> buildPermissions(int sumOfPermissions) throws UnsupportedPermissionsException {
 
-        if (sumOfPermissionsValue < 0 || sumOfPermissionsValue > 31) {
+        if (sumOfPermissions < 0 || sumOfPermissions > 31) {
             throw new UnsupportedPermissionsException();
         }
 
-        if (sumOfPermissionsValue > 0) {
+        if (sumOfPermissions > 0) {
             return Arrays.stream(Permission.values())
-                .filter(permission -> !HIDE.equals(permission) && hasPermissionTo(sumOfPermissionsValue, permission))
+                .filter(permission -> !HIDE.equals(permission) && permission.isGranted(sumOfPermissions))
                 .collect(Collectors.toSet());
         }
 
         return Arrays.stream(Permission.values())
-            .filter(permission -> hasPermissionTo(sumOfPermissionsValue, permission))
+            .filter(permission -> permission.isGranted(sumOfPermissions))
             .collect(Collectors.toSet());
     }
 }

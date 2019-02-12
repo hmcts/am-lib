@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+
 public class AccessManagementService {
     private final Jdbi jdbi;
 
@@ -69,7 +71,7 @@ public class AccessManagementService {
             return null;
         }
 
-        if (Permission.hasPermissionTo(explicitAccess.getPermissions(), Permission.READ)) {
+        if (READ.isGranted(explicitAccess.getPermissions())) {
             Map<String, Set<Permission>> attributePermissions = new HashMap<>();
             attributePermissions.put("/", Permission.buildPermissions(explicitAccess.getPermissions()));
 

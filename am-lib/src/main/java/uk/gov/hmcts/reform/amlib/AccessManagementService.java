@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.exceptions.UnsupportedPermissionsException;
 import uk.gov.hmcts.reform.amlib.models.AccessManagement;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
@@ -52,8 +53,10 @@ public class AccessManagementService {
      * @param resourceId   resource id
      * @param resourceJson json
      * @return resourceJson or null
+     * @throws UnsupportedPermissionsException when permissions are above 31 or below 0.
      */
-    public FilterResourceResponse filterResource(String userId, String resourceId, JsonNode resourceJson) {
+    public FilterResourceResponse filterResource(String userId, String resourceId, JsonNode resourceJson)
+        throws UnsupportedPermissionsException {
         AccessManagement explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resourceId));
 
@@ -61,11 +64,14 @@ public class AccessManagementService {
             return null;
         }
 
-        return Permission.hasPermissionTo(
-                explicitAccess.getPermissions(), Permission.READ) ? FilterResourceResponse.builder()
+        if (Permission.hasPermissionTo(explicitAccess.getPermissions(), Permission.READ)) {
+            return FilterResourceResponse.builder()
                 .resourceId(resourceId)
                 .data(resourceJson)
                 .permissions(Permission.buildPermissions(explicitAccess.getPermissions()))
-                .build() : null;
+                .build();
+        }
+
+        return null;
     }
 }

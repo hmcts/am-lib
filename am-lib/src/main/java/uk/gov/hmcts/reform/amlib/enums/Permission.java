@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.amlib.enums;
 
+import uk.gov.hmcts.reform.amlib.exceptions.UnsupportedPermissionsException;
+
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 
 /**
  * Exposes a set of enum values used to set permissions for Access Management.
@@ -41,7 +42,6 @@ public enum Permission {
         return sum;
     }
 
-
     /**
      * Performs a binary AND operation to determine weather the 'permissions' value has suitable permissionToCheck.
      *
@@ -54,14 +54,20 @@ public enum Permission {
     }
 
     /**
-     * Builds a list of permissions based on decimal value.
+     * Builds a list of permissions based on integer value. HIDE is removed from values above 0, as HIDE only
+     * permits itself as a lone permission.
      *
      * @param sumOfPermissionsValue the decimal value of permissions defined in Permission enum
      * @return Returns a list of permissions.
+     * @throws UnsupportedPermissionsException when sumOfPermissionsValue is negative or larger than 31.
      */
-    public static Set<Permission> buildPermissions(int sumOfPermissionsValue) {
+    public static Set<Permission> buildPermissions(int sumOfPermissionsValue) throws UnsupportedPermissionsException {
 
-        if (sumOfPermissionsValue != 0) {
+        if (sumOfPermissionsValue < 0 || sumOfPermissionsValue > 31) {
+            throw new UnsupportedPermissionsException();
+        }
+
+        if (sumOfPermissionsValue > 0) {
             return Arrays.stream(Permission.values())
                 .filter(permission -> !HIDE.equals(permission) && hasPermissionTo(sumOfPermissionsValue, permission))
                 .collect(Collectors.toSet());

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.exceptions.UnsupportedPermissionsException;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 
@@ -54,7 +55,8 @@ public class AmLibProxyController {
     }
 
     @PostMapping("/filter-resource")
-    public FilterResourceResponse filterResource(@RequestBody Map<String, Object> amData) {
+    public FilterResourceResponse filterResource(@RequestBody Map<String, Object> amData)
+        throws UnsupportedPermissionsException {
         JsonNode jsonNode = mapper.valueToTree(amData.get("resourceJson"));
         return am.filterResource(
                 amData.get("userId").toString(),

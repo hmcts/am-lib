@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.exceptions.UnsupportedPermissionsException;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 
@@ -21,18 +22,17 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
 public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest {
 
+    private String resourceId;
     private static final String ACCESSOR_ID = "a";
     private static final String OTHER_ACCESSOR_ID = "b";
     private static final Set<Permission> EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS = Stream.of(CREATE, READ, UPDATE)
-            .collect(toSet());
+        .collect(toSet());
     private static final String ACCESS_TYPE = "user";
     private static final String SERVICE_NAME = "Service 1";
     private static final String RESOURCE_TYPE = "Resource Type 1";
     private static final String RESOURCE_NAME = "resource";
     private static final String SECURITY_CLASSIFICATION = "Public";
     private static final JsonNode DATA = JsonNodeFactory.instance.objectNode();
-
-    private String resourceId;
 
     @Before
     public void setupTest() {
@@ -44,14 +44,13 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
         ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
 
         int count = jdbi.open().createQuery(
-                "select count(1) from access_management where resource_id = ?")
-                .bind(0, resourceId)
-                .mapTo(int.class)
-                .findOnly();
+            "select count(1) from access_management where resource_id = ?")
+            .bind(0, resourceId)
+            .mapTo(int.class)
+            .findOnly();
 
         assertThat(count).isEqualTo(1);
     }
-
 
     @Test
     public void whenCheckingAccess_ifUserHasAccess_ShouldReturnUserIds() {
@@ -84,21 +83,23 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     }
 
     @Test
-    public void filterResource_whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject() {
+    public void filterResource_whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject()
+        throws UnsupportedPermissionsException {
         ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
 
         FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
-                .resourceId(resourceId)
-                .data(DATA)
-                .permissions(EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS)
-                .build());
+            .resourceId(resourceId)
+            .data(DATA)
+            .permissions(EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS)
+            .build());
     }
 
 
     @Test
-    public void filterResource_whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
+    public void filterResource_whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() throws
+        UnsupportedPermissionsException {
         String nonExistingUserId = "ijk";
         String nonExistingResourceId = "lmn";
 
@@ -108,27 +109,28 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     }
 
     @Test
-    public void filterResource_whenRowExistsAndDoesntHaveReadPermissions_ReturnNull() {
+    public void filterResource_whenRowExistsAndDoesntHaveReadPermissions_ReturnNull()
+        throws UnsupportedPermissionsException {
         ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, Stream.of(CREATE, UPDATE).collect(toSet())));
 
         FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
-
         assertThat(result).isNull();
     }
 
     private ExplicitAccessRecord createRecord(String resourceId,
                                               String accessorId,
                                               Set<Permission> explicitPermissions) {
+
         return ExplicitAccessRecord.builder()
-                .resourceId(resourceId)
-                .accessorId(accessorId)
-                .explicitPermissions(explicitPermissions)
-                .accessType(ACCESS_TYPE)
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .attribute("")
-                .securityClassification(SECURITY_CLASSIFICATION)
-                .build();
+            .resourceId(resourceId)
+            .accessorId(accessorId)
+            .explicitPermissions(explicitPermissions)
+            .accessType(ACCESS_TYPE)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attribute("")
+            .securityClassification(SECURITY_CLASSIFICATION)
+            .build();
     }
 }

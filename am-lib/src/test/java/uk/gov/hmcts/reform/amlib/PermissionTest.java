@@ -12,6 +12,7 @@ import java.util.Set;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
+@SuppressWarnings("PMD")
 public class PermissionTest {
 
     @Test
@@ -34,7 +35,6 @@ public class PermissionTest {
     }
 
     @Test
-
     public void buildPermissions_sumOfPermissionsValueOne_ExpectArray() throws UnsupportedPermissionsException {
         Set<Permission> permissions = Permissions.buildPermissions(1);
 

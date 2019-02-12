@@ -65,7 +65,6 @@ public class ExplicitAccessRecord {
         return Permissions.sumOf(explicitPermissions);
     }
 
-    // TODO: to be replaced by better helper method in the future
     private static Set<Permissions> convertSumOfPermissionsToSet(int sumOfPermissions) {
         return Arrays.stream(Permissions.values())
                 .filter(permission -> hasPermissionTo(sumOfPermissions, permission))

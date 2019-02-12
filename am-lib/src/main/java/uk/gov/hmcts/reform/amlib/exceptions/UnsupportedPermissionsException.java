@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.amlib.exceptions;
 
-public class UnsupportedPermissionsException extends AccessManagementException {
+public class UnsupportedPermissionsException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     public UnsupportedPermissionsException() {

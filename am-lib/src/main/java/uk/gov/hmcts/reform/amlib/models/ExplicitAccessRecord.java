@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.amlib.models;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
 import java.util.Set;
 
@@ -42,6 +43,6 @@ public class ExplicitAccessRecord {
     }
 
     public int getPermissions() {
-        return Permission.sumOf(explicitPermissions);
+        return Permissions.sumOf(explicitPermissions);
     }
 }

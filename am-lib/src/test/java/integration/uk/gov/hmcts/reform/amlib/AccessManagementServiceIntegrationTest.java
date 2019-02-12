@@ -24,7 +24,6 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
 public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest {
 
-    private String resourceId;
     private static final String ACCESSOR_ID = "a";
     private static final String OTHER_ACCESSOR_ID = "b";
     private static final Set<Permission> EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS = Stream.of(CREATE, READ, UPDATE)
@@ -35,6 +34,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     private static final String RESOURCE_NAME = "resource";
     private static final String SECURITY_CLASSIFICATION = "Public";
     private static final JsonNode DATA = JsonNodeFactory.instance.objectNode();
+    private String resourceId;
 
     @Before
     public void setupTest() {

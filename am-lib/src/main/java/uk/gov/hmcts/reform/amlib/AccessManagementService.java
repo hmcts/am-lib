@@ -9,11 +9,11 @@ import uk.gov.hmcts.reform.amlib.models.AccessManagement;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
+import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
@@ -61,7 +61,7 @@ public class AccessManagementService {
      * @return resourceJson or null
      * @throws UnsupportedPermissionsException when permissions are above 31 or below 0.
      */
-    @SuppressWarnings("PMD")
+
     public FilterResourceResponse filterResource(String userId, String resourceId, JsonNode resourceJson)
         throws UnsupportedPermissionsException {
         AccessManagement explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
@@ -72,8 +72,8 @@ public class AccessManagementService {
         }
 
         if (READ.isGranted(explicitAccess.getPermissions())) {
-            Map<String, Set<Permission>> attributePermissions = new HashMap<>();
-            attributePermissions.put("/", Permission.buildPermissions(explicitAccess.getPermissions()));
+            ConcurrentHashMap<String, Set<Permission>> attributePermissions = new ConcurrentHashMap<>();
+            attributePermissions.put("/", Permissions.buildPermissions(explicitAccess.getPermissions()));
 
             return FilterResourceResponse.builder()
                 .resourceId(resourceId)

@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permissions.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permissions.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permissions.UPDATE;
 
+@SuppressWarnings("PMD")
 public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest {
 
     private static final String ACCESSOR_ID = "a";

@@ -17,14 +17,14 @@ public interface AccessManagementRepository {
         + "values (:resourceId, :accessorId, :permissions, :accessType, :serviceName, :resourceType, :resourceName, :attribute, :securityClassification)")
     void createAccessManagementRecord(@BindBean ExplicitAccessRecord explicitAccessRecord);
 
-    @SqlUpdate("delete from access_management where " +
-        "access_management.resource_id = :resourceId " +
-        "and access_management.accessor_id = :accessorId " +
-        "and access_management.access_type = :accessType " +
-        "and access_management.service_name = :serviceName " +
-        "and access_management.resource_type = :resourceType " +
-        "and access_management.resource_name = :resourceName " +
-        "and access_management.attribute = :attribute")
+    @SqlUpdate("delete from access_management where "
+        + "access_management.resource_id = :resourceId "
+        + "and access_management.accessor_id = :accessorId "
+        + "and access_management.access_type = :accessType "
+        + "and access_management.service_name = :serviceName "
+        + "and access_management.resource_type = :resourceType "
+        + "and access_management.resource_name = :resourceName "
+        + "and access_management.attribute = :attribute")
     void removeAccessManagementRecord(@BindBean RemoveExplicitAccessRecord removeExplicitAccessRecord);
 
 

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -12,5 +13,5 @@ import java.util.Set;
 public class FilterResourceResponse {
     private String resourceId;
     private JsonNode data;
-    private Set<Permission> permissions;
+    private Map<String, Set<Permission>> permissions;
 }

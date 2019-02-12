@@ -10,7 +10,10 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class AccessManagementService {
     private final Jdbi jdbi;
@@ -47,7 +50,8 @@ public class AccessManagementService {
     }
 
     /**
-     * Returns `resourceJson` when record with userId and resourceId exist and has READ permissions, otherwise null.
+     * Returns FilterResourceResponse when record with userId and resourceId exist and has READ permissions,
+     * otherwise null.
      *
      * @param userId       (accessorId)
      * @param resourceId   resource id
@@ -65,10 +69,13 @@ public class AccessManagementService {
         }
 
         if (Permission.hasPermissionTo(explicitAccess.getPermissions(), Permission.READ)) {
+            Map<String, Set<Permission>> attributePermissions = new HashMap<>();
+            attributePermissions.put("/", Permission.buildPermissions(explicitAccess.getPermissions()));
+
             return FilterResourceResponse.builder()
                 .resourceId(resourceId)
                 .data(resourceJson)
-                .permissions(Permission.buildPermissions(explicitAccess.getPermissions()))
+                .permissions(attributePermissions)
                 .build();
         }
 

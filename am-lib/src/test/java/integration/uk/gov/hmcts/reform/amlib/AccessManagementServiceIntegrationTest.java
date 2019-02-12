@@ -9,7 +9,9 @@ import uk.gov.hmcts.reform.amlib.exceptions.UnsupportedPermissionsException;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -89,10 +91,13 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
         FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
 
+        Map<String, Set<Permission>> attributePermissions = new HashMap<>();
+        attributePermissions.put("/", EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
+
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
             .data(DATA)
-            .permissions(EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS)
+            .permissions(attributePermissions)
             .build());
     }
 

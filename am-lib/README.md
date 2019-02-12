@@ -15,11 +15,17 @@ When command completed successfully the binary artifacts will be available under
 
 ## Developer notes
 
-### Emitting parameter names
+### Emitting parameter names in IDE
 
 JDBI mapping between database and Java objects requires Java compiler to emit parameter names.  
 
 To enable it add the `-parameters` setting to your compiler arguments in your IDE (make sure you recompile your code after).
+
+### Using Lombok in IDE
+
+Lombok project is used to generate boilerplate code such as accessors methods or methods such as `equals`, `hashCode`, `toString`.
+
+Gradle builds are configured with right annotation processor however when building the project in IDE, Lombok plugin will be required to compile.
 
 ## License
 

@@ -84,6 +84,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
         assertThat(list).isNull();
     }
 
+    @SuppressWarnings("PMD")
     @Test
     public void filterResource_whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject()
         throws UnsupportedPermissionsException {

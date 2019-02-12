@@ -59,6 +59,7 @@ public class AccessManagementService {
      * @return resourceJson or null
      * @throws UnsupportedPermissionsException when permissions are above 31 or below 0.
      */
+    @SuppressWarnings("PMD")
     public FilterResourceResponse filterResource(String userId, String resourceId, JsonNode resourceJson)
         throws UnsupportedPermissionsException {
         AccessManagement explicitAccess = jdbi.withExtension(AccessManagementRepository.class,

@@ -5,7 +5,6 @@ import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import uk.gov.hmcts.reform.amlib.models.AccessManagement;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 
 import java.util.List;
@@ -26,6 +25,6 @@ public interface AccessManagementRepository {
     // The 'LIMIT 1' suffix was introduced because at the current database state (V2.2) there is a technical
     // possibility of returning multiple records with this query, but it's forbidden from business point of view.
     @SqlQuery("select * from access_management where accessor_id=? and resource_id=? LIMIT 1")
-    @RegisterConstructorMapper(AccessManagement.class)
-    AccessManagement getExplicitAccess(String accessorId, String resourceId);
+    @RegisterConstructorMapper(ExplicitAccessRecord.class)
+    ExplicitAccessRecord getExplicitAccess(String accessorId, String resourceId);
 }

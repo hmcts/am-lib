@@ -42,6 +42,10 @@ pmd {
 
 sourceCompatibility = 1.8
 
+compileJava {
+    options.compilerArgs << '-parameters'
+}
+
 repositories {
     mavenLocal()
     mavenCentral()

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.Permissions;
-import uk.gov.hmcts.reform.amlib.models.AccessManagement;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
 
@@ -53,7 +52,7 @@ public class AccessManagementService {
      * @return resourceJson or null
      */
     public JsonNode filterResource(String userId, String resourceId, JsonNode resourceJson) {
-        AccessManagement explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
+        ExplicitAccessRecord explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resourceId));
 
         if (explicitAccess == null) {

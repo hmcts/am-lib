@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.enums.Permissions;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.models.RemoveExplicitAccessRecord;
 
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,19 @@ public class AmLibProxyController {
                 .attribute(amData.get("attribute").toString())
                 .securityClassification(amData.get("securityClassification").toString())
                 .build());
+    }
+
+    @PostMapping("/revoke-resource-access")
+    public void revokeResourceAccess(@RequestBody Map<String, Object> amData) {
+        am.revokeResourceAccess(RemoveExplicitAccessRecord.builder()
+            .resourceId(amData.get(RESOURCE_ID_KEY).toString())
+            .accessorId(amData.get("accessorId").toString())
+            .accessType(amData.get("accessType").toString())
+            .serviceName(amData.get("serviceName").toString())
+            .resourceType(amData.get("resourceType").toString())
+            .resourceName(amData.get("resourceName").toString())
+            .attribute(amData.get("attribute").toString())
+            .build());
     }
 
     @PostMapping("/get-accessors-list")

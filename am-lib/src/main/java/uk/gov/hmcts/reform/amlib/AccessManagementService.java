@@ -52,7 +52,7 @@ public class AccessManagementService {
     }
 
     /**
-     * Returns FilterResourceResponse when record with userId and resourceId exist and has READ permissions,
+     * Returns {@link FilterResourceResponse} when record with userId and resourceId exist and has READ permissions,
      * otherwise null.
      *
      * @param userId       (accessorId)

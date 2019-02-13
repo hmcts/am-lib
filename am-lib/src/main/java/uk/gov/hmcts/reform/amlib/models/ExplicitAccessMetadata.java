@@ -6,7 +6,7 @@ import org.jdbi.v3.core.mapper.reflect.JdbiConstructor;
 
 @Data
 @Builder
-public class RemoveExplicitAccessRecord {
+public class ExplicitAccessMetadata {
 
     private final String resourceId;
     private final String accessorId;
@@ -18,13 +18,13 @@ public class RemoveExplicitAccessRecord {
 
     @JdbiConstructor
     @SuppressWarnings("squid:S00107") // Having so many arguments seems reasonable solution here
-    public RemoveExplicitAccessRecord(String resourceId,
-                                      String accessorId,
-                                      String accessType,
-                                      String serviceName,
-                                      String resourceType,
-                                      String resourceName,
-                                      String attribute) {
+    public ExplicitAccessMetadata(String resourceId,
+                                  String accessorId,
+                                  String accessType,
+                                  String serviceName,
+                                  String resourceType,
+                                  String resourceName,
+                                  String attribute) {
         this.resourceId = resourceId;
         this.accessorId = accessorId;
         this.accessType = accessType;

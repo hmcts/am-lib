@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.amlib.enums.Permissions;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
-import uk.gov.hmcts.reform.amlib.models.RemoveExplicitAccessRecord;
 
 import java.util.List;
 import java.util.Set;
@@ -44,43 +44,21 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     public void createQuery_whenCreatingResourceAccess_ResourceAccessAppearsInDatabase() {
         ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
 
-        int count = jdbi.open().createQuery(
-            "select count(1) from access_management where resource_id = ?")
-            .bind(0, resourceId)
-            .mapTo(int.class)
-            .findOnly();
-
-        assertThat(count).isEqualTo(1);
+        assertThat(countResourcesById(resourceId)).isEqualTo(1);
     }
 
     @Test
     public void revokeResourceAccess_whenRevokingResourceAccess_ResourceAccessRemovedFromDatabase() {
-        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
+        grantAndRevokeAccessToRecord(resourceId);
 
-        ams.revokeResourceAccess(removeRecord(resourceId, ACCESSOR_ID));
-
-        int count = jdbi.open().createQuery(
-            "select count(1) from access_management where resource_id = ?")
-            .bind(0, resourceId)
-            .mapTo(int.class)
-            .findOnly();
-
-        assertThat(count).isEqualTo(0);
+        assertThat(countResourcesById(resourceId)).isEqualTo(0);
     }
 
     @Test
     public void revokeResourceAccess_whenRevokingResourceAccessThatDoesNotExist_NoErrorExpected() {
-        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
-
         ams.revokeResourceAccess(removeRecord("4", ACCESSOR_ID));
 
-        int count = jdbi.open().createQuery(
-            "select count(1) from access_management where resource_id = ?")
-            .bind(0, resourceId)
-            .mapTo(int.class)
-            .findOnly();
-
-        assertThat(count).isEqualTo(1);
+        assertThat(countResourcesById(resourceId)).isEqualTo(0);
     }
 
     @Test
@@ -145,7 +123,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     private ExplicitAccessRecord createRecord(String resourceId,
                                               String accessorId,
                                               Set<Permissions> explicitPermissions) {
-        return ExplicitAccessRecord.builder()
+        return ExplicitAccessRecord.explicitAccessRecordBuilder()
             .resourceId(resourceId)
             .accessorId(accessorId)
             .explicitPermissions(explicitPermissions)
@@ -158,8 +136,8 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
             .build();
     }
 
-    private RemoveExplicitAccessRecord removeRecord(String resourceId, String accessorId) {
-        return RemoveExplicitAccessRecord.builder()
+    private ExplicitAccessMetadata removeRecord(String resourceId, String accessorId) {
+        return ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
             .accessorId(accessorId)
             .accessType(ACCESS_TYPE)
@@ -168,5 +146,19 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
             .resourceName(RESOURCE_NAME)
             .attribute("")
             .build();
+    }
+
+    private void grantAndRevokeAccessToRecord(String resourceId) {
+        createRecord(resourceId, AccessManagementServiceIntegrationTest.ACCESSOR_ID,
+            AccessManagementServiceIntegrationTest.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
+        removeRecord(resourceId, AccessManagementServiceIntegrationTest.ACCESSOR_ID);
+    }
+
+    private int countResourcesById(String resourceId) {
+        return jdbi.open().createQuery(
+            "select count(1) from access_management where resource_id = ?")
+            .bind(0, resourceId)
+            .mapTo(int.class)
+            .findOnly();
     }
 }

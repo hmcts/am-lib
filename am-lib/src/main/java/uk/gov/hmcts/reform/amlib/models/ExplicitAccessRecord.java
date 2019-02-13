@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.amlib.models;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.jdbi.v3.core.mapper.reflect.JdbiConstructor;
 import uk.gov.hmcts.reform.amlib.enums.Permissions;
 
@@ -11,21 +13,16 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.amlib.enums.Permissions.hasPermissionTo;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Builder
-public class ExplicitAccessRecord {
+@Getter
+public class ExplicitAccessRecord extends ExplicitAccessMetadata {
 
-    private final String resourceId;
-    private final String accessorId;
     private final Set<Permissions> explicitPermissions;
-    private final String accessType;
-    private final String serviceName;
-    private final String resourceType;
-    private final String resourceName;
-    private final String attribute;
     private final String securityClassification;
 
     @SuppressWarnings("squid:S00107") // Having so many arguments seems reasonable solution here
+    @Builder(builderMethodName = "explicitAccessRecordBuilder")
     public ExplicitAccessRecord(String resourceId,
                                 String accessorId,
                                 Set<Permissions> explicitPermissions,
@@ -35,14 +32,8 @@ public class ExplicitAccessRecord {
                                 String resourceName,
                                 String attribute,
                                 String securityClassification) {
-        this.resourceId = resourceId;
-        this.accessorId = accessorId;
+        super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute);
         this.explicitPermissions = explicitPermissions;
-        this.accessType = accessType;
-        this.serviceName = serviceName;
-        this.resourceType = resourceType;
-        this.resourceName = resourceName;
-        this.attribute = attribute;
         this.securityClassification = securityClassification;
     }
 
@@ -57,8 +48,9 @@ public class ExplicitAccessRecord {
                                 String resourceName,
                                 String attribute,
                                 String securityClassification) {
-        this(resourceId, accessorId, convertSumOfPermissionsToSet(permissions), accessType, serviceName, resourceType,
-                resourceName, attribute, securityClassification);
+        super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute);
+        this.explicitPermissions = convertSumOfPermissionsToSet(permissions);
+        this.securityClassification = securityClassification;
     }
 
     public int getPermissions() {

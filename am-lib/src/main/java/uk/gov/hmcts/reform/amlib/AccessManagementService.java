@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.Permissions;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
-import uk.gov.hmcts.reform.amlib.models.RemoveExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
 
 import java.util.List;
@@ -32,11 +32,11 @@ public class AccessManagementService {
     /**
      * Removes explicit access to resource accordingly to record configuration.
      *
-     * @param removeExplicitAccessRecord an object to remove a specific explicit access record.
+     * @param explicitAccessMetadata an object to remove a specific explicit access record.
      */
-    public void revokeResourceAccess(RemoveExplicitAccessRecord removeExplicitAccessRecord) {
+    public void revokeResourceAccess(ExplicitAccessMetadata explicitAccessMetadata) {
         jdbi.useExtension(AccessManagementRepository.class,
-            dao -> dao.removeAccessManagementRecord(removeExplicitAccessRecord));
+            dao -> dao.removeAccessManagementRecord(explicitAccessMetadata));
     }
 
     /**

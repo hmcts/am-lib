@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.enums.Permissions;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
-import uk.gov.hmcts.reform.amlib.models.RemoveExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class AmLibProxyController {
     @PostMapping("/create-resource-access")
     public void createResourceAccess(@RequestBody Map<String, Object> amData) {
 
-        am.createResourceAccess(ExplicitAccessRecord.builder()
+        am.createResourceAccess(ExplicitAccessRecord.explicitAccessRecordBuilder()
                 .resourceId(amData.get(RESOURCE_ID_KEY).toString())
                 .accessorId(amData.get("accessorId").toString())
                 .explicitPermissions(((List<String>) amData.get("explicitPermissions")).stream()
@@ -51,7 +51,7 @@ public class AmLibProxyController {
 
     @PostMapping("/revoke-resource-access")
     public void revokeResourceAccess(@RequestBody Map<String, Object> amData) {
-        am.revokeResourceAccess(RemoveExplicitAccessRecord.builder()
+        am.revokeResourceAccess(ExplicitAccessMetadata.builder()
             .resourceId(amData.get(RESOURCE_ID_KEY).toString())
             .accessorId(amData.get("accessorId").toString())
             .accessType(amData.get("accessType").toString())

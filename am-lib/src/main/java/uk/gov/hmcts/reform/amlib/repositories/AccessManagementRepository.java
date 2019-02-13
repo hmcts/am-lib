@@ -5,8 +5,8 @@ import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
-import uk.gov.hmcts.reform.amlib.models.RemoveExplicitAccessRecord;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public interface AccessManagementRepository {
         + "and access_management.resource_type = :resourceType "
         + "and access_management.resource_name = :resourceName "
         + "and access_management.attribute = :attribute")
-    void removeAccessManagementRecord(@BindBean RemoveExplicitAccessRecord removeExplicitAccessRecord);
+    void removeAccessManagementRecord(@BindBean ExplicitAccessMetadata explicitAccessMetadata);
 
 
     @SqlQuery("select accessor_id from access_management where exists "

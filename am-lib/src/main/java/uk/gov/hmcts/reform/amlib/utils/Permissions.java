@@ -13,36 +13,50 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
-//We do not want this class to be instantiated
 public final class Permissions {
 
+    public static final int MIN_PERMISSIONS_VALUE = Permissions.sumOf((CREATE));
     public static final int MAX_PERMISSIONS_VALUE =
-        Permissions.sumOf(Stream.of(CREATE, READ, UPDATE, DELETE).collect(Collectors.toSet()));
-    public static final int MIN_PERMISSIONS_VALUE = Permissions.sumOf(Stream.of(CREATE).collect(Collectors.toSet()));
-
+        Permissions.sumOf(CREATE, READ, UPDATE, DELETE);
 
     private Permissions() {
 
     }
 
     /**
-     * When saving a record into Access Management all the values are summed up (the 'sumOf' method) and saved as int.
+     * {@link Permissions#sumOf} method called when multiple enum values entered e.g (CREATE,READ,UPDATE,DELETE).
+     * Values are then summed up.The integer value of the permission is then returned.
      *
-     * @param perms a set of permission enum values e.g. ("CREATE", "READ") to be converted to integer value.
+     * @param permissions permission enum values e.g. ("CREATE", "READ") to be converted to integer value.
      * @return the sum of permissions.
      */
 
-    public static int sumOf(Set<Permission> perms) {
+    public static int sumOf(Permission ... permissions) {
 
-        return perms.stream().mapToInt(Permission::getValue).sum();
+        return sumOf(Stream.of(permissions).collect(Collectors.toSet()));
     }
+
+    /**
+     * Permission values passed in (CREATE,READ,UPDATE,DELETE) are converted to an integer
+     * value and are summed up.The integer value of the permission is then returned.
+     *
+     * @param permissions a set of permission enum values e.g. ("CREATE", "READ") to be converted to integer value.
+     * @return the sum of permissions.
+     */
+
+    public static int sumOf(Set<Permission> permissions) {
+
+        return permissions.stream().mapToInt(Permission::getValue).sum();
+    }
+
 
     /**
      * Builds a list of permissions based on integer value.
      *
      * @param sumOfPermissions the decimal value of permissions defined in Permission enum
      * @return a list of permissions.
-     * @throws UnsupportedPermissionsException when sumOfPermissions is negative or larger than 31.
+     * @value MAX_PERMISSIONS_VALUE
+     * @throws UnsupportedPermissionsException when sumOfPermissions is negative {@link Permissions#MIN_PERMISSIONS_VALUE} or larger than {@link Permissions#MAX_PERMISSIONS_VALUE}.
      */
     public static Set<Permission> fromSumOf(int sumOfPermissions) throws UnsupportedPermissionsException {
 

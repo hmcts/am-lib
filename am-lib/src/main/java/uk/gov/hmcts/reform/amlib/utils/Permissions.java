@@ -13,6 +13,12 @@ public final class Permissions {
 
     }
 
+    /**
+     * When saving a record into Access Management all the values are summed up (the 'sumOf' method) and saved as int.
+     * @param perms a set of permission enum values e.g. ("CREATE", "READ") to be converted to integer value.
+     * @return the sum of permissions.
+     */
+
     public static int sumOf(Set<Permission> perms) {
         int sum = 0;
 
@@ -24,14 +30,13 @@ public final class Permissions {
     }
 
     /**
-     * Builds a list of permissions based on integer value. HIDE is removed from values above 0, as HIDE only
-     * permits itself as a lone permission.
+     * Builds a list of permissions based on integer value.
      *
      * @param sumOfPermissions the decimal value of permissions defined in Permission enum
-     * @return Returns a list of permissions.
+     * @return a list of permissions.
      * @throws UnsupportedPermissionsException when sumOfPermissions is negative or larger than 31.
      */
-    public static Set<Permission> buildPermissions(int sumOfPermissions) throws UnsupportedPermissionsException {
+    public static Set<Permission> fromSumOf(int sumOfPermissions) throws UnsupportedPermissionsException {
 
         if (sumOfPermissions < 0 || sumOfPermissions > 31) {
             throw new UnsupportedPermissionsException();

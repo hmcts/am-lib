@@ -35,102 +35,102 @@ public class PermissionTest {
     }
 
     @Test
-    public void buildPermissions_sumOfPermissionsValueOne_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.buildPermissions(1);
+    public void fromSumOf_sumOfPermissionsValueOne_ExpectArray() throws UnsupportedPermissionsException {
+        Set<Permission> permissions = Permissions.fromSumOf(1);
 
         assertThat(permissions).containsOnly(Permission.CREATE);
     }
 
     @Test
-    public void buildPermissions_sumOfPermissionsValueThree_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.buildPermissions(3);
+    public void fromSumOf_sumOfPermissionsValueThree_ExpectArray() throws UnsupportedPermissionsException {
+        Set<Permission> permissions = Permissions.fromSumOf(3);
 
         assertThat(permissions).containsOnly(Permission.CREATE, Permission.READ);
     }
 
     @Test
-    public void buildPermissions_sumOfPermissionsValueFour_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.buildPermissions(4);
+    public void fromSumOf_sumOfPermissionsValueFour_ExpectArray() throws UnsupportedPermissionsException {
+        Set<Permission> permissions = Permissions.fromSumOf(4);
 
         assertThat(permissions).containsOnly(Permission.UPDATE);
     }
 
     @Test
-    public void buildPermissions_sumOfPermissionsValueSeven_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.buildPermissions(7);
+    public void fromSumOf_sumOfPermissionsValueSeven_ExpectArray() throws UnsupportedPermissionsException {
+        Set<Permission> permissions = Permissions.fromSumOf(7);
 
         assertThat(permissions).containsOnly(Permission.CREATE, Permission.READ, Permission.UPDATE);
     }
 
     @Test
-    public void buildPermissions_sumOfPermissionsValueTen_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.buildPermissions(10);
+    public void fromSumOf_sumOfPermissionsValueTen_ExpectArray() throws UnsupportedPermissionsException {
+        Set<Permission> permissions = Permissions.fromSumOf(10);
 
         assertThat(permissions).containsOnly(Permission.SHARE, Permission.READ);
     }
 
     @Test
-    public void buildPermissions_sumOfPermissionsValueThirteen_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.buildPermissions(13);
+    public void fromSumOf_sumOfPermissionsValueThirteen_ExpectArray() throws UnsupportedPermissionsException {
+        Set<Permission> permissions = Permissions.fromSumOf(13);
 
         assertThat(permissions).containsOnly(Permission.CREATE, Permission.UPDATE, Permission.SHARE);
     }
 
     @Test
-    public void buildPermissions_sumOfPermissionsValueFifteen_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.buildPermissions(15);
+    public void fromSumOf_sumOfPermissionsValueFifteen_ExpectArray() throws UnsupportedPermissionsException {
+        Set<Permission> permissions = Permissions.fromSumOf(15);
 
         assertThat(permissions).containsOnly(Permission.CREATE, Permission.READ, Permission.UPDATE, Permission.SHARE);
     }
 
     @Test
-    public void buildPermissions_sumOfPermissionsValueSeventeen_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.buildPermissions(17);
+    public void fromSumOf_sumOfPermissionsValueSeventeen_ExpectArray() throws UnsupportedPermissionsException {
+        Set<Permission> permissions = Permissions.fromSumOf(17);
 
         assertThat(permissions).containsOnly(Permission.CREATE, Permission.DELETE);
     }
 
     @Test
-    public void buildPermissions_sumOfPermissionsValueTwentyTwo_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.buildPermissions(22);
+    public void fromSumOf_sumOfPermissionsValueTwentyTwo_ExpectArray() throws UnsupportedPermissionsException {
+        Set<Permission> permissions = Permissions.fromSumOf(22);
 
         assertThat(permissions).containsOnly(Permission.READ, Permission.DELETE, Permission.UPDATE);
     }
 
 
     @Test
-    public void buildPermissions_sumOfPermissionsValueTwentyFive_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.buildPermissions(25);
+    public void fromSumOf_sumOfPermissionsValueTwentyFive_ExpectArray() throws UnsupportedPermissionsException {
+        Set<Permission> permissions = Permissions.fromSumOf(25);
 
         assertThat(permissions).containsOnly(Permission.CREATE, Permission.SHARE, Permission.DELETE);
     }
 
     @Test
-    public void buildPermissions_sumOfPermissionsValueTwentyEight_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.buildPermissions(28);
+    public void fromSumOf_sumOfPermissionsValueTwentyEight_ExpectArray() throws UnsupportedPermissionsException {
+        Set<Permission> permissions = Permissions.fromSumOf(28);
 
         assertThat(permissions).containsOnly(Permission.SHARE, Permission.DELETE, Permission.UPDATE);
     }
 
     @Test
-    public void buildPermissions_sumOfPermissionsValueThirtyOne_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.buildPermissions(31);
+    public void fromSumOf_sumOfPermissionsValueThirtyOne_ExpectArray() throws UnsupportedPermissionsException {
+        Set<Permission> permissions = Permissions.fromSumOf(31);
 
         assertThat(permissions).containsOnly(
             Permission.CREATE, Permission.READ, Permission.UPDATE, Permission.SHARE, Permission.DELETE);
     }
 
     @Test
-    public void buildPermissions_sumOfPermissionsValueHighValue_ShouldThrowUnsupportedPermission() {
+    public void fromSumOf_sumOfPermissionsValueHighValue_ShouldThrowUnsupportedPermission() {
         assertThatExceptionOfType(UnsupportedPermissionsException.class).isThrownBy(
-            () -> Permissions.buildPermissions(32))
+            () -> Permissions.fromSumOf(32))
             .withMessage("The given permissions are not supported");
     }
 
     @Test
-    public void buildPermissions_sumOfPermissionsNegativeValue_ExpectArray() {
+    public void fromSumOf_sumOfPermissionsNegativeValue_ExpectArray() {
         assertThatExceptionOfType(UnsupportedPermissionsException.class).isThrownBy(
-            () -> Permissions.buildPermissions(-5))
+            () -> Permissions.fromSumOf(-5))
             .withMessage("The given permissions are not supported");
     }
 }

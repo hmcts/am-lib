@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.exceptions.UnsupportedPermissionsException;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 
@@ -86,8 +85,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @SuppressWarnings("PMD")
     @Test
-    public void filterResource_whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject()
-        throws UnsupportedPermissionsException {
+    public void filterResource_whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject() {
         ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
 
         FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
@@ -104,8 +102,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
 
     @Test
-    public void filterResource_whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() throws
-        UnsupportedPermissionsException {
+    public void filterResource_whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
         String nonExistingUserId = "ijk";
         String nonExistingResourceId = "lmn";
 
@@ -115,8 +112,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     }
 
     @Test
-    public void filterResource_whenRowExistsAndDoesntHaveReadPermissions_ReturnNull()
-        throws UnsupportedPermissionsException {
+    public void filterResource_whenRowExistsAndDoesntHaveReadPermissions_ReturnNull() {
         ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, Stream.of(CREATE, UPDATE).collect(toSet())));
 
         FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);

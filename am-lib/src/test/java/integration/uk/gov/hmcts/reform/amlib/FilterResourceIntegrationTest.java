@@ -7,9 +7,10 @@ import org.junit.Test;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static integration.uk.gov.hmcts.reform.amlib.Constants.ACCESSOR_ID;
-import static integration.uk.gov.hmcts.reform.amlib.Constants.DATA;
-import static integration.uk.gov.hmcts.reform.amlib.Constants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
+import static integration.uk.gov.hmcts.reform.amlib.TestConstants.ACCESSOR_ID;
+import static integration.uk.gov.hmcts.reform.amlib.TestConstants.DATA;
+import static integration.uk.gov.hmcts.reform.amlib.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
+import static integration.uk.gov.hmcts.reform.amlib.TestConstants.createRecord;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.Permissions.CREATE;

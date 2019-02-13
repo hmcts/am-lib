@@ -5,6 +5,9 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static integration.uk.gov.hmcts.reform.amlib.TestConstants.countResourcesById;
+import static integration.uk.gov.hmcts.reform.amlib.TestConstants.grantAndRevokeAccessToRecord;
+import static integration.uk.gov.hmcts.reform.amlib.TestConstants.removeRecord;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RevokeAccessIntegrationTest extends IntegrationBaseTest {

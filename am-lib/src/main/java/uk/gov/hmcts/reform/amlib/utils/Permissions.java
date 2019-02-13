@@ -44,7 +44,7 @@ public final class Permissions {
      * @return a list of permissions.
      * @throws UnsupportedPermissionsException when sumOfPermissions is negative or larger than 31.
      */
-    public static Set<Permission> fromSumOf(int sumOfPermissions) throws UnsupportedPermissionsException {
+    public static Set<Permission> fromSumOf(int sumOfPermissions) {
 
         if (sumOfPermissions < MIN_PERMISSIONS_VALUE || sumOfPermissions > MAX_PERMISSIONS_VALUE) {
             throw new UnsupportedPermissionsException();

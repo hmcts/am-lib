@@ -1,4 +1,4 @@
-package integration.uk.gov.hmcts.reform.amlib;
+package integration.uk.gov.hmcts.reform.amlib.base;
 
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
@@ -12,11 +12,12 @@ import uk.gov.hmcts.reform.amlib.AccessManagementService;
 public abstract class IntegrationBaseTest {
 
     // According to H2 docs DB_CLOSE_DELAY is required in order to keep open connection to db (on close, h2 drops db)
-    public static final String JDBC_URL = "jdbc:h2:mem:test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1";
+    private static final String JDBC_URL = "jdbc:h2:mem:test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1";
     private static final String H2_BACKUP_LOCATION = "/tmp/h2backup.sql";
 
+    private static Jdbi jdbi;
+
     protected AccessManagementService ams;
-    protected static Jdbi jdbi;
 
     @BeforeClass
     public static void initDatabase() {

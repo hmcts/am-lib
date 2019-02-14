@@ -1,6 +1,7 @@
 package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.Before;
 import org.junit.Test;
 

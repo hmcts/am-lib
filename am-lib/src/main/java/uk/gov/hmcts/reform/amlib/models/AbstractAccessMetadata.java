@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@SuppressWarnings("PMD")
 public abstract class AbstractAccessMetadata {
 
     private final String resourceId;

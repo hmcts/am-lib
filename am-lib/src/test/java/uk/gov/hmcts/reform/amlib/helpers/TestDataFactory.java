@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 
 import java.util.Set;
 
-public class TestDataFactory {
+public final class TestDataFactory {
 
     private TestDataFactory() {
         //NO-OP

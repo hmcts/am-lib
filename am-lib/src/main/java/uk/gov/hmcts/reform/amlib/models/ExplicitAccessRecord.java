@@ -14,7 +14,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permissions.hasPermissionTo;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ExplicitAccessRecord extends AbstractAccessMetadata {
+public final class ExplicitAccessRecord extends AbstractAccessMetadata {
 
     private final Set<Permissions> explicitPermissions;
 

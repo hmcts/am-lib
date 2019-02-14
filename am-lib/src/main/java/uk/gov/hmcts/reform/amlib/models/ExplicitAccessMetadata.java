@@ -6,7 +6,8 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ExplicitAccessMetadata extends AbstractAccessMetadata {
+@SuppressWarnings("PMD")
+public final class ExplicitAccessMetadata extends AbstractAccessMetadata {
 
     @Builder // All args constructor is needs for builder. @SuperBuilder cannot be used because IDE does not support it
     @SuppressWarnings("squid:S00107") // Having so many arguments seems reasonable solution here

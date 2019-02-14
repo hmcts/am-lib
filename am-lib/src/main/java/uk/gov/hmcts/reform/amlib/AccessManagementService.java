@@ -3,12 +3,19 @@ package uk.gov.hmcts.reform.amlib;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import uk.gov.hmcts.reform.amlib.enums.Permissions;
+import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
+import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
 public class AccessManagementService {
     private final Jdbi jdbi;
@@ -55,14 +62,15 @@ public class AccessManagementService {
     }
 
     /**
-     * Returns `resourceJson` when record with userId and resourceId exist and has READ permissions, otherwise null.
+     * Returns {@link FilterResourceResponse} when record with userId and resourceId exist and has READ permissions,
+     * otherwise null.
      *
      * @param userId       (accessorId)
      * @param resourceId   resource id
      * @param resourceJson json
      * @return resourceJson or null
      */
-    public JsonNode filterResource(String userId, String resourceId, JsonNode resourceJson) {
+    public FilterResourceResponse filterResource(String userId, String resourceId, JsonNode resourceJson) {
         ExplicitAccessRecord explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resourceId));
 
@@ -70,6 +78,17 @@ public class AccessManagementService {
             return null;
         }
 
-        return Permissions.hasPermissionTo(explicitAccess.getPermissions(), Permissions.READ) ? resourceJson : null;
+        if (READ.isGranted(explicitAccess.getPermissions())) {
+            Map<String, Set<Permission>> attributePermissions = new ConcurrentHashMap<>();
+            attributePermissions.put("/", Permissions.fromSumOf(explicitAccess.getPermissions()));
+
+            return FilterResourceResponse.builder()
+                    .resourceId(resourceId)
+                    .data(resourceJson)
+                    .permissions(attributePermissions)
+                    .build();
+        }
+
+        return null;
     }
 }

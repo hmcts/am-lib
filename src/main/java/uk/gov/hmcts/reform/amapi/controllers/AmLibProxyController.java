@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
-import uk.gov.hmcts.reform.amlib.enums.Permissions;
+import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
+import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -33,12 +34,11 @@ public class AmLibProxyController {
     @SuppressWarnings("unchecked") // supressing compiler warning about casting from Object to List<String>
     @PostMapping("/create-resource-access")
     public void createResourceAccess(@RequestBody Map<String, Object> amData) {
-
         am.createResourceAccess(ExplicitAccessRecord.builder()
                 .resourceId(amData.get(RESOURCE_ID_KEY).toString())
                 .accessorId(amData.get("accessorId").toString())
                 .explicitPermissions(((List<String>) amData.get("explicitPermissions")).stream()
-                        .map(Permissions::valueOf)
+                        .map(Permission::valueOf)
                         .collect(Collectors.toSet()))
                 .accessType(amData.get("accessType").toString())
                 .serviceName(amData.get("serviceName").toString())
@@ -68,7 +68,7 @@ public class AmLibProxyController {
     }
 
     @PostMapping("/filter-resource")
-    public JsonNode filterResource(@RequestBody Map<String, Object> amData) {
+    public FilterResourceResponse filterResource(@RequestBody Map<String, Object> amData) {
         JsonNode jsonNode = mapper.valueToTree(amData.get("resourceJson"));
         return am.filterResource(
                 amData.get("userId").toString(),

@@ -28,7 +28,6 @@ public class PermissionTest {
 
     @Test
     public void sumOf_whenPassingAPermission_theSumOfValuesIsCalculated() {
-
         int sum = Permissions.sumOf(Permission.CREATE);
         int expectedSum = Permission.CREATE.getValue();
 

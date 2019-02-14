@@ -100,7 +100,6 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
             .build());
     }
 
-
     @Test
     public void filterResource_whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
         String nonExistingUserId = "ijk";

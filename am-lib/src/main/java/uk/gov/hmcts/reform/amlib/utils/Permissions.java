@@ -29,8 +29,7 @@ public final class Permissions {
      * @param permissions permission enum values e.g. ("CREATE", "READ") to be converted to integer value.
      * @return the sum of permissions.
      */
-
-    public static int sumOf(Permission ... permissions) {
+    public static int sumOf(Permission... permissions) {
 
         return sumOf(Stream.of(permissions).collect(Collectors.toSet()));
     }
@@ -47,14 +46,13 @@ public final class Permissions {
         return permissions.stream().mapToInt(Permission::getValue).sum();
     }
 
-
     /**
      * Builds a list of permissions based on integer value.
      *
      * @param sumOfPermissions the decimal value of permissions defined in Permission enum
      * @return a list of permissions.
-     * @value MAX_PERMISSIONS_VALUE
      * @throws UnsupportedPermissionsException when sumOfPermissions is negative {@link Permissions#MIN_PERMISSIONS_VALUE} or larger than {@link Permissions#MAX_PERMISSIONS_VALUE}.
+     * @value MAX_PERMISSIONS_VALUE
      */
     public static Set<Permission> fromSumOf(int sumOfPermissions) {
 

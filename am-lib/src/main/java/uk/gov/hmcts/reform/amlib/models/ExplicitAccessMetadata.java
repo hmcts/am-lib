@@ -16,21 +16,4 @@ public class ExplicitAccessMetadata {
     private final String resourceName;
     private final String attribute;
 
-    @JdbiConstructor
-    @SuppressWarnings("squid:S00107") // Having so many arguments seems reasonable solution here
-    public ExplicitAccessMetadata(String resourceId,
-                                  String accessorId,
-                                  String accessType,
-                                  String serviceName,
-                                  String resourceType,
-                                  String resourceName,
-                                  String attribute) {
-        this.resourceId = resourceId;
-        this.accessorId = accessorId;
-        this.accessType = accessType;
-        this.serviceName = serviceName;
-        this.resourceType = resourceType;
-        this.resourceName = resourceName;
-        this.attribute = attribute;
-    }
 }

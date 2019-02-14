@@ -12,9 +12,9 @@ public class TestDataFactory {
         //NO-OP
     }
 
-    public static ExplicitAccessRecord createAccessRecord(String resourceId,
-                                                          String accessorId,
-                                                          Set<Permissions> explicitPermissions) {
+    public static ExplicitAccessRecord createRecord(String resourceId,
+                                                    String accessorId,
+                                                    Set<Permissions> explicitPermissions) {
         return ExplicitAccessRecord.builder()
             .resourceId(resourceId)
             .accessorId(accessorId)
@@ -28,7 +28,7 @@ public class TestDataFactory {
             .build();
     }
 
-    public static ExplicitAccessMetadata createAccessMetadata(String resourceId) {
+    public static ExplicitAccessMetadata createMetadata(String resourceId) {
         return ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
             .accessorId(TestConstants.ACCESSOR_ID)

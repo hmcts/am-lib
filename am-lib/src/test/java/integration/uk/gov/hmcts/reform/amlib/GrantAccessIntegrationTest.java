@@ -6,10 +6,10 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
-import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createAccessRecord;
-import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createRecord;
 
 public class GrantAccessIntegrationTest extends IntegrationBaseTest {
 
@@ -22,7 +22,7 @@ public class GrantAccessIntegrationTest extends IntegrationBaseTest {
 
     @Test
     public void createQuery_whenCreatingResourceAccess_ResourceAccessAppearsInDatabase() {
-        ams.createResourceAccess(createAccessRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
+        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(1);
     }

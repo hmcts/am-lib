@@ -8,9 +8,13 @@ import java.util.Set;
 
 public class TestDataFactory {
 
-    public static ExplicitAccessRecord createRecord(String resourceId,
-                                                    String accessorId,
-                                                    Set<Permissions> explicitPermissions) {
+    private TestDataFactory() {
+        //NO-OP
+    }
+
+    public static ExplicitAccessRecord createAccessRecord(String resourceId,
+                                                          String accessorId,
+                                                          Set<Permissions> explicitPermissions) {
         return ExplicitAccessRecord.builder()
             .resourceId(resourceId)
             .accessorId(accessorId)
@@ -24,7 +28,7 @@ public class TestDataFactory {
             .build();
     }
 
-    public static ExplicitAccessMetadata removeRecord(String resourceId) {
+    public static ExplicitAccessMetadata createAccessMetadata(String resourceId) {
         return ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
             .accessorId(TestConstants.ACCESSOR_ID)

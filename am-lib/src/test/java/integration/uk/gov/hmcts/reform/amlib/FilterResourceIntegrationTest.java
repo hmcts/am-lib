@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -16,7 +15,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permissions.UPDATE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
-import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createRecord;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createAccessRecord;
 
 public class FilterResourceIntegrationTest extends IntegrationBaseTest {
 
@@ -29,7 +28,7 @@ public class FilterResourceIntegrationTest extends IntegrationBaseTest {
 
     @Test
     public void filterResource_whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject() {
-        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
+        ams.createResourceAccess(createAccessRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
 
         JsonNode result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
 
@@ -48,7 +47,7 @@ public class FilterResourceIntegrationTest extends IntegrationBaseTest {
 
     @Test
     public void filterResource_whenRowExistsAndDoesntHaveReadPermissions_ReturnNull() {
-        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, Stream.of(CREATE, UPDATE).collect(toSet())));
+        ams.createResourceAccess(createAccessRecord(resourceId, ACCESSOR_ID, Stream.of(CREATE, UPDATE).collect(toSet())));
 
         JsonNode result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
 

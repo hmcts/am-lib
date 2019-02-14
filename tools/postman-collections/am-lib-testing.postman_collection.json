@@ -31,10 +31,10 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n\t\"userId\": \"user-A-id\",\n\t\"resourceId\": \"my-super-resource-id\"\n}"
+          "raw": "{\n\t\"userId\": \"UNIQUE-USER-ID\",\n\t\"resourceId\": \"my-super-resource-id\"\n}"
         },
         "url": {
-          "raw": "http://localhost:3703/lib/get-accessors-list?",
+          "raw": "http://localhost:3703/lib/get-accessors-list",
           "protocol": "http",
           "host": [
             "localhost"
@@ -79,10 +79,10 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n\t\"userId\": \"user-A-id\",\n\t\"resourceId\": \"my-super-resource-id\",\n\t\"resourceJson\": {\n\t\t\"someKey\":\"some-value\"\n\t}\n}"
+          "raw": "{\n\t\"userId\": \"UNIQUE-USER-ID\",\n\t\"resourceId\": \"my-super-resource-id\",\n\t\"resourceJson\": {\n\t\t\"someKey\":\"some-value\"\n\t}\n}"
         },
         "url": {
-          "raw": "http://localhost:3703/lib/filter-resource?",
+          "raw": "http://localhost:3703/lib/filter-resource",
           "protocol": "http",
           "host": [
             "localhost"
@@ -115,7 +115,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"resourceId\": \"my-super-resource-id3\",\n    \"accessorId\": \"UNIQUE-USER-ID\",\n    \"explicitPermissions\": [\"CREATE\", \"READ\", \"UPDATE\"],\n    \"accessType\": \"user\",\n    \"serviceName\": \"Service 1\",\n    \"resourceType\": \"Resource Type 1\",\n    \"resourceName\": \"resource\",\n    \"attribute\": \"\",\n    \"securityClassification\": \"Public\"\n}"
+          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorId\": \"UNIQUE-USER-ID\",\n    \"explicitPermissions\": [\"CREATE\", \"READ\", \"UPDATE\"],\n    \"accessType\": \"user\",\n    \"serviceName\": \"Service 1\",\n    \"resourceType\": \"Resource Type 1\",\n    \"resourceName\": \"resource\",\n    \"attribute\": \"\",\n    \"securityClassification\": \"Public\"\n}"
         },
         "url": {
           "raw": "localhost:3703/lib/create-resource-access",

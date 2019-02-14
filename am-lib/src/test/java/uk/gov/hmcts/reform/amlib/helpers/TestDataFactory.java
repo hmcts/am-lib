@@ -11,7 +11,7 @@ public class TestDataFactory {
     public static ExplicitAccessRecord createRecord(String resourceId,
                                                     String accessorId,
                                                     Set<Permissions> explicitPermissions) {
-        return ExplicitAccessRecord.explicitAccessRecordBuilder()
+        return ExplicitAccessRecord.builder()
             .resourceId(resourceId)
             .accessorId(accessorId)
             .explicitPermissions(explicitPermissions)

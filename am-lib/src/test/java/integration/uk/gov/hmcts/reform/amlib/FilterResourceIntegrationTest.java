@@ -4,18 +4,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
-import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createRecord;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.Permissions.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permissions.UPDATE;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createRecord;
 
 public class FilterResourceIntegrationTest extends IntegrationBaseTest {
 

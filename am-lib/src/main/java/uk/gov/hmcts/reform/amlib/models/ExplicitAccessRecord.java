@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.amlib.models;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import org.jdbi.v3.core.mapper.reflect.JdbiConstructor;
 import uk.gov.hmcts.reform.amlib.enums.Permissions;
 
@@ -13,28 +12,26 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.amlib.enums.Permissions.hasPermissionTo;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-@Getter
-public class ExplicitAccessRecord extends ExplicitAccessMetadata {
+@EqualsAndHashCode(callSuper = true)
+public class ExplicitAccessRecord extends AbstractAccessMetadata {
 
     private final Set<Permissions> explicitPermissions;
-    private final String securityClassification;
 
+    @Builder // All args constructor is needs for builder. @SuperBuilder cannot be used because IDE does not support it
     @SuppressWarnings("squid:S00107") // Having so many arguments seems reasonable solution here
-    @Builder(builderMethodName = "explicitAccessRecordBuilder")
-    public ExplicitAccessRecord(String resourceId,
-                                String accessorId,
-                                Set<Permissions> explicitPermissions,
-                                String accessType,
-                                String serviceName,
-                                String resourceType,
-                                String resourceName,
-                                String attribute,
-                                String securityClassification) {
-        super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute);
+    private ExplicitAccessRecord(String resourceId,
+                                 String accessorId,
+                                 String accessType,
+                                 String serviceName,
+                                 String resourceType,
+                                 String resourceName,
+                                 String attribute,
+                                 String securityClassification,
+                                 Set<Permissions> explicitPermissions) {
+        super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute,
+                securityClassification);
         this.explicitPermissions = explicitPermissions;
-        this.securityClassification = securityClassification;
     }
 
     @JdbiConstructor
@@ -48,9 +45,8 @@ public class ExplicitAccessRecord extends ExplicitAccessMetadata {
                                 String resourceName,
                                 String attribute,
                                 String securityClassification) {
-        super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute);
+        super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute, securityClassification);
         this.explicitPermissions = convertSumOfPermissionsToSet(permissions);
-        this.securityClassification = securityClassification;
     }
 
     public int getPermissions() {

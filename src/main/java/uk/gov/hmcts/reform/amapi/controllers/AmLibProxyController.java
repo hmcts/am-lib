@@ -34,7 +34,7 @@ public class AmLibProxyController {
     @PostMapping("/create-resource-access")
     public void createResourceAccess(@RequestBody Map<String, Object> amData) {
 
-        am.createResourceAccess(ExplicitAccessRecord.explicitAccessRecordBuilder()
+        am.createResourceAccess(ExplicitAccessRecord.builder()
                 .resourceId(amData.get(RESOURCE_ID_KEY).toString())
                 .accessorId(amData.get("accessorId").toString())
                 .explicitPermissions(((List<String>) amData.get("explicitPermissions")).stream()

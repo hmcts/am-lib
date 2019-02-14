@@ -40,8 +40,7 @@ public abstract class IntegrationBaseTest {
         // so workaround is to pass relative path to them
         configuration.locations("filesystem:src/main/resources/db/migration");
         Flyway flyway = new Flyway(configuration);
-        int noOfMigrations = flyway.migrate();
-        assertThat(noOfMigrations).isGreaterThan(0);
+        flyway.migrate();
     }
 
     private static void createBackup() {
@@ -54,13 +53,5 @@ public abstract class IntegrationBaseTest {
             handle.execute("DROP ALL OBJECTS");
             return handle.execute("RUNSCRIPT FROM ?", H2_BACKUP_LOCATION);
         });
-    }
-
-    static int countResourcesById(String resourceId) {
-        return jdbi.open().createQuery(
-            "select count(1) from access_management where resource_id = ?")
-            .bind(0, resourceId)
-            .mapTo(int.class)
-            .findOnly();
     }
 }

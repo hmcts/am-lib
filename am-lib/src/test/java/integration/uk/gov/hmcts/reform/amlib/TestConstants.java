@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static integration.uk.gov.hmcts.reform.amlib.IntegrationBaseTest.jdbi;
 import static java.util.stream.Collectors.toSet;
 import static uk.gov.hmcts.reform.amlib.enums.Permissions.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permissions.READ;
@@ -61,5 +62,14 @@ public final class TestConstants {
     public static void grantAndRevokeAccessToRecord(String resourceId) {
         createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
         removeRecord(resourceId);
+    }
+
+
+    public static int countResourcesById(String resourceId) {
+        return jdbi.open().createQuery(
+            "select count(1) from access_management where resource_id = ?")
+            .bind(0, resourceId)
+            .mapTo(int.class)
+            .findOnly();
     }
 }

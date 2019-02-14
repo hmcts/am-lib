@@ -8,8 +8,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @SuppressWarnings("PMD")
 public abstract class IntegrationBaseTest {
 
@@ -53,5 +51,13 @@ public abstract class IntegrationBaseTest {
             handle.execute("DROP ALL OBJECTS");
             return handle.execute("RUNSCRIPT FROM ?", H2_BACKUP_LOCATION);
         });
+    }
+
+    protected static int countResourcesById(String resourceId) {
+        return jdbi.open().createQuery(
+                "select count(1) from access_management where resource_id = ?")
+                .bind(0, resourceId)
+                .mapTo(int.class)
+                .findOnly();
     }
 }

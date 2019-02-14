@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.amlib.helpers;
 
-import uk.gov.hmcts.reform.amlib.enums.Permissions;
+import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 
@@ -14,7 +14,7 @@ public final class TestDataFactory {
 
     public static ExplicitAccessRecord createRecord(String resourceId,
                                                     String accessorId,
-                                                    Set<Permissions> explicitPermissions) {
+                                                    Set<Permission> explicitPermissions) {
         return ExplicitAccessRecord.builder()
             .resourceId(resourceId)
             .accessorId(accessorId)

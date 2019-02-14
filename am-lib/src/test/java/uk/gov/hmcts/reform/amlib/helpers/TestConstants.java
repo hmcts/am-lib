@@ -2,15 +2,15 @@ package uk.gov.hmcts.reform.amlib.helpers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import uk.gov.hmcts.reform.amlib.enums.Permissions;
+import uk.gov.hmcts.reform.amlib.enums.Permission;
 
 import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
-import static uk.gov.hmcts.reform.amlib.enums.Permissions.CREATE;
-import static uk.gov.hmcts.reform.amlib.enums.Permissions.READ;
-import static uk.gov.hmcts.reform.amlib.enums.Permissions.UPDATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
 public final class TestConstants {
 
@@ -21,7 +21,7 @@ public final class TestConstants {
     public static final String SECURITY_CLASSIFICATION = "Public";
     public static final String ACCESSOR_ID = "a";
     public static final String OTHER_ACCESSOR_ID = "b";
-    public static final Set<Permissions> EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS =
+    public static final Set<Permission> EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS =
         Stream.of(CREATE, READ, UPDATE).collect(toSet());
     public static final JsonNode DATA = JsonNodeFactory.instance.objectNode();
 

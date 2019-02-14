@@ -51,8 +51,8 @@ public final class Permissions {
      *
      * @param sumOfPermissions the decimal value of permissions defined in Permission enum
      * @return a list of permissions.
-     * @throws UnsupportedPermissionsException when sumOfPermissions is negative {@link Permissions#MIN_PERMISSIONS_VALUE} or larger than {@link Permissions#MAX_PERMISSIONS_VALUE}.
-     * @value MAX_PERMISSIONS_VALUE
+     * @throws UnsupportedPermissionsException when sumOfPermissions is negative
+     * {@link Permissions#MIN_PERMISSIONS_VALUE} or larger than {@link Permissions#MAX_PERMISSIONS_VALUE}.
      */
     public static Set<Permission> fromSumOf(int sumOfPermissions) {
 

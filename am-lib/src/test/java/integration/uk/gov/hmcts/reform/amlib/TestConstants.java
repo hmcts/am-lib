@@ -59,11 +59,6 @@ public final class TestConstants {
             .build();
     }
 
-    public static void grantAndRevokeAccessToRecord(String resourceId) {
-        createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
-        removeRecord(resourceId);
-    }
-
 
     public static int countResourcesById(String resourceId) {
         return jdbi.open().createQuery(

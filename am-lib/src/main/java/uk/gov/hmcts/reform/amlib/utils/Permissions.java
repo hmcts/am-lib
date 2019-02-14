@@ -55,7 +55,6 @@ public final class Permissions {
      * {@link Permissions#MIN_PERMISSIONS_VALUE} or larger than {@link Permissions#MAX_PERMISSIONS_VALUE}
      */
     public static Set<Permission> fromSumOf(int sumOfPermissions) {
-
         if (sumOfPermissions < MIN_PERMISSIONS_VALUE || sumOfPermissions > MAX_PERMISSIONS_VALUE) {
             throw new UnsupportedPermissionsException();
         }

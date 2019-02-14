@@ -121,7 +121,6 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     private ExplicitAccessRecord createRecord(String resourceId,
                                               String accessorId,
                                               Set<Permission> explicitPermissions) {
-
         return ExplicitAccessRecord.builder()
             .resourceId(resourceId)
             .accessorId(accessorId)

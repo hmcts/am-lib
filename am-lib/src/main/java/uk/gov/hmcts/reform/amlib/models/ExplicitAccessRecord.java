@@ -2,10 +2,13 @@ package uk.gov.hmcts.reform.amlib.models;
 
 import lombok.Builder;
 import lombok.Data;
+import org.jdbi.v3.core.mapper.reflect.JdbiConstructor;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -42,7 +45,29 @@ public class ExplicitAccessRecord {
         this.securityClassification = securityClassification;
     }
 
+    @JdbiConstructor
+    @SuppressWarnings("squid:S00107") // Having so many arguments seems reasonable solution here
+    public ExplicitAccessRecord(String resourceId,
+                                String accessorId,
+                                int permissions,
+                                String accessType,
+                                String serviceName,
+                                String resourceType,
+                                String resourceName,
+                                String attribute,
+                                String securityClassification) {
+        this(resourceId, accessorId, convertSumOfPermissionsToSet(permissions), accessType, serviceName, resourceType,
+            resourceName, attribute, securityClassification);
+    }
+
     public int getPermissions() {
         return Permissions.sumOf(explicitPermissions);
     }
+
+    private static Set<Permission> convertSumOfPermissionsToSet(int sumOfPermissions) {
+        return Arrays.stream(Permission.values())
+            .filter(permission -> permission.isGranted(sumOfPermissions))
+            .collect(Collectors.toSet());
+    }
+
 }

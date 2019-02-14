@@ -20,7 +20,7 @@ public final class Permissions {
         Permissions.sumOf(CREATE, READ, UPDATE, DELETE);
 
     private Permissions() {
-
+        //NO-OP
     }
 
     /**
@@ -58,7 +58,7 @@ public final class Permissions {
      * @value MAX_PERMISSIONS_VALUE
      * @throws UnsupportedPermissionsException when sumOfPermissions is negative {@link Permissions#MIN_PERMISSIONS_VALUE} or larger than {@link Permissions#MAX_PERMISSIONS_VALUE}.
      */
-    public static Set<Permission> fromSumOf(int sumOfPermissions) throws UnsupportedPermissionsException {
+    public static Set<Permission> fromSumOf(int sumOfPermissions) {
 
         if (sumOfPermissions < MIN_PERMISSIONS_VALUE || sumOfPermissions > MAX_PERMISSIONS_VALUE) {
             throw new UnsupportedPermissionsException();

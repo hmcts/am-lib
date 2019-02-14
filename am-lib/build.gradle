@@ -42,6 +42,10 @@ pmd {
 
 sourceCompatibility = 1.8
 
+compileJava {
+    options.compilerArgs << '-parameters'
+}
+
 repositories {
     mavenLocal()
     mavenCentral()
@@ -49,8 +53,8 @@ repositories {
 }
 
 dependencies {
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
     
     compile group: 'org.jdbi', name: 'jdbi3-core', version: '3.6.0'
     compile group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.6.0'

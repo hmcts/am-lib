@@ -23,7 +23,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     private static final String ACCESSOR_ID = "a";
     private static final String OTHER_ACCESSOR_ID = "b";
     private static final Set<Permissions> EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS = Stream.of(CREATE, READ, UPDATE)
-            .collect(toSet());
+        .collect(toSet());
     private static final String ACCESS_TYPE = "user";
     private static final String SERVICE_NAME = "Service 1";
     private static final String RESOURCE_TYPE = "Resource Type 1";
@@ -36,6 +36,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     @Before
     public void setupTest() {
         resourceId = UUID.randomUUID().toString();
+        jdbi.open().execute("delete from access_management");
     }
 
     @Test
@@ -43,10 +44,10 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
         ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
 
         int count = jdbi.open().createQuery(
-                "select count(1) from access_management where resource_id = ?")
-                .bind(0, resourceId)
-                .mapTo(int.class)
-                .findOnly();
+            "select count(1) from access_management where resource_id = ?")
+            .bind(0, resourceId)
+            .mapTo(int.class)
+            .findOnly();
 
         assertThat(count).isEqualTo(1);
     }
@@ -114,15 +115,15 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
                                               String accessorId,
                                               Set<Permissions> explicitPermissions) {
         return ExplicitAccessRecord.builder()
-                .resourceId(resourceId)
-                .accessorId(accessorId)
-                .explicitPermissions(explicitPermissions)
-                .accessType(ACCESS_TYPE)
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .attribute("")
-                .securityClassification(SECURITY_CLASSIFICATION)
-                .build();
+            .resourceId(resourceId)
+            .accessorId(accessorId)
+            .explicitPermissions(explicitPermissions)
+            .accessType(ACCESS_TYPE)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attribute("")
+            .securityClassification(SECURITY_CLASSIFICATION)
+            .build();
     }
 }

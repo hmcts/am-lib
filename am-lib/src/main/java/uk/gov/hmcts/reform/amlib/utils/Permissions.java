@@ -23,36 +23,36 @@ public final class Permissions {
     }
 
     /**
-     * {@link Permissions#sumOf} method called when multiple enum values entered e.g (CREATE,READ,UPDATE,DELETE).
-     * Values are then summed up.The integer value of the permission is then returned.
+     * Converts permissions passed in to an integer values and sums them up.
      *
-     * @param permissions permission enum values e.g. ("CREATE", "READ") to be converted to integer value.
-     * @return the sum of permissions.
+     * @param permissions permission enum values e.g. ("CREATE", "READ") to be converted to integer value
+     * @return the sum of permissions
+     *
+     * @see Permissions#sumOf(Set)
      */
     public static int sumOf(Permission... permissions) {
-
         return sumOf(Stream.of(permissions).collect(Collectors.toSet()));
     }
 
     /**
-     * Permission values passed in (CREATE,READ,UPDATE,DELETE) are converted to an integer
-     * value and are summed up.The integer value of the permission is then returned.
+     * Converts permissions passed in to an integer values and sums them up.
      *
-     * @param permissions a set of permission enum values e.g. ("CREATE", "READ") to be converted to integer value.
-     * @return the sum of permissions.
+     * @param permissions a set of permission enum values e.g. ("CREATE", "READ") to be converted to integer value
+     * @return the sum of permissions
+     *
+     * @see Permissions#sumOf(Permission...)
      */
     public static int sumOf(Set<Permission> permissions) {
-
         return permissions.stream().mapToInt(Permission::getValue).sum();
     }
 
     /**
-     * Builds a list of permissions based on integer value.
+     * Builds a set of permissions based on integer value that represents sum of permissions.
      *
-     * @param sumOfPermissions the decimal value of permissions defined in Permission enum
+     * @param sumOfPermissions sum of permission integer values defined in {@link Permission} enum
      * @return a list of permissions.
-     * @throws UnsupportedPermissionsException when sumOfPermissions is negative
-     * {@link Permissions#MIN_PERMISSIONS_VALUE} or larger than {@link Permissions#MAX_PERMISSIONS_VALUE}.
+     * @throws UnsupportedPermissionsException when sumOfPermissions is smaller than
+     * {@link Permissions#MIN_PERMISSIONS_VALUE} or larger than {@link Permissions#MAX_PERMISSIONS_VALUE}
      */
     public static Set<Permission> fromSumOf(int sumOfPermissions) {
 

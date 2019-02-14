@@ -13,13 +13,14 @@ import java.util.List;
 public interface AccessManagementRepository {
 
     @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, access_type, service_name, resource_type, resource_name, attribute, security_classification) "
-            + "values (:resourceId, :accessorId, :permissions, :accessType, :serviceName, :resourceType, :resourceName, :attribute, :securityClassification)")
+        + "values (:resourceId, :accessorId, :permissions, :accessType, :serviceName, :resourceType, :resourceName, :attribute, :securityClassification)"
+        + "on conflict on constraint access_management_unique do update set permissions = :permissions")
     void createAccessManagementRecord(@BindBean ExplicitAccessRecord explicitAccessRecord);
 
     @SqlQuery("select accessor_id from access_management where exists "
-            + "(select 1 from access_management where access_management.accessor_id = :accessorId "
-            + "and access_management.resource_id = :resourceId) "
-            + "and access_management.resource_id = :resourceId")
+        + "(select 1 from access_management where access_management.accessor_id = :accessorId "
+        + "and access_management.resource_id = :resourceId) "
+        + "and access_management.resource_id = :resourceId")
     List<String> getAccessorsList(@Bind("accessorId") String accessorId, @Bind("resourceId") String resourceId);
 
     // The 'LIMIT 1' suffix was introduced because at the current database state (V2.2) there is a technical

@@ -34,7 +34,6 @@ public class FilterResourceIntegrationTest extends IntegrationBaseTest {
         assertThat(result).isEqualTo(DATA);
     }
 
-
     @Test
     public void filterResource_whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
         String nonExistingUserId = "ijk";

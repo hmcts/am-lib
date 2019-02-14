@@ -55,4 +55,12 @@ public abstract class IntegrationBaseTest {
             return handle.execute("RUNSCRIPT FROM ?", H2_BACKUP_LOCATION);
         });
     }
+
+    static int countResourcesById(String resourceId) {
+        return jdbi.open().createQuery(
+            "select count(1) from access_management where resource_id = ?")
+            .bind(0, resourceId)
+            .mapTo(int.class)
+            .findOnly();
+    }
 }

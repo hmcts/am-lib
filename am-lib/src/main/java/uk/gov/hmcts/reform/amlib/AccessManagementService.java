@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amlib;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
@@ -24,6 +25,12 @@ public class AccessManagementService {
      * @param explicitAccessRecord a record that describes explicit access to resource
      */
     public void createResourceAccess(ExplicitAccessRecord explicitAccessRecord) {
+        try {
+            JsonPointer.valueOf(explicitAccessRecord.getAttribute());
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException(ex.getMessage());
+        }
+
         jdbi.useExtension(AccessManagementRepository.class,
             dao -> dao.createAccessManagementRecord(explicitAccessRecord));
     }

@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.enums.Permissions.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permissions.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permissions.UPDATE;
@@ -29,6 +30,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
     private static final String RESOURCE_TYPE = "Resource Type 1";
     private static final String RESOURCE_NAME = "resource";
     private static final String SECURITY_CLASSIFICATION = "Public";
+    private static final String ATTRIBUTE = "/test";
     private static final JsonNode DATA = JsonNodeFactory.instance.objectNode();
 
     private String resourceId;
@@ -41,7 +43,32 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void createQuery_whenCreatingResourceAccess_ResourceAccessAppearsInDatabase() {
-        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
+        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS, ATTRIBUTE));
+
+        int count = jdbi.open().createQuery(
+            "select count(1) from access_management where resource_id = ?")
+            .bind(0, resourceId)
+            .mapTo(int.class)
+            .findOnly();
+
+        assertThat(count).isEqualTo(1);
+    }
+
+    @Test
+    public void createQuery_whenCreatingResourceAccess_InvalidAttributeThrowsError() {
+        String invalidJsonPointer = "invalid";
+
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+            ams.createResourceAccess(
+                createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS, invalidJsonPointer)))
+            .withMessage("Invalid input: JSON Pointer expression must start with '/': \"" + invalidJsonPointer + "\"");
+    }
+
+    @Test
+    public void createQuery_whenCreatingResourceAccess_EmptyAttribute() {
+        String emptyJsonPointer = "";
+
+        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS, emptyJsonPointer));
 
         int count = jdbi.open().createQuery(
             "select count(1) from access_management where resource_id = ?")
@@ -54,8 +81,8 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void whenCheckingAccess_ifUserHasAccess_ShouldReturnUserIds() {
-        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
-        ams.createResourceAccess(createRecord(resourceId, OTHER_ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
+        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS, ATTRIBUTE));
+        ams.createResourceAccess(createRecord(resourceId, OTHER_ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS, ATTRIBUTE));
 
         List<String> list = ams.getAccessorsList(ACCESSOR_ID, resourceId);
 
@@ -64,7 +91,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void whenCheckingAccess_ifUserHasNoAccess_ShouldReturnNull() {
-        ams.createResourceAccess(createRecord(resourceId, OTHER_ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
+        ams.createResourceAccess(createRecord(resourceId, OTHER_ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS, ATTRIBUTE));
 
         List<String> list = ams.getAccessorsList(ACCESSOR_ID, resourceId);
 
@@ -73,7 +100,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void whenCheckingAccess_ToNonExistingResource_ShouldReturnNull() {
-        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
+        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS, ATTRIBUTE));
 
         String nonExistingResourceId = "bbbbbbbb";
 
@@ -84,13 +111,12 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void filterResource_whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject() {
-        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
+        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS, ATTRIBUTE));
 
         JsonNode result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
 
         assertThat(result).isEqualTo(DATA);
     }
-
 
     @Test
     public void filterResource_whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
@@ -104,7 +130,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     @Test
     public void filterResource_whenRowExistsAndDoesntHaveReadPermissions_ReturnNull() {
-        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, Stream.of(CREATE, UPDATE).collect(toSet())));
+        ams.createResourceAccess(createRecord(resourceId, ACCESSOR_ID, Stream.of(CREATE, UPDATE).collect(toSet()), ATTRIBUTE));
 
         JsonNode result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
 
@@ -113,7 +139,8 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
 
     private ExplicitAccessRecord createRecord(String resourceId,
                                               String accessorId,
-                                              Set<Permissions> explicitPermissions) {
+                                              Set<Permissions> explicitPermissions,
+                                              String attribute) {
         return ExplicitAccessRecord.builder()
             .resourceId(resourceId)
             .accessorId(accessorId)
@@ -122,7 +149,7 @@ public class AccessManagementServiceIntegrationTest extends IntegrationBaseTest 
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
-            .attribute("")
+            .attribute(attribute)
             .securityClassification(SECURITY_CLASSIFICATION)
             .build();
     }

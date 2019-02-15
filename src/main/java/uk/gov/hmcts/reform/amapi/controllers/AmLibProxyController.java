@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.exceptions.UnsupportedPermissionsException;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 
@@ -49,14 +49,26 @@ public class AmLibProxyController {
                 .build());
     }
 
+    @PostMapping("/revoke-resource-access")
+    public void revokeResourceAccess(@RequestBody Map<String, Object> amData) {
+        am.revokeResourceAccess(ExplicitAccessMetadata.builder()
+            .resourceId(amData.get(RESOURCE_ID_KEY).toString())
+            .accessorId(amData.get("accessorId").toString())
+            .accessType(amData.get("accessType").toString())
+            .serviceName(amData.get("serviceName").toString())
+            .resourceType(amData.get("resourceType").toString())
+            .resourceName(amData.get("resourceName").toString())
+            .attribute(amData.get("attribute").toString())
+            .build());
+    }
+
     @PostMapping("/get-accessors-list")
     public List<String> getAccessorsList(@RequestBody Map<String, Object> amData) {
         return am.getAccessorsList(amData.get("userId").toString(), amData.get(RESOURCE_ID_KEY).toString());
     }
 
     @PostMapping("/filter-resource")
-    public FilterResourceResponse filterResource(@RequestBody Map<String, Object> amData)
-        throws UnsupportedPermissionsException {
+    public FilterResourceResponse filterResource(@RequestBody Map<String, Object> amData) {
         JsonNode jsonNode = mapper.valueToTree(amData.get("resourceJson"));
         return am.filterResource(
                 amData.get("userId").toString(),

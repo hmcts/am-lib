@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
@@ -33,6 +34,16 @@ public class AccessManagementService {
     public void createResourceAccess(ExplicitAccessRecord explicitAccessRecord) {
         jdbi.useExtension(AccessManagementRepository.class,
             dao -> dao.createAccessManagementRecord(explicitAccessRecord));
+    }
+
+    /**
+     * Removes explicit access to resource accordingly to record configuration.
+     *
+     * @param explicitAccessMetadata an object to remove a specific explicit access record.
+     */
+    public void revokeResourceAccess(ExplicitAccessMetadata explicitAccessMetadata) {
+        jdbi.useExtension(AccessManagementRepository.class,
+            dao -> dao.removeAccessManagementRecord(explicitAccessMetadata));
     }
 
     /**
@@ -72,10 +83,10 @@ public class AccessManagementService {
             attributePermissions.put("/", Permissions.fromSumOf(explicitAccess.getPermissions()));
 
             return FilterResourceResponse.builder()
-                .resourceId(resourceId)
-                .data(resourceJson)
-                .permissions(attributePermissions)
-                .build();
+                    .resourceId(resourceId)
+                    .data(resourceJson)
+                    .permissions(attributePermissions)
+                    .build();
         }
 
         return null;

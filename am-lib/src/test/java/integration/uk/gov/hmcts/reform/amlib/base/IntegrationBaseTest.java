@@ -1,4 +1,4 @@
-package integration.uk.gov.hmcts.reform.amlib;
+package integration.uk.gov.hmcts.reform.amlib.base;
 
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
@@ -9,12 +9,10 @@ import org.junit.ClassRule;
 import org.testcontainers.containers.PostgreSQLContainer;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @SuppressWarnings("PMD")
 public abstract class IntegrationBaseTest {
+    private static Jdbi jdbi;
     protected AccessManagementService ams;
-    protected static Jdbi jdbi;
 
     @ClassRule
     public static final PostgreSQLContainer db = new PostgreSQLContainer().withUsername("sa").withPassword("");
@@ -38,7 +36,14 @@ public abstract class IntegrationBaseTest {
         // so workaround is to pass relative path to them
         configuration.locations("filesystem:src/main/resources/db/migration");
         Flyway flyway = new Flyway(configuration);
-        int noOfMigrations = flyway.migrate();
-        assertThat(noOfMigrations).isGreaterThan(0);
+        flyway.migrate();
+    }
+
+    protected static int countResourcesById(String resourceId) {
+        return jdbi.open().createQuery(
+            "select count(1) from access_management where resource_id = ?")
+            .bind(0, resourceId)
+            .mapTo(int.class)
+            .findOnly();
     }
 }

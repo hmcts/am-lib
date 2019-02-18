@@ -18,7 +18,22 @@ def component = "lib-test"
 withNightlyPipeline(type, product, component) {
     env.TEST_URL = params.URL_TO_TEST
 
-    enableMutationTest()
+//    enableMutationTest()
     enablePerformanceTest()
-    enableSlackNotifications('#am-master-builds')
+//    enableSlackNotifications('#am-master-builds')
+
+    before('PerformanceTest') {
+        sh """
+            env
+        """
+        sh """
+            ls
+        """
+        sh """
+            ls src/gatling
+        """
+        sh """
+            ls src/gatling/bodies
+        """
+    }
 }

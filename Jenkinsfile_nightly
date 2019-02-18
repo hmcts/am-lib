@@ -35,5 +35,17 @@ withNightlyPipeline(type, product, component) {
         sh """
             ls src/gatling/bodies
         """
+        withDocker('hmcts/moj-gatling-image:2.3.1-1.0', '--network=host -v $WORKSPACE/src/gatling/conf:/etc/gatling/conf') {
+            sh "pwd"
+        }
+        withDocker('hmcts/moj-gatling-image:2.3.1-1.0', '--network=host -v $WORKSPACE/src/gatling/conf:/etc/gatling/conf') {
+            sh "env"
+        }
+        withDocker('hmcts/moj-gatling-image:2.3.1-1.0', '--network=host -v $WORKSPACE/src/gatling/conf:/etc/gatling/conf') {
+            sh "ls /opt/jenkins/workspace/AM_am-lib_performance-test-debug"
+        }
+        withDocker('hmcts/moj-gatling-image:2.3.1-1.0', '--network=host -v $WORKSPACE/src/gatling/conf:/etc/gatling/conf') {
+            sh "ls /opt/jenkins/workspace/AM_am-lib_performance-test-debug/src/gatling/bodies"
+        }
     }
 }

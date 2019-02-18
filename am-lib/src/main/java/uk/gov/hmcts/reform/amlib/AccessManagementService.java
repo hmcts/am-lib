@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.jdbi.v3.sqlobject.transaction.Transaction;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
@@ -33,6 +34,7 @@ public class AccessManagementService {
      *
      * @param explicitAccessGrant a record that describes explicit access to resource
      */
+    @Transaction
     public void grantExplicitResourceAccess(ExplicitAccessGrant explicitAccessGrant) {
         if (explicitAccessGrant.getAttributePermissions().size() == 0) {
             throw new IllegalArgumentException("Attribute permissions cannot be empty");

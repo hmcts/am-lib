@@ -27,6 +27,7 @@ public final class TestConstants {
     public static final Set<Permission> EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS =
         Stream.of(CREATE, READ, UPDATE).collect(toSet());
     public static final Set<Permission> EXPLICIT_READ_PERMISSION = Stream.of(READ).collect(toSet());
+    public static final Set<Permission> EXPLICIT_CREATE_PERMISSION = Stream.of(CREATE).collect(toSet());
     public static final Map<JsonPointer, Set<Permission>> EMPTY_ATTRIBUTE_PERMISSIONS = new ConcurrentHashMap<>();
     public static final Map<JsonPointer, Set<Permission>> SINGLE_ATTRIBUTE_PERMISSION = new ConcurrentHashMap<>();
 

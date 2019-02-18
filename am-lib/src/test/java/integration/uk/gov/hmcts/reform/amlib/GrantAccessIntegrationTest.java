@@ -30,6 +30,13 @@ public class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
+    public void grantAccess_emptyPermissionsMap_shouldThrowException() {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+            ams.grantExplicitResourceAccess(createRecord(resourceId, ACCESSOR_ID, EMPTY_ATTRIBUTE_PERMISSIONS)))
+            .withMessage("Attribute permissions cannot be empty");
+    }
+
+    @Test
     public void grantAccess_whenCreatingResourceAccess_ResourceAccessAppearsInDatabase() {
         ams.grantExplicitResourceAccess(createRecord(resourceId, ACCESSOR_ID, SINGLE_ATTRIBUTE_PERMISSION));
 
@@ -37,21 +44,21 @@ public class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void invalidAttributeThrowsError() {
-        String invalidJsonPointer = "invalid";
+    public void grantAccess_whenCreatingResourceAccess_EmptyAttribute() {
+        Map<JsonPointer, Set<Permission>> emptyAttributeWithReadPermission = new ConcurrentHashMap<>();
+        emptyAttributeWithReadPermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_PERMISSION);
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-            EMPTY_ATTRIBUTE_PERMISSIONS.put(JsonPointer.valueOf(invalidJsonPointer), EXPLICIT_READ_PERMISSION))
-            .withMessage("Invalid input: JSON Pointer expression must start with '/': \"" + invalidJsonPointer + "\"");
+        ams.grantExplicitResourceAccess(createRecord(resourceId, ACCESSOR_ID, emptyAttributeWithReadPermission));
+
+        assertThat(countResourcesById(resourceId)).isEqualTo(1);
     }
 
     @Test
-    public void grantAccess_whenCreatingResourceAccess_EmptyAttribute() {
-        JsonPointer emptyJsonPointer = JsonPointer.valueOf("");
-        Map<JsonPointer, Set<Permission>> emptyAttributeWithReadPermission = new ConcurrentHashMap<>();
-        emptyAttributeWithReadPermission.put(emptyJsonPointer, EXPLICIT_READ_PERMISSION);
+    public void grantAccess_whenCreatingResourceAccess_NullAttribute() {
+        Map<JsonPointer, Set<Permission>> nullAttributeWithReadPermission = new ConcurrentHashMap<>();
+        nullAttributeWithReadPermission.put(JsonPointer.valueOf(null), EXPLICIT_READ_PERMISSION);
 
-        ams.grantExplicitResourceAccess(createRecord(resourceId, ACCESSOR_ID, emptyAttributeWithReadPermission));
+        ams.grantExplicitResourceAccess(createRecord(resourceId, ACCESSOR_ID, nullAttributeWithReadPermission));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(1);
     }

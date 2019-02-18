@@ -18,34 +18,7 @@ def component = "lib-test"
 withNightlyPipeline(type, product, component) {
     env.TEST_URL = params.URL_TO_TEST
 
-//    enableMutationTest()
+    enableMutationTest()
     enablePerformanceTest()
-//    enableSlackNotifications('#am-master-builds')
-
-    before('PerformanceTest') {
-        sh """
-            env
-        """
-        sh """
-            ls
-        """
-        sh """
-            ls src/gatling
-        """
-        sh """
-            ls src/gatling/bodies
-        """
-        withDocker('hmcts/moj-gatling-image:2.3.1-1.0', '--network=host -v $WORKSPACE/src/gatling/conf:/etc/gatling/conf') {
-            sh "pwd"
-        }
-        withDocker('hmcts/moj-gatling-image:2.3.1-1.0', '--network=host -v $WORKSPACE/src/gatling/conf:/etc/gatling/conf') {
-            sh "env"
-        }
-        withDocker('hmcts/moj-gatling-image:2.3.1-1.0', '--network=host -v $WORKSPACE/src/gatling/conf:/etc/gatling/conf') {
-            sh "ls /opt/jenkins/workspace/AM_am-lib_performance-test-debug"
-        }
-        withDocker('hmcts/moj-gatling-image:2.3.1-1.0', '--network=host -v $WORKSPACE/src/gatling/conf:/etc/gatling/conf') {
-            sh "ls /opt/jenkins/workspace/AM_am-lib_performance-test-debug/src/gatling/bodies"
-        }
-    }
+    enableSlackNotifications('#am-master-builds')
 }

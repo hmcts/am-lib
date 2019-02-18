@@ -1,18 +1,35 @@
 # How to run Gatling locally
-### Prerequisites
 
+## Prerequisites
 
-#### Gatling Setup
-1. Download and extract the [Gatling-2.3.1-bundle](https://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts-bundle/2.3.1/gatling-charts-highcharts-bundle-2.3.1-bundle.zip) (currently used version in jenkins)
-2. Copy bin and lib directories into $project_dir/src/gatling
+- [Docker](https://www.docker.com)
+- [realpath-osx](https://github.com/harto/realpath-osx) (Mac OS only)
 
-#### IDE Setup
-1. In intelliJ Right click the lib directory and select "Add as Library..."
-2. In intelliJ Right click the $project_dir/src/gatling/simulations directory and mark it as Sources root
+## Running
 
-### Running
-1. Start the am-lib project with the dummy service running - for more info check the project's Readme
-2. Run Gatling from the /src/gatling/bin folder and follow the instructions
-```bash
-gatling.sh
+Before you run simulation make sure AM testing service is up and running (for more info check the project's README).
+
+When above precondition is met run simulation using the following command:
+
+```$bash
+ $ ./run.sh
 ```
+
+You can optionally override default `TEST_URL` (set to `http://localhost:3704`) the following way:
+
+```$bash
+ $ TEST_URL=http://localhost:3703 ./run.sh
+```
+
+Bash script will:
+
+1. mount Gatling config and sources Docker container
+2. run simulation in same way as it happens in CI pipeline
+
+## IDE Setup
+
+The following steps will make simulation development easier in IntelliJ IDEA IDE:   
+
+1. copy lib directory from [Gatling bundle](https://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts-bundle/2.3.1/gatling-charts-highcharts-bundle-2.3.1-bundle.zip) to `$project_dir/src/gatling/lib` directory 
+2. in IDE right click the `$project_dir/src/gatling/lib` directory and select "Add as Library..." from menu
+3. in IDE click the $project_dir/src/gatling/simulations directory and mark it as "Sources root"

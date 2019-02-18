@@ -34,7 +34,6 @@ public final class TestDataFactory {
             .attributePermissions(attributePermissions)
             .securityClassification(SECURITY_CLASSIFICATION)
             .build();
-
     }
 
     public static ExplicitAccessMetadata createMetadata(String resourceId) {

@@ -7,18 +7,10 @@ def product = "am"
 def component = "lib-test"
 
 withPipeline(type, product, component) {
+    setVaultName('am')
+    enableDockerBuild()
+    installCharts()
     enableDbMigration()
-    echo env.CHANGE_TITLE
-    if (env.CHANGE_TITLE && !env.CHANGE_TITLE.contains('[PREVIEW]')
-            && env.CHANGE_TITLE.contains('[AKS]')) {
-        setVaultName('am')
-        enableDockerBuild()
-        installCharts()
-    }
-
-    after('checkout') {
-        echo 'am-lib-testing-service checked out'
-    }
 
     before('buildinfra:prod') {
         currentBuild.description = "Success!"

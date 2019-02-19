@@ -1,4 +1,4 @@
-package integration.uk.gov.hmcts.reform.amlib;
+package integration.uk.gov.hmcts.reform.amlib.base;
 
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
@@ -8,17 +8,15 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @SuppressWarnings("PMD")
-abstract class IntegrationBaseTest {
+public abstract class IntegrationBaseTest {
 
     // According to H2 docs DB_CLOSE_DELAY is required in order to keep open connection to db (on close, h2 drops db)
     private static final String JDBC_URL = "jdbc:h2:mem:test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1";
     private static final String H2_BACKUP_LOCATION = "/tmp/h2backup.sql";
 
-    AccessManagementService ams;
-    static Jdbi jdbi;
+    private static Jdbi jdbi;
+    protected AccessManagementService ams;
 
     @BeforeAll
     static void initDatabase() {
@@ -40,8 +38,7 @@ abstract class IntegrationBaseTest {
         // so workaround is to pass relative path to them
         configuration.locations("filesystem:src/main/resources/db/migration");
         Flyway flyway = new Flyway(configuration);
-        int noOfMigrations = flyway.migrate();
-        assertThat(noOfMigrations).isGreaterThan(0);
+        flyway.migrate();
     }
 
     private static void createBackup() {
@@ -54,5 +51,13 @@ abstract class IntegrationBaseTest {
             handle.execute("DROP ALL OBJECTS");
             return handle.execute("RUNSCRIPT FROM ?", H2_BACKUP_LOCATION);
         });
+    }
+
+    protected static int countResourcesById(String resourceId) {
+        return jdbi.open().createQuery(
+                "select count(1) from access_management where resource_id = ?")
+                .bind(0, resourceId)
+                .mapTo(int.class)
+                .findOnly();
     }
 }

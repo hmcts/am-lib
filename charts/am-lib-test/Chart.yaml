@@ -1,4 +1,4 @@
-description: Helm chart for the HMCTS am am-lib-testing-service service
 name: am-lib-test
-home: https://github.com/hmcts/am-lib
 version: 0.0.1
+description: Helm chart for the HMCTS Access Management testing service
+home: https://github.com/hmcts/am-lib

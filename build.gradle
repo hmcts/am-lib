@@ -5,7 +5,6 @@ plugins {
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.0.6.RELEASE'
     id 'org.springframework.boot' version '2.1.2.RELEASE'
-    id 'org.sonarqube' version '2.7'
     id 'org.owasp.dependencycheck' version '4.0.2'
     id 'com.github.ben-manes.versions' version '0.20.0'
     id "org.flywaydb.flyway" version "5.2.4"
@@ -109,19 +108,6 @@ jacocoTestReport {
     }
 }
 
-project.tasks['sonarqube'].dependsOn test, integration
-
-sonarqube {
-    properties {
-        property "sonar.projectName", "Reform :: am-lib-testing-service"
-        property "sonar.projectKey", "uk.gov.hmcts.reform:am-lib-testing-service"
-        property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
-        property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
-        property "sonar.exclusions", "**/config/**,**/*FlywayMigrator*,**/*Application*,**/*Controller*"
-        property "sonar.coverage.exclusions", "**/config/**,**/*FlywayMigrator*,**/*Application*,**/*Controller*"
-    }
-}
-
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
@@ -193,6 +179,11 @@ bootJar {
     manifest {
         attributes('Implementation-Version': project.version.toString())
     }
+}
+
+task sonarqube(type: Exec) {
+    workingDir './am-lib'
+    commandLine './gradlew', 'sonarqube', '--rerun-tasks'
 }
 
 task pitest(type: Exec) {

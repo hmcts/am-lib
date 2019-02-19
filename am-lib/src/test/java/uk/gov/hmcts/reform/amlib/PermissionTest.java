@@ -1,10 +1,14 @@
 package uk.gov.hmcts.reform.amlib;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.UnsupportedPermissionsException;
 import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,24 +16,28 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
 @SuppressWarnings("PMD")
 class PermissionTest {
 
     @Test
     void sumOf_whenPassingSetOfPermissions_theSumOfValuesIsCalculated() {
-        Set<Permission> permissions = Stream.of(Permission.CREATE, Permission.READ).collect(Collectors.toSet());
+        Set<Permission> permissions = Stream.of(CREATE, Permission.READ).collect(Collectors.toSet());
 
         int sum = Permissions.sumOf(permissions);
-        int expectedSum = Permission.CREATE.getValue() + Permission.READ.getValue();
+        int expectedSum = CREATE.getValue() + Permission.READ.getValue();
 
         assertThat(sum).isEqualTo(expectedSum);
     }
 
     @Test
     void sumOf_whenPassingAPermission_theSumOfValuesIsCalculated() {
-        int sum = Permissions.sumOf(Permission.CREATE);
-        int expectedSum = Permission.CREATE.getValue();
+        int sum = Permissions.sumOf(CREATE);
+        int expectedSum = CREATE.getValue();
 
         assertThat(sum).isEqualTo(expectedSum);
     }
@@ -43,110 +51,31 @@ class PermissionTest {
         assertThat(sum).isEqualTo(0);
     }
 
-    @Test
-    void fromSumOf_sumOfPermissionsValueOne_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(1);
-
-        assertThat(permissions).containsOnly(Permission.CREATE);
+    @ParameterizedTest
+    @MethodSource("createPermissionTestData")
+    void fromSumOf_shouldMapIntegerValueToSetOfPermissions(int sumOfPermissions, Set<Permission> permissions) {
+        assertThat(Permissions.fromSumOf(sumOfPermissions))
+            .containsOnlyElementsOf(permissions);
     }
 
-    @Test
-    void fromSumOf_sumOfPermissionsValueTwo_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(2);
-
-        assertThat(permissions).containsOnly(Permission.READ);
-    }
-
-    @Test
-    void fromSumOf_sumOfPermissionsValueThree_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(3);
-
-        assertThat(permissions).containsOnly(Permission.CREATE, Permission.READ);
-    }
-
-    @Test
-    void fromSumOf_sumOfPermissionsValueFour_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(4);
-
-        assertThat(permissions).containsOnly(Permission.UPDATE);
-    }
-
-    @Test
-    void fromSumOf_sumOfPermissionsValueFive_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(5);
-
-        assertThat(permissions).containsOnly(Permission.CREATE, Permission.UPDATE);
-    }
-
-    @Test
-    void fromSumOf_sumOfPermissionsValueSix_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(6);
-
-        assertThat(permissions).containsOnly(Permission.READ, Permission.UPDATE);
-    }
-
-    @Test
-    void fromSumOf_sumOfPermissionsValueSeven_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(7);
-
-        assertThat(permissions).containsOnly(Permission.CREATE, Permission.READ, Permission.UPDATE);
-    }
-
-    @Test
-    void fromSumOf_sumOfPermissionsValueEight_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(8);
-
-        assertThat(permissions).containsOnly(Permission.DELETE);
-    }
-
-    @Test
-    void fromSumOf_sumOfPermissionsValueNine_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(9);
-
-        assertThat(permissions).containsOnly(Permission.CREATE, Permission.DELETE);
-    }
-
-    @Test
-    void fromSumOf_sumOfPermissionsValueTen_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(10);
-
-        assertThat(permissions).containsOnly(Permission.READ, Permission.DELETE);
-    }
-
-    @Test
-    void fromSumOf_sumOfPermissionsValueEleven_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(11);
-
-        assertThat(permissions).containsOnly(Permission.CREATE, Permission.READ, Permission.DELETE);
-    }
-
-    @Test
-    void fromSumOf_sumOfPermissionsValueTwelve_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(12);
-
-        assertThat(permissions).containsOnly(Permission.DELETE, Permission.UPDATE);
-    }
-
-    @Test
-    void fromSumOf_sumOfPermissionsValueThirteen_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(13);
-
-        assertThat(permissions).containsOnly(Permission.CREATE, Permission.UPDATE, Permission.DELETE);
-    }
-
-    @Test
-    void fromSumOf_sumOfPermissionsValueFourteen_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(14);
-
-        assertThat(permissions).containsOnly(Permission.READ, Permission.DELETE, Permission.UPDATE);
-    }
-
-    @Test
-    void fromSumOf_sumOfPermissionsValueFifteen_ExpectArray() throws UnsupportedPermissionsException {
-        Set<Permission> permissions = Permissions.fromSumOf(15);
-
-        assertThat(permissions).containsOnly(
-            Permission.CREATE, Permission.READ, Permission.UPDATE, Permission.DELETE);
+    private static Stream<Arguments> createPermissionTestData() {
+        return Stream.of(
+            Arguments.of(1, setOf(CREATE)),
+            Arguments.of(2, setOf(READ)),
+            Arguments.of(3, setOf(CREATE, READ)),
+            Arguments.of(4, setOf(UPDATE)),
+            Arguments.of(5, setOf(CREATE, UPDATE)),
+            Arguments.of(6, setOf(READ, UPDATE)),
+            Arguments.of(7, setOf(CREATE, READ, UPDATE)),
+            Arguments.of(8, setOf(DELETE)),
+            Arguments.of(9, setOf(CREATE, DELETE)),
+            Arguments.of(10, setOf(READ, DELETE)),
+            Arguments.of(11, setOf(CREATE, READ, DELETE)),
+            Arguments.of(12, setOf(UPDATE, DELETE)),
+            Arguments.of(13, setOf(CREATE, UPDATE, DELETE)),
+            Arguments.of(14, setOf(READ, UPDATE, DELETE)),
+            Arguments.of(15, setOf(CREATE, READ, UPDATE, DELETE))
+        );
     }
 
     @Test
@@ -161,5 +90,9 @@ class PermissionTest {
         assertThatExceptionOfType(UnsupportedPermissionsException.class).isThrownBy(
             () -> Permissions.fromSumOf(Permissions.MIN_PERMISSIONS_VALUE - 5))
             .withMessage("The given permissions are not supported");
+    }
+
+    private static Set<Permission> setOf(Permission... permissions) {
+        return Arrays.stream(permissions).collect(Collectors.toSet());
     }
 }

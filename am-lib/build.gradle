@@ -36,10 +36,20 @@ test {
 pitest {
     pitestVersion = '1.4.5'
     testPlugin = 'junit5'
-    targetClasses = ['uk.gov.hmcts.reform.amlib.*']
-    targetTests = ['integration.uk.gov.hmcts.reform.amlib.*']
-    excludedClasses = ['uk.gov.hmcts.reform.amlib.models.*']
-    excludedTestClasses = ['integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest']
+    targetClasses = [
+      'uk.gov.hmcts.reform.amlib.*'
+    ]
+    targetTests = [
+      'integration.uk.gov.hmcts.reform.amlib.*Test'
+    ]
+    excludedClasses = [
+      'uk.gov.hmcts.reform.amlib.models.*',
+      'uk.gov.hmcts.reform.amlib.helpers.TestConstants',
+      'uk.gov.hmcts.reform.amlib.helpers.TestDataFactory'
+    ]
+    excludedTestClasses = [
+      'integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest'
+    ]
     threads = 4
     outputFormats = ['XML', 'HTML']
     timestampedReports = false

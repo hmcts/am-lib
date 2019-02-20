@@ -4,9 +4,9 @@ plugins {
     id 'checkstyle'
     id 'pmd'
     id 'jacoco'
+    id 'org.sonarqube' version '2.7'
     id 'com.jfrog.bintray' version '1.8.4'
     id 'com.github.johnrengelman.shadow' version '4.0.4'
-    id 'info.solidsoft.pitest' version '1.4.0'
 }
 
 group 'uk.gov.hmcts.reform'
@@ -16,14 +16,8 @@ configurations {
     testOutput.extendsFrom(testCompile)
 }
 
-pitest {
-    targetTests = ['integration.uk.gov.hmcts.reform.amlib.*']
-    excludedTestClasses = ['integration.uk.gov.hmcts.reform.amlib.IntegrationBaseTest']
-    excludedClasses = ['uk.gov.hmcts.reform.amlib.models.*']
-    threads = 4
-    outputFormats = ['XML', 'HTML']
-    timestampedReports = false
-    mutationThreshold = 80
+test {
+    useJUnitPlatform()
 }
 
 checkstyle {
@@ -39,6 +33,18 @@ pmd {
     ruleSetFiles = files("$projectDir/config/pmd/ruleset.xml")
     ruleSets = []
 }
+
+sonarqube {
+    properties {
+        property "sonar.projectName", "Reform :: am-lib"
+        property "sonar.projectKey", "uk.gov.hmcts.reform:am-lib"
+        property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
+        property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
+        property "sonar.coverage.exclusions", "**/models/**"
+    }
+}
+
+project.tasks['sonarqube'].dependsOn test
 
 sourceCompatibility = 1.8
 
@@ -61,8 +67,8 @@ dependencies {
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.24.0'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.24.5'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.12.0'
     testCompile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
     testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.10.6'

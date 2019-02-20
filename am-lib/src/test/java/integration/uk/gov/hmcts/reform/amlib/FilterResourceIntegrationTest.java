@@ -2,8 +2,8 @@ package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 
@@ -21,17 +21,17 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_CREATE_PE
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.grantAccess;
 
-public class FilterResourceIntegrationTest extends IntegrationBaseTest {
+class FilterResourceIntegrationTest extends IntegrationBaseTest {
 
     private String resourceId;
 
-    @Before
-    public void setupTest() {
+    @BeforeEach
+    void setupTest() {
         resourceId = UUID.randomUUID().toString();
     }
 
     @Test
-    public void whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject() throws TransactionRolledbackException {
+    void whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf("/"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -47,7 +47,7 @@ public class FilterResourceIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
+    void whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
         String nonExistingUserId = "ijk";
         String nonExistingResourceId = "lmn";
 
@@ -57,7 +57,7 @@ public class FilterResourceIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void whenRowExistsAndDoesntHaveReadPermissions_ReturnNull() throws TransactionRolledbackException {
+    void whenRowExistsAndDoesntHaveReadPermissions_ReturnNull() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> rootLevelCreatePermission = new ConcurrentHashMap<>();
         rootLevelCreatePermission.put(JsonPointer.valueOf("/"), EXPLICIT_CREATE_PERMISSION);
 

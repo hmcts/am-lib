@@ -19,7 +19,8 @@ class PipelineSimulation extends Simulation {
     BasicScenarios.helloWorld.inject(loadProfile).protocols(httpProtocol),
     BasicScenarios.createResourceAccess.inject(loadProfile).protocols(httpProtocol),
     BasicScenarios.filterResource.inject(loadProfile).protocols(httpProtocol),
-    BasicScenarios.getAccessorsList.inject(loadProfile).protocols(httpProtocol)
+    BasicScenarios.getAccessorsList.inject(loadProfile).protocols(httpProtocol),
+    BasicScenarios.revokeResourceAccess.inject(loadProfile).protocols(httpProtocol)
   ).maxDuration(30.seconds)
     .assertions(
       global.failedRequests.count.is(0),

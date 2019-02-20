@@ -2,8 +2,8 @@ package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
 import java.util.List;
@@ -20,17 +20,17 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREA
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.grantAccess;
 
-public class GetAccessorsListIntegrationTest extends IntegrationBaseTest {
+class GetAccessorsListIntegrationTest extends IntegrationBaseTest {
 
     private String resourceId;
 
-    @Before
-    public void setupTest() {
+    @BeforeEach
+    void setupTest() {
         resourceId = UUID.randomUUID().toString();
     }
 
     @Test
-    public void ifUserHasAccess_ShouldReturnUserIds() throws TransactionRolledbackException {
+     void ifUserHasAccess_ShouldReturnUserIds() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -43,7 +43,7 @@ public class GetAccessorsListIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void ifUserHasNoAccess_ShouldReturnNull() throws TransactionRolledbackException {
+    void ifUserHasNoAccess_ShouldReturnNull() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -55,7 +55,7 @@ public class GetAccessorsListIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void whenCheckingAccess_ToNonExistingResource_ShouldReturnNull() throws TransactionRolledbackException {
+    void whenCheckingAccess_ToNonExistingResource_ShouldReturnNull() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 

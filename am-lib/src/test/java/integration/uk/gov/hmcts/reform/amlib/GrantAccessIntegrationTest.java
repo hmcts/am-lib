@@ -2,8 +2,8 @@ package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
 import java.util.Map;
@@ -20,17 +20,17 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_CREATE_PE
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.grantAccess;
 
-public class GrantAccessIntegrationTest extends IntegrationBaseTest {
+class GrantAccessIntegrationTest extends IntegrationBaseTest {
 
     private String resourceId;
 
-    @Before
-    public void setupTest() {
+    @BeforeEach
+    void setupTest() {
         resourceId = UUID.randomUUID().toString();
     }
 
     @Test
-    public void emptyPermissionsMap_shouldThrowException() {
+    void emptyPermissionsMap_shouldThrowException() {
         Map<JsonPointer, Set<Permission>> emptyAttributePermissions = new ConcurrentHashMap<>();
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
@@ -39,7 +39,7 @@ public class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void whenCreatingResourceAccess_ResourceAccessAppearsInDatabase() throws TransactionRolledbackException {
+    void whenCreatingResourceAccess_ResourceAccessAppearsInDatabase() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -49,7 +49,7 @@ public class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void whenCreatingResourceAccess_MultipleEntriesAppearInDatabase() throws TransactionRolledbackException {
+    void whenCreatingResourceAccess_MultipleEntriesAppearInDatabase() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> multipleAttributePermissions = new ConcurrentHashMap<>();
         multipleAttributePermissions.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
         multipleAttributePermissions.put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
@@ -60,7 +60,7 @@ public class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void whenCreatingDuplicateResourceAccess_EntryIsOverwritten() throws TransactionRolledbackException {
+    void whenCreatingDuplicateResourceAccess_EntryIsOverwritten() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> duplicateAttributePermissions = new ConcurrentHashMap<>();
         duplicateAttributePermissions.put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
         duplicateAttributePermissions.put(JsonPointer.valueOf("/name"), EXPLICIT_CREATE_PERMISSION);

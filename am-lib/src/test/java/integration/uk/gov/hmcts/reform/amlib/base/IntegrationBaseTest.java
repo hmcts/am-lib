@@ -3,29 +3,34 @@ package integration.uk.gov.hmcts.reform.amlib.base;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.jdbi.v3.core.Jdbi;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.testcontainers.containers.PostgreSQLContainer;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 
 @SuppressWarnings("PMD")
 public abstract class IntegrationBaseTest {
+
+    private static final PostgreSQLContainer db = new PostgreSQLContainer().withUsername("sa").withPassword("");
     private static Jdbi jdbi;
     protected AccessManagementService ams;
 
-    @ClassRule
-    public static final PostgreSQLContainer db = new PostgreSQLContainer().withUsername("sa").withPassword("");
-
-    @BeforeClass
-    public static void initDatabase() {
+    @BeforeAll
+    static void initDatabase() {
+        db.start();
         jdbi = Jdbi.create(db.getJdbcUrl(), db.getUsername(), db.getPassword());
 
         initSchema();
     }
 
-    @Before
-    public void setup() {
+    @AfterAll
+    static void destroyDatabase() {
+        db.stop();
+    }
+
+    @BeforeEach
+    void setup() {
         ams = new AccessManagementService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
     }
 

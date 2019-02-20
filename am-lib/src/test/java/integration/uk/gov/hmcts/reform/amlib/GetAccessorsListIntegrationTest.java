@@ -30,7 +30,7 @@ class GetAccessorsListIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-     void ifUserHasAccess_ShouldReturnUserIds() throws TransactionRolledbackException {
+     void ifUserHasAccessShouldReturnUserIds() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -43,7 +43,7 @@ class GetAccessorsListIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void ifUserHasNoAccess_ShouldReturnNull() throws TransactionRolledbackException {
+    void ifUserHasNoAccessShouldReturnNull() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -55,7 +55,7 @@ class GetAccessorsListIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void whenCheckingAccess_ToNonExistingResource_ShouldReturnNull() throws TransactionRolledbackException {
+    void whenCheckingAccessToNonExistingResourceShouldReturnNull() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 

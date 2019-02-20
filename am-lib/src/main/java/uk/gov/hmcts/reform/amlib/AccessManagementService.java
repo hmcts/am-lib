@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import org.jdbi.v3.sqlobject.transaction.Transaction;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
@@ -35,8 +34,8 @@ public class AccessManagementService {
      * Grants explicit access to resource accordingly to record configuration.
      *
      * @param explicitAccessGrant an object that describes explicit access to resource
+     * @throws TransactionRolledbackException when any error occurs in the transaction
      */
-    @Transaction
     public void grantExplicitResourceAccess(ExplicitAccessGrant explicitAccessGrant)
         throws TransactionRolledbackException {
         if (explicitAccessGrant.getAttributePermissions().size() == 0) {

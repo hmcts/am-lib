@@ -29,7 +29,7 @@ class RevokeAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void whenRevokingResourceAccess_ResourceAccessRemovedFromDatabase() throws TransactionRolledbackException {
+    void whenRevokingResourceAccessResourceAccessRemovedFromDatabase() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -41,7 +41,7 @@ class RevokeAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void whenRevokingResourceAccessThatDoesNotExist_NoErrorExpected() {
+    void whenRevokingResourceAccessThatDoesNotExistNoErrorExpected() {
         ams.revokeResourceAccess(createMetadata("4"));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(0);

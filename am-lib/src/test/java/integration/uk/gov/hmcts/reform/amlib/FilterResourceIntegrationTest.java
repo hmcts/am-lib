@@ -31,7 +31,7 @@ class FilterResourceIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject() throws TransactionRolledbackException {
+    void whenRowExistWithAccessorIdAndResourceIdReturnPassedJsonObject() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf("/"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -47,7 +47,7 @@ class FilterResourceIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
+    void whenRowNotExistWithAccessorIdAndResourceIdReturnNull() {
         String nonExistingUserId = "ijk";
         String nonExistingResourceId = "lmn";
 
@@ -57,7 +57,7 @@ class FilterResourceIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void whenRowExistsAndDoesntHaveReadPermissions_ReturnNull() throws TransactionRolledbackException {
+    void whenRowExistsAndDoesntHaveReadPermissionsReturnNull() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> rootLevelCreatePermission = new ConcurrentHashMap<>();
         rootLevelCreatePermission.put(JsonPointer.valueOf("/"), EXPLICIT_CREATE_PERMISSION);
 

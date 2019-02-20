@@ -30,7 +30,7 @@ class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void emptyPermissionsMap_shouldThrowException() {
+    void emptyPermissionsMapShouldThrowException() {
         Map<JsonPointer, Set<Permission>> emptyAttributePermissions = new ConcurrentHashMap<>();
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
@@ -39,7 +39,7 @@ class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void whenCreatingResourceAccess_ResourceAccessAppearsInDatabase() throws TransactionRolledbackException {
+    void whenCreatingResourceAccessResourceAccessAppearsInDatabase() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -49,7 +49,7 @@ class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void whenCreatingResourceAccess_MultipleEntriesAppearInDatabase() throws TransactionRolledbackException {
+    void whenCreatingResourceAccessMultipleEntriesAppearInDatabase() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> multipleAttributePermissions = new ConcurrentHashMap<>();
         multipleAttributePermissions.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
         multipleAttributePermissions.put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
@@ -60,7 +60,7 @@ class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void whenCreatingDuplicateResourceAccess_EntryIsOverwritten() throws TransactionRolledbackException {
+    void whenCreatingDuplicateResourceAccessEntryIsOverwritten() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> duplicateAttributePermissions = new ConcurrentHashMap<>();
         duplicateAttributePermissions.put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
         duplicateAttributePermissions.put(JsonPointer.valueOf("/name"), EXPLICIT_CREATE_PERMISSION);

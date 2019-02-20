@@ -16,8 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_CREATE_PERMISSION;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SINGLE_ATTRIBUTE_PERMISSION;
-import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createRecord;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.grantAccess;
 
 public class FilterResourceIntegrationTest extends IntegrationBaseTest {
 
@@ -30,14 +30,17 @@ public class FilterResourceIntegrationTest extends IntegrationBaseTest {
 
     @Test
     public void filterResource_whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject() {
-        ams.grantExplicitResourceAccess(createRecord(resourceId, ACCESSOR_ID, SINGLE_ATTRIBUTE_PERMISSION));
+        Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
+        singleAttributePermission.put(JsonPointer.valueOf("/"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
+
+        ams.grantExplicitResourceAccess(grantAccess(resourceId, ACCESSOR_ID, singleAttributePermission));
 
         FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
             .data(DATA)
-            .permissions(SINGLE_ATTRIBUTE_PERMISSION)
+            .permissions(singleAttributePermission)
             .build());
     }
 
@@ -56,7 +59,7 @@ public class FilterResourceIntegrationTest extends IntegrationBaseTest {
         Map<JsonPointer, Set<Permission>> rootLevelCreatePermission = new ConcurrentHashMap<>();
         rootLevelCreatePermission.put(JsonPointer.valueOf("/"), EXPLICIT_CREATE_PERMISSION);
 
-        ams.grantExplicitResourceAccess(createRecord(resourceId, ACCESSOR_ID, rootLevelCreatePermission));
+        ams.grantExplicitResourceAccess(grantAccess(resourceId, ACCESSOR_ID, rootLevelCreatePermission));
 
         FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
 

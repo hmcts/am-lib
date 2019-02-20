@@ -32,29 +32,33 @@ public class AccessManagementService {
     /**
      * Grants explicit access to resource accordingly to record configuration.
      *
-     * @param explicitAccessGrant a record that describes explicit access to resource
+     * @param explicitAccessGrant an object that describes explicit access to resource
      */
     @Transaction
     public void grantExplicitResourceAccess(ExplicitAccessGrant explicitAccessGrant) {
-        if (explicitAccessGrant.getAttributePermissions().size() == 0) {
+        if (validExplicitAccessGrant(explicitAccessGrant)) {
+            explicitAccessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
+                ExplicitAccessRecord.builder()
+                    .resourceId(explicitAccessGrant.getResourceId())
+                    .accessorId(explicitAccessGrant.getAccessorId())
+                    .explicitPermissions(attributePermission.getValue())
+                    .accessType(explicitAccessGrant.getAccessType())
+                    .serviceName(explicitAccessGrant.getServiceName())
+                    .resourceType(explicitAccessGrant.getResourceType())
+                    .resourceName(explicitAccessGrant.getResourceName())
+                    .attribute(attributePermission.getKey().toString())
+                    .securityClassification(explicitAccessGrant.getSecurityClassification())
+                    .build())
+                .forEach(explicitAccessRecord ->
+                    jdbi.useExtension(AccessManagementRepository.class,
+                        dao -> dao.createAccessManagementRecord(explicitAccessRecord)));
+        } else {
             throw new IllegalArgumentException("Attribute permissions cannot be empty");
         }
+    }
 
-        explicitAccessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
-            ExplicitAccessRecord.builder()
-                .resourceId(explicitAccessGrant.getResourceId())
-                .accessorId(explicitAccessGrant.getAccessorId())
-                .explicitPermissions(attributePermission.getValue())
-                .accessType(explicitAccessGrant.getAccessType())
-                .serviceName(explicitAccessGrant.getServiceName())
-                .resourceType(explicitAccessGrant.getResourceType())
-                .resourceName(explicitAccessGrant.getResourceName())
-                .attribute(attributePermission.getKey().toString())
-                .securityClassification(explicitAccessGrant.getSecurityClassification())
-                .build())
-            .forEach(explicitAccessRecord ->
-                jdbi.useExtension(AccessManagementRepository.class,
-                    dao -> dao.createAccessManagementRecord(explicitAccessRecord)));
+    private boolean validExplicitAccessGrant(ExplicitAccessGrant explicitAccessGrant) {
+        return explicitAccessGrant.getAttributePermissions().size() != 0;
     }
 
     /**

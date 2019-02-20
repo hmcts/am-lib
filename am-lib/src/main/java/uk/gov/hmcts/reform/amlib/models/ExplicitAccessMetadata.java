@@ -20,6 +20,6 @@ public final class ExplicitAccessMetadata extends AbstractAccessMetadata {
                                    String attribute,
                                    String securityClassification) {
         super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute,
-                securityClassification);
+            securityClassification);
     }
 }

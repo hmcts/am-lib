@@ -14,11 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EMPTY_ATTRIBUTE_PERMISSIONS;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_PERMISSION;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.MULTIPLE_ATTRIBUTE_PERMISSIONS;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SINGLE_ATTRIBUTE_PERMISSION;
-import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createRecord;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.grantAccess;
 
 public class GrantAccessIntegrationTest extends IntegrationBaseTest {
 
@@ -31,41 +28,30 @@ public class GrantAccessIntegrationTest extends IntegrationBaseTest {
 
     @Test
     public void grantAccess_emptyPermissionsMap_shouldThrowException() {
+        Map<JsonPointer, Set<Permission>> emptyAttributePermissions = new ConcurrentHashMap<>();
+
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-            ams.grantExplicitResourceAccess(createRecord(resourceId, ACCESSOR_ID, EMPTY_ATTRIBUTE_PERMISSIONS)))
+            ams.grantExplicitResourceAccess(grantAccess(resourceId, ACCESSOR_ID, emptyAttributePermissions)))
             .withMessage("Attribute permissions cannot be empty");
     }
 
     @Test
     public void grantAccess_whenCreatingResourceAccess_ResourceAccessAppearsInDatabase() {
-        ams.grantExplicitResourceAccess(createRecord(resourceId, ACCESSOR_ID, SINGLE_ATTRIBUTE_PERMISSION));
+        Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
+        singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
+
+        ams.grantExplicitResourceAccess(grantAccess(resourceId, ACCESSOR_ID, singleAttributePermission));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(1);
     }
 
     @Test
-    public void grantAccess_whenCreatingResourceAccess_EmptyAttribute() {
-        Map<JsonPointer, Set<Permission>> emptyAttributeWithReadPermission = new ConcurrentHashMap<>();
-        emptyAttributeWithReadPermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_PERMISSION);
+    public void grantAccess_whenCreatingResourceAccess_MultipleEntriesAppearInDatabase() {
+        Map<JsonPointer, Set<Permission>> multipleAttributePermissions = new ConcurrentHashMap<>();
+        multipleAttributePermissions.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
+        multipleAttributePermissions.put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
-        ams.grantExplicitResourceAccess(createRecord(resourceId, ACCESSOR_ID, emptyAttributeWithReadPermission));
-
-        assertThat(countResourcesById(resourceId)).isEqualTo(1);
-    }
-
-    @Test
-    public void grantAccess_whenCreatingResourceAccess_NullAttribute() {
-        Map<JsonPointer, Set<Permission>> nullAttributeWithReadPermission = new ConcurrentHashMap<>();
-        nullAttributeWithReadPermission.put(JsonPointer.valueOf(null), EXPLICIT_READ_PERMISSION);
-
-        ams.grantExplicitResourceAccess(createRecord(resourceId, ACCESSOR_ID, nullAttributeWithReadPermission));
-
-        assertThat(countResourcesById(resourceId)).isEqualTo(1);
-    }
-
-    @Test
-    public void grantAccess_whenCreatingResourceAccess_MultipleEntries() {
-        ams.grantExplicitResourceAccess(createRecord(resourceId, ACCESSOR_ID, MULTIPLE_ATTRIBUTE_PERMISSIONS));
+        ams.grantExplicitResourceAccess(grantAccess(resourceId, ACCESSOR_ID, multipleAttributePermissions));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(2);
     }

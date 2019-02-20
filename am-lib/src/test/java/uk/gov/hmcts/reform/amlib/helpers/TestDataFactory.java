@@ -21,9 +21,9 @@ public final class TestDataFactory {
         //NO-OP
     }
 
-    public static ExplicitAccessGrant createRecord(String resourceId,
-                                                   String accessorId,
-                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
+    public static ExplicitAccessGrant grantAccess(String resourceId,
+                                                  String accessorId,
+                                                  Map<JsonPointer, Set<Permission>> attributePermissions) {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorId(accessorId)
@@ -44,7 +44,7 @@ public final class TestDataFactory {
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
-            .attribute("/")
+            .attribute("")
             .build();
     }
 }

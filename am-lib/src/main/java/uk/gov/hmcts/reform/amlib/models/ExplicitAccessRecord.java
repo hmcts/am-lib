@@ -27,7 +27,7 @@ public final class ExplicitAccessRecord extends AbstractAccessMetadata {
                                  String securityClassification,
                                  Set<Permission> explicitPermissions) {
         super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute,
-                securityClassification);
+            securityClassification);
         this.explicitPermissions = explicitPermissions;
     }
 
@@ -43,7 +43,7 @@ public final class ExplicitAccessRecord extends AbstractAccessMetadata {
                                 String attribute,
                                 String securityClassification) {
         this(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute,
-                securityClassification, Permissions.fromSumOf(permissions));
+            securityClassification, Permissions.fromSumOf(permissions));
     }
 
     public int getPermissions() {

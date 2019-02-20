@@ -17,5 +17,4 @@ public abstract class AbstractAccessMetadata {
     private final String resourceName;
     private final String attribute;
     private final String securityClassification;
-
 }

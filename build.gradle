@@ -1,3 +1,14 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  configurations.maybeCreate('pitest')
+  dependencies {
+    classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
+    pitest 'org.pitest:pitest-junit5-plugin:0.8'
+  }
+}
+
 plugins {
     id 'application'
     id 'checkstyle'
@@ -13,6 +24,33 @@ plugins {
 subprojects {
     apply plugin: 'org.owasp.dependencycheck'
     apply plugin: 'com.github.ben-manes.versions'
+}
+
+project(":am-lib") {
+  apply plugin: 'info.solidsoft.pitest'
+
+  pitest {
+    pitestVersion = '1.4.5'
+    testPlugin = 'junit5'
+    targetClasses = [
+      'uk.gov.hmcts.reform.amlib.*'
+    ]
+    targetTests = [
+      'integration.uk.gov.hmcts.reform.amlib.*Test'
+    ]
+    excludedClasses = [
+      'uk.gov.hmcts.reform.amlib.models.*',
+      'uk.gov.hmcts.reform.amlib.helpers.TestConstants',
+      'uk.gov.hmcts.reform.amlib.helpers.TestDataFactory'
+    ]
+    excludedTestClasses = [
+      'integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest'
+    ]
+    threads = 4
+    outputFormats = ['XML', 'HTML']
+    timestampedReports = false
+    mutationThreshold = 80
+  }
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -184,11 +222,6 @@ bootJar {
 task sonarqube(type: Exec) {
     workingDir './am-lib'
     commandLine './gradlew', 'sonarqube', '--rerun-tasks'
-}
-
-task pitest(type: Exec) {
-    workingDir './am-lib'
-    commandLine './gradlew', 'pitest', '--rerun-tasks'
 }
 
 //local flyway settings

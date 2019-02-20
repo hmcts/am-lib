@@ -41,7 +41,7 @@ public class AccessManagementService {
         if (explicitAccessGrant.getAttributePermissions().size() == 0) {
             throw new IllegalArgumentException("Attribute permissions cannot be empty");
         } else {
-            jdbi.useTransaction((handle) -> {
+            jdbi.useTransaction(handle -> {
                 AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
                 try {
                     explicitAccessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->

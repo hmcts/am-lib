@@ -11,9 +11,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.transaction.TransactionRolledbackException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.grantAccess;
 
@@ -36,7 +39,7 @@ public class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void whenCreatingResourceAccess_ResourceAccessAppearsInDatabase() {
+    public void whenCreatingResourceAccess_ResourceAccessAppearsInDatabase() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -46,7 +49,7 @@ public class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void whenCreatingResourceAccess_MultipleEntriesAppearInDatabase() {
+    public void whenCreatingResourceAccess_MultipleEntriesAppearInDatabase() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> multipleAttributePermissions = new ConcurrentHashMap<>();
         multipleAttributePermissions.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
         multipleAttributePermissions.put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
@@ -54,5 +57,16 @@ public class GrantAccessIntegrationTest extends IntegrationBaseTest {
         ams.grantExplicitResourceAccess(grantAccess(resourceId, ACCESSOR_ID, multipleAttributePermissions));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(2);
+    }
+
+    @Test
+    public void whenCreatingDuplicateResourceAccess_EntryIsOverwritten() throws TransactionRolledbackException {
+        Map<JsonPointer, Set<Permission>> duplicateAttributePermissions = new ConcurrentHashMap<>();
+        duplicateAttributePermissions.put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
+        duplicateAttributePermissions.put(JsonPointer.valueOf("/name"), EXPLICIT_CREATE_PERMISSION);
+
+        ams.grantExplicitResourceAccess(grantAccess(resourceId, ACCESSOR_ID, duplicateAttributePermissions));
+
+        assertThat(countResourcesById(resourceId)).isEqualTo(1);
     }
 }

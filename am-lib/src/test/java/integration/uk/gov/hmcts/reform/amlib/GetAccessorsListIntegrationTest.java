@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.transaction.TransactionRolledbackException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
@@ -28,10 +30,9 @@ public class GetAccessorsListIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void ifUserHasAccess_ShouldReturnUserIds() {
+    public void ifUserHasAccess_ShouldReturnUserIds() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
-
 
         ams.grantExplicitResourceAccess(grantAccess(resourceId, ACCESSOR_ID, singleAttributePermission));
         ams.grantExplicitResourceAccess(grantAccess(resourceId, OTHER_ACCESSOR_ID, singleAttributePermission));
@@ -42,7 +43,7 @@ public class GetAccessorsListIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void ifUserHasNoAccess_ShouldReturnNull() {
+    public void ifUserHasNoAccess_ShouldReturnNull() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -54,7 +55,7 @@ public class GetAccessorsListIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void whenCheckingAccess_ToNonExistingResource_ShouldReturnNull() {
+    public void whenCheckingAccess_ToNonExistingResource_ShouldReturnNull() throws TransactionRolledbackException {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 

@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.transaction.TransactionRolledbackException;
+
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
 public class AccessManagementService {
@@ -35,30 +37,33 @@ public class AccessManagementService {
      * @param explicitAccessGrant an object that describes explicit access to resource
      */
     @Transaction
-    public void grantExplicitResourceAccess(ExplicitAccessGrant explicitAccessGrant) {
-        if (validExplicitAccessGrant(explicitAccessGrant)) {
-            explicitAccessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
-                ExplicitAccessRecord.builder()
-                    .resourceId(explicitAccessGrant.getResourceId())
-                    .accessorId(explicitAccessGrant.getAccessorId())
-                    .explicitPermissions(attributePermission.getValue())
-                    .accessType(explicitAccessGrant.getAccessType())
-                    .serviceName(explicitAccessGrant.getServiceName())
-                    .resourceType(explicitAccessGrant.getResourceType())
-                    .resourceName(explicitAccessGrant.getResourceName())
-                    .attribute(attributePermission.getKey().toString())
-                    .securityClassification(explicitAccessGrant.getSecurityClassification())
-                    .build())
-                .forEach(explicitAccessRecord ->
-                    jdbi.useExtension(AccessManagementRepository.class,
-                        dao -> dao.createAccessManagementRecord(explicitAccessRecord)));
-        } else {
+    public void grantExplicitResourceAccess(ExplicitAccessGrant explicitAccessGrant)
+        throws TransactionRolledbackException {
+        if (explicitAccessGrant.getAttributePermissions().size() == 0) {
             throw new IllegalArgumentException("Attribute permissions cannot be empty");
+        } else {
+            jdbi.useTransaction((handle) -> {
+                AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
+                try {
+                    explicitAccessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
+                        ExplicitAccessRecord.builder()
+                            .resourceId(explicitAccessGrant.getResourceId())
+                            .accessorId(explicitAccessGrant.getAccessorId())
+                            .explicitPermissions(attributePermission.getValue())
+                            .accessType(explicitAccessGrant.getAccessType())
+                            .serviceName(explicitAccessGrant.getServiceName())
+                            .resourceType(explicitAccessGrant.getResourceType())
+                            .resourceName(explicitAccessGrant.getResourceName())
+                            .attribute(attributePermission.getKey().toString())
+                            .securityClassification(explicitAccessGrant.getSecurityClassification())
+                            .build())
+                        .forEach(dao::createAccessManagementRecord);
+                } catch (RuntimeException e) {
+                    throw (TransactionRolledbackException)
+                        new TransactionRolledbackException("operation could not be completed").initCause(e);
+                }
+            });
         }
-    }
-
-    private boolean validExplicitAccessGrant(ExplicitAccessGrant explicitAccessGrant) {
-        return explicitAccessGrant.getAttributePermissions().size() != 0;
     }
 
     /**

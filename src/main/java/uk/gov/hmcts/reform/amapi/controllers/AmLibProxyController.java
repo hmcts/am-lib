@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 
+import javax.transaction.TransactionRolledbackException;
+
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +32,7 @@ public class AmLibProxyController {
     private AccessManagementService am;
 
     @PostMapping("/create-resource-access")
-    public void createResourceAccess(@RequestBody ExplicitAccessGrant amData) {
+    public void createResourceAccess(@RequestBody ExplicitAccessGrant amData) throws TransactionRolledbackException {
         am.grantExplicitResourceAccess(amData);
     }
 

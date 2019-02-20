@@ -32,7 +32,7 @@ public class AmLibProxyController {
     private AccessManagementService am;
 
     @PostMapping("/create-resource-access")
-    public void createResourceAccess(@RequestBody ExplicitAccessGrant amData) throws TransactionRolledbackException {
+    public void createResourceAccess(@RequestBody ExplicitAccessGrant amData) {
         am.grantExplicitResourceAccess(amData);
     }
 

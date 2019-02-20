@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_TYPE;
@@ -34,6 +35,27 @@ public final class TestDataFactory {
             .attributePermissions(attributePermissions)
             .securityClassification(SECURITY_CLASSIFICATION)
             .build();
+    }
+
+    public static ExplicitAccessGrant grantAccessForWholeDocument(String resourceId,
+                                                                  Set<Permission> permissions) {
+        return ExplicitAccessGrant.builder()
+            .resourceId(resourceId)
+            .accessorId(ACCESSOR_ID)
+            .accessType(ACCESS_TYPE)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attributePermissions(createPermissions("", permissions))
+            .securityClassification(SECURITY_CLASSIFICATION)
+            .build();
+    }
+
+    public static Map<JsonPointer, Set<Permission>> createPermissions(String attribute,
+                                                                      Set<Permission> permissions) {
+        Map<JsonPointer, Set<Permission>> attributePermissions = new ConcurrentHashMap<>();
+        attributePermissions.put(JsonPointer.valueOf(attribute), permissions);
+        return attributePermissions;
     }
 
     public static ExplicitAccessMetadata createMetadata(String resourceId) {

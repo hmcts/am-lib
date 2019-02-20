@@ -29,7 +29,7 @@ public class FilterResourceIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void filterResource_whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject() {
+    public void whenRowExistWithAccessorIdAndResourceId_ReturnPassedJsonObject() {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf("/"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -45,7 +45,7 @@ public class FilterResourceIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void filterResource_whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
+    public void whenRowNotExistWithAccessorIdAndResourceId_ReturnNull() {
         String nonExistingUserId = "ijk";
         String nonExistingResourceId = "lmn";
 
@@ -55,7 +55,7 @@ public class FilterResourceIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void filterResource_whenRowExistsAndDoesntHaveReadPermissions_ReturnNull() {
+    public void whenRowExistsAndDoesntHaveReadPermissions_ReturnNull() {
         Map<JsonPointer, Set<Permission>> rootLevelCreatePermission = new ConcurrentHashMap<>();
         rootLevelCreatePermission.put(JsonPointer.valueOf("/"), EXPLICIT_CREATE_PERMISSION);
 

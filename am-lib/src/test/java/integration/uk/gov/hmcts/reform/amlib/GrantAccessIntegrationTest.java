@@ -27,7 +27,7 @@ public class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void grantAccess_emptyPermissionsMap_shouldThrowException() {
+    public void emptyPermissionsMap_shouldThrowException() {
         Map<JsonPointer, Set<Permission>> emptyAttributePermissions = new ConcurrentHashMap<>();
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
@@ -36,7 +36,7 @@ public class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void grantAccess_whenCreatingResourceAccess_ResourceAccessAppearsInDatabase() {
+    public void whenCreatingResourceAccess_ResourceAccessAppearsInDatabase() {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -46,7 +46,7 @@ public class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void grantAccess_whenCreatingResourceAccess_MultipleEntriesAppearInDatabase() {
+    public void whenCreatingResourceAccess_MultipleEntriesAppearInDatabase() {
         Map<JsonPointer, Set<Permission>> multipleAttributePermissions = new ConcurrentHashMap<>();
         multipleAttributePermissions.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
         multipleAttributePermissions.put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);

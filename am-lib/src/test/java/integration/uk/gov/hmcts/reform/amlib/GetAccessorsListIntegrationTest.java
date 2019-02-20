@@ -28,7 +28,7 @@ public class GetAccessorsListIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void whenCheckingAccess_ifUserHasAccess_ShouldReturnUserIds() {
+    public void ifUserHasAccess_ShouldReturnUserIds() {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -42,7 +42,7 @@ public class GetAccessorsListIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void whenCheckingAccess_ifUserHasNoAccess_ShouldReturnNull() {
+    public void ifUserHasNoAccess_ShouldReturnNull() {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 

@@ -27,7 +27,7 @@ public class RevokeAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void revokeResourceAccess_whenRevokingResourceAccess_ResourceAccessRemovedFromDatabase() {
+    public void whenRevokingResourceAccess_ResourceAccessRemovedFromDatabase() {
         Map<JsonPointer, Set<Permission>> singleAttributePermission = new ConcurrentHashMap<>();
         singleAttributePermission.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
@@ -39,7 +39,7 @@ public class RevokeAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void revokeResourceAccess_whenRevokingResourceAccessThatDoesNotExist_NoErrorExpected() {
+    public void whenRevokingResourceAccessThatDoesNotExist_NoErrorExpected() {
         ams.revokeResourceAccess(createMetadata("4"));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(0);

@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.amlib.exceptions.UnsupportedPermissionsException;
 import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -22,11 +23,23 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 @SuppressWarnings("PMD")
 class PermissionTest {
 
+    @Test
+    void sumOf_shouldCalculateSumOfPermissionsFromEmptyArray() {
+        int sumOfPermissions = Permissions.sumOf();
+        assertThat(sumOfPermissions).isEqualTo(0);
+    }
+
     @ParameterizedTest
     @MethodSource("createArguments")
     void sumOf_shouldCalculateSumOfPermissionsFromArray(Arguments args) {
         int sumOfPermissions = Permissions.sumOf(args.permissions);
         assertThat(sumOfPermissions).isEqualTo(args.sumOfPermissions);
+    }
+
+    @Test
+    void sumOf_shouldCalculateSumOfPermissionsFromEmptySet() {
+        int sumOfPermissions = Permissions.sumOf(new HashSet<>());
+        assertThat(sumOfPermissions).isEqualTo(0);
     }
 
     @ParameterizedTest

@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_PERMISSION;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 
@@ -39,7 +39,7 @@ class GrantAccessIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void whenCreatingResourceAccessResourceAccessAppearsInDatabase() {
-        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, EXPLICIT_READ_PERMISSION));
+        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(1);
     }
@@ -57,8 +57,8 @@ class GrantAccessIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void whenCreatingDuplicateResourceAccessEntryIsOverwritten() {
-        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, EXPLICIT_READ_PERMISSION));
-        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, EXPLICIT_READ_PERMISSION));
+        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
+        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(1);
     }

@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_PERMISSION;
-import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createMetadata;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createMetadata;
 
 class RevokeAccessIntegrationTest extends IntegrationBaseTest {
 
@@ -22,7 +22,7 @@ class RevokeAccessIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void whenRevokingResourceAccessResourceAccessRemovedFromDatabase() {
-        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, EXPLICIT_READ_PERMISSION));
+        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
         ams.revokeResourceAccess(createMetadata(resourceId));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(0);

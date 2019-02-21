@@ -12,11 +12,6 @@ object AccessManagement {
       .body(ElFileBody(body)).asJSON
       .check(status.is(200))
 
-  def helloWorld: HttpRequestBuilder =
-    http("GET Hello World")
-      .get("/")
-      .check(status.is(200))
-
   def createResourceAssess: HttpRequestBuilder =
     postRequest("/create-resource-access","createResourceAccess.json")
 

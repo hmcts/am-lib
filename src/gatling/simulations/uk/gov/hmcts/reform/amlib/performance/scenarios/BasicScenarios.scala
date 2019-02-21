@@ -8,11 +8,6 @@ import io.gatling.core.structure.ScenarioBuilder
 import scala.concurrent.duration._
 
 object BasicScenarios {
-  val helloWorld: ScenarioBuilder = scenario("Hello World")
-    .forever(
-      exec(AccessManagement.helloWorld)
-        .pause(1.second)
-    )
 
   val createResourceAccess: ScenarioBuilder = scenario("Create Resource Access")
     .forever(

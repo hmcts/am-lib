@@ -16,7 +16,6 @@ class PipelineSimulation extends Simulation {
       this is just an exemplary simulation */
 
   setUp(
-    BasicScenarios.helloWorld.inject(loadProfile).protocols(httpProtocol),
     BasicScenarios.createResourceAccess.inject(loadProfile).protocols(httpProtocol),
     BasicScenarios.filterResource.inject(loadProfile).protocols(httpProtocol),
     BasicScenarios.getAccessorsList.inject(loadProfile).protocols(httpProtocol),

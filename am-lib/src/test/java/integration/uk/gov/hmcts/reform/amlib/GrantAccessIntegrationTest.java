@@ -40,6 +40,7 @@ class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
+    @SuppressWarnings("PMD")
     void noPermissionsForAttributesShouldThrowException() {
         Map<JsonPointer, Set<Permission>> attributeNoPermissions = createPermissionsForWholeDocument(new HashSet<>());
 

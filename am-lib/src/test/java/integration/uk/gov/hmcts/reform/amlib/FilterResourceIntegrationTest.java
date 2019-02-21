@@ -13,7 +13,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissionsForWholeDocument;
-import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.grantAccessForWholeDocument;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 
 class FilterResourceIntegrationTest extends IntegrationBaseTest {
 
@@ -26,7 +26,7 @@ class FilterResourceIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void whenRowExistWithAccessorIdAndResourceIdReturnPassedJsonObject() {
-        ams.grantExplicitResourceAccess(grantAccessForWholeDocument(resourceId, ACCESSOR_ID, EXPLICIT_READ_PERMISSION));
+        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, EXPLICIT_READ_PERMISSION));
 
         FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
 
@@ -49,7 +49,7 @@ class FilterResourceIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void whenRowExistsAndDoesntHaveReadPermissionsReturnNull() {
-        ams.grantExplicitResourceAccess(grantAccessForWholeDocument(resourceId, ACCESSOR_ID, EXPLICIT_CREATE_PERMISSION));
+        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, EXPLICIT_CREATE_PERMISSION));
 
         FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
 

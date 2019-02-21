@@ -16,8 +16,8 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_PERMISSION;
-import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.grantAccess;
-import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.grantAccessForWholeDocument;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 
 class GrantAccessIntegrationTest extends IntegrationBaseTest {
 
@@ -33,13 +33,13 @@ class GrantAccessIntegrationTest extends IntegrationBaseTest {
         Map<JsonPointer, Set<Permission>> emptyAttributePermissions = new ConcurrentHashMap<>();
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-            ams.grantExplicitResourceAccess(grantAccess(resourceId, ACCESSOR_ID, emptyAttributePermissions)))
+            ams.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, emptyAttributePermissions)))
             .withMessage("Attribute permissions cannot be empty");
     }
 
     @Test
     void whenCreatingResourceAccessResourceAccessAppearsInDatabase() {
-        ams.grantExplicitResourceAccess(grantAccessForWholeDocument(resourceId, EXPLICIT_READ_PERMISSION));
+        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, EXPLICIT_READ_PERMISSION));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(1);
     }
@@ -50,15 +50,15 @@ class GrantAccessIntegrationTest extends IntegrationBaseTest {
         multipleAttributePermissions.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
         multipleAttributePermissions.put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
-        ams.grantExplicitResourceAccess(grantAccess(resourceId, ACCESSOR_ID, multipleAttributePermissions));
+        ams.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, multipleAttributePermissions));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(2);
     }
 
     @Test
     void whenCreatingDuplicateResourceAccessEntryIsOverwritten() {
-        ams.grantExplicitResourceAccess(grantAccessForWholeDocument(resourceId, EXPLICIT_READ_PERMISSION));
-        ams.grantExplicitResourceAccess(grantAccessForWholeDocument(resourceId, EXPLICIT_READ_PERMISSION));
+        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, EXPLICIT_READ_PERMISSION));
+        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, EXPLICIT_READ_PERMISSION));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(1);
     }

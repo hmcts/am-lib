@@ -22,18 +22,18 @@ public final class TestDataFactory {
         //NO-OP
     }
 
-    public static ExplicitAccessGrant grantAccessForWholeDocument(String resourceId,
+    public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
                                                                   Set<Permission> permissions) {
-        return grantAccessForWholeDocument(resourceId, ACCESSOR_ID, permissions);
+        return createGrantForWholeDocument(resourceId, ACCESSOR_ID, permissions);
     }
 
-    public static ExplicitAccessGrant grantAccessForWholeDocument(String resourceId,
+    public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
                                                                   String accessorId,
                                                                   Set<Permission> permissions) {
-        return grantAccess(resourceId, accessorId, createPermissionsForWholeDocument(permissions));
+        return createGrant(resourceId, accessorId, createPermissionsForWholeDocument(permissions));
     }
 
-    public static ExplicitAccessGrant grantAccess(String resourceId,
+    public static ExplicitAccessGrant createGrant(String resourceId,
                                                   String accessorId,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
         return ExplicitAccessGrant.builder()

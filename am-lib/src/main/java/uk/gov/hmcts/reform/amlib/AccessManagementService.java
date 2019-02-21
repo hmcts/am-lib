@@ -32,6 +32,8 @@ public class AccessManagementService {
     /**
      * Grants explicit access to resource accordingly to record configuration.
      *
+     * Operation is performed in transaction so that if not all records can be created then whole grant will fail.
+     *
      * @param explicitAccessGrant an object that describes explicit access to resource
      */
     public void grantExplicitResourceAccess(ExplicitAccessGrant explicitAccessGrant) {

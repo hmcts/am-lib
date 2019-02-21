@@ -12,7 +12,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_PERMISSION;
-import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissionsForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.grantAccessForWholeDocument;
 
 class FilterResourceIntegrationTest extends IntegrationBaseTest {
@@ -26,14 +26,14 @@ class FilterResourceIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void whenRowExistWithAccessorIdAndResourceIdReturnPassedJsonObject() {
-        ams.grantExplicitResourceAccess(grantAccessForWholeDocument(resourceId, EXPLICIT_READ_PERMISSION));
+        ams.grantExplicitResourceAccess(grantAccessForWholeDocument(resourceId, ACCESSOR_ID, EXPLICIT_READ_PERMISSION));
 
         FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
             .data(DATA)
-            .permissions(createPermissions("", EXPLICIT_READ_PERMISSION))
+            .permissions(createPermissionsForWholeDocument(EXPLICIT_READ_PERMISSION))
             .build());
     }
 
@@ -49,7 +49,7 @@ class FilterResourceIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void whenRowExistsAndDoesntHaveReadPermissionsReturnNull() {
-        ams.grantExplicitResourceAccess(grantAccessForWholeDocument(resourceId, EXPLICIT_CREATE_PERMISSION));
+        ams.grantExplicitResourceAccess(grantAccessForWholeDocument(resourceId, ACCESSOR_ID, EXPLICIT_CREATE_PERMISSION));
 
         FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
 

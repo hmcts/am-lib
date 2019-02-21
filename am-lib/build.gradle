@@ -90,12 +90,12 @@ task codeCoverageReport(type: JacocoReport, dependsOn: test) {
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
@@ -107,7 +107,7 @@ shadowJar {
     from('src/main/java') {
         include '**/*.sql'
     }
-    classifier = 'all'
+    archiveClassifier = 'all'
 }
 
 artifacts {

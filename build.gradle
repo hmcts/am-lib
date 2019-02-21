@@ -102,9 +102,6 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
-
-    // set your environment variables here
-    // environment("APPINSIGHTS_INSTRUMENTATIONKEY", "test-key")
 }
 
 configurations {
@@ -212,7 +209,7 @@ dependencies {
 mainClassName = 'uk.gov.hmcts.reform.amapi.Application'
 
 bootJar {
-    archiveName = 'am-lib-testing-service.jar'
+    archiveFileName = 'am-lib-testing-service.jar'
 
     manifest {
         attributes('Implementation-Version': project.version.toString())

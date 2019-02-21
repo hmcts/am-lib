@@ -22,7 +22,18 @@ public final class TestDataFactory {
         //NO-OP
     }
 
-    public static ExplicitAccessGrant grantAccess(String resourceId,
+    public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
+                                                                  Set<Permission> permissions) {
+        return createGrantForWholeDocument(resourceId, ACCESSOR_ID, permissions);
+    }
+
+    public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
+                                                                  String accessorId,
+                                                                  Set<Permission> permissions) {
+        return createGrant(resourceId, accessorId, createPermissionsForWholeDocument(permissions));
+    }
+
+    public static ExplicitAccessGrant createGrant(String resourceId,
                                                   String accessorId,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
         return ExplicitAccessGrant.builder()
@@ -37,18 +48,8 @@ public final class TestDataFactory {
             .build();
     }
 
-    public static ExplicitAccessGrant grantAccessForWholeDocument(String resourceId,
-                                                                  Set<Permission> permissions) {
-        return ExplicitAccessGrant.builder()
-            .resourceId(resourceId)
-            .accessorId(ACCESSOR_ID)
-            .accessType(ACCESS_TYPE)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .attributePermissions(createPermissions("", permissions))
-            .securityClassification(SECURITY_CLASSIFICATION)
-            .build();
+    public static Map<JsonPointer, Set<Permission>> createPermissionsForWholeDocument(Set<Permission> permissions) {
+        return createPermissions("", permissions);
     }
 
     public static Map<JsonPointer, Set<Permission>> createPermissions(String attribute,

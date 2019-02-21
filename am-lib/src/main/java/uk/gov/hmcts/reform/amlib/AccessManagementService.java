@@ -38,7 +38,11 @@ public class AccessManagementService {
      */
     public void grantExplicitResourceAccess(ExplicitAccessGrant explicitAccessGrant) {
         if (explicitAccessGrant.getAttributePermissions().size() == 0) {
-            throw new IllegalArgumentException("Attribute permissions cannot be empty");
+            throw new IllegalArgumentException("At least one attribute is required");
+        }
+        if (explicitAccessGrant.getAttributePermissions().entrySet().stream()
+            .anyMatch(attributePermission -> attributePermission.getValue().isEmpty())) {
+            throw new IllegalArgumentException("At least one permission per attribute is required");
         }
 
         jdbi.useTransaction(handle -> {

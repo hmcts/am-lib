@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREA
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissionsForWholeDocument;
 
 class GrantAccessIntegrationTest extends IntegrationBaseTest {
 
@@ -29,12 +31,21 @@ class GrantAccessIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void emptyPermissionsMapShouldThrowException() {
+    void noAttributesShouldThrowException() {
         Map<JsonPointer, Set<Permission>> emptyAttributePermissions = new ConcurrentHashMap<>();
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
             ams.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, emptyAttributePermissions)))
-            .withMessage("Attribute permissions cannot be empty");
+            .withMessage("At least one attribute is required");
+    }
+
+    @Test
+    void noPermissionsForAttributesShouldThrowException() {
+        Map<JsonPointer, Set<Permission>> attributeNoPermissions = createPermissionsForWholeDocument(new HashSet<>());
+
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+            ams.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, attributeNoPermissions)))
+            .withMessage("At least one permission per attribute is required");
     }
 
     @Test

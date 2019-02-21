@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import org.jdbi.v3.sqlobject.transaction.Transaction;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.ErrorAddingEntriesToDatabaseException;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -35,32 +34,31 @@ public class AccessManagementService {
      *
      * @param explicitAccessGrant an object that describes explicit access to resource
      */
-    @Transaction
     public void grantExplicitResourceAccess(ExplicitAccessGrant explicitAccessGrant) {
         if (explicitAccessGrant.getAttributePermissions().size() == 0) {
             throw new IllegalArgumentException("Attribute permissions cannot be empty");
         }
 
-        jdbi.useExtension(AccessManagementRepository.class, dao -> {
-                try {
-                    explicitAccessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
-                        ExplicitAccessRecord.builder()
-                            .resourceId(explicitAccessGrant.getResourceId())
-                            .accessorId(explicitAccessGrant.getAccessorId())
-                            .explicitPermissions(attributePermission.getValue())
-                            .accessType(explicitAccessGrant.getAccessType())
-                            .serviceName(explicitAccessGrant.getServiceName())
-                            .resourceType(explicitAccessGrant.getResourceType())
-                            .resourceName(explicitAccessGrant.getResourceName())
-                            .attribute(attributePermission.getKey().toString())
-                            .securityClassification(explicitAccessGrant.getSecurityClassification())
-                            .build())
-                        .forEach(dao::createAccessManagementRecord);
-                } catch (Throwable e) {
-                    throw new ErrorAddingEntriesToDatabaseException();
-                }
+        jdbi.useTransaction(handle -> {
+            AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
+            try {
+                explicitAccessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
+                    ExplicitAccessRecord.builder()
+                        .resourceId(explicitAccessGrant.getResourceId())
+                        .accessorId(explicitAccessGrant.getAccessorId())
+                        .explicitPermissions(attributePermission.getValue())
+                        .accessType(explicitAccessGrant.getAccessType())
+                        .serviceName(explicitAccessGrant.getServiceName())
+                        .resourceType(explicitAccessGrant.getResourceType())
+                        .resourceName(explicitAccessGrant.getResourceName())
+                        .attribute(attributePermission.getKey().toString())
+                        .securityClassification(explicitAccessGrant.getSecurityClassification())
+                        .build())
+                    .forEach(dao::createAccessManagementRecord);
+            } catch (Exception e) {
+                throw new ErrorAddingEntriesToDatabaseException(e);
             }
-        );
+        });
     }
 
     /**

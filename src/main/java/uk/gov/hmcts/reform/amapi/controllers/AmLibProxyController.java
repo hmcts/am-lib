@@ -12,8 +12,6 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 
-import javax.transaction.TransactionRolledbackException;
-
 import java.util.List;
 import java.util.Map;
 

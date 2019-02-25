@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.testcontainers.containers.PostgreSQLContainer;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 
 @SuppressWarnings("PMD")
 public abstract class IntegrationBaseTest {
@@ -15,6 +16,7 @@ public abstract class IntegrationBaseTest {
     private static final PostgreSQLContainer db = new PostgreSQLContainer().withUsername("sa").withPassword("");
     private static Jdbi jdbi;
     protected AccessManagementService ams;
+    protected DefaultRoleSetupImportService defaultRoleService;
 
     @BeforeAll
     static void initDatabase() {
@@ -32,6 +34,7 @@ public abstract class IntegrationBaseTest {
     @BeforeEach
     void setup() {
         ams = new AccessManagementService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
+        defaultRoleService = new DefaultRoleSetupImportService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
     }
 
     private static void initSchema() {
@@ -48,6 +51,14 @@ public abstract class IntegrationBaseTest {
         return jdbi.open().createQuery(
             "select count(1) from access_management where resource_id = ?")
             .bind(0, resourceId)
+            .mapTo(int.class)
+            .findOnly();
+    }
+
+    protected static int countServices(String serviceName) {
+        return jdbi.open().createQuery(
+            "select count(1) from services where services.service_name = ?")
+            .bind(0, serviceName)
             .mapTo(int.class)
             .findOnly();
     }

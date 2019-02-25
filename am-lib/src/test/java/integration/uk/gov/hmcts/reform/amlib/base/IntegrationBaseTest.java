@@ -62,4 +62,21 @@ public abstract class IntegrationBaseTest {
             .mapTo(int.class)
             .findOnly();
     }
+
+    protected static int countRoles(String roleName) {
+        return jdbi.open().createQuery(
+            "select count(1) from roles where roles.role_name = ?")
+            .bind(0, roleName)
+            .mapTo(int.class)
+            .findOnly();
+    }
+
+    protected static int countResources(String serviceName, String resourceType, String resourceName) {
+        return jdbi.open().createQuery(
+            "select count(1) from resources where resources.service_name = ? and resources.resource_type = ? and"
+                + " resources.resource_name = ?")
+            .bind(0, serviceName).bind(1, resourceType).bind(2, resourceName)
+            .mapTo(int.class)
+            .findOnly();
+    }
 }

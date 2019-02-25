@@ -21,6 +21,7 @@ public final class TestConstants {
     public static final String SECURITY_CLASSIFICATION = "Public";
     public static final String ACCESSOR_ID = "a";
     public static final String OTHER_ACCESSOR_ID = "b";
+    public static final String ROLE_NAME = "Role Name";
     public static final Set<Permission> EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS =
         Stream.of(CREATE, READ, UPDATE).collect(toSet());
     public static final Set<Permission> CREATE_PERMISSION = Stream.of(CREATE).collect(toSet());

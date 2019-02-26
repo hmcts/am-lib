@@ -14,16 +14,16 @@ class AddRoleIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void whenAddRoleIsCalledAddNewEntryIntoDatabase() {
-        defaultRoleService.addRole(ROLE_NAME, RoleType.IDAM, SecurityClassification.PUBLIC,
+        defaultRoleService.addRole(ROLE_NAME, RoleType.IDAM, SecurityClassification.Public,
             AccessManagementType.ROLEBASED);
         assertThat(countRoles(ROLE_NAME)).isEqualTo(1);
     }
 
     @Test
     void whenCallIsMadeDuplicatingExistingRoleUpdatesExistingEntry() {
-        defaultRoleService.addRole(ROLE_NAME, RoleType.IDAM, SecurityClassification.PUBLIC,
+        defaultRoleService.addRole(ROLE_NAME, RoleType.IDAM, SecurityClassification.Public,
             AccessManagementType.ROLEBASED);
-        defaultRoleService.addRole(ROLE_NAME, RoleType.IDAM, SecurityClassification.PUBLIC,
+        defaultRoleService.addRole(ROLE_NAME, RoleType.IDAM, SecurityClassification.Public,
             AccessManagementType.ROLEBASED);
         assertThat(countRoles(ROLE_NAME)).isEqualTo(1);
     }

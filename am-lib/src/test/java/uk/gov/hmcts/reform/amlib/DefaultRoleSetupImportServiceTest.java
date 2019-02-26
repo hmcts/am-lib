@@ -6,8 +6,11 @@ import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
-public class DefaultRoleSetupImportServiceTest {
+class DefaultRoleSetupImportServiceTest {
     private DefaultRoleSetupImportService defaultRoleSetupImportService = new DefaultRoleSetupImportService(
         "", "", "");
 
@@ -25,27 +28,63 @@ public class DefaultRoleSetupImportServiceTest {
     }
 
     @Test
-    void whenRoleNameIsEmptyThrowNullPointerException() {
+    void whenRoleNameIsNullThrowNullPointerException() {
         assertThatExceptionOfType(NullPointerException.class)
             .isThrownBy(() -> defaultRoleSetupImportService.addRole(
-                null, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessManagementType.ROLEBASED));
+                null, RoleType.RESOURCE, SecurityClassification.Public, AccessManagementType.ROLEBASED));
     }
 
     @Test
     void whenRoleNameIsEmptyStringThrowIllegalArgumentException() {
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> defaultRoleSetupImportService.addRole(
-                "", RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessManagementType.ROLEBASED))
+                "", RoleType.RESOURCE, SecurityClassification.Public, AccessManagementType.ROLEBASED))
             .withMessage("Role name cannot be empty");
     }
 
-//    @ParameterizedTest()
-//    @CsvSource({"\"\", resource name", "resource type, \"\""})
-//    void whenResourceNameIsEmptyThrowNullPointerException(String resourceType, String resourceName) {
-//        assertThatExceptionOfType(NullPointerException.class)
-//            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(
-//                SERVICE_NAME, resourceType, resourceName)).withMessage("Resource cannot contain empty values");
-//    }
+    @Test
+    void whenServiceNameIsNullThrowNullPointerException() {
+        assertThatExceptionOfType(NullPointerException.class)
+            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(
+                null, RESOURCE_TYPE, RESOURCE_NAME));
+    }
 
+    @Test
+    void whenServiceNameIsEmptyThrowIllegalArgumentException() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(
+                "", RESOURCE_TYPE, RESOURCE_NAME))
+            .withMessage("Service name cannot be empty");
+    }
+
+    @Test
+    void whenResourceNameIsNullThrowNullPointerException() {
+        assertThatExceptionOfType(NullPointerException.class)
+            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(
+                SERVICE_NAME, RESOURCE_TYPE, null));
+    }
+
+    @Test
+    void whenResourceNameIsEmptyThrowIllegalArgumentException() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(
+                SERVICE_NAME, RESOURCE_TYPE, ""))
+            .withMessage("Resource cannot contain empty values");
+    }
+
+    @Test
+    void whenResourceTypeIsNullThrowNullPointerException() {
+        assertThatExceptionOfType(NullPointerException.class)
+            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(
+                SERVICE_NAME, null, RESOURCE_NAME));
+    }
+
+    @Test
+    void whenResourceTypeIsEmptyThrowNullPointerException() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(
+                SERVICE_NAME, "", RESOURCE_NAME))
+            .withMessage("Resource cannot contain empty values");
+    }
 
 }

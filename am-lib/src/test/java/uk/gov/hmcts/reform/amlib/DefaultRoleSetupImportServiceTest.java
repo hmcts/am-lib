@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 class DefaultRoleSetupImportServiceTest {
-    private DefaultRoleSetupImportService defaultRoleSetupImportService = new DefaultRoleSetupImportService(
+    private final DefaultRoleSetupImportService defaultRoleSetupImportService = new DefaultRoleSetupImportService(
         "", "", "");
 
     @Test

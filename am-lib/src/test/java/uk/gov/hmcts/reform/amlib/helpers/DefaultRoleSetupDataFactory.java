@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
-public class DefaultRoleSetupDataFactory {
+public final class DefaultRoleSetupDataFactory {
 
     private DefaultRoleSetupDataFactory() {
         //NO-OP

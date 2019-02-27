@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.ErrorAddingEntriesToDatabaseException;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermission;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
+import uk.gov.hmcts.reform.amlib.models.ResourceAttribute;
 import uk.gov.hmcts.reform.amlib.repositories.DefaultRoleSetupRepository;
 import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
@@ -56,17 +57,18 @@ public class DefaultRoleSetupImportService {
     }
 
     public void grantDefaultPermission(DefaultPermissionGrant defaultPermissionGrant) {
-
         jdbi.useTransaction((handle) -> {
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
             try {
                 defaultPermissionGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
-                    dao.createResourceAttribute(
-                        defaultPermissionGrant.getServiceName(),
-                        defaultPermissionGrant.getResourceType(),
-                        defaultPermissionGrant.getResourceName(),
-                        attribute.toString(),
-                        permissionAndClassification.getValue());
+                    dao.createResourceAttribute(ResourceAttribute.builder()
+                        .serviceName(defaultPermissionGrant.getServiceName())
+                        .resourceName(defaultPermissionGrant.getResourceName())
+                        .resourceType(defaultPermissionGrant.getResourceType())
+                        .attribute(attribute.toString())
+                        .securityClassification(permissionAndClassification.getValue())
+                        .build()
+                    );
 
                     dao.grantDefaultPermission(
                         DefaultPermission.builder()

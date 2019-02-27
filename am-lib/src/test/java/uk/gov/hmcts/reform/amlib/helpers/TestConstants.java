@@ -18,7 +18,7 @@ public final class TestConstants {
     public static final String SERVICE_NAME = "Service 1";
     public static final String RESOURCE_TYPE = "Resource Type 1";
     public static final String RESOURCE_NAME = "resource";
-    public static final String SECURITY_CLASSIFICATION = "Public";
+    public static final String SECURITY_CLASSIFICATION = "PUBLIC";
     public static final String ACCESSOR_ID = "a";
     public static final String OTHER_ACCESSOR_ID = "b";
     public static final String ROLE_NAME = "Role Name";

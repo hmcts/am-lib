@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.amlib.models;
 
-import com.fasterxml.jackson.core.JsonPointer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.amlib.repositories;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import uk.gov.hmcts.reform.amlib.enums.AccessManagementType;
+import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermission;
@@ -15,9 +15,9 @@ public interface DefaultRoleSetupRepository {
         + " on conflict on constraint services_pkey do update set service_name = :serviceName, service_description = :serviceDescription")
     void addService(@Bind("serviceName") String serviceName, @Bind("serviceDescription") String serviceDescription);
 
-    @SqlUpdate("insert into roles (role_name, role_type, security_classification, access_management_type) values (:roleName, :roleType, cast(:securityClassification as securityclassification), :accessManagementType)"
-        + " on conflict on constraint roles_pkey do update set role_name = :roleName, role_type = :roleType, security_classification = cast(:securityClassification as securityclassification), access_management_type = :accessManagementType")
-    void addRole(@Bind("roleName") String roleName, @Bind("roleType") RoleType roleType, @Bind("securityClassification") SecurityClassification securityClassification, @Bind("accessManagementType") AccessManagementType accessManagementType);
+    @SqlUpdate("insert into roles (role_name, role_type, security_classification, access_management_type) values (:roleName, cast(:roleType as roletype), cast(:securityClassification as securityclassification), cast(:accessType as accessmanagementtype))"
+        + " on conflict on constraint roles_pkey do update set role_name = :roleName, role_type = cast(:roleType as roletype), security_classification = cast(:securityClassification as securityclassification), access_management_type = cast(:accessType as accessmanagementtype)")
+    void addRole(@Bind("roleName") String roleName, @Bind("roleType") RoleType roleType, @Bind("securityClassification") SecurityClassification securityClassification, @Bind("accessType") AccessType accessType);
 
     @SqlUpdate("insert into resources (service_name, resource_type, resource_name) values (:serviceName, :resourceType, :resourceName)"
         + "on conflict on constraint resources_pkey do update set service_name = :serviceName, resource_type = :resourceType, resource_name = :resourceName")

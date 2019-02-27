@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.amlib.enums;
 
-public enum AccessManagementType {
-    ROLEBASED,
+public enum AccessType {
+    ROLE_BASED,
     EXPLICIT;
 }

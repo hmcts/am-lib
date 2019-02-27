@@ -45,45 +45,39 @@ class DefaultRoleSetupImportServiceTest {
     @Test
     void whenServiceNameIsNullThrowNullPointerException() {
         assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(
-                null, RESOURCE_TYPE, RESOURCE_NAME));
+            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(null, RESOURCE_TYPE, RESOURCE_NAME));
     }
 
     @Test
     void whenServiceNameIsEmptyThrowIllegalArgumentException() {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(
-                "", RESOURCE_TYPE, RESOURCE_NAME))
+            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition("", RESOURCE_TYPE, RESOURCE_NAME))
             .withMessage("Service name cannot be empty");
     }
 
     @Test
     void whenResourceNameIsNullThrowNullPointerException() {
         assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(
-                SERVICE_NAME, RESOURCE_TYPE, null));
+            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, null));
     }
 
     @Test
     void whenResourceNameIsEmptyThrowIllegalArgumentException() {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(
-                SERVICE_NAME, RESOURCE_TYPE, ""))
+            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, ""))
             .withMessage("Resource cannot contain empty values");
     }
 
     @Test
     void whenResourceTypeIsNullThrowNullPointerException() {
         assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(
-                SERVICE_NAME, null, RESOURCE_NAME));
+            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(SERVICE_NAME, null, RESOURCE_NAME));
     }
 
     @Test
     void whenResourceTypeIsEmptyThrowNullPointerException() {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(
-                SERVICE_NAME, "", RESOURCE_NAME))
+            .isThrownBy(() -> defaultRoleSetupImportService.addResourceDefinition(SERVICE_NAME, "", RESOURCE_NAME))
             .withMessage("Resource cannot contain empty values");
     }
 

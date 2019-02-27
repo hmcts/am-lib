@@ -1,4 +1,4 @@
-package integration.uk.gov.hmcts.reform.amlib.DefaultRoleSetup;
+package integration.uk.gov.hmcts.reform.amlib.defaultrolesetup;
 
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
-
 
 class AddRoleIntegrationTest extends IntegrationBaseTest {
 
@@ -26,5 +25,14 @@ class AddRoleIntegrationTest extends IntegrationBaseTest {
         defaultRoleService.addRole(ROLE_NAME, RoleType.IDAM, SecurityClassification.Public,
             AccessManagementType.ROLEBASED);
         assertThat(countRoles(ROLE_NAME)).isEqualTo(1);
+    }
+
+    @Test
+    void canDeleteRoleFromTable() {
+        defaultRoleService.addRole(ROLE_NAME, RoleType.IDAM, SecurityClassification.Public,
+            AccessManagementType.ROLEBASED);
+        defaultRoleService.deleteRole(ROLE_NAME);
+
+        assertThat(countRoles(ROLE_NAME)).isEqualTo(0);
     }
 }

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
-import uk.gov.hmcts.reform.amlib.exceptions.ErrorAddingEntriesToDatabaseException;
+import uk.gov.hmcts.reform.amlib.exceptions.ErrorAddingEntriesException;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
@@ -27,7 +27,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     void shouldNotBeAbleToCreateDefaultPermissionWhenRoleDoesNotExist() {
         defaultRoleService.deleteRole(ROLE_NAME);
 
-        assertThatExceptionOfType(ErrorAddingEntriesToDatabaseException.class)
+        assertThatExceptionOfType(ErrorAddingEntriesException.class)
             .isThrownBy(() -> defaultRoleService.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION)))
             .withMessageContaining("(role_name)=(Role Name) is not present in table \"roles\"");
     }

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.exceptions.ErrorAddingEntriesToDatabaseException;
+import uk.gov.hmcts.reform.amlib.exceptions.ErrorAddingEntriesException;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
@@ -62,7 +62,7 @@ public class AccessManagementService {
                         .build())
                     .forEach(dao::createAccessManagementRecord);
             } catch (Exception e) {
-                throw new ErrorAddingEntriesToDatabaseException(e);
+                throw new ErrorAddingEntriesException(e);
             }
         });
     }

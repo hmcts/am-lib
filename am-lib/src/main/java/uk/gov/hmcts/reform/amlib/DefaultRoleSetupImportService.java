@@ -6,7 +6,8 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
-import uk.gov.hmcts.reform.amlib.exceptions.ErrorAddingEntriesToDatabaseException;
+import uk.gov.hmcts.reform.amlib.exceptions.ErrorAddingEntriesException;
+import uk.gov.hmcts.reform.amlib.exceptions.ErrorWithDeletionException;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermission;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceAttribute;
@@ -102,7 +103,7 @@ public class DefaultRoleSetupImportService {
 
     /**
      * A method to create a resource attribute and assign it default permissions for a role. This method uses a
-     * transaction and will rollback if any errors are encountered. {@link ErrorAddingEntriesToDatabaseException}
+     * transaction and will rollback if any errors are encountered. {@link ErrorAddingEntriesException}
      *
      * @param defaultPermissionGrant a container for granting default permissions.
      */
@@ -132,7 +133,7 @@ public class DefaultRoleSetupImportService {
                 });
 
             } catch (Exception e) {
-                throw new ErrorAddingEntriesToDatabaseException(e);
+                throw new ErrorAddingEntriesException(e);
             }
         });
     }
@@ -151,8 +152,7 @@ public class DefaultRoleSetupImportService {
                 dao.deleteDefaultPermissionsForRoles(serviceName, resourceType);
                 dao.deleteResourceAttributes(serviceName, resourceType);
             } catch (Exception e) {
-                //TODO: new exception for removing entries.
-                throw new ErrorAddingEntriesToDatabaseException(e);
+                throw new ErrorWithDeletionException(e);
             }
         });
     }
@@ -174,8 +174,7 @@ public class DefaultRoleSetupImportService {
                 dao.deleteDefaultPermissionsForRoles(serviceName, resourceType, resourceName);
                 dao.deleteResourceAttributes(serviceName, resourceType, resourceName);
             } catch (Exception e) {
-                //TODO: new exception for removing entries.
-                throw new ErrorAddingEntriesToDatabaseException(e);
+                throw new ErrorWithDeletionException(e);
             }
         });
     }

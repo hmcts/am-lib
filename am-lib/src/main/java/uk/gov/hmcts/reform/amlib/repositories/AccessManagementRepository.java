@@ -7,6 +7,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
 
 import java.util.List;
 
@@ -41,4 +42,8 @@ public interface AccessManagementRepository {
     @SqlQuery("select * from access_management where accessor_id=? and resource_id=? LIMIT 1")
     @RegisterConstructorMapper(ExplicitAccessRecord.class)
     ExplicitAccessRecord getExplicitAccess(String accessorId, String resourceId);
+
+    @SqlQuery("select * from default_permissions_for_roles where service_name =? and resource_type =? and resource_name =? and role_name =?")
+    @RegisterConstructorMapper(RoleBasedAccessRecord.class)
+    RoleBasedAccessRecord getRolePermissions(String serviceName, String resourceType, String resourceName, String roleName);
 }

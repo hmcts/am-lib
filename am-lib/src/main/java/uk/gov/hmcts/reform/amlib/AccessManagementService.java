@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
+import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
 import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
@@ -20,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
+@SuppressWarnings("PMD")
 public class AccessManagementService {
     private final Jdbi jdbi;
 
@@ -121,5 +123,18 @@ public class AccessManagementService {
         }
 
         return null;
+    }
+
+    public Map<JsonPointer, Set<Permission>> getRolePermissions(String serviceName, String resourceType,
+                                                                String resourceName, String roleName) {
+
+        RoleBasedAccessRecord roleBasedAccess = jdbi.withExtension(AccessManagementRepository.class,
+            dao -> dao.getRolePermissions(serviceName, resourceType, resourceName, roleName));
+
+        Map<JsonPointer, Set<Permission>> permissionsByTypeAndRole = new ConcurrentHashMap<>();
+        permissionsByTypeAndRole.put(JsonPointer.valueOf(roleBasedAccess.getAttribute()),
+            Permissions.fromSumOf(roleBasedAccess.getPermissions()));
+
+        return permissionsByTypeAndRole;
     }
 }

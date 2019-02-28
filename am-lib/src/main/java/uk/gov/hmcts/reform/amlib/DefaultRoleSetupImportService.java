@@ -6,8 +6,7 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
-import uk.gov.hmcts.reform.amlib.exceptions.ErrorAddingEntriesException;
-import uk.gov.hmcts.reform.amlib.exceptions.ErrorWithDeletionException;
+import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermission;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceAttribute;
@@ -30,7 +29,7 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * A method to add a new service.
+     * Creates a new unique service or updates if already exists.
      *
      * @param serviceName the name of the service.
      */
@@ -44,7 +43,7 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * A method to add a new service.
+     * Creates a new unique service, with a description, or updates if already exists.
      *
      * @param serviceName        the name of the service.
      * @param serviceDescription a description of the service.
@@ -59,7 +58,7 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * A method to add a new role.
+     * Creates a new unique role or updates if already exists.
      *
      * @param roleName               the name of the role.
      * @param roleType               the type of role.
@@ -79,7 +78,7 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * A method used to add a resource definition.
+     * Creates a new resource definition or updates if already exists.
      *
      * @param serviceName  the name of the service the resource belongs to.
      * @param resourceType the type of resource.
@@ -102,8 +101,10 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * A method to create a resource attribute and assign it default permissions for a role. This method uses a
-     * transaction and will rollback if any errors are encountered. {@link ErrorAddingEntriesException}
+     * Creates a new resource attribute with default permissions for a role or updates if already exists.
+     *
+     * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
+     * {@link PersistenceException}
      *
      * @param defaultPermissionGrant a container for granting default permissions.
      */
@@ -133,14 +134,15 @@ public class DefaultRoleSetupImportService {
                 });
 
             } catch (Exception e) {
-                throw new ErrorAddingEntriesException(e);
+                throw new PersistenceException(e);
             }
         });
     }
 
     /**
-     * A method to delete default permissions within a service for a given resource type.
-     * This method uses a transaction and will rollback if any errors are encountered.
+     * Deletes all default permissions within a service for a given resource type.
+     *
+     * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *
      * @param serviceName  the name of the service to delete default permissions for.
      * @param resourceType the type of resource to delete default permissions for.
@@ -152,14 +154,15 @@ public class DefaultRoleSetupImportService {
                 dao.deleteDefaultPermissionsForRoles(serviceName, resourceType);
                 dao.deleteResourceAttributes(serviceName, resourceType);
             } catch (Exception e) {
-                throw new ErrorWithDeletionException(e);
+                throw new PersistenceException(e);
             }
         });
     }
 
     /**
-     * A method to delete default permissions within a service for a specific resource name and resource type.
-     * This method uses a transaction and will rollback if any errors are encountered.
+     * Deletes all default permissions within a service for a specific resource name and resource type.
+     *
+     * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *
      * @param serviceName  the name of the service to delete default permissions for.
      * @param resourceType the type of resource to delete default permissions for.
@@ -174,13 +177,13 @@ public class DefaultRoleSetupImportService {
                 dao.deleteDefaultPermissionsForRoles(serviceName, resourceType, resourceName);
                 dao.deleteResourceAttributes(serviceName, resourceType, resourceName);
             } catch (Exception e) {
-                throw new ErrorWithDeletionException(e);
+                throw new PersistenceException(e);
             }
         });
     }
 
     /**
-     * A method to delete a resource attribute.
+     * Deletes a resource attribute.
      *
      * @param serviceName  the name of the service the resource attribute belongs to.
      * @param resourceType the type of resource.
@@ -192,7 +195,7 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * A method to delete a role.
+     * Deletes a role.
      *
      * @param roleName the role name to delete.
      */
@@ -201,7 +204,7 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * A method to delete a service.
+     * Deletes a service.
      *
      * @param serviceName the service name to delete.
      */

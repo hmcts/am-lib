@@ -438,7 +438,6 @@ class FilterServiceTest {
     }
 
     @Test
-    @Disabled("Temporarily to bring change to preview env - unknown properties result in MissingNode")
     void itShouldReturnEmptyNodeWhenFieldsDoNotExist() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 

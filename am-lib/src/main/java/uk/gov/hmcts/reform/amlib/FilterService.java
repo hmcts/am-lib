@@ -81,9 +81,11 @@ public class FilterService {
             JsonPointer parentPointer = pointerCandidateForRetaining.head();
 
             while (parentPointer != null) {
-                ObjectNode node = (ObjectNode) resource.at(parentPointer);
-                log.debug(">>> Retaining '" + fieldPointer + "' out of '" + parentPointer + "'");
-                node.retain(fieldPointer.toString().substring(1));
+                JsonNode node = resource.at(parentPointer);
+                if (node instanceof ObjectNode) {
+                    log.debug(">>> Retaining '" + fieldPointer + "' out of '" + parentPointer + "'");
+                    ((ObjectNode) node).retain(fieldPointer.toString().substring(1));
+                }
 
                 fieldPointer = parentPointer.last();
                 parentPointer = parentPointer.head();
@@ -99,14 +101,18 @@ public class FilterService {
                 .collect(Collectors.toList());
             if (childPointersWithRead.isEmpty()) {
                 // remove whole node
-                ObjectNode node = (ObjectNode) resource.at(pointerCandidateForRemoval.head());
-                node.remove(pointerCandidateForRemoval.last().toString().substring(1));
+                JsonNode node = resource.at(pointerCandidateForRemoval.head());
+                if (node instanceof ObjectNode) {
+                    ((ObjectNode) node).remove(pointerCandidateForRemoval.last().toString().substring(1));
+                }
             } else {
                 // retain node's children with READ
-                ObjectNode node = (ObjectNode) resource.at(pointerCandidateForRemoval);
-                node.retain(childPointersWithRead.stream()
-                    .map(pointer -> pointer.last().toString().substring(1))
-                    .collect(Collectors.toList()));
+                JsonNode node = resource.at(pointerCandidateForRemoval);
+                if (node instanceof ObjectNode) {
+                    ((ObjectNode) node).retain(childPointersWithRead.stream()
+                        .map(pointer -> pointer.last().toString().substring(1))
+                        .collect(Collectors.toList()));
+                }
             }
         });
     }

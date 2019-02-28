@@ -18,6 +18,8 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 @Slf4j
 public class FilterService {
 
+    private static final JsonPointer WHOLE_RESOURCE_POINTER = JsonPointer.valueOf("");
+
     JsonNode filterJson(JsonNode resourceJson, Map<JsonPointer, Set<Permission>> attributePermissions) {
         List<JsonPointer> nodesWithRead = attributePermissions.entrySet().stream()
             .filter(entry -> entry.getValue().contains(READ))
@@ -47,23 +49,22 @@ public class FilterService {
 
         JsonNode resourceCopy = resourceJson.deepCopy();
 
-        uniqueNodesWithRead.forEach(pointerCandidateForRetaining -> {
-            if (pointerCandidateForRetaining.toString().isEmpty()) {
-                return;
-            }
-            log.debug(">> Pointer candidate for retaining: " + pointerCandidateForRetaining);
-            JsonPointer fieldPointer = pointerCandidateForRetaining.last();
-            JsonPointer parentPointer = pointerCandidateForRetaining.head();
+        if (!uniqueNodesWithRead.contains(WHOLE_RESOURCE_POINTER)) {
+            uniqueNodesWithRead.forEach(pointerCandidateForRetaining -> {
+                log.debug(">> Pointer candidate for retaining: " + pointerCandidateForRetaining);
+                JsonPointer fieldPointer = pointerCandidateForRetaining.last();
+                JsonPointer parentPointer = pointerCandidateForRetaining.head();
 
-            while (parentPointer != null) {
-                ObjectNode node = (ObjectNode) resourceCopy.at(parentPointer);
-                log.debug(">>> Retaining '" + fieldPointer + "' out of '" + parentPointer + "'");
-                node.retain(fieldPointer.toString().substring(1));
+                while (parentPointer != null) {
+                    ObjectNode node = (ObjectNode) resourceCopy.at(parentPointer);
+                    log.debug(">>> Retaining '" + fieldPointer + "' out of '" + parentPointer + "'");
+                    node.retain(fieldPointer.toString().substring(1));
 
-                fieldPointer = parentPointer.last();
-                parentPointer = parentPointer.head();
-            }
-        });
+                    fieldPointer = parentPointer.last();
+                    parentPointer = parentPointer.head();
+                }
+            });
+        }
 
         List<JsonPointer> nodesWithoutRead = attributePermissions.entrySet().stream()
             .filter(entry -> !entry.getValue().contains(READ))

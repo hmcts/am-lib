@@ -254,7 +254,7 @@ class FilterServiceTest {
     }
 
     @Test
-    @Disabled("Temporarily to bring change to preview env")
+    @Disabled("Temporarily to bring change to preview env - retain in for-loop removes too much")
     void itShouldBePossibleToShowManyTopLevelObjects() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
@@ -290,7 +290,7 @@ class FilterServiceTest {
     }
 
     @Test
-    @Disabled("Temporarily to bring change to preview env")
+    @Disabled("Temporarily to bring change to preview env - distance problem")
     void itShouldBePossibleToShowEverythingExceptTopLevelObjectWithLeafLevelException() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
@@ -438,7 +438,7 @@ class FilterServiceTest {
     }
 
     @Test
-    @Disabled("Temporarily to bring change to preview env")
+    @Disabled("Temporarily to bring change to preview env - unknown properties result in MissingNode")
     void itShouldReturnEmptyNodeWhenFieldsDoNotExist() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 

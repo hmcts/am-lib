@@ -27,6 +27,7 @@ class GetRolePermissionsIntegrationTest extends IntegrationBaseTest {
 
         assertThat(accessRecord.containsKey("/test") && accessRecord.containsValue(READ_PERMISSION));
         assertThat(accessRecord.containsKey("/test2") && accessRecord.containsValue(CREATE_PERMISSION));
+        assertThat(accessRecord.size() == 2);
     }
 
     @Test

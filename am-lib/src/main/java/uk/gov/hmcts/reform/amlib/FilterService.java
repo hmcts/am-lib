@@ -28,12 +28,14 @@ public class FilterService {
             return null;
         }
 
-        List<JsonPointer> uniqueNodesWithRead = reducePointersToUniqueList(nodesWithRead);
-        log.debug("> Unique nodes with READ access: " + uniqueNodesWithRead);
-
         JsonNode resourceCopy = resource.deepCopy();
 
-        retainFieldsWithReadPermission(resourceCopy, uniqueNodesWithRead);
+        if (!nodesWithRead.contains(WHOLE_RESOURCE_POINTER)) {
+            List<JsonPointer> uniqueNodesWithRead = reducePointersToUniqueList(nodesWithRead);
+            log.debug("> Unique nodes with READ access: " + uniqueNodesWithRead);
+
+            retainFieldsWithReadPermission(resourceCopy, uniqueNodesWithRead);
+        }
 
         List<JsonPointer> nodesWithoutRead = filterPointersWithoutReadPermission(attributePermissions);
         log.debug("> Nodes without READ access: " + nodesWithoutRead);
@@ -56,8 +58,8 @@ public class FilterService {
             .reduce(new ArrayList<>(),
                 (List<JsonPointer> result, JsonPointer pointerCandidate) -> {
                     // already contains parent so no point adding
-                    if (result.stream().noneMatch(acceptedPointer -> acceptedPointer.toString().equals("")
-                        || pointerCandidate.toString().startsWith(acceptedPointer.toString())
+                    if (result.stream().noneMatch(acceptedPointer ->
+                        pointerCandidate.toString().startsWith(acceptedPointer.toString())
                     )) {
                         result.add(pointerCandidate);
                     }
@@ -73,22 +75,20 @@ public class FilterService {
     }
 
     private void retainFieldsWithReadPermission(JsonNode resource, List<JsonPointer> uniqueNodesWithRead) {
-        if (!uniqueNodesWithRead.contains(WHOLE_RESOURCE_POINTER)) {
-            uniqueNodesWithRead.forEach(pointerCandidateForRetaining -> {
-                log.debug(">> Pointer candidate for retaining: " + pointerCandidateForRetaining);
-                JsonPointer fieldPointer = pointerCandidateForRetaining.last();
-                JsonPointer parentPointer = pointerCandidateForRetaining.head();
+        uniqueNodesWithRead.forEach(pointerCandidateForRetaining -> {
+            log.debug(">> Pointer candidate for retaining: " + pointerCandidateForRetaining);
+            JsonPointer fieldPointer = pointerCandidateForRetaining.last();
+            JsonPointer parentPointer = pointerCandidateForRetaining.head();
 
-                while (parentPointer != null) {
-                    ObjectNode node = (ObjectNode) resource.at(parentPointer);
-                    log.debug(">>> Retaining '" + fieldPointer + "' out of '" + parentPointer + "'");
-                    node.retain(fieldPointer.toString().substring(1));
+            while (parentPointer != null) {
+                ObjectNode node = (ObjectNode) resource.at(parentPointer);
+                log.debug(">>> Retaining '" + fieldPointer + "' out of '" + parentPointer + "'");
+                node.retain(fieldPointer.toString().substring(1));
 
-                    fieldPointer = parentPointer.last();
-                    parentPointer = parentPointer.head();
-                }
-            });
-        }
+                fieldPointer = parentPointer.last();
+                parentPointer = parentPointer.head();
+            }
+        });
     }
 
     private void removeFieldsWithoutReadPermission(JsonNode resource, List<JsonPointer> nodesWithRead, List<JsonPointer> nodesWithoutRead) {

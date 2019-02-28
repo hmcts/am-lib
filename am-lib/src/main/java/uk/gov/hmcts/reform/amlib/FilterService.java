@@ -20,19 +20,38 @@ public class FilterService {
 
     private static final JsonPointer WHOLE_RESOURCE_POINTER = JsonPointer.valueOf("");
 
-    JsonNode filterJson(JsonNode resourceJson, Map<JsonPointer, Set<Permission>> attributePermissions) {
-        List<JsonPointer> nodesWithRead = attributePermissions.entrySet().stream()
-            .filter(entry -> entry.getValue().contains(READ))
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toList());
-
+    JsonNode filterJson(JsonNode resource, Map<JsonPointer, Set<Permission>> attributePermissions) {
+        List<JsonPointer> nodesWithRead = filterPointersWithReadPermission(attributePermissions);
         log.debug("> Nodes with READ access: " + nodesWithRead);
 
         if (nodesWithRead.isEmpty()) {
             return null;
         }
 
-        List<JsonPointer> uniqueNodesWithRead = nodesWithRead.stream()
+        List<JsonPointer> uniqueNodesWithRead = reducePointersToUniqueList(nodesWithRead);
+        log.debug("> Unique nodes with READ access: " + uniqueNodesWithRead);
+
+        JsonNode resourceCopy = resource.deepCopy();
+
+        retainFieldsWithReadPermission(resourceCopy, uniqueNodesWithRead);
+
+        List<JsonPointer> nodesWithoutRead = filterPointersWithoutReadPermission(attributePermissions);
+        log.debug("> Nodes without READ access: " + nodesWithoutRead);
+
+        removeFieldsWithoutReadPermission(resourceCopy, nodesWithRead, nodesWithoutRead);
+
+        return resourceCopy;
+    }
+
+    private List<JsonPointer> filterPointersWithReadPermission(Map<JsonPointer, Set<Permission>> attributePermissions) {
+        return attributePermissions.entrySet().stream()
+            .filter(entry -> entry.getValue().contains(READ))
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
+    }
+
+    private List<JsonPointer> reducePointersToUniqueList(List<JsonPointer> nodesWithRead) {
+        return nodesWithRead.stream()
             .sorted(Comparator.comparing(JsonPointer::toString))
             .reduce(new ArrayList<>(),
                 (List<JsonPointer> result, JsonPointer pointerCandidate) -> {
@@ -44,11 +63,16 @@ public class FilterService {
                     }
                     return result;
                 }, (firstPointer, secondPointer) -> firstPointer);
+    }
 
-        log.debug("> Unique nodes with READ access: " + uniqueNodesWithRead);
+    private List<JsonPointer> filterPointersWithoutReadPermission(Map<JsonPointer, Set<Permission>> attributePermissions) {
+        return attributePermissions.entrySet().stream()
+            .filter(entry -> !entry.getValue().contains(READ))
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
+    }
 
-        JsonNode resourceCopy = resourceJson.deepCopy();
-
+    private void retainFieldsWithReadPermission(JsonNode resource, List<JsonPointer> uniqueNodesWithRead) {
         if (!uniqueNodesWithRead.contains(WHOLE_RESOURCE_POINTER)) {
             uniqueNodesWithRead.forEach(pointerCandidateForRetaining -> {
                 log.debug(">> Pointer candidate for retaining: " + pointerCandidateForRetaining);
@@ -56,7 +80,7 @@ public class FilterService {
                 JsonPointer parentPointer = pointerCandidateForRetaining.head();
 
                 while (parentPointer != null) {
-                    ObjectNode node = (ObjectNode) resourceCopy.at(parentPointer);
+                    ObjectNode node = (ObjectNode) resource.at(parentPointer);
                     log.debug(">>> Retaining '" + fieldPointer + "' out of '" + parentPointer + "'");
                     node.retain(fieldPointer.toString().substring(1));
 
@@ -65,14 +89,9 @@ public class FilterService {
                 }
             });
         }
+    }
 
-        List<JsonPointer> nodesWithoutRead = attributePermissions.entrySet().stream()
-            .filter(entry -> !entry.getValue().contains(READ))
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toList());
-
-        log.debug("> Nodes without READ access: " + nodesWithoutRead);
-
+    private void removeFieldsWithoutReadPermission(JsonNode resource, List<JsonPointer> nodesWithRead, List<JsonPointer> nodesWithoutRead) {
         nodesWithoutRead.forEach(pointerCandidateForRemoval -> {
             log.debug(">> Pointer candidate for removal: " + pointerCandidateForRemoval);
             List<JsonPointer> childPointersWithRead = nodesWithRead.stream()
@@ -80,17 +99,15 @@ public class FilterService {
                 .collect(Collectors.toList());
             if (childPointersWithRead.isEmpty()) {
                 // remove whole node
-                ObjectNode node = (ObjectNode) resourceCopy.at(pointerCandidateForRemoval.head());
+                ObjectNode node = (ObjectNode) resource.at(pointerCandidateForRemoval.head());
                 node.remove(pointerCandidateForRemoval.last().toString().substring(1));
             } else {
                 // retain node's children with READ
-                ObjectNode node = (ObjectNode) resourceCopy.at(pointerCandidateForRemoval);
+                ObjectNode node = (ObjectNode) resource.at(pointerCandidateForRemoval);
                 node.retain(childPointersWithRead.stream()
                     .map(pointer -> pointer.last().toString().substring(1))
                     .collect(Collectors.toList()));
             }
         });
-
-        return resourceCopy;
     }
 }

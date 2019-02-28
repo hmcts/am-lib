@@ -18,13 +18,24 @@ import javax.sql.DataSource;
 public class DefaultRoleSetupImportService {
     private final Jdbi jdbi;
 
-    private static final String emptyServiceError = "Service name cannot be empty";
-
+    /**
+     * This constructor has issues with performance due to requiring a new connection for every query.
+     *
+     * @param url      the url for the database
+     * @param user     the user name for the database
+     * @param password the password for the database
+     */
     public DefaultRoleSetupImportService(String url, String user, String password) {
         this.jdbi = Jdbi.create(url, user, password);
         this.jdbi.installPlugin(new SqlObjectPlugin());
     }
 
+
+    /**
+     * This constructor is recommended to be used over the above.
+     *
+     * @param dataSource the datasource for the database
+     */
     public DefaultRoleSetupImportService(DataSource dataSource) {
         this.jdbi = Jdbi.create(dataSource);
         this.jdbi.installPlugin(new SqlObjectPlugin());
@@ -33,12 +44,10 @@ public class DefaultRoleSetupImportService {
     /**
      * Creates a new unique service or updates if already exists.
      *
-     * @param serviceName the name of the service.
+     * @param serviceName the name of the service
      */
     public void addService(@NonNull String serviceName) {
-        if (serviceName.isEmpty()) {
-            throw new IllegalArgumentException(emptyServiceError);
-        }
+        addService(serviceName, null);
 
         jdbi.useExtension(DefaultRoleSetupRepository.class,
             dao -> dao.addService(serviceName, ""));
@@ -47,12 +56,12 @@ public class DefaultRoleSetupImportService {
     /**
      * Creates a new unique service, with a description, or updates if already exists.
      *
-     * @param serviceName        the name of the service.
-     * @param serviceDescription a description of the service.
+     * @param serviceName        the name of the service
+     * @param serviceDescription a description of the service
      */
     public void addService(@NonNull String serviceName, String serviceDescription) {
         if (serviceName.isEmpty()) {
-            throw new IllegalArgumentException(emptyServiceError);
+            throw new IllegalArgumentException("Service name cannot be empty");
         }
 
         jdbi.useExtension(DefaultRoleSetupRepository.class,
@@ -62,10 +71,10 @@ public class DefaultRoleSetupImportService {
     /**
      * Creates a new unique role or updates if already exists.
      *
-     * @param roleName               the name of the role.
-     * @param roleType               the type of role.
-     * @param securityClassification the security classification for the role.
-     * @param accessType             the access type for the role.
+     * @param roleName               the name of the role
+     * @param roleType               the type of role
+     * @param securityClassification the security classification for the role
+     * @param accessType             the access type for the role
      */
     public void addRole(@NonNull String roleName,
                         @NonNull RoleType roleType,
@@ -82,15 +91,15 @@ public class DefaultRoleSetupImportService {
     /**
      * Creates a new resource definition or updates if already exists.
      *
-     * @param serviceName  the name of the service the resource belongs to.
-     * @param resourceType the type of resource.
-     * @param resourceName the name of the resource.
+     * @param serviceName  the name of the service the resource belongs to
+     * @param resourceType the type of resource
+     * @param resourceName the name of the resource
      */
     public void addResourceDefinition(@NonNull String serviceName,
                                       @NonNull String resourceType,
                                       @NonNull String resourceName) {
         if (serviceName.isEmpty()) {
-            throw new IllegalArgumentException(emptyServiceError);
+            throw new IllegalArgumentException("Service name cannot be empty");
         }
 
         if (resourceType.isEmpty() || resourceName.isEmpty()) {
@@ -106,9 +115,9 @@ public class DefaultRoleSetupImportService {
      * Creates a new resource attribute with default permissions for a role or updates if already exists.
      *
      * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
-     * {@link PersistenceException}
      *
-     * @param defaultPermissionGrant a container for granting default permissions.
+     * @param defaultPermissionGrant a container for granting default permissions
+     * @throws PersistenceException if any errors were encountered causing transaction rollback
      */
     public void grantDefaultPermission(DefaultPermissionGrant defaultPermissionGrant) {
         jdbi.useTransaction(handle -> {
@@ -119,7 +128,7 @@ public class DefaultRoleSetupImportService {
                         .serviceName(defaultPermissionGrant.getServiceName())
                         .resourceName(defaultPermissionGrant.getResourceName())
                         .resourceType(defaultPermissionGrant.getResourceType())
-                        .attribute(attribute.toString())
+                        .attribute(attribute)
                         .securityClassification(permissionAndClassification.getValue())
                         .build()
                     );
@@ -129,7 +138,7 @@ public class DefaultRoleSetupImportService {
                             .serviceName(defaultPermissionGrant.getServiceName())
                             .resourceType(defaultPermissionGrant.getResourceType())
                             .resourceName(defaultPermissionGrant.getResourceName())
-                            .attribute(attribute.toString())
+                            .attribute(attribute)
                             .roleName(defaultPermissionGrant.getRoleName())
                             .permissions(Permissions.sumOf(permissionAndClassification.getKey()))
                             .build());
@@ -146,8 +155,9 @@ public class DefaultRoleSetupImportService {
      *
      * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *
-     * @param serviceName  the name of the service to delete default permissions for.
-     * @param resourceType the type of resource to delete default permissions for.
+     * @param serviceName  the name of the service to delete default permissions for
+     * @param resourceType the type of resource to delete default permissions for
+     * @throws PersistenceException if any errors were encountered causing transaction rollback
      */
     public void truncateDefaultPermissionsForService(String serviceName, String resourceType) {
         jdbi.useTransaction(handle -> {
@@ -166,9 +176,10 @@ public class DefaultRoleSetupImportService {
      *
      * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *
-     * @param serviceName  the name of the service to delete default permissions for.
-     * @param resourceType the type of resource to delete default permissions for.
-     * @param resourceName the name of the resource to delete default permissions for.
+     * @param serviceName  the name of the service to delete default permissions for
+     * @param resourceType the type of resource to delete default permissions for
+     * @param resourceName the name of the resource to delete default permissions for
+     * @throws PersistenceException if any errors were encountered causing transaction rollback
      */
     public void truncateDefaultPermissionsByResourceDefinition(String serviceName,
                                                                String resourceType,
@@ -185,11 +196,11 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * Deletes a resource attribute.
+     * Deletes a resource definition.
      *
-     * @param serviceName  the name of the service the resource attribute belongs to.
-     * @param resourceType the type of resource.
-     * @param resourceName the name of the resource.
+     * @param serviceName  the name of the service the resource attribute belongs to
+     * @param resourceType the type of resource
+     * @param resourceName the name of the resource
      */
     public void deleteResourceDefinition(String serviceName, String resourceType, String resourceName) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao ->
@@ -199,7 +210,7 @@ public class DefaultRoleSetupImportService {
     /**
      * Deletes a role.
      *
-     * @param roleName the role name to delete.
+     * @param roleName the role name to delete
      */
     public void deleteRole(String roleName) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao -> dao.deleteRole(roleName));
@@ -208,7 +219,7 @@ public class DefaultRoleSetupImportService {
     /**
      * Deletes a service.
      *
-     * @param serviceName the service name to delete.
+     * @param serviceName the service name to delete
      */
     public void deleteService(String serviceName) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao -> dao.deleteService(serviceName));

@@ -5,19 +5,17 @@ import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.testcontainers.containers.PostgreSQLContainer;
-import uk.gov.hmcts.reform.amlib.AccessManagementService;
-import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
+
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("PMD")
 public abstract class IntegrationBaseTest {
 
-    private static final PostgreSQLContainer db = new PostgreSQLContainer().withUsername("sa").withPassword("");
+    public static final PostgreSQLContainer db = new PostgreSQLContainer().withUsername("sa").withPassword("");
     private static Jdbi jdbi;
-    protected AccessManagementService ams;
-    protected DefaultRoleSetupImportService defaultRoleService;
 
     @BeforeAll
     static void initDatabase() {
@@ -30,12 +28,6 @@ public abstract class IntegrationBaseTest {
     @AfterAll
     static void destroyDatabase() {
         db.stop();
-    }
-
-    @BeforeEach
-    void setup() {
-        ams = new AccessManagementService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
-        defaultRoleService = new DefaultRoleSetupImportService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
     }
 
     private static void initSchema() {
@@ -56,20 +48,20 @@ public abstract class IntegrationBaseTest {
             .findOnly();
     }
 
-    protected static int countServices(String serviceName) {
+    protected static List<Map<String, Object>> countServices(String serviceName) {
         return jdbi.open().createQuery(
-            "select count(1) from services where services.service_name = ?")
+            "select * from services where services.service_name = ?")
             .bind(0, serviceName)
-            .mapTo(int.class)
-            .findOnly();
+            .mapToMap()
+            .list();
     }
 
-    protected static int countRoles(String roleName) {
+    protected static List<Map<String, Object>> countRoles(String roleName) {
         return jdbi.open().createQuery(
-            "select count(1) from roles where roles.role_name = ?")
+            "select * from roles where roles.role_name = ?")
             .bind(0, roleName)
-            .mapTo(int.class)
-            .findOnly();
+            .mapToMap()
+            .list();
     }
 
     protected static int countResources(String serviceName, String resourceType, String resourceName) {
@@ -118,7 +110,7 @@ public abstract class IntegrationBaseTest {
                 + " and resource_attributes.resource_type = ?"
                 + " and resource_attributes.resource_name = ?"
                 + " and resource_attributes.attribute = ?"
-                + " and resource_attributes.default_security_classification = cast(? as securityclassification)")
+                + " and resource_attributes.default_security_classification = cast(? as security_classification)")
             .bind(0, serviceName)
             .bind(1, resourceType)
             .bind(2, resourceName)

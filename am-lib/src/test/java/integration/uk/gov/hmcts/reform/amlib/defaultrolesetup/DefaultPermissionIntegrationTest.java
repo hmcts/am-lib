@@ -1,7 +1,9 @@
 package integration.uk.gov.hmcts.reform.amlib.defaultrolesetup;
 
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
@@ -22,20 +24,26 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
+    private static DefaultRoleSetupImportService service;
+
+    @BeforeAll
+    static void setUp() {
+        service = new DefaultRoleSetupImportService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
+    }
 
     @Test
     void shouldNotBeAbleToCreateDefaultPermissionWhenRoleDoesNotExist() {
-        defaultRoleService.deleteRole(ROLE_NAME);
+        service.deleteRole(ROLE_NAME);
 
         assertThatExceptionOfType(PersistenceException.class)
-            .isThrownBy(() -> defaultRoleService.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION)))
+            .isThrownBy(() -> service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION)))
             .withMessageContaining("(role_name)=(Role Name) is not present in table \"roles\"");
     }
 
     @Test
-    void whenAddResourceDefinitionIsCalledAddNewEntryIntoDatabase() {
-        defaultRoleService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        defaultRoleService.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
+    void shouldAddNewEntryIntoDatabaseWhenUniqueEntry() {
+        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
 
         assertThat(countDefaultPermissions(
             SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE, ROLE_NAME, Permissions.sumOf(READ_PERMISSION)))
@@ -47,10 +55,10 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void whenAddResourceDefinitionIsCalledTwiceWithSameParamsOverwriteExistingRecord() {
-        defaultRoleService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        defaultRoleService.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
-        defaultRoleService.grantDefaultPermission(createDefaultPermissionGrant(CREATE_PERMISSION));
+    void shouldOverwriteExistingRecordWhenEntryIsAddedASecondTime() {
+        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
+        service.grantDefaultPermission(createDefaultPermissionGrant(CREATE_PERMISSION));
 
         assertThat(countDefaultPermissions(
             SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE, ROLE_NAME, Permissions.sumOf(CREATE_PERMISSION)))
@@ -62,13 +70,13 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void truncateDefaultPermissionsRemovesAllEntriesFromTables() {
-        defaultRoleService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        defaultRoleService.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
-        defaultRoleService.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME + "2");
+    void shouldRemoveAllEntriesFromTablesWhenValuesExist() {
+        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
+        service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME + "2");
 
-        defaultRoleService.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
-        defaultRoleService.grantDefaultPermission(DefaultPermissionGrant.builder()
+        service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
+        service.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
@@ -76,7 +84,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
             .attributePermissions(createReadPermissionsForAttribute(READ_PERMISSION))
             .build());
 
-        defaultRoleService.truncateDefaultPermissionsForService(SERVICE_NAME, RESOURCE_TYPE);
+        service.truncateDefaultPermissionsForService(SERVICE_NAME, RESOURCE_TYPE);
 
         assertThat(countDefaultPermissions(
             SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE, ROLE_NAME, Permissions.sumOf(READ_PERMISSION)))
@@ -88,12 +96,12 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    void truncateDefaultPermissionsRemovesEntriesWithResourceNameFromTables() {
-        defaultRoleService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        defaultRoleService.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
-        defaultRoleService.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
+    void shouldRemoveEntriesWithResourceNameFromTablesWhenEntriesExist() {
+        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
+        service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
 
-        defaultRoleService.truncateDefaultPermissionsByResourceDefinition(
+        service.truncateDefaultPermissionsByResourceDefinition(
             SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
 
         assertThat(countDefaultPermissions(

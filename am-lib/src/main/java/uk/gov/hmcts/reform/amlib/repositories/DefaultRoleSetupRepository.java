@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.amlib.repositories;
 
-import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
@@ -13,19 +12,19 @@ import uk.gov.hmcts.reform.amlib.models.ResourceAttribute;
 public interface DefaultRoleSetupRepository {
     @SqlUpdate("insert into services (service_name, service_description) values (:serviceName, :serviceDescription)"
         + " on conflict on constraint services_pkey do update set service_name = :serviceName, service_description = :serviceDescription")
-    void addService(@Bind("serviceName") String serviceName, @Bind("serviceDescription") String serviceDescription);
+    void addService(String serviceName, String serviceDescription);
 
-    @SqlUpdate("insert into roles (role_name, role_type, security_classification, access_management_type) values (:roleName, cast(:roleType as roletype), cast(:securityClassification as securityclassification), cast(:accessType as accessmanagementtype))"
-        + " on conflict on constraint roles_pkey do update set role_name = :roleName, role_type = cast(:roleType as roletype), security_classification = cast(:securityClassification as securityclassification), access_management_type = cast(:accessType as accessmanagementtype)")
-    void addRole(@Bind("roleName") String roleName, @Bind("roleType") RoleType roleType, @Bind("securityClassification") SecurityClassification securityClassification, @Bind("accessType") AccessType accessType);
+    @SqlUpdate("insert into roles (role_name, role_type, security_classification, access_management_type) values (:roleName, cast(:roleType as role_type), cast(:securityClassification as security_classification), cast(:accessType as access_type))"
+        + " on conflict on constraint roles_pkey do update set role_name = :roleName, role_type = cast(:roleType as role_type), security_classification = cast(:securityClassification as security_classification), access_management_type = cast(:accessType as access_type)")
+    void addRole(String roleName, RoleType roleType, SecurityClassification securityClassification, AccessType accessType);
 
     @SqlUpdate("insert into resources (service_name, resource_type, resource_name) values (:serviceName, :resourceType, :resourceName)"
         + "on conflict on constraint resources_pkey do update set service_name = :serviceName, resource_type = :resourceType, resource_name = :resourceName")
-    void addResourceDefinition(@Bind("serviceName") String serviceName, @Bind("resourceType") String resourceType, @Bind("resourceName") String resourceName);
+    void addResourceDefinition(String serviceName, String resourceType, String resourceName);
 
     @SqlUpdate("insert into resource_attributes (service_name, resource_type, resource_name, attribute, default_security_classification)"
-        + " values (:serviceName, :resourceType, :resourceName, :attribute, cast(:securityClassification as securityclassification))"
-        + " on conflict on constraint resource_attributes_pkey do update set service_name = :serviceName, resource_type = :resourceType, resource_name = :resourceName, attribute = :attribute, default_security_classification = cast(:securityClassification as securityclassification)")
+        + " values (:serviceName, :resourceType, :resourceName, :attribute, cast(:securityClassification as security_classification))"
+        + " on conflict on constraint resource_attributes_pkey do update set service_name = :serviceName, resource_type = :resourceType, resource_name = :resourceName, attribute = :attribute, default_security_classification = cast(:securityClassification as security_classification)")
     void createResourceAttribute(@BindBean ResourceAttribute resourceAttribute);
 
     @SqlUpdate("insert into default_permissions_for_roles (service_name, resource_type, resource_name, attribute, role_name, permissions)"
@@ -34,23 +33,23 @@ public interface DefaultRoleSetupRepository {
     void grantDefaultPermission(@BindBean DefaultPermission defaultPermission);
 
     @SqlUpdate("delete from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType")
-    void deleteDefaultPermissionsForRoles(@Bind("serviceName") String serviceName, @Bind("resourceType") String resourceType);
+    void deleteDefaultPermissionsForRoles(String serviceName, String resourceType);
 
     @SqlUpdate("delete from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType and resource_name = :resourceName")
-    void deleteDefaultPermissionsForRoles(@Bind("serviceName") String serviceName, @Bind("resourceType") String resourceType, @Bind("resourceName") String resourceName);
+    void deleteDefaultPermissionsForRoles(String serviceName, String resourceType, String resourceName);
 
     @SqlUpdate("delete from resource_attributes where service_name = :serviceName and resource_type = :resourceType")
-    void deleteResourceAttributes(@Bind("serviceName") String serviceName, @Bind("resourceType") String resourceType);
+    void deleteResourceAttributes(String serviceName, String resourceType);
 
     @SqlUpdate("delete from resource_attributes where service_name = :serviceName and resource_type = :resourceType  and resource_name = :resourceName")
-    void deleteResourceAttributes(@Bind("serviceName") String serviceName, @Bind("resourceType") String resourceType, @Bind("resourceName") String resourceName);
+    void deleteResourceAttributes(String serviceName, String resourceType, String resourceName);
 
     @SqlUpdate("delete from resources where service_name = :serviceName and resource_type = :resourceType  and resource_name = :resourceName")
-    void deleteResourceDefinition(@Bind("serviceName") String serviceName, @Bind("resourceType") String resourceType, @Bind("resourceName") String resourceName);
+    void deleteResourceDefinition(String serviceName, String resourceType, String resourceName);
 
     @SqlUpdate("delete from roles where role_name = :roleName")
-    void deleteRole(@Bind("roleName") String roleName);
+    void deleteRole(String roleName);
 
     @SqlUpdate("delete from services where service_name = :serviceName")
-    void deleteService(@Bind("serviceName") String serviceName);
+    void deleteService(String serviceName);
 }

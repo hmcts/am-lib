@@ -7,12 +7,9 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public final class RoleBasedAccessRecord {
-
+public class RoleBasedAccessGrant {
     private final String serviceName;
     private final String resourceType;
     private final String resourceName;
-    private final String attribute;
     private final String roleName;
-    private final int permissions;
 }

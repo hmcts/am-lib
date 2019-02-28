@@ -18,6 +18,8 @@ import javax.sql.DataSource;
 public class DefaultRoleSetupImportService {
     private final Jdbi jdbi;
 
+    private static final String emptyServiceError = "Service name cannot be empty";
+
     public DefaultRoleSetupImportService(String url, String user, String password) {
         this.jdbi = Jdbi.create(url, user, password);
         this.jdbi.installPlugin(new SqlObjectPlugin());
@@ -35,7 +37,7 @@ public class DefaultRoleSetupImportService {
      */
     public void addService(@NonNull String serviceName) {
         if (serviceName.isEmpty()) {
-            throw new IllegalArgumentException("Service name cannot be empty");
+            throw new IllegalArgumentException(emptyServiceError);
         }
 
         jdbi.useExtension(DefaultRoleSetupRepository.class,
@@ -50,7 +52,7 @@ public class DefaultRoleSetupImportService {
      */
     public void addService(@NonNull String serviceName, String serviceDescription) {
         if (serviceName.isEmpty()) {
-            throw new IllegalArgumentException("Service name cannot be empty");
+            throw new IllegalArgumentException(emptyServiceError);
         }
 
         jdbi.useExtension(DefaultRoleSetupRepository.class,
@@ -88,7 +90,7 @@ public class DefaultRoleSetupImportService {
                                       @NonNull String resourceType,
                                       @NonNull String resourceName) {
         if (serviceName.isEmpty()) {
-            throw new IllegalArgumentException("Service name cannot be empty");
+            throw new IllegalArgumentException(emptyServiceError);
         }
 
         if (resourceType.isEmpty() || resourceName.isEmpty()) {
@@ -109,7 +111,7 @@ public class DefaultRoleSetupImportService {
      * @param defaultPermissionGrant a container for granting default permissions.
      */
     public void grantDefaultPermission(DefaultPermissionGrant defaultPermissionGrant) {
-        jdbi.useTransaction((handle) -> {
+        jdbi.useTransaction(handle -> {
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
             try {
                 defaultPermissionGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
@@ -148,7 +150,7 @@ public class DefaultRoleSetupImportService {
      * @param resourceType the type of resource to delete default permissions for.
      */
     public void truncateDefaultPermissionsForService(String serviceName, String resourceType) {
-        jdbi.useTransaction((handle) -> {
+        jdbi.useTransaction(handle -> {
             try {
                 DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
                 dao.deleteDefaultPermissionsForRoles(serviceName, resourceType);
@@ -171,7 +173,7 @@ public class DefaultRoleSetupImportService {
     public void truncateDefaultPermissionsByResourceDefinition(String serviceName,
                                                                String resourceType,
                                                                String resourceName) {
-        jdbi.useTransaction((handle) -> {
+        jdbi.useTransaction(handle -> {
             try {
                 DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
                 dao.deleteDefaultPermissionsForRoles(serviceName, resourceType, resourceName);

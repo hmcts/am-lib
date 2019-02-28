@@ -2,15 +2,21 @@ package uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
@@ -64,7 +70,7 @@ public class FilterService {
                         result.add(pointerCandidate);
                     }
                     return result;
-                }, (firstPointer, secondPointer) -> firstPointer);
+                }, (f, s) -> f);
     }
 
     private List<JsonPointer> filterPointersWithoutReadPermission(Map<JsonPointer, Set<Permission>> attributePermissions) {
@@ -75,21 +81,49 @@ public class FilterService {
     }
 
     private void retainFieldsWithReadPermission(JsonNode resource, List<JsonPointer> uniqueNodesWithRead) {
-        uniqueNodesWithRead.forEach(pointerCandidateForRetaining -> {
-            log.debug(">> Pointer candidate for retaining: " + pointerCandidateForRetaining);
-            JsonPointer fieldPointer = pointerCandidateForRetaining.last();
-            JsonPointer parentPointer = pointerCandidateForRetaining.head();
+        Map<Integer, Map<JsonPointer, Set<String>>> reduce = uniqueNodesWithRead.stream()
+            .reduce(new TreeMap<>(Collections.reverseOrder()),
+                (Map<Integer, Map<JsonPointer, Set<String>>> result, JsonPointer pointer) -> {
+                    JsonPointer fieldPointer = pointer.last();
+                    JsonPointer parentPointer = pointer.head();
 
-            while (parentPointer != null) {
-                JsonNode node = resource.at(parentPointer);
+                    while (parentPointer != null) {
+                        int depth = parentPointer.toString().split("/").length;
+
+                        if (!result.containsKey(depth)) {
+                            result.put(depth, new ConcurrentHashMap<>());
+                        }
+
+                        Map<JsonPointer, Set<String>> map = result.get(depth);
+
+
+                        if (!map.containsKey(parentPointer)) {
+                            map.put(parentPointer, new HashSet<>());
+                        }
+
+                        map.get(parentPointer).add(fieldPointer.toString().substring(1));
+
+                        fieldPointer = parentPointer.last();
+                        parentPointer = parentPointer.head();
+                    }
+
+                    return result;
+                }, (firstPointer, secondPointer) -> firstPointer);
+
+        log.debug(">> Pointer candidates for retaining: " + reduce.values());
+
+        reduce.values().forEach(map -> {
+            map.entrySet().forEach(entry -> {
+                JsonNode node = resource.at(entry.getKey());
                 if (node instanceof ObjectNode) {
-                    log.debug(">>> Retaining '" + fieldPointer + "' out of '" + parentPointer + "'");
-                    ((ObjectNode) node).retain(fieldPointer.toString().substring(1));
+                    log.debug(">>> Retaining '" + entry.getValue() + "' out of '" + entry.getKey() + "'");
+                    ObjectNode filteredNode = ((ObjectNode) node).retain(entry.getValue());
+                    if (filteredNode.size() == 0 && entry.getKey().head() != null) {
+                        ((ObjectNode) resource.at(entry.getKey().head()))
+                            .remove(entry.getKey().last().toString().substring(1));
+                    }
                 }
-
-                fieldPointer = parentPointer.last();
-                parentPointer = parentPointer.head();
-            }
+            });
         });
     }
 

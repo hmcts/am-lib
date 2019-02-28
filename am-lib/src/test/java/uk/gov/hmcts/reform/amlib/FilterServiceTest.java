@@ -254,7 +254,6 @@ class FilterServiceTest {
     }
 
     @Test
-    @Disabled("Temporarily to bring change to preview env - retain in for-loop removes too much")
     void itShouldBePossibleToShowManyTopLevelObjects() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
@@ -278,6 +277,64 @@ class FilterServiceTest {
                 )
                 .defendant(Defendant.builder()
                     .name("Marry")
+                    .address(Address.builder()
+                        .city("Swansea")
+                        .postcode("SA1")
+                        .build())
+                    .build()
+                )
+                .build()
+            )
+        );
+    }
+
+    @Test
+    void itShouldBePossibleToShowManyLeafLevelObjectsFromSameParent() throws IOException {
+        JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
+
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
+            .put(JsonPointer.valueOf("/claimant/name"), READ_PERMISSION)
+            .put(JsonPointer.valueOf("/claimant/address"), READ_PERMISSION)
+            .build();
+
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+
+        assertThat(returnedJson).isEqualTo(mapper.valueToTree(
+            Resource.builder()
+                .claimant(Claimant.builder()
+                    .name("John")
+                    .address(Address.builder()
+                        .city("London")
+                        .postcode("SE1")
+                        .build())
+                    .build()
+                )
+                .build()
+            )
+        );
+    }
+
+    @Test
+    void itShouldBePossibleToShowManyLeafLevelObjectsFromDifferentParents() throws IOException {
+        JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
+
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
+            .put(JsonPointer.valueOf("/claimant/address"), READ_PERMISSION)
+            .put(JsonPointer.valueOf("/defendant/address"), READ_PERMISSION)
+            .build();
+
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+
+        assertThat(returnedJson).isEqualTo(mapper.valueToTree(
+            Resource.builder()
+                .claimant(Claimant.builder()
+                    .address(Address.builder()
+                        .city("London")
+                        .postcode("SE1")
+                        .build())
+                    .build()
+                )
+                .defendant(Defendant.builder()
                     .address(Address.builder()
                         .city("Swansea")
                         .postcode("SA1")

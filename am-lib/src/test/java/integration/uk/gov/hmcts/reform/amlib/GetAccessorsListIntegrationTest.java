@@ -19,7 +19,6 @@ class GetAccessorsListIntegrationTest extends IntegrationBaseTest {
     private String resourceId;
     private static AccessManagementService ams;
 
-
     @BeforeAll
     static void setUp() {
         ams = new AccessManagementService(db.getJdbcUrl(), db.getUsername(), db.getPassword());

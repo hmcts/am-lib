@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
-import uk.gov.hmcts.reform.amlib.utils.PairEntry;
+import uk.gov.hmcts.reform.amlib.utils.Pair;
 
 import java.util.Map;
 import java.util.Set;
@@ -22,13 +22,13 @@ public final class DefaultRoleSetupDataFactory {
         throw new UnsupportedOperationException("Constructing utility class is not supported");
     }
 
-    public static Map<JsonPointer, PairEntry<Set<Permission>, SecurityClassification>>
+    public static Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>>
         createReadPermissionsForAttribute(Set<Permission> permissions) {
 
-        PairEntry<Set<Permission>, SecurityClassification> pair =
-            new PairEntry<>(permissions, SecurityClassification.PUBLIC);
+        Pair<Set<Permission>, SecurityClassification> pair =
+            new Pair<>(permissions, SecurityClassification.PUBLIC);
 
-        Map<JsonPointer, PairEntry<Set<Permission>, SecurityClassification>> attributePermission =
+        Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermission =
             new ConcurrentHashMap<>();
 
         attributePermission.put(JsonPointer.valueOf(ATTRIBUTE), pair);

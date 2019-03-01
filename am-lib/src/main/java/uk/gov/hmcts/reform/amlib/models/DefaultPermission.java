@@ -16,7 +16,7 @@ public class DefaultPermission {
     private final String roleName;
     private final int permissions;
 
-    public String getAttribute() {
+    public String getAttributeAsString() {
         return attribute.toString();
     }
 }

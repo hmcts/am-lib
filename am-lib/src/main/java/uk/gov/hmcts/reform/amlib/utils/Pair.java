@@ -3,12 +3,12 @@ package uk.gov.hmcts.reform.amlib.utils;
 import java.util.Map;
 
 @SuppressWarnings("PMD")
-//complains about setValue having a return. It is implemented this way in Map.Entry
-public class PairEntry<K, V> implements Map.Entry<K, V> {
+// Complains about setValue having a return. It is implemented this way in Map.Entry
+public class Pair<K, V> implements Map.Entry<K, V> {
     private final K key;
     private V value;
 
-    public PairEntry(K key, V value) {
+    public Pair(K key, V value) {
         this.key = key;
         this.value = value;
     }

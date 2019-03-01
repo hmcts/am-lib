@@ -16,7 +16,7 @@ public class ResourceAttribute {
     private final JsonPointer attribute;
     private final SecurityClassification securityClassification;
 
-    public String getAttribute() {
+    public String getAttributeAsString() {
         return attribute.toString();
     }
 }

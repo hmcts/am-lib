@@ -22,14 +22,13 @@ public class DefaultRoleSetupImportService {
      * This constructor has issues with performance due to requiring a new connection for every query.
      *
      * @param url      the url for the database
-     * @param user     the user name for the database
+     * @param username     the username for the database
      * @param password the password for the database
      */
-    public DefaultRoleSetupImportService(String url, String user, String password) {
-        this.jdbi = Jdbi.create(url, user, password);
-        this.jdbi.installPlugin(new SqlObjectPlugin());
+    public DefaultRoleSetupImportService(String url, String username, String password) {
+        this.jdbi = Jdbi.create(url, username, password)
+            .installPlugin(new SqlObjectPlugin());
     }
-
 
     /**
      * This constructor is recommended to be used over the above.
@@ -37,24 +36,21 @@ public class DefaultRoleSetupImportService {
      * @param dataSource the datasource for the database
      */
     public DefaultRoleSetupImportService(DataSource dataSource) {
-        this.jdbi = Jdbi.create(dataSource);
-        this.jdbi.installPlugin(new SqlObjectPlugin());
+        this.jdbi = Jdbi.create(dataSource)
+            .installPlugin(new SqlObjectPlugin());
     }
 
     /**
-     * Creates a new unique service or updates if already exists.
+     * Creates a new unique service or updates description if already exists.
      *
      * @param serviceName the name of the service
      */
     public void addService(@NonNull String serviceName) {
         addService(serviceName, null);
-
-        jdbi.useExtension(DefaultRoleSetupRepository.class,
-            dao -> dao.addService(serviceName, ""));
     }
 
     /**
-     * Creates a new unique service, with a description, or updates if already exists.
+     * Creates a new unique service, with a description, or updates description if already exists.
      *
      * @param serviceName        the name of the service
      * @param serviceDescription a description of the service
@@ -69,7 +65,7 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * Creates a new unique role or updates if already exists.
+     * Creates a new unique role or updates type, security classification and access type if already exists.
      *
      * @param roleName               the name of the role
      * @param roleType               the type of role
@@ -89,7 +85,7 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * Creates a new resource definition or updates if already exists.
+     * Creates a new resource definition or does nothing if already exists.
      *
      * @param serviceName  the name of the service the resource belongs to
      * @param resourceType the type of resource
@@ -112,7 +108,7 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * Creates a new resource attribute with default permissions for a role or updates if already exists.
+     * Creates a new resource attribute with default permissions for a role or updates attributes if already exists.
      *
      * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *

@@ -20,7 +20,7 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void shouldPutNewRowInputIntoDatabaseWhenUniqueServiceNameIsGiven() {
-        service.addService(SERVICE_NAME, "");
+        service.addService(SERVICE_NAME);
 
         assertThat(countServices(SERVICE_NAME).size()).isEqualTo(1);
     }
@@ -29,7 +29,7 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
     void shouldUpdateExistingEntryWhenDuplicateServiceNameIsAdded() {
         String newDescription = "Different description";
 
-        service.addService(SERVICE_NAME, "");
+        service.addService(SERVICE_NAME);
         service.addService(SERVICE_NAME, newDescription);
 
         assertThat(countServices(SERVICE_NAME).size()).isEqualTo(1);
@@ -38,7 +38,7 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void shouldDeleteServiceFromTableWhenServiceIsPresent() {
-        service.addService(SERVICE_NAME, "");
+        service.addService(SERVICE_NAME);
         //Resource must be deleted before a getService can be deleted.
         service.deleteResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
         service.deleteService(SERVICE_NAME);

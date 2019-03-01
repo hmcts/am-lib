@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
-import uk.gov.hmcts.reform.amlib.utils.PairEntry;
+import uk.gov.hmcts.reform.amlib.utils.Pair;
 
 import java.util.Map;
 import java.util.Set;
@@ -20,5 +20,5 @@ public class DefaultPermissionGrant {
     private final String resourceName;
     private final String attribute;
     private final String roleName;
-    private final Map<JsonPointer, PairEntry<Set<Permission>, SecurityClassification>> attributePermissions;
+    private final Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermissions;
 }

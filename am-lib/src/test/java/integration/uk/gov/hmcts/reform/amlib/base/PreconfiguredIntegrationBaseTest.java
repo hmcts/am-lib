@@ -10,7 +10,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 /**
  * Base class for integration tests that populates DB with basic definitions.
  */
-public class PreconfiguredIntegrationBaseTest extends IntegrationBaseTest {
+public abstract class PreconfiguredIntegrationBaseTest extends IntegrationBaseTest {
 
     @BeforeAll
     static void populateDatabaseWithBasicDefinitions() {

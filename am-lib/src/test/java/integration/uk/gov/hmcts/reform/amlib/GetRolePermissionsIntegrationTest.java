@@ -15,7 +15,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME_IN_LIST;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 class GetRolePermissionsIntegrationTest extends IntegrationBaseTest {
@@ -23,29 +23,30 @@ class GetRolePermissionsIntegrationTest extends IntegrationBaseTest {
     @Test
     void returnListOfPermissionsForRoleName() {
         Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions(SERVICE_NAME,
-            RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAME);
+            RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAME_IN_LIST);
 
-        assertThat(accessRecord.containsKey("/test") && accessRecord.containsValue(READ_PERMISSION));
-        assertThat(accessRecord.containsKey("/test2") && accessRecord.containsValue(CREATE_PERMISSION));
+        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/test"),READ_PERMISSION);
+        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/test2"),CREATE_PERMISSION);
+
         assertThat(accessRecord.size() == 2);
     }
 
     @Test
     void nonExistentServiceReturnsNull() {
         Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions("Service 2",
-            RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAME);
+            RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAME_IN_LIST);
         assertThat(accessRecord).isNull();
     }
 
     @Test
     void noResourceTypeReturnsNull() {
         Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions(SERVICE_NAME,
-            "No Resource Type ", RESOURCE_NAME, ROLE_NAME);
+            "No Resource Type ", RESOURCE_NAME, ROLE_NAME_IN_LIST);
         assertThat(accessRecord).isNull();
     }
 
     @Test
-    void noDefaultSetup() {
+    void noDefaultRoleNameReturnsNull() {
         List<String> noDefaultRoleName = Arrays.asList("citizen");
 
         Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions(SERVICE_NAME,

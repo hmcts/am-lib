@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
-import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
 import uk.gov.hmcts.reform.amlib.utils.Permissions;
@@ -25,7 +24,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
 public class AccessManagementService {
     private final Jdbi jdbi;
-    private static final int ROLENAMESIZE = 1;
+    private static final int MAXROLENAMESRETURNED = 1;
 
     public AccessManagementService(String url, String user, String password) {
         this.jdbi = Jdbi.create(url, user, password);
@@ -129,32 +128,31 @@ public class AccessManagementService {
 
 
     /**
-     * Returns a map of JsonPointers and set of permissions when record with user role and type exists in database.
+     * Method requires name of service, the type of resource, name of resource and a role name to
+     * populate a  map of JsonPointers and set of permissions when record with user role and type exists in database.
      *
-     * @param serviceName  (service_name)
-     * @param resourceType (resource_type)
-     * @param resourceName (resource_name)
-     * @param roleNames    A list of (role_names)
-     * @return permissionsByTypeAndRole or null
+     * @param serviceName  name of service
+     * @param resourceType type of resource
+     * @param resourceName  name of a resource
+     * @param roleNames    A list of role names
+     * @return permissionsByTypeAndRole a map of attributes and their corresponding permissions or null.
      */
     public Map<JsonPointer, Set<Permission>> getRolePermissions(
-        String serviceName, String resourceType, String resourceName, @NonNull List<String> roleNames) {
-        if (roleNames.size() > ROLENAMESIZE) {
-            throw new UnsupportedOperationException();
+        @NonNull String serviceName, @NonNull String resourceType,
+        @NonNull String resourceName, @NonNull List<String> roleNames) {
+        if (roleNames.size() > MAXROLENAMESRETURNED) {
+            throw new IllegalArgumentException();
         }
 
         List<RoleBasedAccessRecord> roleBasedAccess = jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getRolePermissions(
-                RoleBasedAccessGrant.builder()
-                    .serviceName(serviceName)
-                    .resourceType(resourceType)
-                    .resourceName(resourceName)
-                    .roleName(roleNames.get(0))
-                    .build()));
+            dao -> dao.getRolePermissions(serviceName, resourceType, resourceName, roleNames.get(0)));
 
         if (roleBasedAccess.isEmpty()) {
             return null;
         }
+
+//        Map<JsonPointer, Set<Permission>> permissionsByTypeAndRole = roleBasedAccess.stream().collect(Collectors.toMap(RoleBasedAccessRecord::getAttribute, RoleBasedAccessRecord::getPermissions));
+//        System.out.println(permissionsByTypeAndRole);
 
         Map<JsonPointer, Set<Permission>> permissionsByTypeAndRole = new ConcurrentHashMap<>();
 

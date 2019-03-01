@@ -7,7 +7,6 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
-import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
 
 import java.util.List;
@@ -44,7 +43,9 @@ public interface AccessManagementRepository {
     @RegisterConstructorMapper(ExplicitAccessRecord.class)
     ExplicitAccessRecord getExplicitAccess(String accessorId, String resourceId);
 
+    @SuppressWarnings("PMD")
+    //Suppressing as PMD does not allow more than 3 string parameters to be passed in.
     @SqlQuery("select * from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType and resource_name = :resourceName and role_name = :roleName")
     @RegisterConstructorMapper(RoleBasedAccessRecord.class)
-    List<RoleBasedAccessRecord> getRolePermissions(@BindBean RoleBasedAccessGrant roleBasedAccessGrant);
+    List<RoleBasedAccessRecord> getRolePermissions(String serviceName, String resourceType, String resourceName, String roleName);
 }

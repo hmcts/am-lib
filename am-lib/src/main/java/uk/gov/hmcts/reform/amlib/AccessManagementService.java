@@ -155,10 +155,7 @@ public class AccessManagementService {
             return null;
         }
 
-        Map<JsonPointer, Set<Permission>> permissionsByTypeAndRole = roleBasedAccess.stream()
+        return roleBasedAccess.stream()
             .collect(Collectors.toMap(RoleBasedAccessRecord::getAttribute, RoleBasedAccessRecord::getPermissions));
-        System.out.println(permissionsByTypeAndRole);
-
-        return permissionsByTypeAndRole;
     }
 }

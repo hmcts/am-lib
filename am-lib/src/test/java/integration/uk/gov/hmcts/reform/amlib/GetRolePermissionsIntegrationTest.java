@@ -25,8 +25,8 @@ class GetRolePermissionsIntegrationTest extends IntegrationBaseTest {
         Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions(SERVICE_NAME,
             RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAME);
 
-        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/test"),READ_PERMISSION);
-        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/test2"),CREATE_PERMISSION);
+        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/test"), READ_PERMISSION);
+        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/test2"), CREATE_PERMISSION);
 
         assertThat(accessRecord.size() == 2);
     }

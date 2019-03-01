@@ -32,9 +32,11 @@ class RoleIntegrationTest extends IntegrationBaseTest {
         service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PRIVATE, AccessType.EXPLICIT);
 
         assertThat(countRoles(ROLE_NAME).size()).isEqualTo(1);
-        assertThat(countRoles(ROLE_NAME).get(0).containsValue(RoleType.RESOURCE));
-        assertThat(countRoles(ROLE_NAME).get(0).containsValue(SecurityClassification.PRIVATE));
-        assertThat(countRoles(ROLE_NAME).get(0).containsValue(AccessType.EXPLICIT));
+        assertThat(countRoles(ROLE_NAME).get(0).values()).containsExactly(
+            ROLE_NAME,
+            RoleType.RESOURCE.toString(),
+            SecurityClassification.PRIVATE.toString(),
+            AccessType.EXPLICIT.toString());
     }
 
     @Test
@@ -42,6 +44,6 @@ class RoleIntegrationTest extends IntegrationBaseTest {
         service.addRole(ROLE_NAME, RoleType.IDAM, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
         service.deleteRole(ROLE_NAME);
 
-        assertThat(countRoles(ROLE_NAME).isEmpty());
+        assertThat(countRoles(ROLE_NAME)).isEmpty();
     }
 }

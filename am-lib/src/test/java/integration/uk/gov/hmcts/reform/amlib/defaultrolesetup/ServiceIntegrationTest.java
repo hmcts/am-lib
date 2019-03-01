@@ -33,7 +33,7 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
         service.addService(SERVICE_NAME, newDescription);
 
         assertThat(countServices(SERVICE_NAME).size()).isEqualTo(1);
-        assertThat(countServices(SERVICE_NAME).get(0).containsValue(newDescription));
+        assertThat(countServices(SERVICE_NAME).get(0).containsValue(newDescription)).isTrue();
     }
 
     @Test
@@ -43,6 +43,6 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
         service.deleteResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
         service.deleteService(SERVICE_NAME);
 
-        assertThat(countServices(SERVICE_NAME).isEmpty());
+        assertThat(countServices(SERVICE_NAME)).isEmpty();
     }
 }

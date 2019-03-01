@@ -23,8 +23,8 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
     @Test
     void shouldNotBeAbleToCreateResourceForServiceThatDoesNotExist() {
         assertThatExceptionOfType(UnableToExecuteStatementException.class).isThrownBy(() ->
-            service.addResourceDefinition("fake getService", RESOURCE_TYPE, RESOURCE_NAME))
-            .withMessageContaining("(service_name)=(fake getService) is not present in table \"services\"");
+            service.addResourceDefinition("fake service", RESOURCE_TYPE, RESOURCE_NAME))
+            .withMessageContaining("(service_name)=(fake service) is not present in table \"services\"");
     }
 
     @Test

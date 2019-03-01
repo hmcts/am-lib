@@ -1,4 +1,4 @@
-package integration.uk.gov.hmcts.reform.amlib.defaultrolesetup;
+package integration.uk.gov.hmcts.reform.amlib.importer;
 
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,7 +23,7 @@ class RoleIntegrationTest extends IntegrationBaseTest {
     void shouldAddNewEntryIntoDatabaseWhenNewRoleIsAdded() {
         service.addRole(ROLE_NAME, RoleType.IDAM, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
 
-        assertThat(countRoles(ROLE_NAME).size()).isEqualTo(1);
+        assertThat(countRoles(ROLE_NAME)).hasSize(1);
     }
 
     @Test
@@ -31,12 +31,12 @@ class RoleIntegrationTest extends IntegrationBaseTest {
         service.addRole(ROLE_NAME, RoleType.IDAM, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
         service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PRIVATE, AccessType.EXPLICIT);
 
-        assertThat(countRoles(ROLE_NAME).size()).isEqualTo(1);
-        assertThat(countRoles(ROLE_NAME).get(0).values()).containsExactly(
+        assertThat(countRoles(ROLE_NAME)).hasSize(1);
+        assertThat(countRoles(ROLE_NAME).get(0)).containsValues(
             ROLE_NAME,
-            RoleType.RESOURCE.toString(),
-            SecurityClassification.PRIVATE.toString(),
-            AccessType.EXPLICIT.toString());
+            RoleType.RESOURCE.name(),
+            SecurityClassification.PRIVATE.name(),
+            AccessType.EXPLICIT.name());
     }
 
     @Test

@@ -1,4 +1,4 @@
-package integration.uk.gov.hmcts.reform.amlib.defaultrolesetup;
+package integration.uk.gov.hmcts.reform.amlib.importer;
 
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
@@ -29,7 +29,7 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void shouldAddNewResourceDefinitionIntoDatabaseWhenServiceNameExists() {
-        service.addService(SERVICE_NAME, "");
+        service.addService(SERVICE_NAME);
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
 
         assertThat(countResources(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME)).isEqualTo(1);
@@ -37,7 +37,7 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void shouldUpdateExistingEntryWhenDuplicateResourceDefinitionsAreAdded() {
-        service.addService(SERVICE_NAME, "");
+        service.addService(SERVICE_NAME);
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
 
@@ -46,7 +46,7 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void shouldDeleteResourceDefinitionFromTableWhenValueExists() {
-        service.addService(SERVICE_NAME, "");
+        service.addService(SERVICE_NAME);
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
         service.deleteResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
 

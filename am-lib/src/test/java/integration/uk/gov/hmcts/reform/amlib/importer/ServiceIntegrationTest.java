@@ -1,4 +1,4 @@
-package integration.uk.gov.hmcts.reform.amlib.defaultrolesetup;
+package integration.uk.gov.hmcts.reform.amlib.importer;
 
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.BeforeAll;
@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 class ServiceIntegrationTest extends IntegrationBaseTest {
@@ -22,7 +20,7 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
     void shouldPutNewRowInputIntoDatabaseWhenUniqueServiceNameIsGiven() {
         service.addService(SERVICE_NAME);
 
-        assertThat(countServices(SERVICE_NAME).size()).isEqualTo(1);
+        assertThat(countServices(SERVICE_NAME)).hasSize(1);
     }
 
     @Test
@@ -32,15 +30,13 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
         service.addService(SERVICE_NAME);
         service.addService(SERVICE_NAME, newDescription);
 
-        assertThat(countServices(SERVICE_NAME).size()).isEqualTo(1);
-        assertThat(countServices(SERVICE_NAME).get(0).containsValue(newDescription)).isTrue();
+        assertThat(countServices(SERVICE_NAME)).hasSize(1);
+        assertThat(countServices(SERVICE_NAME).get(0)).containsValue(newDescription);
     }
 
     @Test
     void shouldDeleteServiceFromTableWhenServiceIsPresent() {
         service.addService(SERVICE_NAME);
-        //Resource must be deleted before a getService can be deleted.
-        service.deleteResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
         service.deleteService(SERVICE_NAME);
 
         assertThat(countServices(SERVICE_NAME)).isEmpty();

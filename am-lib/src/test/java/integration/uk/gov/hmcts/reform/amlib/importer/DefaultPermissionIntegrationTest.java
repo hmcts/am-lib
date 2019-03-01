@@ -1,4 +1,4 @@
-package integration.uk.gov.hmcts.reform.amlib.defaultrolesetup;
+package integration.uk.gov.hmcts.reform.amlib.importer;
 
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.BeforeAll;
@@ -29,12 +29,13 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     @BeforeAll
     static void setUp() {
         service = new DefaultRoleSetupImportService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
+
+        service.addService(SERVICE_NAME);
+        service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
     }
 
     @Test
     void shouldNotBeAbleToCreateDefaultPermissionWhenRoleDoesNotExist() {
-        service.deleteRole(ROLE_NAME);
-
         assertThatExceptionOfType(PersistenceException.class)
             .isThrownBy(() -> service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION)))
             .withMessageContaining("(role_name)=(Role Name) is not present in table \"roles\"");

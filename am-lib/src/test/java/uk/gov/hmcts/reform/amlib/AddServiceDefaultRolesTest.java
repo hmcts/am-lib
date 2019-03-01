@@ -5,25 +5,24 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class AddServiceDefaultRolesTest {
-    private final DefaultRoleSetupImportService defaultRoleSetupImportService = new DefaultRoleSetupImportService(
-        "", "", "");
+    private final DefaultRoleSetupImportService service = new DefaultRoleSetupImportService("", "", "");
 
     @Test
     void whenServiceNameIsNullAddServiceShouldThrowNullPointerException() {
         assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> defaultRoleSetupImportService.addService(null, ""));
+            .isThrownBy(() -> service.addService(null, ""));
     }
 
     @Test
     void whenOnlyParamIsServiceNameAndItIsNullAddServiceShouldThrowNullPointerException() {
         assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> defaultRoleSetupImportService.addService(null));
+            .isThrownBy(() -> service.addService(null));
     }
 
     @Test
     void whenServiceNameIsEmptyAddServiceShouldThrowIllegalArgumentException() {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> defaultRoleSetupImportService.addService("", ""))
+            .isThrownBy(() -> service.addService("", ""))
             .withMessage("Service name cannot be empty");
     }
 }

@@ -9,20 +9,19 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 
 class AddRoleDefaultRolesTest {
-    private final DefaultRoleSetupImportService defaultRoleSetupImportService = new DefaultRoleSetupImportService(
-        "", "", "");
+    private final DefaultRoleSetupImportService service = new DefaultRoleSetupImportService("", "", "");
 
     @Test
     void whenRoleNameIsNullAddRoleWillThrowNullPointerException() {
         assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> defaultRoleSetupImportService.addRole(
+            .isThrownBy(() -> service.addRole(
                 null, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED));
     }
 
     @Test
     void whenRoleNameIsEmptyAddRoleWillThrowIllegalArgumentException() {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> defaultRoleSetupImportService.addRole(
+            .isThrownBy(() -> service.addRole(
                 "", RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED))
             .withMessage("Role name cannot be empty");
     }
@@ -30,21 +29,21 @@ class AddRoleDefaultRolesTest {
     @Test
     void whenRoleTypeIsNullAddRoleWillThrowNullPointerException() {
         assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> defaultRoleSetupImportService.addRole(
+            .isThrownBy(() -> service.addRole(
                 ROLE_NAME, null, SecurityClassification.PUBLIC, AccessType.ROLE_BASED));
     }
 
     @Test
     void whenSecurityClassificationIsNullAddRoleWillThrowNullPointerException() {
         assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> defaultRoleSetupImportService.addRole(
+            .isThrownBy(() -> service.addRole(
                 ROLE_NAME, RoleType.RESOURCE, null, AccessType.ROLE_BASED));
     }
 
     @Test
     void whenAccessManagementTypeIsNullAddRoleWillThrowNullPointerException() {
         assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> defaultRoleSetupImportService.addRole(
+            .isThrownBy(() -> service.addRole(
                 ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, null));
     }
 }

@@ -1,9 +1,11 @@
 package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
+import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
 import java.util.HashSet;
@@ -21,9 +23,14 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissionsForWholeDocument;
 
-class GrantAccessIntegrationTest extends IntegrationBaseTest {
-
+class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private String resourceId;
+    private static AccessManagementService ams;
+
+    @BeforeAll
+    static void setUp() {
+        ams = new AccessManagementService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
+    }
 
     @BeforeEach
     void setupTest() {

@@ -509,17 +509,39 @@ class FilterServiceTest {
     }
 
     @Test
-    void itShould() throws IOException {
+    void itShouldNotLeakAttributeValueWhenAccessIsGrantedToAnotherAttributeThatStartsSameWay() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf("/namename"), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/name"), CREATE_PERMISSION)
+            .put(JsonPointer.valueOf(""), READ_PERMISSION)
+            .put(JsonPointer.valueOf("/amountInPounds"), READ_PERMISSION)
+            .put(JsonPointer.valueOf("/amount"), CREATE_PERMISSION)
             .build();
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
-        assertThat(returnedJson).isEqualTo(JsonNodeFactory.instance.objectNode());
+        assertThat(returnedJson).isEqualTo(mapper.valueToTree(
+            Resource.builder()
+                .claimant(Claimant.builder()
+                    .name("John")
+                    .age(21)
+                    .address(Address.builder()
+                        .city("London")
+                        .postcode("SE1")
+                        .build())
+                    .build()
+                )
+                .defendant(Defendant.builder()
+                    .name("Marry")
+                    .address(Address.builder()
+                        .city("Swansea")
+                        .postcode("SA1")
+                        .build())
+                    .build()
+                )
+                .build()
+            )
+        );
     }
 
     @Builder

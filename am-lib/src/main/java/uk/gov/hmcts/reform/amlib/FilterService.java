@@ -66,7 +66,7 @@ public class FilterService {
                 (List<JsonPointer> result, JsonPointer pointerCandidate) -> {
                     // already contains parent so no point adding
                     if (result.stream().noneMatch(acceptedPointer ->
-                        pointerCandidate.toString().startsWith(acceptedPointer.toString())
+                        pointerCandidate.toString().startsWith(acceptedPointer.toString() + "/")
                     )) {
                         result.add(pointerCandidate);
                     }
@@ -162,7 +162,7 @@ public class FilterService {
         nodesWithoutRead.forEach(pointerCandidateForRemoval -> {
             log.debug(">> Pointer candidate for removal: " + pointerCandidateForRemoval);
             List<JsonPointer> childPointersWithRead = nodesWithRead.stream()
-                .filter(pointerWithRead -> pointerWithRead.toString().startsWith(pointerCandidateForRemoval.toString()))
+                .filter(pointerWithRead -> pointerWithRead.toString().startsWith(pointerCandidateForRemoval.toString() + "/"))
                 .collect(Collectors.toList());
             if (childPointersWithRead.isEmpty()) {
                 // remove whole node

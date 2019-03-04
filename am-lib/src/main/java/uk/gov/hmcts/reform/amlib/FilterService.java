@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
@@ -23,6 +21,7 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
 @Slf4j
+@SuppressWarnings("LineLength")
 public class FilterService {
 
     private static final JsonPointer WHOLE_RESOURCE_POINTER = JsonPointer.valueOf("");
@@ -81,6 +80,7 @@ public class FilterService {
             .collect(Collectors.toList());
     }
 
+    @SuppressWarnings("PMD") // UseConcurrentHashMap: ConcurrentHashMap cannot be used as sorted map is needed. Instance is local as well.
     private void retainFieldsWithReadPermission(JsonNode resource, List<JsonPointer> uniqueNodesWithRead) {
         Map<Integer, Map<JsonPointer, Set<String>>> reduce = uniqueNodesWithRead.stream()
             .reduce(new TreeMap<>(Collections.reverseOrder()),

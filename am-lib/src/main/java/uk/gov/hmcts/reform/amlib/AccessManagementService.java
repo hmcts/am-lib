@@ -25,7 +25,6 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
 public class AccessManagementService {
     private final Jdbi jdbi;
-    private static final int MAX_ROLE_NAMES_RETURNED = 1;
 
     public AccessManagementService(String url, String user, String password) {
         this.jdbi = Jdbi.create(url, user, password);
@@ -129,23 +128,23 @@ public class AccessManagementService {
 
 
     /**
-     * <p>
-     * Method requires name of service, the type of resource, name of resource and a role name to
-     * populate a  map of JsonPointers and set of permissions when record with user role and type exists in database.
-     * </p>
+     * Retrieves a list of {@link RoleBasedAccessRecord } and returns attribute and permissions values.
      *
      * @param serviceName  name of service
      * @param resourceType type of resource
      * @param resourceName name of a resource
      * @param roleNames    A set of role names. Currently only one role name is supported but
-     *                     in future implementations we shall support having multiple role names.
-     * @return permissionsByTypeAndRole a map of attributes and their corresponding permissions or null.
+     *                     in future implementations we shall support having multiple role names
+     * @return permissionsByTypeAndRole a map of attributes and their corresponding permissions or null
      */
+    @SuppressWarnings("PMD")
+    //Magic number used temporarily until future implementation supports multiple roles.
     public Map<JsonPointer, Set<Permission>> getRolePermissions(
         @NonNull String serviceName, @NonNull String resourceType,
         @NonNull String resourceName, @NonNull Set<String> roleNames) {
-        if (roleNames.size() > MAX_ROLE_NAMES_RETURNED) {
-            throw new IllegalArgumentException();
+        if (roleNames.size() > 1) {
+            throw new IllegalArgumentException("Currently a single role only is supported. " +
+                "Future implementations will allow for multiple roles.");
         }
 
         List<RoleBasedAccessRecord> roleBasedAccess = jdbi.withExtension(AccessManagementRepository.class,

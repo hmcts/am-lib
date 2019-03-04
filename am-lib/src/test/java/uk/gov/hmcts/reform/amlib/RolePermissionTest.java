@@ -5,38 +5,38 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 public class RolePermissionTest {
 
-    private final AccessManagementService ams = new AccessManagementService("", "", "");
+    private final AccessManagementService service = new AccessManagementService("", "", "");
 
     @Test
     void shouldThrowNullPointerWhenServiceNameIsNull() {
         assertThrows(NullPointerException.class, () -> {
-            ams.getRolePermissions(null, RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAME);
+            service.getRolePermissions(null, RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAMES);
         });
     }
 
     @Test
     void shouldThrowNullPointerWhenResourceTypeIsNull() {
         assertThrows(NullPointerException.class, () -> {
-            ams.getRolePermissions(SERVICE_NAME, null, RESOURCE_NAME, ROLE_NAME);
+            service.getRolePermissions(SERVICE_NAME, null, RESOURCE_NAME, ROLE_NAMES);
         });
     }
 
     @Test
     void shouldThrowNullPointerWhenResourceNameIsNull() {
         assertThrows(NullPointerException.class, () -> {
-            ams.getRolePermissions(SERVICE_NAME, RESOURCE_TYPE, null, ROLE_NAME);
+            service.getRolePermissions(SERVICE_NAME, RESOURCE_TYPE, null, ROLE_NAMES);
         });
     }
 
     @Test
     void shouldThrowNullPointerWhenRoleIsNull() {
         assertThrows(NullPointerException.class, () -> {
-            ams.getRolePermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, null);
+            service.getRolePermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, null);
         });
     }
 }

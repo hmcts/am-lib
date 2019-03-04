@@ -82,7 +82,51 @@ public class FilterService {
 
     @SuppressWarnings("PMD") // UseConcurrentHashMap: ConcurrentHashMap cannot be used as sorted map is needed. Instance is local as well.
     private void retainFieldsWithReadPermission(JsonNode resource, List<JsonPointer> uniqueNodesWithRead) {
-        Map<Integer, Map<JsonPointer, Set<String>>> reduce = uniqueNodesWithRead.stream()
+        Map<Integer, Map<JsonPointer, Set<String>>> reduce = reduceToUniqueTreeLeaves(uniqueNodesWithRead);
+
+        log.debug(">> Pointer candidates for retaining: " + reduce.values());
+
+        reduce.values().forEach(map -> map.entrySet().forEach(entry -> {
+            JsonNode node = resource.at(entry.getKey());
+            if (node instanceof ObjectNode) {
+                log.debug(">>> Retaining '" + entry.getValue() + "' out of '" + entry.getKey() + "'");
+                ObjectNode filteredNode = ((ObjectNode) node).retain(entry.getValue());
+                if (filteredNode.size() == 0 && entry.getKey().head() != null) {
+                    ((ObjectNode) resource.at(entry.getKey().head()))
+                        .remove(entry.getKey().last().toString().substring(1));
+                }
+            }
+        }));
+    }
+
+    /**
+     * Decomposes set of JSON pointers into parent-children maps sorted by the depth of the tree.
+     * <p><p>
+     * Example:
+     * <pre>
+     * [
+     *   /claimant/name
+     *   /claimant/address
+     *   /defendant/address
+     * ]
+     *
+     * {
+     *   "2": {
+     *     "/claimant": [
+     *       ["name", "address"]
+     *     ],
+     *     "/defendant": [
+     *       ["address"]
+     *     ]
+     *   },
+     *   "1": {
+     *     "/": ["claimant", "defendant"]
+     *   }
+     * }
+     * </pre>
+     */
+    private Map<Integer, Map<JsonPointer, Set<String>>> reduceToUniqueTreeLeaves(List<JsonPointer> nodes) {
+        return nodes.stream()
             .reduce(new TreeMap<>(Collections.reverseOrder()),
                 (Map<Integer, Map<JsonPointer, Set<String>>> result, JsonPointer pointer) -> {
                     JsonPointer fieldPointer = pointer.last();
@@ -110,22 +154,6 @@ public class FilterService {
 
                     return result;
                 }, (firstPointer, secondPointer) -> firstPointer);
-
-        log.debug(">> Pointer candidates for retaining: " + reduce.values());
-
-        reduce.values().forEach(map -> {
-            map.entrySet().forEach(entry -> {
-                JsonNode node = resource.at(entry.getKey());
-                if (node instanceof ObjectNode) {
-                    log.debug(">>> Retaining '" + entry.getValue() + "' out of '" + entry.getKey() + "'");
-                    ObjectNode filteredNode = ((ObjectNode) node).retain(entry.getValue());
-                    if (filteredNode.size() == 0 && entry.getKey().head() != null) {
-                        ((ObjectNode) resource.at(entry.getKey().head()))
-                            .remove(entry.getKey().last().toString().substring(1));
-                    }
-                }
-            });
-        });
     }
 
     private void removeFieldsWithoutReadPermission(JsonNode resource, List<JsonPointer> nodesWithRead, List<JsonPointer> nodesWithoutRead) {

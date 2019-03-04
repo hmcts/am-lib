@@ -28,7 +28,7 @@ class GetRolePermissionsIntegrationTest extends IntegrationBaseTest {
         assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/test"), READ_PERMISSION);
         assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/test2"), CREATE_PERMISSION);
 
-        assertThat(accessRecord.size() == 2);
+        assertThat(accessRecord).size().isEqualTo(2);
     }
 
     @Test

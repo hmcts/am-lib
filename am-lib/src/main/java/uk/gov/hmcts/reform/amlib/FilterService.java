@@ -101,8 +101,8 @@ public class FilterService {
 
     /**
      * Decomposes set of JSON pointers into parent-children maps sorted by the depth of the tree.
-     * <p><p>
-     * Example:
+     *
+     * <p>Example:
      * <pre>
      * [
      *   /claimant/name
@@ -125,6 +125,7 @@ public class FilterService {
      * }
      * </pre>
      */
+    @SuppressWarnings("PMD") // AvoidInstantiatingObjectsInLoops: objects cannot be created outside the loop
     private Map<Integer, Map<JsonPointer, Set<String>>> reduceToUniqueTreeLeaves(List<JsonPointer> nodes) {
         return nodes.stream()
             .reduce(new TreeMap<>(Collections.reverseOrder()),

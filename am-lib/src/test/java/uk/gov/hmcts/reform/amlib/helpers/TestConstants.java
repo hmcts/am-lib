@@ -15,12 +15,14 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 public final class TestConstants {
 
     public static final String ACCESS_TYPE = "user";
-    public static final String SERVICE_NAME = "Service 1";
-    public static final String RESOURCE_TYPE = "Resource Type 1";
+    public static final String SERVICE_NAME = "Service";
+    public static final String RESOURCE_TYPE = "Resource Type";
     public static final String RESOURCE_NAME = "resource";
-    public static final String SECURITY_CLASSIFICATION = "Public";
+    public static final String SECURITY_CLASSIFICATION = "PUBLIC";
+    public static final String ATTRIBUTE = "/test";
     public static final String ACCESSOR_ID = "a";
     public static final String OTHER_ACCESSOR_ID = "b";
+    public static final String ROLE_NAME = "Role Name";
     public static final Set<Permission> EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS =
         Stream.of(CREATE, READ, UPDATE).collect(toSet());
     public static final Set<Permission> CREATE_PERMISSION = Stream.of(CREATE).collect(toSet());

@@ -141,8 +141,8 @@ public class AccessManagementService {
         @NonNull String serviceName, @NonNull String resourceType,
         @NonNull String resourceName, @NonNull Set<String> roleNames) {
         if (roleNames.size() > 1) {
-            throw new IllegalArgumentException("Currently a single role only is supported. " +
-                "Future implementations will allow for multiple roles.");
+            throw new IllegalArgumentException("Currently a single role only is supported. "
+                + "Future implementations will allow for multiple roles.");
         }
 
         List<RoleBasedAccessRecord> roleBasedAccess = jdbi.withExtension(AccessManagementRepository.class,

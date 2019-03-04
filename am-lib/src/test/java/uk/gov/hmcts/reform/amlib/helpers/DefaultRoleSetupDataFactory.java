@@ -25,8 +25,7 @@ public final class DefaultRoleSetupDataFactory {
     }
 
     public static Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>>
-    createReadPermissionsForAttribute(Set<Permission> permissions) {
-
+        createReadPermissionsForAttribute(Set<Permission> permissions) {
         Pair<Set<Permission>, SecurityClassification> pair =
             new Pair<>(permissions, SecurityClassification.PUBLIC);
 

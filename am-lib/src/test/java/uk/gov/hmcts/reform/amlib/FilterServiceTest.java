@@ -508,6 +508,20 @@ class FilterServiceTest {
         assertThat(returnedJson).isEqualTo(JsonNodeFactory.instance.objectNode());
     }
 
+    @Test
+    void itShould() throws IOException {
+        JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
+
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
+            .put(JsonPointer.valueOf("/namename"), READ_PERMISSION)
+            .put(JsonPointer.valueOf("/name"), CREATE_PERMISSION)
+            .build();
+
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+
+        assertThat(returnedJson).isEqualTo(JsonNodeFactory.instance.objectNode());
+    }
+
     @Builder
     @Data
     static class Resource {

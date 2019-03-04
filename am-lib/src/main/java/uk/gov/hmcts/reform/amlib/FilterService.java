@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -80,20 +81,21 @@ public class FilterService {
             .collect(Collectors.toList());
     }
 
-    @SuppressWarnings("PMD") // UseConcurrentHashMap: ConcurrentHashMap cannot be used as sorted map is needed. Instance is local as well.
+    @SuppressWarnings("PMD")
+    // UseConcurrentHashMap: ConcurrentHashMap cannot be used as sorted map is needed. Instance is local as well.
     private void retainFieldsWithReadPermission(JsonNode resource, List<JsonPointer> uniqueNodesWithRead) {
-        Map<Integer, Map<JsonPointer, Set<String>>> reduce = reduceToUniqueTreeLeaves(uniqueNodesWithRead);
 
-        log.debug(">> Pointer candidates for retaining: " + reduce.values());
+        Collection<Map<JsonPointer, Set<String>>> pointersByDepth = decomposePointersByDepth(uniqueNodesWithRead).values();
+        log.debug(">> Pointer candidates for retaining: " + pointersByDepth);
 
-        reduce.values().forEach(map -> map.entrySet().forEach(entry -> {
-            JsonNode node = resource.at(entry.getKey());
+        pointersByDepth.forEach(map -> map.forEach((key, value) -> {
+            JsonNode node = resource.at(key);
             if (node instanceof ObjectNode) {
-                log.debug(">>> Retaining '" + entry.getValue() + "' out of '" + entry.getKey() + "'");
-                ObjectNode filteredNode = ((ObjectNode) node).retain(entry.getValue());
-                if (filteredNode.size() == 0 && entry.getKey().head() != null) {
-                    ((ObjectNode) resource.at(entry.getKey().head()))
-                        .remove(entry.getKey().last().toString().substring(1));
+                log.debug(">>> Retaining '" + value + "' out of '" + key + "'");
+                ObjectNode filteredNode = ((ObjectNode) node).retain(value);
+                if (filteredNode.size() == 0 && key.head() != null) {
+                    ((ObjectNode) resource.at(key.head()))
+                        .remove(key.last().toString().substring(1));
                 }
             }
         }));
@@ -126,7 +128,7 @@ public class FilterService {
      * </pre>
      */
     @SuppressWarnings("PMD") // AvoidInstantiatingObjectsInLoops: objects cannot be created outside the loop
-    private Map<Integer, Map<JsonPointer, Set<String>>> reduceToUniqueTreeLeaves(List<JsonPointer> nodes) {
+    private Map<Integer, Map<JsonPointer, Set<String>>> decomposePointersByDepth(List<JsonPointer> nodes) {
         return nodes.stream()
             .reduce(new TreeMap<>(Collections.reverseOrder()),
                 (Map<Integer, Map<JsonPointer, Set<String>>> result, JsonPointer pointer) -> {
@@ -141,7 +143,6 @@ public class FilterService {
                         }
 
                         Map<JsonPointer, Set<String>> map = result.get(depth);
-
 
                         if (!map.containsKey(parentPointer)) {
                             map.put(parentPointer, new HashSet<>());

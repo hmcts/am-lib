@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -135,6 +136,7 @@ public class FilterService {
                 .collect(Collectors.toList());
             if (childPointersWithRead.isEmpty()) {
                 // remove whole node
+                log.debug(">>> Removing '" + pointerCandidateForRemoval + "'");
                 JsonNode node = resource.at(pointerCandidateForRemoval.head());
                 if (node instanceof ObjectNode) {
                     ((ObjectNode) node).remove(pointerCandidateForRemoval.last().toString().substring(1));
@@ -143,9 +145,18 @@ public class FilterService {
                 // retain node's children with READ
                 JsonNode node = resource.at(pointerCandidateForRemoval);
                 if (node instanceof ObjectNode) {
-                    ((ObjectNode) node).retain(childPointersWithRead.stream()
-                        .map(pointer -> pointer.last().toString().substring(1))
-                        .collect(Collectors.toList()));
+                    childPointersWithRead.forEach(childPointerWithRead -> {
+                        JsonPointer fieldPointer = childPointerWithRead.last();
+                        JsonPointer parentPointer = childPointerWithRead.head();
+
+                        while (!Objects.equals(parentPointer, pointerCandidateForRemoval.head())) {
+                            log.debug(">>> Retaining '" + fieldPointer + "' out of '" + parentPointer + "'");
+                            ((ObjectNode) resource.at(parentPointer)).retain(fieldPointer.toString().substring(1));
+
+                            fieldPointer = parentPointer.last();
+                            parentPointer = parentPointer.head();
+                        }
+                    });
                 }
             }
         });

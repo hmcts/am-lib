@@ -126,7 +126,6 @@ public class AccessManagementService {
         return null;
     }
 
-
     /**
      * Retrieves a list of {@link RoleBasedAccessRecord } and returns attribute and permissions values.
      *
@@ -135,10 +134,9 @@ public class AccessManagementService {
      * @param resourceName name of a resource
      * @param roleNames    A set of role names. Currently only one role name is supported but
      *                     in future implementations we shall support having multiple role names
-     * @return permissionsByTypeAndRole a map of attributes and their corresponding permissions or null
+     * @return a map of attributes and their corresponding permissions or null
      */
     @SuppressWarnings("PMD")
-    //Magic number used temporarily until future implementation supports multiple roles.
     public Map<JsonPointer, Set<Permission>> getRolePermissions(
         @NonNull String serviceName, @NonNull String resourceType,
         @NonNull String resourceName, @NonNull Set<String> roleNames) {

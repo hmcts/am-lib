@@ -25,7 +25,7 @@ public final class DefaultRoleSetupDataFactory {
     }
 
     public static Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>>
-        createReadPermissionsForAttribute(Set<Permission> permissions) {
+    createReadPermissionsForAttribute(Set<Permission> permissions) {
 
         Pair<Set<Permission>, SecurityClassification> pair =
             new Pair<>(permissions, SecurityClassification.PUBLIC);
@@ -38,7 +38,7 @@ public final class DefaultRoleSetupDataFactory {
         return attributePermission;
     }
 
-    public static Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> grantMultipleResources(){
+    public static Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> createMultipleResources() {
         Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermissions =
             new ConcurrentHashMap<>();
 

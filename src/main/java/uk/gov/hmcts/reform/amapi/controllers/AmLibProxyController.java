@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.amapi.controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
+import uk.gov.hmcts.reform.amlib.models.FilterResource;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 
 import java.util.List;
@@ -45,12 +45,7 @@ public class AmLibProxyController {
     }
 
     @PostMapping("/filter-resource")
-    public FilterResourceResponse filterResource(@RequestBody Map<String, Object> amData) {
-        JsonNode jsonNode = mapper.valueToTree(amData.get("resourceJson"));
-        return am.filterResource(
-            amData.get("userId").toString(),
-            amData.get(RESOURCE_ID_KEY).toString(),
-            jsonNode
-        );
+    public FilterResourceResponse filterResource(@RequestBody FilterResource amData) {
+        return am.filterResource(amData.getUserId(), amData.getUserRoles(), amData.getResource());
     }
 }

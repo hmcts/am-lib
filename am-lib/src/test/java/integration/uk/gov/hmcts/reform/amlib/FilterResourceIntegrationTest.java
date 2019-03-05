@@ -2,9 +2,7 @@ package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.ImmutableMap;
-import com.sun.tools.classfile.Opcode;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
-import jdk.management.resource.ResourceType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,12 +11,9 @@ import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
-import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 
-import java.util.Arrays;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
@@ -26,10 +21,9 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
 
@@ -50,10 +44,10 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenRowExistsAndHaveReadPermissionsReturnEnvelopeWithData() {
+    void whenRowExistsAndHasReadPermissionsShouldReturnEnvelopeWithData() {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, READ_PERMISSION));
 
-        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
+        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, null, createResource(resourceId));
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
@@ -63,10 +57,10 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenRowExistsAndDoesNotHaveReadPermissionsReturnEnvelopeWithoutData() {
+    void whenRowExistsAndDoesNotHaveReadPermissionsShouldReturnEnvelopeWithoutData() {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, CREATE_PERMISSION));
 
-        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);
+        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, null, createResource(resourceId));
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
@@ -76,34 +70,36 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenNoRowExistsReturnNull() {
-        //TODO: this test could fail - it won't just return null but will check for role based access.
-        // will most likely be replaced by the test below. This test should check when no explicit access and no role.
-
+    void whenThereAreNoAccessRecordsShouldReturnNull() {
         String nonExistingUserId = "ijk";
         String nonExistingResourceId = "lmn";
 
-        FilterResourceResponse result = ams.filterResource(nonExistingUserId, nonExistingResourceId, DATA);
-//        FilterResourceResponse result = ams.filterResource("ijk", null, createResource(resourceId));
+        FilterResourceResponse result = ams.filterResource(
+            nonExistingUserId, ROLE_NAMES, createResource(nonExistingResourceId));
 
         assertThat(result).isNull();
     }
 
     @Test
-    void whenNoExplicitAccessExistsShouldAddRoleBasedAccess() {
-        rolesService.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
+    void whenNoExplicitAccessShouldUseRoleBasedAccess() {
+        rolesService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        rolesService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
 
         FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
-        //TODO: assert that role based access permissions is added to response
-        assertThat(result);
+        assertThat(result).isEqualTo(FilterResourceResponse.builder()
+            .resourceId(resourceId)
+            .data(DATA)
+            .permissions(ImmutableMap.of(ROOT_ATTRIBUTE, READ_PERMISSION))
+            .build());
     }
 
     @Test
-    void whenRoleBasedAccessAndRoleHasExplicitAccessType() {
+    void whenNoExplicitAccessAndRoleHasExplicitAccessType() {
         rolesService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.EXPLICIT);
+        rolesService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
 
-        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, listWithRoleName, createResource(resourceId));
+        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
         assertThat(result).isNull();
     }

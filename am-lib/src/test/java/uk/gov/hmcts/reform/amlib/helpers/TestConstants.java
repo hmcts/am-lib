@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.amlib.helpers;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.models.Resource;
-import uk.gov.hmcts.reform.amlib.models.ResourceType;
 
 import java.util.Set;
 import java.util.stream.Stream;
@@ -22,8 +21,10 @@ public final class TestConstants {
     public static final String RESOURCE_NAME = "resource";
     public static final String SECURITY_CLASSIFICATION = "PUBLIC";
     public static final String ATTRIBUTE = "/test";
+    public static final JsonPointer ROOT_ATTRIBUTE = JsonPointer.valueOf("");
     public static final String ACCESSOR_ID = "a";
     public static final String OTHER_ACCESSOR_ID = "b";
+    public static final Set<String> ROLE_NAMES = Stream.of("Role Name").collect(toSet());
     public static final String ROLE_NAME = "Role Name";
     public static final Set<Permission> EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS =
         Stream.of(CREATE, READ, UPDATE).collect(toSet());

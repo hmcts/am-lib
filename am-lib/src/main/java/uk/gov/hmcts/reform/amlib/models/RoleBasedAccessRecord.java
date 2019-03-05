@@ -5,19 +5,27 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
-import uk.gov.hmcts.reform.amlib.utils.Pair;
+import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
-import java.util.Map;
 import java.util.Set;
 
 @Data
 @Builder
 @AllArgsConstructor
-public class DefaultPermissionGrant {
+public final class RoleBasedAccessRecord {
+
     private final String serviceName;
     private final String resourceType;
     private final String resourceName;
+    private final String attribute;
     private final String roleName;
-    private final Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermissions;
+    private final int permissions;
+
+    public JsonPointer getAttributeAsPointer() {
+        return JsonPointer.valueOf(attribute);
+    }
+
+    public Set<Permission> getPermissionsAsSet() {
+        return Permissions.fromSumOf(permissions);
+    }
 }

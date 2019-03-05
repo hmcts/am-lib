@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.NonNull;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -11,6 +13,7 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.models.Resource;
+import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
 import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
@@ -52,7 +55,7 @@ public class AccessManagementService {
     /**
      * Grants explicit access to resource accordingly to record configuration.
      *
-     * <p>Operation is performed in transaction so that if not all records can be created then whole grant will fail.
+     * <p>Operation is performed in a transaction so that if not all records can be created then whole grant will fail.
      *
      * @param explicitAccessGrant an object that describes explicit access to resource
      */
@@ -112,15 +115,13 @@ public class AccessManagementService {
         });
     }
 
-    //TODO: reword javadoc.
-
     /**
      * Filters {@link JsonNode} to remove fields that user has no access to (no READ permission). In addition to that
      * method also returns map of all permissions that user has to resource.
      *
      * @param userId    accessor ID
      * @param userRoles user roles
-     * @param resource  Resource and metadata
+     * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
      * to resource is configured, otherwise null.
      */
@@ -130,7 +131,7 @@ public class AccessManagementService {
 
         if (explicitAccess.isEmpty()) {
             List<RoleBasedAccessRecord> roleBasedAccess = jdbi.withExtension(AccessManagementRepository.class,
-                dao -> dao.getRoleBasedAccess(
+                dao -> dao.getRolePermissions(
                     resource.getType().getServiceName(),
                     resource.getType().getResourceType(),
                     resource.getType().getResourceName(),
@@ -140,9 +141,25 @@ public class AccessManagementService {
                 return null;
             }
 
-            //TODO: Get attribute and permissions values from RoleBasedAccessRecord and filter for attribute permissions.
+            if (jdbi.withExtension(AccessManagementRepository.class,
+                dao -> dao.getRoleAccessType(userRoles.iterator().next())).equals(AccessType.EXPLICIT.name())) {
+                return null;
+            }
 
-            //TODO: Explict or Role based access type on role?
+            Map<JsonPointer, Set<Permission>> attributePermissions = roleBasedAccess.stream().collect(
+                Collectors.toMap(
+                    RoleBasedAccessRecord::getAttributeAsPointer, RoleBasedAccessRecord::getPermissionsAsSet
+                )
+            );
+
+            JsonNode filteredJson = filterService.filterJson(resource.getResourceJson(), attributePermissions);
+
+            return FilterResourceResponse.builder()
+                .resourceId(resource.getResourceId())
+                .data(filteredJson)
+                .permissions(attributePermissions)
+                .build();
+
         }
 
         Map<JsonPointer, Set<Permission>> attributePermissions = explicitAccess.stream().collect(
@@ -159,5 +176,36 @@ public class AccessManagementService {
             .data(filteredJson)
             .permissions(attributePermissions)
             .build();
+    }
+
+    /**
+     * Retrieves a list of {@link RoleBasedAccessRecord } and returns attribute and permissions values.
+     *
+     * @param serviceName  name of service
+     * @param resourceType type of resource
+     * @param resourceName name of a resource
+     * @param roleNames    A set of role names. Currently only one role name is supported but
+     *                     in future implementations we shall support having multiple role names
+     * @return a map of attributes and their corresponding permissions or null
+     */
+    @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
+    public Map<JsonPointer, Set<Permission>> getRolePermissions(
+        @NonNull String serviceName, @NonNull String resourceType,
+        @NonNull String resourceName, @NonNull Set<String> roleNames) {
+        if (roleNames.size() > 1) {
+            throw new IllegalArgumentException("Currently a single role only is supported. "
+                + "Future implementations will allow for multiple roles.");
+        }
+
+        List<RoleBasedAccessRecord> roleBasedAccessRecords = jdbi.withExtension(AccessManagementRepository.class,
+            dao -> dao.getRolePermissions(serviceName, resourceType, resourceName, roleNames.iterator().next()));
+
+        if (roleBasedAccessRecords.isEmpty()) {
+            return null;
+        }
+
+        return roleBasedAccessRecords.stream()
+            .collect(Collectors.toMap(RoleBasedAccessRecord::getAttributeAsPointer,
+                RoleBasedAccessRecord::getPermissionsAsSet));
     }
 }

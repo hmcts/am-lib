@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -13,6 +13,6 @@ import java.util.List;
 public class Resource {
     private final String resourceId;
     private final ResourceType type;
-    private final List<String> resourceRoles;
+    private final Set<String> resourceRoles;
     private final JsonNode resourceJson;
 }

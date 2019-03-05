@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
@@ -82,7 +83,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME + "2")
-            .attributePermissions(createReadPermissionsForAttribute(READ_PERMISSION))
+            .attributePermissions(createReadPermissionsForAttribute(ROOT_ATTRIBUTE, READ_PERMISSION))
             .build());
 
         service.truncateDefaultPermissionsForService(SERVICE_NAME, RESOURCE_TYPE);

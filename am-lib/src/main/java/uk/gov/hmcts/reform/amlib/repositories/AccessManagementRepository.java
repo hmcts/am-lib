@@ -7,6 +7,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
 
 import java.util.List;
 
@@ -39,4 +40,12 @@ public interface AccessManagementRepository {
     @SqlQuery("select * from access_management where accessor_id=? and resource_id=?")
     @RegisterConstructorMapper(ExplicitAccessRecord.class)
     List<ExplicitAccessRecord> getExplicitAccess(String accessorId, String resourceId);
+
+    @SuppressWarnings("PMD") // UseObjectForClearerAPI: more than 3 parameters makes sense for now, subject to change
+    @SqlQuery("select * from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType and resource_name = :resourceName and role_name = :roleName")
+    @RegisterConstructorMapper(RoleBasedAccessRecord.class)
+    List<RoleBasedAccessRecord> getRolePermissions(String serviceName, String resourceType, String resourceName, String roleName);
+
+    @SqlQuery("select access_management_type from roles where role_name = :roleName")
+    String getRoleAccessType(String roleName);
 }

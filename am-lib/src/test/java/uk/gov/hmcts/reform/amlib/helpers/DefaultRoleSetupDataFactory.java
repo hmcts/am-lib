@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 public final class DefaultRoleSetupDataFactory {
@@ -23,7 +23,7 @@ public final class DefaultRoleSetupDataFactory {
     }
 
     public static Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>>
-        createReadPermissionsForAttribute(Set<Permission> permissions) {
+    createReadPermissionsForAttribute(JsonPointer attribute, Set<Permission> permissions) {
 
         Pair<Set<Permission>, SecurityClassification> pair =
             new Pair<>(permissions, SecurityClassification.PUBLIC);
@@ -31,7 +31,7 @@ public final class DefaultRoleSetupDataFactory {
         Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermission =
             new ConcurrentHashMap<>();
 
-        attributePermission.put(JsonPointer.valueOf(ATTRIBUTE), pair);
+        attributePermission.put(attribute, pair);
 
         return attributePermission;
     }
@@ -42,7 +42,18 @@ public final class DefaultRoleSetupDataFactory {
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
-            .attributePermissions(createReadPermissionsForAttribute(permissions))
+            .attributePermissions(createReadPermissionsForAttribute(ROOT_ATTRIBUTE, permissions))
+            .build();
+    }
+
+    public static DefaultPermissionGrant createDefaultPermissionGrant(
+        JsonPointer attribute, Set<Permission> permissions) {
+        return DefaultPermissionGrant.builder()
+            .roleName(ROLE_NAME)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attributePermissions(createReadPermissionsForAttribute(attribute, permissions))
             .build();
     }
 }

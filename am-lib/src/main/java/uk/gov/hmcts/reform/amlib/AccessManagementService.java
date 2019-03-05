@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
 import javax.sql.DataSource;
 
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
@@ -170,6 +171,7 @@ public class AccessManagementService {
         }
 
         return roleBasedAccessRecords.stream()
-            .collect(Collectors.toMap(RoleBasedAccessRecord::getAttributeAsPointer, RoleBasedAccessRecord::getPermissionsAsSet));
+            .collect(Collectors.toMap(RoleBasedAccessRecord::getAttributeAsPointer,
+                RoleBasedAccessRecord::getPermissionsAsSet));
     }
 }

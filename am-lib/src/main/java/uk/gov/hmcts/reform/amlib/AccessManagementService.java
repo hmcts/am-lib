@@ -123,7 +123,7 @@ public class AccessManagementService {
      * @param userRoles user roles
      * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
-     * to resource is configured, otherwise null.
+     *     to resource is configured, otherwise null.
      */
     public FilterResourceResponse filterResource(String userId, Set<String> userRoles, Resource resource) {
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,

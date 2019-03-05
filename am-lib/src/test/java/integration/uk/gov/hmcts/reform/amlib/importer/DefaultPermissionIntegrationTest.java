@@ -1,5 +1,6 @@
 package integration.uk.gov.hmcts.reform.amlib.importer;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     @Test
     void shouldAddNewEntryIntoDatabaseWhenUniqueEntry() {
         service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
+        service.grantDefaultPermission(createDefaultPermissionGrant(JsonPointer.valueOf(ATTRIBUTE), READ_PERMISSION));
 
         assertThat(countDefaultPermissions(
             SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE, ROLE_NAME, Permissions.sumOf(READ_PERMISSION)))
@@ -59,8 +60,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     @Test
     void shouldOverwriteExistingRecordWhenEntryIsAddedASecondTime() {
         service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
-        service.grantDefaultPermission(createDefaultPermissionGrant(CREATE_PERMISSION));
+        service.grantDefaultPermission(createDefaultPermissionGrant(JsonPointer.valueOf(ATTRIBUTE), READ_PERMISSION));
+        service.grantDefaultPermission(createDefaultPermissionGrant(JsonPointer.valueOf(ATTRIBUTE), CREATE_PERMISSION));
 
         assertThat(countDefaultPermissions(
             SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE, ROLE_NAME, Permissions.sumOf(CREATE_PERMISSION)))

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.amapi.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,8 +23,6 @@ public class AmLibProxyController {
 
     private static final String RESOURCE_ID_KEY = "resourceId";
 
-    @Autowired
-    private ObjectMapper mapper;
     @Autowired
     private AccessManagementService am;
 

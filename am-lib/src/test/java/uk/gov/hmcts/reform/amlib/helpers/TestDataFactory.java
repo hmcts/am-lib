@@ -5,7 +5,7 @@ import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
-import uk.gov.hmcts.reform.amlib.models.ResourceType;
+import uk.gov.hmcts.reform.amlib.models.ResourceMetadata;
 
 import java.util.Map;
 import java.util.Set;
@@ -16,7 +16,6 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
@@ -78,12 +77,11 @@ public final class TestDataFactory {
     public static Resource createResource(String resourceId) {
         return Resource.builder()
             .resourceId(resourceId)
-            .type(ResourceType.builder()
+            .type(ResourceMetadata.builder()
                 .resourceName(RESOURCE_NAME)
                 .resourceType(RESOURCE_TYPE)
                 .serviceName(SERVICE_NAME)
                 .build())
-            .resourceRoles(ROLE_NAMES)
             .resourceJson(DATA)
             .build();
     }

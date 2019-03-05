@@ -8,6 +8,7 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
+import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
@@ -15,7 +16,6 @@ import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
-import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
 import java.util.List;
 import java.util.Map;
@@ -75,12 +75,12 @@ public class AccessManagementService {
                     ExplicitAccessRecord.builder()
                         .resourceId(explicitAccessGrant.getResourceId())
                         .accessorId(explicitAccessGrant.getAccessorId())
-                        .explicitPermissions(attributePermission.getValue())
+                        .permissions(attributePermission.getValue())
                         .accessType(explicitAccessGrant.getAccessType())
                         .serviceName(explicitAccessGrant.getServiceName())
                         .resourceType(explicitAccessGrant.getResourceType())
                         .resourceName(explicitAccessGrant.getResourceName())
-                        .attribute(attributePermission.getKey().toString())
+                        .attribute(attributePermission.getKey())
                         .securityClassification(explicitAccessGrant.getSecurityClassification())
                         .build())
                     .forEach(dao::createAccessManagementRecord);
@@ -163,10 +163,7 @@ public class AccessManagementService {
         }
 
         Map<JsonPointer, Set<Permission>> attributePermissions = explicitAccess.stream().collect(
-            Collectors.toMap(
-                explicitAccessRecord -> JsonPointer.valueOf(explicitAccessRecord.getAttribute()),
-                explicitAccessRecord -> Permissions.fromSumOf(explicitAccessRecord.getPermissions())
-            )
+            Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions)
         );
 
         JsonNode filteredJson = filterService.filterJson(resource.getResourceJson(), attributePermissions);
@@ -204,8 +201,8 @@ public class AccessManagementService {
             return null;
         }
 
-        return roleBasedAccessRecords.stream()
-            .collect(Collectors.toMap(RoleBasedAccessRecord::getAttributeAsPointer,
-                RoleBasedAccessRecord::getPermissionsAsSet));
+        return roleBasedAccessRecords.stream().collect(
+            Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions)
+        );
     }
 }

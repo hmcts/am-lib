@@ -15,8 +15,8 @@ import java.util.List;
 public interface AccessManagementRepository {
 
     @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, access_type, service_name, resource_type, resource_name, attribute, security_classification) "
-        + "values (:resourceId, :accessorId, :permissions, :accessType, :serviceName, :resourceType, :resourceName, :attribute, :securityClassification)"
-        + "on conflict on constraint access_management_unique do update set permissions = :permissions"
+        + "values (:resourceId, :accessorId, :permissionsAsInt, :accessType, :serviceName, :resourceType, :resourceName, :attributeAsString, :securityClassification)"
+        + "on conflict on constraint access_management_unique do update set permissions = :permissionsAsInt"
     )
     void createAccessManagementRecord(@BindBean ExplicitAccessRecord explicitAccessRecord);
 
@@ -27,7 +27,7 @@ public interface AccessManagementRepository {
         + "and access_management.service_name = :serviceName "
         + "and access_management.resource_type = :resourceType "
         + "and access_management.resource_name = :resourceName "
-        + "and access_management.attribute = :attribute")
+        + "and access_management.attribute = :attributeAsString")
     void removeAccessManagementRecord(@BindBean ExplicitAccessMetadata explicitAccessMetadata);
 
 

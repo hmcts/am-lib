@@ -70,7 +70,7 @@ public final class TestDataFactory {
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
-            .attribute("")
+            .attribute(JsonPointer.valueOf(""))
             .build();
     }
 

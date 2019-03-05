@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amlib.models;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,9 +18,14 @@ public final class ExplicitAccessMetadata extends AbstractAccessMetadata {
                                    String serviceName,
                                    String resourceType,
                                    String resourceName,
-                                   String attribute,
+                                   JsonPointer attribute,
                                    String securityClassification) {
         super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute,
             securityClassification);
     }
+
+    public String getAttributeAsString() {
+        return getAttribute().toString();
+    }
+
 }

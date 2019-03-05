@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceAttribute;
 import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.repositories.DefaultRoleSetupRepository;
-import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
 import javax.sql.DataSource;
 
@@ -134,9 +133,9 @@ public class DefaultRoleSetupImportService {
                             .serviceName(defaultPermissionGrant.getServiceName())
                             .resourceType(defaultPermissionGrant.getResourceType())
                             .resourceName(defaultPermissionGrant.getResourceName())
-                            .attribute(attribute.toString())
+                            .attribute(attribute)
                             .roleName(defaultPermissionGrant.getRoleName())
-                            .permissions(Permissions.sumOf(permissionAndClassification.getKey()))
+                            .permissions(permissionAndClassification.getKey())
                             .build());
                 });
 

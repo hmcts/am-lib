@@ -36,10 +36,11 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     static void setUp() {
         ams = new AccessManagementService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
         defaultRoleService = new DefaultRoleSetupImportService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
+
+        populateDatabaseWithRoleAndDefaultPermissions();
     }
 
-    @BeforeAll
-    static void populateDatabaseWithRoleAndDefaultPermissions() {
+    private static void populateDatabaseWithRoleAndDefaultPermissions() {
         Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermissions =
             new ConcurrentHashMap<>();
 

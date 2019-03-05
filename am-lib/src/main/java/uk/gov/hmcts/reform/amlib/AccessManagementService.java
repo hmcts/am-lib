@@ -129,6 +129,8 @@ public class AccessManagementService {
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resource.getResourceId()));
 
+        Map<JsonPointer, Set<Permission>> attributePermissions;
+
         if (explicitAccess.isEmpty()) {
             List<RoleBasedAccessRecord> roleBasedAccess = jdbi.withExtension(AccessManagementRepository.class,
                 dao -> dao.getRolePermissions(
@@ -146,25 +148,15 @@ public class AccessManagementService {
                 return null;
             }
 
-            Map<JsonPointer, Set<Permission>> attributePermissions = roleBasedAccess.stream().collect(
-                Collectors.toMap(
-                    RoleBasedAccessRecord::getAttributeAsPointer, RoleBasedAccessRecord::getPermissionsAsSet
-                )
+            attributePermissions = roleBasedAccess.stream().collect(
+                Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions)
             );
 
-            JsonNode filteredJson = filterService.filterJson(resource.getResourceJson(), attributePermissions);
-
-            return FilterResourceResponse.builder()
-                .resourceId(resource.getResourceId())
-                .data(filteredJson)
-                .permissions(attributePermissions)
-                .build();
-
+        } else {
+            attributePermissions = explicitAccess.stream().collect(
+                Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions)
+            );
         }
-
-        Map<JsonPointer, Set<Permission>> attributePermissions = explicitAccess.stream().collect(
-            Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions)
-        );
 
         JsonNode filteredJson = filterService.filterJson(resource.getResourceJson(), attributePermissions);
 

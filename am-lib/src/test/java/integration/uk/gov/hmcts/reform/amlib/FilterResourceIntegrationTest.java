@@ -33,7 +33,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenRowExistsAndHaveReadPermissionsReturnEnvelopeWithData() {
+    void whenRowExistsAndHasReadPermissionsShouldReturnEnvelopeWithData() {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, READ_PERMISSION));
 
         FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, resourceId, DATA);

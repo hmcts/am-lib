@@ -20,16 +20,33 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import javax.sql.DataSource;
 
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
 public class AccessManagementService {
     private final Jdbi jdbi;
 
-    public AccessManagementService(String url, String user, String password) {
-        this.jdbi = Jdbi.create(url, user, password);
+    /**
+     * This constructor has issues with performance due to requiring a new connection for every query.
+     *
+     * @param url      the url for the database
+     * @param username the username for the database
+     * @param password the password for the database
+     */
+    public AccessManagementService(String url, String username, String password) {
+        this.jdbi = Jdbi.create(url, username, password)
+            .installPlugin(new SqlObjectPlugin());
+    }
 
-        this.jdbi.installPlugin(new SqlObjectPlugin());
+    /**
+     * This constructor is recommended to be used over the above.
+     *
+     * @param dataSource the datasource for the database
+     */
+    public AccessManagementService(DataSource dataSource) {
+        this.jdbi = Jdbi.create(dataSource)
+            .installPlugin(new SqlObjectPlugin());
     }
 
     /**

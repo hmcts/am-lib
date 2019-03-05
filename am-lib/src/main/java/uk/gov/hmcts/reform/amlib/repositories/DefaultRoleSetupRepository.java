@@ -5,8 +5,8 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
-import uk.gov.hmcts.reform.amlib.models.DefaultPermission;
 import uk.gov.hmcts.reform.amlib.models.ResourceAttribute;
+import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
 
 @SuppressWarnings({"LineLength", "PMD"})
 public interface DefaultRoleSetupRepository {
@@ -28,9 +28,9 @@ public interface DefaultRoleSetupRepository {
     void createResourceAttribute(@BindBean ResourceAttribute resourceAttribute);
 
     @SqlUpdate("insert into default_permissions_for_roles (service_name, resource_type, resource_name, attribute, role_name, permissions)"
-        + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, :roleName, :permissions)"
-        + " on conflict on constraint default_permissions_for_roles_service_name_resource_type_re_key do update set service_name = :serviceName, resource_type = :resourceType, resource_name = :resourceName, attribute = :attributeAsString, role_name = :roleName, permissions = :permissions")
-    void grantDefaultPermission(@BindBean DefaultPermission defaultPermission);
+        + " values (:serviceName, :resourceType, :resourceName, :attribute, :roleName, :permissions)"
+        + " on conflict on constraint default_permissions_for_roles_service_name_resource_type_re_key do update set service_name = :serviceName, resource_type = :resourceType, resource_name = :resourceName, attribute = :attribute, role_name = :roleName, permissions = :permissions")
+    void grantDefaultPermission(@BindBean RoleBasedAccessRecord roleBasedAccessRecord);
 
     @SqlUpdate("delete from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType")
     void deleteDefaultPermissionsForRoles(String serviceName, String resourceType);

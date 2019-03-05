@@ -153,6 +153,6 @@ public class AccessManagementService {
         }
 
         return roleBasedAccess.stream()
-            .collect(Collectors.toMap(RoleBasedAccessRecord::getAttribute, RoleBasedAccessRecord::getPermissions));
+            .collect(Collectors.toMap(RoleBasedAccessRecord::getAttributeAsPointer, RoleBasedAccessRecord::getPermissionsAsSet));
     }
 }

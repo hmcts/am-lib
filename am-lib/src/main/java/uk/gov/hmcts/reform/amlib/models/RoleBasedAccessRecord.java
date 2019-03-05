@@ -21,11 +21,11 @@ public final class RoleBasedAccessRecord {
     private final String roleName;
     private final int permissions;
 
-    public JsonPointer getAttribute() {
+    public JsonPointer getAttributeAsPointer() {
         return JsonPointer.valueOf(attribute);
     }
 
-    public Set<Permission> getPermissions() {
+    public Set<Permission> getPermissionsAsSet() {
         return Permissions.fromSumOf(permissions);
     }
 }

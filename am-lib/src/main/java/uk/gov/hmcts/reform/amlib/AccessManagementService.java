@@ -20,16 +20,33 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import javax.sql.DataSource;
 
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
 public class AccessManagementService {
     private final Jdbi jdbi;
 
-    public AccessManagementService(String url, String user, String password) {
-        this.jdbi = Jdbi.create(url, user, password);
+    /**
+     * This constructor has issues with performance due to requiring a new connection for every query.
+     *
+     * @param url      the url for the database
+     * @param username the username for the database
+     * @param password the password for the database
+     */
+    public AccessManagementService(String url, String username, String password) {
+        this.jdbi = Jdbi.create(url, username, password)
+            .installPlugin(new SqlObjectPlugin());
+    }
 
-        this.jdbi.installPlugin(new SqlObjectPlugin());
+    /**
+     * This constructor is recommended to be used over the above.
+     *
+     * @param dataSource the datasource for the database
+     */
+    public AccessManagementService(DataSource dataSource) {
+        this.jdbi = Jdbi.create(dataSource)
+            .installPlugin(new SqlObjectPlugin());
     }
 
     /**
@@ -136,7 +153,7 @@ public class AccessManagementService {
      *                     in future implementations we shall support having multiple role names
      * @return a map of attributes and their corresponding permissions or null
      */
-    @SuppressWarnings("PMD")
+    @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     public Map<JsonPointer, Set<Permission>> getRolePermissions(
         @NonNull String serviceName, @NonNull String resourceType,
         @NonNull String resourceName, @NonNull Set<String> roleNames) {
@@ -145,14 +162,14 @@ public class AccessManagementService {
                 + "Future implementations will allow for multiple roles.");
         }
 
-        List<RoleBasedAccessRecord> roleBasedAccess = jdbi.withExtension(AccessManagementRepository.class,
+        List<RoleBasedAccessRecord> roleBasedAccessRecords = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getRolePermissions(serviceName, resourceType, resourceName, roleNames.iterator().next()));
 
-        if (roleBasedAccess.isEmpty()) {
+        if (roleBasedAccessRecords.isEmpty()) {
             return null;
         }
 
-        return roleBasedAccess.stream()
+        return roleBasedAccessRecords.stream()
             .collect(Collectors.toMap(RoleBasedAccessRecord::getAttributeAsPointer, RoleBasedAccessRecord::getPermissionsAsSet));
     }
 }

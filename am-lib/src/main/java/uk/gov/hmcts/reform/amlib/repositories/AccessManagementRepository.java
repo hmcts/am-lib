@@ -43,8 +43,7 @@ public interface AccessManagementRepository {
     @RegisterConstructorMapper(ExplicitAccessRecord.class)
     ExplicitAccessRecord getExplicitAccess(String accessorId, String resourceId);
 
-    @SuppressWarnings("PMD")
-    //Suppressing as PMD does not allow more than 3 string parameters to be passed in.
+    @SuppressWarnings("PMD") // UseObjectForClearerAPI: more than 3 parameters makes sense for now, subject to change
     @SqlQuery("select * from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType and resource_name = :resourceName and role_name = :roleName")
     @RegisterConstructorMapper(RoleBasedAccessRecord.class)
     List<RoleBasedAccessRecord> getRolePermissions(String serviceName, String resourceType, String resourceName, String roleName);

@@ -8,7 +8,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
-public class GetRolePermissionsValidationTest {
+class GetRolePermissionsValidationTest {
 
     private final AccessManagementService service = new AccessManagementService("", "", "");
 

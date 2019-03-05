@@ -153,7 +153,7 @@ public class AccessManagementService {
      *                     in future implementations we shall support having multiple role names
      * @return a map of attributes and their corresponding permissions or null
      */
-    @SuppressWarnings("PMD")
+    @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     public Map<JsonPointer, Set<Permission>> getRolePermissions(
         @NonNull String serviceName, @NonNull String resourceType,
         @NonNull String resourceName, @NonNull Set<String> roleNames) {
@@ -162,14 +162,14 @@ public class AccessManagementService {
                 + "Future implementations will allow for multiple roles.");
         }
 
-        List<RoleBasedAccessRecord> roleBasedAccess = jdbi.withExtension(AccessManagementRepository.class,
+        List<RoleBasedAccessRecord> roleBasedAccessRecords = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getRolePermissions(serviceName, resourceType, resourceName, roleNames.iterator().next()));
 
-        if (roleBasedAccess.isEmpty()) {
+        if (roleBasedAccessRecords.isEmpty()) {
             return null;
         }
 
-        return roleBasedAccess.stream()
+        return roleBasedAccessRecords.stream()
             .collect(Collectors.toMap(RoleBasedAccessRecord::getAttribute, RoleBasedAccessRecord::getPermissions));
     }
 }

@@ -3,7 +3,6 @@ package integration.uk.gov.hmcts.reform.amlib;
 import com.fasterxml.jackson.core.JsonPointer;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
@@ -39,8 +38,8 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         defaultRoleService = new DefaultRoleSetupImportService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
     }
 
-    @BeforeEach
-    void roleSetUp() {
+    @BeforeAll
+    static void populateDatabaseWithRoleAndDefaultPermissions() {
         Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermissions =
             new ConcurrentHashMap<>();
 
@@ -69,18 +68,17 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions(SERVICE_NAME,
             RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAMES);
 
+        assertThat(accessRecord).hasSize(3);
         assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/test"), READ_PERMISSION);
         assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/test2"), READ_PERMISSION);
         assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/testCreate"), CREATE_PERMISSION);
-
-
-        assertThat(accessRecord).hasSize(3);
     }
 
     @Test
     void shouldReturnNullWhenServiceNameDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions("Service 2",
+        Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions("Unknown Service",
             RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAMES);
+
         assertThat(accessRecord).isNull();
     }
 
@@ -88,6 +86,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     void shouldReturnNullWhenResourceTypeDoesNotExist() {
         Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions(SERVICE_NAME,
             "Unknown Resource Type ", RESOURCE_NAME, ROLE_NAMES);
+
         assertThat(accessRecord).isNull();
     }
 
@@ -95,13 +94,15 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     void shouldReturnNullWhenResourceNameDoesNotExist() {
         Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions(SERVICE_NAME,
             RESOURCE_TYPE, "Unknown Resource Name", ROLE_NAMES);
+
         assertThat(accessRecord).isNull();
     }
 
     @Test
     void shouldReturnNullWhenDefaultRoleNameDoesNotExist() {
         Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions(SERVICE_NAME,
-            RESOURCE_TYPE, RESOURCE_NAME, Stream.of("Unknown").collect(toSet()));
+            RESOURCE_TYPE, RESOURCE_NAME, Stream.of("Unknown Role").collect(toSet()));
+
         assertThat(accessRecord).isNull();
     }
 }

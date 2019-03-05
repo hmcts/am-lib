@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amlib.models;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,6 @@ public abstract class AbstractAccessMetadata {
     private final String serviceName;
     private final String resourceType;
     private final String resourceName;
-    private final String attribute;
+    private final JsonPointer attribute;
     private final String securityClassification;
 }

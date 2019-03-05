@@ -7,9 +7,9 @@ import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
-import uk.gov.hmcts.reform.amlib.models.DefaultPermission;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceAttribute;
+import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.repositories.DefaultRoleSetupRepository;
 import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
@@ -130,11 +130,11 @@ public class DefaultRoleSetupImportService {
                     );
 
                     dao.grantDefaultPermission(
-                        DefaultPermission.builder()
+                        RoleBasedAccessRecord.builder()
                             .serviceName(defaultPermissionGrant.getServiceName())
                             .resourceType(defaultPermissionGrant.getResourceType())
                             .resourceName(defaultPermissionGrant.getResourceName())
-                            .attribute(attribute)
+                            .attribute(attribute.toString())
                             .roleName(defaultPermissionGrant.getRoleName())
                             .permissions(Permissions.sumOf(permissionAndClassification.getKey()))
                             .build());

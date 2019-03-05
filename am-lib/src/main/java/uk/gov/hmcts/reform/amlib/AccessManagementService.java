@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
+import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
 import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.sql.DataSource;
 
 public class AccessManagementService {
 
@@ -25,8 +27,25 @@ public class AccessManagementService {
 
     private final Jdbi jdbi;
 
-    public AccessManagementService(String url, String user, String password) {
-        this.jdbi = Jdbi.create(url, user, password)
+    /**
+     * This constructor has issues with performance due to requiring a new connection for every query.
+     *
+     * @param url      the url for the database
+     * @param username the username for the database
+     * @param password the password for the database
+     */
+    public AccessManagementService(String url, String username, String password) {
+        this.jdbi = Jdbi.create(url, username, password)
+            .installPlugin(new SqlObjectPlugin());
+    }
+
+    /**
+     * This constructor is recommended to be used over the above.
+     *
+     * @param dataSource the datasource for the database
+     */
+    public AccessManagementService(DataSource dataSource) {
+        this.jdbi = Jdbi.create(dataSource)
             .installPlugin(new SqlObjectPlugin());
     }
 
@@ -93,22 +112,37 @@ public class AccessManagementService {
         });
     }
 
+    //TODO: reword javadoc.
+
     /**
      * Filters {@link JsonNode} to remove fields that user has no access to (no READ permission). In addition to that
      * method also returns map of all permissions that user has to resource.
      *
-     * @param userId       accessor ID
-     * @param resourceId   resource ID
-     * @param resourceJson JSON resource
+     * @param userId    accessor ID
+     * @param userRoles user roles
+     * @param resource  Resource and metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
-     *     to resource is configured, otherwise null.
+     * to resource is configured, otherwise null.
      */
-    public FilterResourceResponse filterResource(String userId, String resourceId, JsonNode resourceJson) {
+    public FilterResourceResponse filterResource(String userId, Set<String> userRoles, Resource resource) {
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getExplicitAccess(userId, resourceId));
+            dao -> dao.getExplicitAccess(userId, resource.getResourceId()));
 
         if (explicitAccess.isEmpty()) {
-            return null;
+            List<RoleBasedAccessRecord> roleBasedAccess = jdbi.withExtension(AccessManagementRepository.class,
+                dao -> dao.getRoleBasedAccess(
+                    resource.getType().getServiceName(),
+                    resource.getType().getResourceType(),
+                    resource.getType().getResourceName(),
+                    userRoles.iterator().next()));
+
+            if (roleBasedAccess.isEmpty()) {
+                return null;
+            }
+
+            //TODO: Get attribute and permissions values from RoleBasedAccessRecord and filter for attribute permissions.
+
+            //TODO: Explict or Role based access type on role?
         }
 
         Map<JsonPointer, Set<Permission>> attributePermissions = explicitAccess.stream().collect(
@@ -118,10 +152,10 @@ public class AccessManagementService {
             )
         );
 
-        JsonNode filteredJson = filterService.filterJson(resourceJson, attributePermissions);
+        JsonNode filteredJson = filterService.filterJson(resource.getResourceJson(), attributePermissions);
 
         return FilterResourceResponse.builder()
-            .resourceId(resourceId)
+            .resourceId(resource.getResourceId())
             .data(filteredJson)
             .permissions(attributePermissions)
             .build();

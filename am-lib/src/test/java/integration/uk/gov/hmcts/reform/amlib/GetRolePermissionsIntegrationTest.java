@@ -12,14 +12,15 @@ import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
+import uk.gov.hmcts.reform.amlib.utils.Pair;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createMultipleResources;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
@@ -40,13 +41,26 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @BeforeEach
     void roleSetUp() {
+        Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermissions =
+            new ConcurrentHashMap<>();
+
+        Pair<Set<Permission>, SecurityClassification> readPermission =
+            new Pair<>(READ_PERMISSION, SecurityClassification.PUBLIC);
+
+        Pair<Set<Permission>, SecurityClassification> createPermission =
+            new Pair<>(CREATE_PERMISSION, SecurityClassification.PUBLIC);
+
+        attributePermissions.put(JsonPointer.valueOf("/test"), readPermission);
+        attributePermissions.put(JsonPointer.valueOf("/test2"), readPermission);
+        attributePermissions.put(JsonPointer.valueOf("/testCreate"), createPermission);
+
         defaultRoleService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
         defaultRoleService.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
-            .attributePermissions(createMultipleResources())
+            .attributePermissions(attributePermissions)
             .build());
     }
 

@@ -11,8 +11,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ATTRIBUTE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
@@ -35,23 +33,6 @@ public final class DefaultRoleSetupDataFactory {
         attributePermission.put(JsonPointer.valueOf(ATTRIBUTE), pair);
 
         return attributePermission;
-    }
-
-    public static Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> createMultipleResources() {
-        Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermissions =
-            new ConcurrentHashMap<>();
-
-        Pair<Set<Permission>, SecurityClassification> readPermission =
-            new Pair<>(READ_PERMISSION, SecurityClassification.PUBLIC);
-
-        Pair<Set<Permission>, SecurityClassification> createPermission =
-            new Pair<>(CREATE_PERMISSION, SecurityClassification.PUBLIC);
-
-        attributePermissions.put(JsonPointer.valueOf("/test"), readPermission);
-        attributePermissions.put(JsonPointer.valueOf("/test2"), readPermission);
-        attributePermissions.put(JsonPointer.valueOf("/testCreate"), createPermission);
-
-        return attributePermissions;
     }
 
     public static DefaultPermissionGrant createDefaultPermissionGrant(Set<Permission> permissions) {

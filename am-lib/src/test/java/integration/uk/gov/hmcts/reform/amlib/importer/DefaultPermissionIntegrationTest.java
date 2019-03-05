@@ -29,7 +29,6 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     @BeforeAll
     static void setUp() {
         service = new DefaultRoleSetupImportService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
-
         service.addService(SERVICE_NAME);
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
     }

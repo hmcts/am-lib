@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class ResourceMetadata {
+public class ResourceDefinition {
     private final String serviceName;
     private final String resourceType;
     private final String resourceName;

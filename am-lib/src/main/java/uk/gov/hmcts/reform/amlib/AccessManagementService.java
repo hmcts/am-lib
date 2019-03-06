@@ -8,6 +8,7 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
+import uk.gov.hmcts.reform.amlib.models.Access;
 import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
@@ -143,8 +144,7 @@ public class AccessManagementService {
                 return null;
             }
 
-            if (jdbi.withExtension(AccessManagementRepository.class,
-                dao -> dao.getRoleAccessType(userRoles.iterator().next())).equals(AccessType.EXPLICIT.name())) {
+            if (explicitAccessType(userRoles)) {
                 return null;
             }
 
@@ -162,8 +162,11 @@ public class AccessManagementService {
 
         return FilterResourceResponse.builder()
             .resourceId(resource.getResourceId())
+            .type(resource.getType())
             .data(filteredJson)
-            .permissions(attributePermissions)
+            .access(Access.builder()
+                .permissions(attributePermissions)
+                .build())
             .build();
     }
 
@@ -180,6 +183,11 @@ public class AccessManagementService {
     public List<FilterResourceResponse> filterResource(String userId, Set<String> userRoles, List<Resource> resources) {
         return resources.stream().map(
             resource -> filterResource(userId, userRoles, resource)).collect(Collectors.toList());
+    }
+
+    private boolean explicitAccessType(Set<String> userRoles) {
+        return jdbi.withExtension(AccessManagementRepository.class,
+            dao -> dao.getRoleAccessType(userRoles.iterator().next())).equals(AccessType.EXPLICIT.name());
     }
 
     /**

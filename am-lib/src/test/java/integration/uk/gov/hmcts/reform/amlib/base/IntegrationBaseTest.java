@@ -17,17 +17,27 @@ public abstract class IntegrationBaseTest {
     protected static final PostgreSQLContainer db = new PostgreSQLContainer().withUsername("sa").withPassword("");
     private static Jdbi jdbi;
 
+    static {
+        db.start();
+    }
+
     @BeforeAll
     static void initDatabase() {
-        db.start();
         jdbi = Jdbi.create(db.getJdbcUrl(), db.getUsername(), db.getPassword());
 
         initSchema();
     }
 
     @AfterAll
-    static void destroyDatabase() {
-        db.stop();
+    static void cleanupDatabase() {
+        jdbi.open().execute(
+            "delete from access_management;"
+                + "delete from default_permissions_for_roles;"
+                + "delete from resource_attributes;"
+                + "delete from resources;"
+                + "delete from services;"
+                + "delete from roles;"
+        );
     }
 
     private static void initSchema() {

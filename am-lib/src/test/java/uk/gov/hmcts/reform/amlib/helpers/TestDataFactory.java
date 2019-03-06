@@ -5,7 +5,7 @@ import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
-import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
+import uk.gov.hmcts.reform.amlib.models.ResourceMetadata;
 
 import java.util.Map;
 import java.util.Set;
@@ -77,7 +77,7 @@ public final class TestDataFactory {
     public static Resource createResource(String resourceId) {
         return Resource.builder()
             .resourceId(resourceId)
-            .type(ResourceDefinition.builder()
+            .type(ResourceMetadata.builder()
                 .resourceName(RESOURCE_NAME)
                 .resourceType(RESOURCE_TYPE)
                 .serviceName(SERVICE_NAME)

@@ -12,10 +12,8 @@ import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
-import uk.gov.hmcts.reform.amlib.models.Access;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.models.Resource;
-import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,12 +24,9 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
@@ -60,15 +55,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
-            .type(ResourceDefinition.builder()
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .build())
             .data(DATA)
-            .access(Access.builder()
-                .permissions(ImmutableMap.of(JsonPointer.valueOf(""), READ_PERMISSION))
-                .build())
+            .permissions(ImmutableMap.of(JsonPointer.valueOf(""), READ_PERMISSION))
             .build());
     }
 
@@ -80,15 +68,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
-            .type(ResourceDefinition.builder()
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .build())
             .data(null)
-            .access(Access.builder()
-                .permissions(ImmutableMap.of(JsonPointer.valueOf(""), CREATE_PERMISSION))
-                .build())
+            .permissions(ImmutableMap.of(JsonPointer.valueOf(""), CREATE_PERMISSION))
             .build());
     }
 
@@ -112,15 +93,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
-            .type(ResourceDefinition.builder()
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .build())
             .data(DATA)
-            .access(Access.builder()
-                .permissions(ImmutableMap.of(ROOT_ATTRIBUTE, READ_PERMISSION))
-                .build())
+            .permissions(ImmutableMap.of(ROOT_ATTRIBUTE, READ_PERMISSION))
             .build());
     }
 
@@ -150,39 +124,18 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         List<FilterResourceResponse> expectedResult = ImmutableList.<FilterResourceResponse>builder()
             .add(FilterResourceResponse.builder()
                 .resourceId(resourceId)
-                .type(ResourceDefinition.builder()
-                    .serviceName(SERVICE_NAME)
-                    .resourceType(RESOURCE_TYPE)
-                    .resourceName(RESOURCE_NAME)
-                    .build())
                 .data(DATA)
-                .access(Access.builder()
-                    .permissions(createPermissions("", READ_PERMISSION))
-                    .build())
+                .permissions(createPermissions("", READ_PERMISSION))
                 .build())
             .add(FilterResourceResponse.builder()
                 .resourceId(resourceId)
-                .type(ResourceDefinition.builder()
-                    .serviceName(SERVICE_NAME)
-                    .resourceType(RESOURCE_TYPE)
-                    .resourceName(RESOURCE_NAME)
-                    .build())
                 .data(DATA)
-                .access(Access.builder()
-                    .permissions(createPermissions("", READ_PERMISSION))
-                    .build())
+                .permissions(createPermissions("", READ_PERMISSION))
                 .build())
             .add(FilterResourceResponse.builder()
                 .resourceId(resourceId)
-                .type(ResourceDefinition.builder()
-                    .serviceName(SERVICE_NAME)
-                    .resourceType(RESOURCE_TYPE)
-                    .resourceName(RESOURCE_NAME)
-                    .build())
                 .data(DATA)
-                .access(Access.builder()
-                    .permissions(createPermissions("", READ_PERMISSION))
-                    .build())
+                .permissions(createPermissions("", READ_PERMISSION))
                 .build())
             .build();
 
@@ -205,39 +158,18 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         List<FilterResourceResponse> expectedResult = ImmutableList.<FilterResourceResponse>builder()
             .add(FilterResourceResponse.builder()
                 .resourceId(resourceId)
-                .type(ResourceDefinition.builder()
-                    .serviceName(SERVICE_NAME)
-                    .resourceType(RESOURCE_TYPE)
-                    .resourceName(RESOURCE_NAME)
-                    .build())
                 .data(null)
-                .access(Access.builder()
-                    .permissions(createPermissions("", CREATE_PERMISSION))
-                    .build())
+                .permissions(createPermissions("", CREATE_PERMISSION))
                 .build())
             .add(FilterResourceResponse.builder()
                 .resourceId(resourceId)
-                .type(ResourceDefinition.builder()
-                    .serviceName(SERVICE_NAME)
-                    .resourceType(RESOURCE_TYPE)
-                    .resourceName(RESOURCE_NAME)
-                    .build())
                 .data(null)
-                .access(Access.builder()
-                    .permissions(createPermissions("", CREATE_PERMISSION))
-                    .build())
+                .permissions(createPermissions("", CREATE_PERMISSION))
                 .build())
             .add(FilterResourceResponse.builder()
                 .resourceId(resourceId)
-                .type(ResourceDefinition.builder()
-                    .serviceName(SERVICE_NAME)
-                    .resourceType(RESOURCE_TYPE)
-                    .resourceName(RESOURCE_NAME)
-                    .build())
                 .data(null)
-                .access(Access.builder()
-                    .permissions(createPermissions("", CREATE_PERMISSION))
-                    .build())
+                .permissions(createPermissions("", CREATE_PERMISSION))
                 .build())
             .build();
 

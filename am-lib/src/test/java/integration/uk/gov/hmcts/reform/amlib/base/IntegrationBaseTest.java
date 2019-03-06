@@ -14,7 +14,9 @@ import java.util.Map;
 @SuppressWarnings("PMD")
 public abstract class IntegrationBaseTest {
 
-    protected static final PostgreSQLContainer db = new PostgreSQLContainer().withUsername("sa").withPassword("");
+    protected static final PostgreSQLContainer db = new PostgreSQLContainer("postgres:10")
+        .withUsername("sa")
+        .withPassword("");
     private static Jdbi jdbi;
 
     static {

@@ -1,6 +1,5 @@
 package integration.uk.gov.hmcts.reform.amlib.importer;
 
-import com.fasterxml.jackson.core.JsonPointer;
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -49,7 +48,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
 
         assertThat(countDefaultPermissions(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(READ_PERMISSION)))
+            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ROOT_ATTRIBUTE.toString(), ROLE_NAME,
+            Permissions.sumOf(READ_PERMISSION)))
             .isEqualTo(1);
 
         assertThat(countResourceAttributes(
@@ -64,7 +64,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         service.grantDefaultPermission(createDefaultPermissionGrant(CREATE_PERMISSION));
 
         assertThat(countDefaultPermissions(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(CREATE_PERMISSION)))
+            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ROOT_ATTRIBUTE.toString(), ROLE_NAME,
+            Permissions.sumOf(CREATE_PERMISSION)))
             .isEqualTo(1);
 
         assertThat(countResourceAttributes(

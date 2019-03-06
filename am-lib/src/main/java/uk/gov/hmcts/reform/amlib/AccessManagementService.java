@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 
@@ -126,6 +125,7 @@ public class AccessManagementService {
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
      *     to resource is configured, otherwise null.
      */
+    @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     public FilterResourceResponse filterResource(String userId, Set<String> userRoles, Resource resource) {
         if (userRoles.size() > 1) {
             throw new IllegalArgumentException("Currently a single role only is supported. "

@@ -77,11 +77,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         FilterResourceResponse result = ams.filterResource(
             nonExistingUserId, ROLE_NAMES, createResource(nonExistingResourceId));
 
-        assertThat(result).isEqualTo(FilterResourceResponse.builder()
-            .resourceId(resourceId)
-            .data(null)
-            .permissions(ImmutableMap.of(JsonPointer.valueOf(""), CREATE_PERMISSION))
-            .build());
+        assertThat(result).isNull();
     }
 
     @Test

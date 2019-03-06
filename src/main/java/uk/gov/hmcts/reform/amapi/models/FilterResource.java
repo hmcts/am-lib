@@ -1,8 +1,9 @@
-package uk.gov.hmcts.reform.amlib.models;
+package uk.gov.hmcts.reform.amapi.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.hmcts.reform.amlib.models.Resource;
 
 import java.util.Set;
 

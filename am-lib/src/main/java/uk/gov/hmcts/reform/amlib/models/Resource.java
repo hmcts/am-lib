@@ -10,6 +10,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class Resource {
     private final String resourceId;
-    private final ResourceMetadata type;
+    private final ResourceDefinition type;
     private final JsonNode resourceJson;
 }

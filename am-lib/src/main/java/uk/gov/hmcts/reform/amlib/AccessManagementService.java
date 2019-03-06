@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 
@@ -120,12 +121,17 @@ public class AccessManagementService {
      * method also returns map of all permissions that user has to resource.
      *
      * @param userId    accessor ID
-     * @param userRoles user roles
+     * @param userRoles accessor roles
      * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
      *     to resource is configured, otherwise null.
      */
     public FilterResourceResponse filterResource(String userId, Set<String> userRoles, Resource resource) {
+        if (userRoles.size() > 1) {
+            throw new IllegalArgumentException("Currently a single role only is supported. "
+                + "Future implementations will allow for multiple roles.");
+        }
+
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resource.getResourceId()));
 
@@ -143,8 +149,7 @@ public class AccessManagementService {
                 return null;
             }
 
-            if (jdbi.withExtension(AccessManagementRepository.class,
-                dao -> dao.getRoleAccessType(userRoles.iterator().next())).equals(AccessType.EXPLICIT.name())) {
+            if (explicitAccessType(userRoles)) {
                 return null;
             }
 
@@ -166,6 +171,12 @@ public class AccessManagementService {
             .permissions(attributePermissions)
             .build();
     }
+
+    private boolean explicitAccessType(Set<String> userRoles) {
+        return jdbi.withExtension(AccessManagementRepository.class,
+            dao -> dao.getRoleAccessType(userRoles.iterator().next())).equals(AccessType.EXPLICIT);
+    }
+
 
     /**
      * Retrieves a list of {@link RoleBasedAccessRecord } and returns attribute and permissions values.

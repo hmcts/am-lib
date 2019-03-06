@@ -46,29 +46,29 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     @Test
     void shouldAddNewEntryIntoDatabaseWhenUniqueEntry() {
         service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        service.grantDefaultPermission(createDefaultPermissionGrant(JsonPointer.valueOf(ATTRIBUTE), READ_PERMISSION));
+        service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
 
         assertThat(countDefaultPermissions(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE, ROLE_NAME, Permissions.sumOf(READ_PERMISSION)))
+            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(READ_PERMISSION)))
             .isEqualTo(1);
 
         assertThat(countResourceAttributes(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE, SecurityClassification.PUBLIC))
+            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ROOT_ATTRIBUTE.toString(), SecurityClassification.PUBLIC))
             .isEqualTo(1);
     }
 
     @Test
     void shouldOverwriteExistingRecordWhenEntryIsAddedASecondTime() {
         service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        service.grantDefaultPermission(createDefaultPermissionGrant(JsonPointer.valueOf(ATTRIBUTE), READ_PERMISSION));
-        service.grantDefaultPermission(createDefaultPermissionGrant(JsonPointer.valueOf(ATTRIBUTE), CREATE_PERMISSION));
+        service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
+        service.grantDefaultPermission(createDefaultPermissionGrant(CREATE_PERMISSION));
 
         assertThat(countDefaultPermissions(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE, ROLE_NAME, Permissions.sumOf(CREATE_PERMISSION)))
+            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(CREATE_PERMISSION)))
             .isEqualTo(1);
 
         assertThat(countResourceAttributes(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE, SecurityClassification.PUBLIC))
+            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ROOT_ATTRIBUTE.toString(), SecurityClassification.PUBLIC))
             .isEqualTo(1);
     }
 

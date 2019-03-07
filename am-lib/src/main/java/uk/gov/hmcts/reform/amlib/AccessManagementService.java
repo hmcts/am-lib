@@ -169,11 +169,6 @@ public class AccessManagementService {
             .build();
     }
 
-    private boolean explicitAccessType(Set<String> userRoles) {
-        return jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getRoleAccessType(userRoles.iterator().next())).equals(AccessType.EXPLICIT);
-    }
-
     /**
      * Filters a list of {@link JsonNode} to remove fields that user has no access to (no READ permission) and returns
      * an envelope response consisting of resourceId, filtered json and permissions for attributes.
@@ -216,6 +211,11 @@ public class AccessManagementService {
         }
 
         return roleBasedAccessRecords.stream().collect(getMapCollector());
+    }
+
+    private boolean explicitAccessType(Set<String> userRoles) {
+        return jdbi.withExtension(AccessManagementRepository.class,
+            dao -> dao.getRoleAccessType(userRoles.iterator().next())).equals(AccessType.EXPLICIT);
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

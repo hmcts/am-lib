@@ -60,7 +60,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenCreatingResourceAccessResourceAccessAppearsInDatabase() {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
 
-        assertThat(databaseHelper.countExplicitAccessRecordsByResourcesById(resourceId)).isEqualTo(1);
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
     }
 
     @Test
@@ -71,7 +71,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         ams.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, multipleAttributePermissions));
 
-        assertThat(databaseHelper.countExplicitAccessRecordsByResourcesById(resourceId)).isEqualTo(2);
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(2);
     }
 
     @Test
@@ -79,6 +79,6 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
 
-        assertThat(databaseHelper.countExplicitAccessRecordsByResourcesById(resourceId)).isEqualTo(1);
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
     }
 }

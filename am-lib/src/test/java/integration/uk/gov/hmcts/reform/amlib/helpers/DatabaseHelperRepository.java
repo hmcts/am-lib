@@ -30,10 +30,6 @@ public interface DatabaseHelperRepository {
     @RegisterConstructorMapper(Service.class)
     Service getService(String serviceName);
 
-    @SqlQuery("select count(1) from access_management "
-        + "where resource_id = :resourceId")
-    int countExplicitAccessRecordsByResourcesById(String resourceId);
-
     @SqlQuery("select * from resources "
         + "where service_name = :serviceName "
         + "and resource_type = :resourceType "
@@ -49,6 +45,10 @@ public interface DatabaseHelperRepository {
         + "and default_security_classification = cast(:securityClassification as security_classification)")
     @RegisterConstructorMapper(ResourceAttribute.class)
     ResourceAttribute getResourceAttribute(String serviceName, String resourceType, String resourceName, String attribute, SecurityClassification securityClassification);
+
+    @SqlQuery("select count(1) from access_management "
+        + "where resource_id = :resourceId")
+    int countExplicitPermissions(String resourceId);
 
     @SqlQuery("select count(1) from default_permissions_for_roles "
         + "where service_name = :serviceName "

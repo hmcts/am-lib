@@ -28,7 +28,9 @@ public final class TestConstants {
         Stream.of(CREATE, READ, UPDATE).collect(toSet());
     public static final Set<Permission> CREATE_PERMISSION = Stream.of(CREATE).collect(toSet());
     public static final Set<Permission> READ_PERMISSION = Stream.of(READ).collect(toSet());
-    public static final JsonNode DATA = JsonNodeFactory.instance.objectNode();
+    public static final JsonNode DATA = JsonNodeFactory.instance.objectNode()
+        .put("name", "John")
+        .put("age", 18);
 
     private TestConstants() {
         //NO-OP

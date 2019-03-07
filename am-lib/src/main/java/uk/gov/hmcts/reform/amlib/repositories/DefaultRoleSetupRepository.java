@@ -28,8 +28,8 @@ public interface DefaultRoleSetupRepository {
     void createResourceAttribute(@BindBean ResourceAttribute resourceAttribute);
 
     @SqlUpdate("insert into default_permissions_for_roles (service_name, resource_type, resource_name, attribute, role_name, permissions)"
-        + " values (:serviceName, :resourceType, :resourceName, :attribute, :roleName, :permissions)"
-        + " on conflict on constraint default_permissions_for_roles_service_name_resource_type_re_key do update set service_name = :serviceName, resource_type = :resourceType, resource_name = :resourceName, attribute = :attribute, role_name = :roleName, permissions = :permissions")
+        + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, :roleName, :permissionsAsInt)"
+        + " on conflict on constraint default_permissions_for_roles_service_name_resource_type_re_key do update set service_name = :serviceName, resource_type = :resourceType, resource_name = :resourceName, attribute = :attributeAsString, role_name = :roleName, permissions = :permissionsAsInt")
     void grantDefaultPermission(@BindBean RoleBasedAccessRecord roleBasedAccessRecord);
 
     @SqlUpdate("delete from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType")

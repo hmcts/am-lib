@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amlib.models;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,11 +12,11 @@ import java.util.Set;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public final class ExplicitAccessRecord extends AbstractAccessMetadata {
+public final class ExplicitAccessRecord extends AbstractAccessMetadata implements AttributeAccessDefinition {
 
-    private final Set<Permission> explicitPermissions;
+    private final Set<Permission> permissions;
 
-    @Builder // All args constructor is needs for builder. @SuperBuilder cannot be used because IDE does not support it
+    @Builder // All args constructor is needed for builder. @SuperBuilder cannot be used because IDE does not support it
     @SuppressWarnings("squid:S00107") // Having so many arguments seems reasonable solution here
     private ExplicitAccessRecord(String resourceId,
                                  String accessorId,
@@ -23,31 +24,36 @@ public final class ExplicitAccessRecord extends AbstractAccessMetadata {
                                  String serviceName,
                                  String resourceType,
                                  String resourceName,
-                                 String attribute,
-                                 String securityClassification,
-                                 Set<Permission> explicitPermissions) {
+                                 JsonPointer attribute,
+                                 Set<Permission> permissions,
+                                 String securityClassification) {
         super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute,
             securityClassification);
-        this.explicitPermissions = explicitPermissions;
+        this.permissions = permissions;
     }
 
     @JdbiConstructor
     @SuppressWarnings("squid:S00107") // Having so many arguments seems reasonable solution here
     public ExplicitAccessRecord(String resourceId,
                                 String accessorId,
-                                int permissions,
                                 String accessType,
                                 String serviceName,
                                 String resourceType,
                                 String resourceName,
                                 String attribute,
+                                int permissions,
                                 String securityClassification) {
-        this(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute,
-            securityClassification, Permissions.fromSumOf(permissions));
+        this(resourceId, accessorId, accessType, serviceName, resourceType, resourceName,
+            JsonPointer.valueOf(attribute), Permissions.fromSumOf(permissions), securityClassification);
     }
 
-    public int getPermissions() {
-        return Permissions.sumOf(explicitPermissions);
+    @Override
+    public String getAttributeAsString() {
+        return getAttribute().toString();
     }
 
+    @Override
+    public int getPermissionsAsInt() {
+        return Permissions.sumOf(permissions);
+    }
 }

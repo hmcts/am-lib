@@ -115,8 +115,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         List<Resource> resources = ImmutableList.<Resource>builder()
             .add(createResource(resourceId))
-            .add(createResource(resourceId))
-            .add(createResource(resourceId))
+            .add(createResource(resourceId + "2"))
             .build();
 
         List<FilterResourceResponse> result = ams.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
@@ -128,12 +127,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .permissions(createPermissions("", READ_PERMISSION))
                 .build())
             .add(FilterResourceResponse.builder()
-                .resourceId(resourceId)
-                .data(DATA)
-                .permissions(createPermissions("", READ_PERMISSION))
-                .build())
-            .add(FilterResourceResponse.builder()
-                .resourceId(resourceId)
+                .resourceId(resourceId + "2")
                 .data(DATA)
                 .permissions(createPermissions("", READ_PERMISSION))
                 .build())
@@ -149,8 +143,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         List<Resource> resources = ImmutableList.<Resource>builder()
             .add(createResource(resourceId))
-            .add(createResource(resourceId))
-            .add(createResource(resourceId))
+            .add(createResource(resourceId + "2"))
             .build();
 
         List<FilterResourceResponse> result = ams.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
@@ -162,12 +155,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .permissions(createPermissions("", CREATE_PERMISSION))
                 .build())
             .add(FilterResourceResponse.builder()
-                .resourceId(resourceId)
-                .data(null)
-                .permissions(createPermissions("", CREATE_PERMISSION))
-                .build())
-            .add(FilterResourceResponse.builder()
-                .resourceId(resourceId)
+                .resourceId(resourceId + "2")
                 .data(null)
                 .permissions(createPermissions("", CREATE_PERMISSION))
                 .build())

@@ -9,7 +9,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @SuppressWarnings("PMD")
 public final class ExplicitAccessMetadata extends AbstractAccessMetadata {
-    StringBuilder stringBuilder = new StringBuilder();
 
     @Builder // All args constructor is needs for builder. @SuperBuilder cannot be used because IDE does not support it
     @SuppressWarnings("squid:S00107") // Having so many arguments seems reasonable solution here
@@ -21,7 +20,7 @@ public final class ExplicitAccessMetadata extends AbstractAccessMetadata {
                                    String resourceName,
                                    JsonPointer attribute,
                                    String securityClassification) {
-        super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute + new StringBuilder().append("%"),
+        super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute + "%",
             securityClassification);
     }
 

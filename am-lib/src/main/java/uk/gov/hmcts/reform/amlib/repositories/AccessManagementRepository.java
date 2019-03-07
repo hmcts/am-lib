@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.amlib.repositories;
 
+import org.jdbi.v3.sqlobject.config.RegisterColumnMapper;
+import org.jdbi.v3.sqlobject.config.RegisterColumnMappers;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -8,10 +10,16 @@ import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
+import uk.gov.hmcts.reform.amlib.repositories.mappers.JsonPointerMapper;
+import uk.gov.hmcts.reform.amlib.repositories.mappers.PermissionSetMapper;
 
 import java.util.List;
 
 @SuppressWarnings("LineLength")
+@RegisterColumnMappers({
+    @RegisterColumnMapper(JsonPointerMapper.class),
+    @RegisterColumnMapper(PermissionSetMapper.class)
+})
 public interface AccessManagementRepository {
 
     @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, access_type, service_name, resource_type, resource_name, attribute, security_classification) "
@@ -29,7 +37,6 @@ public interface AccessManagementRepository {
         + "and access_management.resource_name = :resourceName "
         + "and access_management.attribute = :attributeAsString")
     void removeAccessManagementRecord(@BindBean ExplicitAccessMetadata explicitAccessMetadata);
-
 
     @SqlQuery("select accessor_id from access_management where exists "
         + "(select 1 from access_management where access_management.accessor_id = :accessorId "

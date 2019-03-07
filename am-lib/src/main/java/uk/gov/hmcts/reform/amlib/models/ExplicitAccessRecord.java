@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
 import java.util.Set;
@@ -25,7 +26,7 @@ public final class ExplicitAccessRecord extends AbstractAccessMetadata implement
                                 String resourceName,
                                 JsonPointer attribute,
                                 Set<Permission> permissions,
-                                String securityClassification) {
+                                SecurityClassification securityClassification) {
         super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute,
             securityClassification);
         this.permissions = permissions;

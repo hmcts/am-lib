@@ -218,6 +218,7 @@ public class AccessManagementService {
 
         return roleBasedAccessRecords.stream().collect(getMapCollector());
     }
+
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {
         return Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions);
     }

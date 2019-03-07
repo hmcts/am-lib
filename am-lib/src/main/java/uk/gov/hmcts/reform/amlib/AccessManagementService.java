@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
@@ -153,14 +154,10 @@ public class AccessManagementService {
                 return null;
             }
 
-            attributePermissions = roleBasedAccess.stream().collect(
-                Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions)
-            );
+            attributePermissions = roleBasedAccess.stream().collect(getMapCollector());
 
         } else {
-            attributePermissions = explicitAccess.stream().collect(
-                Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions)
-            );
+            attributePermissions = explicitAccess.stream().collect(getMapCollector());
         }
 
         JsonNode filteredJson = filterService.filterJson(resource.getResourceJson(), attributePermissions);
@@ -176,7 +173,6 @@ public class AccessManagementService {
         return jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getRoleAccessType(userRoles.iterator().next())).equals(AccessType.EXPLICIT);
     }
-
 
     /**
      * Retrieves a list of {@link RoleBasedAccessRecord } and returns attribute and permissions values.
@@ -204,8 +200,10 @@ public class AccessManagementService {
             return null;
         }
 
-        return roleBasedAccessRecords.stream().collect(
-            Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions)
-        );
+        return roleBasedAccessRecords.stream().collect(getMapCollector());
+    }
+
+    private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {
+        return Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions);
     }
 }

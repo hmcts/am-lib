@@ -1,11 +1,11 @@
 package integration.uk.gov.hmcts.reform.amlib.base;
 
+import com.google.common.collect.ImmutableMap;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterAll;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
 import java.util.List;

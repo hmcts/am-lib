@@ -7,25 +7,26 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
+import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
-import uk.gov.hmcts.reform.amlib.utils.Permissions;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
-import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
 public class AccessManagementService {
+
+    private final FilterService filterService = new FilterService();
+
     private final Jdbi jdbi;
 
     /**
@@ -73,12 +74,12 @@ public class AccessManagementService {
                     ExplicitAccessRecord.builder()
                         .resourceId(explicitAccessGrant.getResourceId())
                         .accessorId(explicitAccessGrant.getAccessorId())
-                        .explicitPermissions(attributePermission.getValue())
+                        .permissions(attributePermission.getValue())
                         .accessType(explicitAccessGrant.getAccessType())
                         .serviceName(explicitAccessGrant.getServiceName())
                         .resourceType(explicitAccessGrant.getResourceType())
                         .resourceName(explicitAccessGrant.getResourceName())
-                        .attribute(attributePermission.getKey().toString())
+                        .attribute(attributePermission.getKey())
                         .securityClassification(explicitAccessGrant.getSecurityClassification())
                         .build())
                     .forEach(dao::createAccessManagementRecord);
@@ -114,34 +115,34 @@ public class AccessManagementService {
     }
 
     /**
-     * Returns {@link FilterResourceResponse} when record with userId and resourceId exist and has READ permissions,
-     * otherwise null.
+     * Filters {@link JsonNode} to remove fields that user has no access to (no READ permission). In addition to that
+     * method also returns map of all permissions that user has to resource.
      *
-     * @param userId       (accessorId)
-     * @param resourceId   resource id
-     * @param resourceJson json
-     * @return resourceJson or null
+     * @param userId       accessor ID
+     * @param resourceId   resource ID
+     * @param resourceJson JSON resource
+     * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
+     *     to resource is configured, otherwise null.
      */
     public FilterResourceResponse filterResource(String userId, String resourceId, JsonNode resourceJson) {
-        ExplicitAccessRecord explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
+        List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resourceId));
 
-        if (explicitAccess == null) {
+        if (explicitAccess.isEmpty()) {
             return null;
         }
 
-        if (READ.isGranted(explicitAccess.getPermissions())) {
-            Map<JsonPointer, Set<Permission>> attributePermissions = new ConcurrentHashMap<>();
-            attributePermissions.put(JsonPointer.valueOf(""), Permissions.fromSumOf(explicitAccess.getPermissions()));
+        Map<JsonPointer, Set<Permission>> attributePermissions = explicitAccess.stream().collect(
+            Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions)
+        );
 
-            return FilterResourceResponse.builder()
-                .resourceId(resourceId)
-                .data(resourceJson)
-                .permissions(attributePermissions)
-                .build();
-        }
+        JsonNode filteredJson = filterService.filterJson(resourceJson, attributePermissions);
 
-        return null;
+        return FilterResourceResponse.builder()
+            .resourceId(resourceId)
+            .data(filteredJson)
+            .permissions(attributePermissions)
+            .build();
     }
 
     /**
@@ -170,8 +171,8 @@ public class AccessManagementService {
             return null;
         }
 
-        return roleBasedAccessRecords.stream()
-            .collect(Collectors.toMap(RoleBasedAccessRecord::getAttributeAsPointer,
-                RoleBasedAccessRecord::getPermissionsAsSet));
+        return roleBasedAccessRecords.stream().collect(
+            Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions)
+        );
     }
 }

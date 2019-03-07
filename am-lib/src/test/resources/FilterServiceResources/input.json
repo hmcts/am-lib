@@ -1,0 +1,18 @@
+{
+  "claimant": {
+    "name": "John",
+    "age": 21,
+    "address": {
+      "city": "London",
+      "postcode": "SE1"
+    }
+  },
+  "defendant": {
+    "name": "Marry",
+    "address": {
+      "city": "Swansea",
+      "postcode": "SA1"
+    }
+  },
+  "amount": 100
+}

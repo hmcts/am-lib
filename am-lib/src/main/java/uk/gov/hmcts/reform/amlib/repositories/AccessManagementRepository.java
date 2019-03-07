@@ -15,8 +15,8 @@ import java.util.List;
 public interface AccessManagementRepository {
 
     @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, access_type, service_name, resource_type, resource_name, attribute, security_classification) "
-        + "values (:resourceId, :accessorId, :permissions, :accessType, :serviceName, :resourceType, :resourceName, :attribute, :securityClassification)"
-        + "on conflict on constraint access_management_unique do update set permissions = :permissions"
+        + "values (:resourceId, :accessorId, :permissionsAsInt, :accessType, :serviceName, :resourceType, :resourceName, :attributeAsString, :securityClassification)"
+        + "on conflict on constraint access_management_unique do update set permissions = :permissionsAsInt"
     )
     void createAccessManagementRecord(@BindBean ExplicitAccessRecord explicitAccessRecord);
 
@@ -37,11 +37,9 @@ public interface AccessManagementRepository {
         + "and access_management.resource_id = :resourceId")
     List<String> getAccessorsList(@Bind("accessorId") String accessorId, @Bind("resourceId") String resourceId);
 
-    // The 'LIMIT 1' suffix was introduced because at the current database state (V2.2) there is a technical
-    // possibility of returning multiple records with this query, but it's forbidden from business point of view.
-    @SqlQuery("select * from access_management where accessor_id=? and resource_id=? LIMIT 1")
+    @SqlQuery("select * from access_management where accessor_id=? and resource_id=?")
     @RegisterConstructorMapper(ExplicitAccessRecord.class)
-    ExplicitAccessRecord getExplicitAccess(String accessorId, String resourceId);
+    List<ExplicitAccessRecord> getExplicitAccess(String accessorId, String resourceId);
 
     @SuppressWarnings("PMD") // UseObjectForClearerAPI: more than 3 parameters makes sense for now, subject to change
     @SqlQuery("select * from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType and resource_name = :resourceName and role_name = :roleName")

@@ -4,6 +4,8 @@ import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
+import uk.gov.hmcts.reform.amlib.models.ResourceAttribute;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.Role;
 import uk.gov.hmcts.reform.amlib.models.Service;
 
@@ -21,30 +23,32 @@ public interface DatabaseHelperRepository {
     @SqlQuery("select * from roles "
         + "where role_name = :roleName")
     @RegisterConstructorMapper(Role.class)
-    Role getRoleByName(String roleName);
+    Role getRole(String roleName);
 
     @SqlQuery("select * from services "
         + "where service_name = :serviceName")
     @RegisterConstructorMapper(Service.class)
-    Service getServiceByName(String serviceName);
+    Service getService(String serviceName);
 
     @SqlQuery("select count(1) from access_management "
         + "where resource_id = :resourceId")
-    int countResourcesById(String resourceId);
+    int countExplicitAccessRecordsByResourcesById(String resourceId);
 
-    @SqlQuery("select count(1) from resources "
+    @SqlQuery("select * from resources "
         + "where service_name = :serviceName "
         + "and resource_type = :resourceType "
         + "and resource_name = :resourceName")
-    int countResources(String serviceName, String resourceType, String resourceName);
+    @RegisterConstructorMapper(ResourceDefinition.class)
+    ResourceDefinition getResourcesDefinition(String serviceName, String resourceType, String resourceName);
 
-    @SqlQuery("select count(1) from resource_attributes "
+    @SqlQuery("select * from resource_attributes "
         + "where service_name = :serviceName "
         + "and resource_type = :resourceType "
         + "and resource_name = :resourceName "
         + "and attribute = :attribute "
         + "and default_security_classification = cast(:securityClassification as security_classification)")
-    int countResourceAttributes(String serviceName, String resourceType, String resourceName, String attribute, SecurityClassification securityClassification);
+    @RegisterConstructorMapper(ResourceAttribute.class)
+    ResourceAttribute getResourceAttribute(String serviceName, String resourceType, String resourceName, String attribute, SecurityClassification securityClassification);
 
     @SqlQuery("select count(1) from default_permissions_for_roles "
         + "where service_name = :serviceName "

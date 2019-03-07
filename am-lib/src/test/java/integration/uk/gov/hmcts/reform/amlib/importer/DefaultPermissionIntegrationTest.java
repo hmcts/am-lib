@@ -50,8 +50,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         assertThat(databaseHelper.countDefaultPermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
             ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(READ_PERMISSION))).isEqualTo(1);
 
-        assertThat(databaseHelper.countResourceAttributes(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
-            ROOT_ATTRIBUTE.toString(), SecurityClassification.PUBLIC)).isEqualTo(1);
+        assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+            ROOT_ATTRIBUTE.toString(), SecurityClassification.PUBLIC)).isNotNull();
     }
 
     @Test
@@ -63,8 +63,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         assertThat(databaseHelper.countDefaultPermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
             ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(CREATE_PERMISSION))).isEqualTo(1);
 
-        assertThat(databaseHelper.countResourceAttributes(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
-            ROOT_ATTRIBUTE.toString(), SecurityClassification.PUBLIC)).isEqualTo(1);
+        assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+            ROOT_ATTRIBUTE.toString(), SecurityClassification.PUBLIC)).isNotNull();
     }
 
     @Test
@@ -87,8 +87,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         assertThat(databaseHelper.countDefaultPermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE,
             ROLE_NAME, Permissions.sumOf(READ_PERMISSION))).isEqualTo(0);
 
-        assertThat(databaseHelper.countResourceAttributes(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE,
-            SecurityClassification.PUBLIC)).isEqualTo(0);
+        assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE,
+            SecurityClassification.PUBLIC)).isNull();
     }
 
     @Test
@@ -103,7 +103,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         assertThat(databaseHelper.countDefaultPermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE,
             ROLE_NAME, Permissions.sumOf(READ_PERMISSION))).isEqualTo(0);
 
-        assertThat(databaseHelper.countResourceAttributes(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE,
-            SecurityClassification.PUBLIC)).isEqualTo(0);
+        assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE,
+            SecurityClassification.PUBLIC)).isNull();
     }
 }

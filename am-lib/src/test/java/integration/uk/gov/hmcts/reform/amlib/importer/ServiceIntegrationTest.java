@@ -21,7 +21,7 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
     void shouldPutNewRowInputIntoDatabaseWhenUniqueServiceNameIsGiven() {
         service.addService(SERVICE_NAME);
 
-        assertThat(databaseHelper.getServiceByName(SERVICE_NAME)).isNotNull();
+        assertThat(databaseHelper.getService(SERVICE_NAME)).isNotNull();
     }
 
     @Test
@@ -31,7 +31,7 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
         service.addService(SERVICE_NAME);
         service.addService(SERVICE_NAME, newDescription);
 
-        Service service = databaseHelper.getServiceByName(SERVICE_NAME);
+        Service service = databaseHelper.getService(SERVICE_NAME);
         assertThat(service).isNotNull();
         assertThat(service.getServiceDescription()).isEqualTo(newDescription);
     }
@@ -41,6 +41,6 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
         service.addService(SERVICE_NAME);
         service.deleteService(SERVICE_NAME);
 
-        assertThat(databaseHelper.getServiceByName(SERVICE_NAME)).isNull();
+        assertThat(databaseHelper.getService(SERVICE_NAME)).isNull();
     }
 }

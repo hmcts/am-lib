@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.NonNull;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
@@ -12,16 +13,17 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
+import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
-
 
 public class AccessManagementService {
 
@@ -118,31 +120,58 @@ public class AccessManagementService {
      * Filters {@link JsonNode} to remove fields that user has no access to (no READ permission). In addition to that
      * method also returns map of all permissions that user has to resource.
      *
-     * @param userId       accessor ID
-     * @param resourceId   resource ID
-     * @param resourceJson JSON resource
+     * @param userId    accessor ID
+     * @param userRoles accessor roles
+     * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
      *     to resource is configured, otherwise null.
      */
-    public FilterResourceResponse filterResource(String userId, String resourceId, JsonNode resourceJson) {
-        List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getExplicitAccess(userId, resourceId));
-
-        if (explicitAccess.isEmpty()) {
-            return null;
+    @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
+    public FilterResourceResponse filterResource(String userId, Set<String> userRoles, Resource resource) {
+        if (userRoles.size() > 1) {
+            throw new IllegalArgumentException("Currently a single role only is supported. "
+                + "Future implementations will allow for multiple roles.");
         }
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = explicitAccess.stream().collect(
-            Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions)
-        );
+        List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
+            dao -> dao.getExplicitAccess(userId, resource.getResourceId()));
 
-        JsonNode filteredJson = filterService.filterJson(resourceJson, attributePermissions);
+        Map<JsonPointer, Set<Permission>> attributePermissions;
+
+        if (explicitAccess.isEmpty()) {
+            List<RoleBasedAccessRecord> roleBasedAccess = jdbi.withExtension(AccessManagementRepository.class,
+                dao -> dao.getRolePermissions(
+                    resource.getType().getServiceName(),
+                    resource.getType().getResourceType(),
+                    resource.getType().getResourceName(),
+                    userRoles.iterator().next()));
+
+            if (roleBasedAccess.isEmpty()) {
+                return null;
+            }
+
+            if (explicitAccessType(userRoles)) {
+                return null;
+            }
+
+            attributePermissions = roleBasedAccess.stream().collect(getMapCollector());
+
+        } else {
+            attributePermissions = explicitAccess.stream().collect(getMapCollector());
+        }
+
+        JsonNode filteredJson = filterService.filterJson(resource.getResourceJson(), attributePermissions);
 
         return FilterResourceResponse.builder()
-            .resourceId(resourceId)
+            .resourceId(resource.getResourceId())
             .data(filteredJson)
             .permissions(attributePermissions)
             .build();
+    }
+
+    private boolean explicitAccessType(Set<String> userRoles) {
+        return jdbi.withExtension(AccessManagementRepository.class,
+            dao -> dao.getRoleAccessType(userRoles.iterator().next())).equals(AccessType.EXPLICIT);
     }
 
     /**
@@ -171,8 +200,10 @@ public class AccessManagementService {
             return null;
         }
 
-        return roleBasedAccessRecords.stream().collect(
-            Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions)
-        );
+        return roleBasedAccessRecords.stream().collect(getMapCollector());
+    }
+
+    private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {
+        return Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions);
     }
 }

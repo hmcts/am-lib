@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.amapi.controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
+import uk.gov.hmcts.reform.amapi.models.FilterResource;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 
 import java.util.List;
@@ -25,8 +24,6 @@ public class AmLibProxyController {
     private static final String RESOURCE_ID_KEY = "resourceId";
 
     @Autowired
-    private ObjectMapper mapper;
-    @Autowired
     private AccessManagementService am;
 
     @PostMapping("/create-resource-access")
@@ -35,22 +32,17 @@ public class AmLibProxyController {
     }
 
     @PostMapping("/revoke-resource-access")
-    public void revokeResourceAccess(@RequestBody ExplicitAccessMetadata amData) {
-        am.revokeResourceAccess(amData);
+    public void revokeResourceAccess(@RequestBody ExplicitAccessMetadata request) {
+        am.revokeResourceAccess(request);
     }
 
     @PostMapping("/get-accessors-list")
-    public List<String> getAccessorsList(@RequestBody Map<String, Object> amData) {
-        return am.getAccessorsList(amData.get("userId").toString(), amData.get(RESOURCE_ID_KEY).toString());
+    public List<String> getAccessorsList(@RequestBody Map<String, Object> request) {
+        return am.getAccessorsList(request.get("userId").toString(), request.get(RESOURCE_ID_KEY).toString());
     }
 
     @PostMapping("/filter-resource")
-    public FilterResourceResponse filterResource(@RequestBody Map<String, Object> amData) {
-        JsonNode jsonNode = mapper.valueToTree(amData.get("resourceJson"));
-        return am.filterResource(
-            amData.get("userId").toString(),
-            amData.get(RESOURCE_ID_KEY).toString(),
-            jsonNode
-        );
+    public FilterResourceResponse filterResource(@RequestBody FilterResource request) {
+        return am.filterResource(request.getUserId(), request.getUserRoles(), request.getResource());
     }
 }

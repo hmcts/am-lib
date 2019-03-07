@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.amlib.repositories;
 
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
-import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -36,7 +35,7 @@ public interface AccessManagementRepository {
         + "(select 1 from access_management where access_management.accessor_id = :accessorId "
         + "and access_management.resource_id = :resourceId) "
         + "and access_management.resource_id = :resourceId")
-    List<String> getAccessorsList(@Bind("accessorId") String accessorId, @Bind("resourceId") String resourceId);
+    List<String> getAccessorsList(String accessorId, String resourceId);
 
     @SqlQuery("select * from access_management where accessor_id=? and resource_id=?")
     @RegisterConstructorMapper(ExplicitAccessRecord.class)

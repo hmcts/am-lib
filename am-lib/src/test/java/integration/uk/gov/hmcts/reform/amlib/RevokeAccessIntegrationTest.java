@@ -36,6 +36,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         resourceId = UUID.randomUUID().toString();
     }
 
+
     @Test
     void whenRevokingResourceAccessResourceAccessRemovedFromDatabase() {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
@@ -47,16 +48,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenRevokingResourceAccessOnRootResourceAccessRemovedFromDatabase() {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
-        ams.revokeResourceAccess(ExplicitAccessMetadata.builder()
-            .resourceId(resourceId)
-            .accessorId(ACCESSOR_ID)
-            .accessType(ACCESS_TYPE)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .attribute("/")
-            .securityClassification(SECURITY_CLASSIFICATION)
-            .build());
+        revokeResourceAccess("");
 
         assertThat(countResourcesById(resourceId)).isEqualTo(0);
     }
@@ -64,16 +56,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenRevokingResourceAccessOnSingleNestedAttributeResourceAccessRemovedFromDatabase() {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
-        ams.revokeResourceAccess(ExplicitAccessMetadata.builder()
-            .resourceId(resourceId)
-            .accessorId(ACCESSOR_ID)
-            .accessType(ACCESS_TYPE)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .attribute("/test/childTest")
-            .securityClassification(SECURITY_CLASSIFICATION)
-            .build());
+        revokeResourceAccess("/test/childTest");
 
         assertThat(countResourcesById(resourceId)).isEqualTo(0);
     }
@@ -81,44 +64,36 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenRevokingResourceAccessOnMultipleNestedAttributesResourceAccessRemovedFromDatabase() {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
-        ams.revokeResourceAccess(ExplicitAccessMetadata.builder()
-            .resourceId(resourceId)
-            .accessorId(ACCESSOR_ID)
-            .accessType(ACCESS_TYPE)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .attribute("/test/childTest/secondChildTest")
-            .securityClassification(SECURITY_CLASSIFICATION)
-            .build());
+        revokeResourceAccess("/test/childTest/secondChildTest");
 
         assertThat(countResourcesById(resourceId)).isEqualTo(0);
     }
 
     @Test
     void whenPermissionsOnlyOnChildAttributeRevokingPermissionsOnParentShouldCascade() {
-        ams.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
-            .resourceId(resourceId)
-            .accessorId(ACCESSOR_ID)
-            .accessType(ACCESS_TYPE)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .attributePermissions(createPermissions("/childTest", READ_PERMISSION))
-            .securityClassification(SECURITY_CLASSIFICATION)
-            .build());
-        ams.revokeResourceAccess(ExplicitAccessMetadata.builder()
-            .resourceId(resourceId)
-            .accessorId(ACCESSOR_ID)
-            .accessType(ACCESS_TYPE)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .attribute("/test/childTest/secondChildTest")
-            .securityClassification(SECURITY_CLASSIFICATION)
-            .build());
+        grantExplicitResourceAccess(resourceId, "/childTest");
+        revokeResourceAccess("/test/childTest/secondChildTest");
 
         assertThat(countResourcesById(resourceId)).isEqualTo(0);
+    }
+
+    @Test
+    void whenPermissionRevokedFromRootAllChildAttributesDeleted() {
+        grantExplicitResourceAccess(resourceId, "/child");
+        grantExplicitResourceAccess(resourceId, "/childTest");
+        grantExplicitResourceAccess(resourceId, "/test/childTest");
+        revokeResourceAccess("");
+
+        assertThat(countResourcesById(resourceId)).isEqualTo(0);
+    }
+
+    @Test
+    void whenRevokingSpecificEntryShouldRemoveCorrectEntry() {
+        grantExplicitResourceAccess(resourceId, "/test/childTest");
+        grantExplicitResourceAccess("resource2", "/test/childTest");
+        revokeResourceAccess("/test/childTest/");
+
+        assertThat(countResourcesById("resource2")).isEqualTo(1);
     }
 
     @Test
@@ -126,5 +101,31 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         ams.revokeResourceAccess(createMetadata("4"));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(0);
+    }
+
+    private void grantExplicitResourceAccess(String resourceId, String attribute) {
+        ams.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
+            .resourceId(resourceId)
+            .accessorId(ACCESSOR_ID)
+            .accessType(ACCESS_TYPE)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attributePermissions(createPermissions(attribute, READ_PERMISSION))
+            .securityClassification(SECURITY_CLASSIFICATION)
+            .build());
+    }
+
+    private void revokeResourceAccess(String attribute) {
+        ams.revokeResourceAccess(ExplicitAccessMetadata.builder()
+            .resourceId(resourceId)
+            .accessorId(ACCESSOR_ID)
+            .accessType(ACCESS_TYPE)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attribute(attribute)
+            .securityClassification(SECURITY_CLASSIFICATION)
+            .build());
     }
 }

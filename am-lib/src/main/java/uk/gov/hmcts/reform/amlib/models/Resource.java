@@ -7,7 +7,6 @@ import lombok.Data;
 
 @Data
 @Builder
-@AllArgsConstructor
 public class Resource {
     private final String resourceId;
     private final ResourceDefinition type;

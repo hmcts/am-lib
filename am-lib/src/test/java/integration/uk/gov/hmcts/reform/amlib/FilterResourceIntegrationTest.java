@@ -95,7 +95,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenNoExplicitAccessAndRoleHasExplicitAccessType() {
+    void whenNoExplicitAccessAndRoleHasExplicitAccessTypeShouldReturnNull() {
         rolesService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.EXPLICIT);
         rolesService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
 

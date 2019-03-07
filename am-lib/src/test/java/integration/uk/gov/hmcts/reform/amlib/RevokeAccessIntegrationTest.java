@@ -57,24 +57,24 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenRevokingResourceAccessOnSingleNestedAttributeResourceAccessRemovedFromDatabase() {
-        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
-        revokeResourceAccess("/test/childTest");
+        grantExplicitResourceAccess(resourceId, "/test/childTest");
+        revokeResourceAccess("/test");
 
         assertThat(countResourcesById(resourceId)).isEqualTo(0);
     }
 
     @Test
     void whenRevokingResourceAccessOnMultipleNestedAttributesResourceAccessRemovedFromDatabase() {
-        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
-        revokeResourceAccess("/test/childTest/secondChildTest");
+        grantExplicitResourceAccess(resourceId, "/test/childTest/secondChild/thirdChild");
+        revokeResourceAccess("/test/childTest");
 
         assertThat(countResourcesById(resourceId)).isEqualTo(0);
     }
 
     @Test
     void whenPermissionsOnlyOnChildAttributeRevokingPermissionsOnParentShouldCascade() {
-        grantExplicitResourceAccess(resourceId, "/childTest");
-        revokeResourceAccess("/test/childTest/secondChildTest");
+        grantExplicitResourceAccess(resourceId, "/test/childTest");
+        revokeResourceAccess("/test");
 
         assertThat(countResourcesById(resourceId)).isEqualTo(0);
     }
@@ -93,14 +93,26 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenRevokingSpecificEntryShouldRemoveCorrectEntry() {
         grantExplicitResourceAccess(resourceId, "/test/childTest");
         grantExplicitResourceAccess("resource2", "/test/childTest");
-        revokeResourceAccess("/test/childTest/");
+        revokeResourceAccess("/test/childTest");
 
+        assertThat(countResourcesById(resourceId)).isEqualTo(0);
         assertThat(countResourcesById("resource2")).isEqualTo(1);
     }
 
     @Test
+    void whenRevokingAccessShouldOnlyRemoveSpecifiedAttributeAndChildrAttributes() {
+        grantExplicitResourceAccess(resourceId, "/test/childTest");
+        grantExplicitResourceAccess(resourceId, "/test/childTest/secondChild");
+        grantExplicitResourceAccess(resourceId, "/test/child");
+
+        revokeResourceAccess("/test/childTest");
+
+        assertThat(countResourcesById(resourceId)).isEqualTo(1);
+    }
+
+    @Test
     void whenRevokingResourceAccessThatDoesNotExistNoErrorExpected() {
-        ams.revokeResourceAccess(createMetadata("4"));
+        ams.revokeResourceAccess(createMetadata(resourceId));
 
         assertThat(countResourcesById(resourceId)).isEqualTo(0);
     }

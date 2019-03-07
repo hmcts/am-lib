@@ -1,10 +1,10 @@
 package integration.uk.gov.hmcts.reform.amlib.base;
 
+import com.google.common.collect.ImmutableMap;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.PostgreSQLContainer;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
@@ -14,20 +14,35 @@ import java.util.Map;
 @SuppressWarnings("PMD")
 public abstract class IntegrationBaseTest {
 
-    protected static final PostgreSQLContainer db = new PostgreSQLContainer().withUsername("sa").withPassword("");
-    private static Jdbi jdbi;
+    protected static final PostgreSQLContainer db;
+    private static final Jdbi jdbi;
 
-    @BeforeAll
-    static void initDatabase() {
+    static {
+        db = createDatabaseContainer();
         db.start();
-        jdbi = Jdbi.create(db.getJdbcUrl(), db.getUsername(), db.getPassword());
-
         initSchema();
+
+        jdbi = Jdbi.create(db.getJdbcUrl(), db.getUsername(), db.getPassword());
     }
 
     @AfterAll
-    static void destroyDatabase() {
-        db.stop();
+    static void cleanupDatabase() {
+        jdbi.open().execute(
+            "delete from access_management;"
+                + "delete from default_permissions_for_roles;"
+                + "delete from resource_attributes;"
+                + "delete from resources;"
+                + "delete from services;"
+                + "delete from roles;"
+        );
+    }
+
+    @SuppressWarnings("unchecked")
+    private static PostgreSQLContainer createDatabaseContainer() {
+        return (PostgreSQLContainer) new PostgreSQLContainer("postgres:10")
+            .withUsername("sa")
+            .withPassword("")
+            .withTmpFs(ImmutableMap.of("/var/lib/postgresql/data", "rw"));
     }
 
     private static void initSchema() {

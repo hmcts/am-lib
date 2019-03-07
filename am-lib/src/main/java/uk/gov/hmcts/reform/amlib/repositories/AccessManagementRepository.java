@@ -5,6 +5,7 @@ import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
@@ -47,5 +48,5 @@ public interface AccessManagementRepository {
     List<RoleBasedAccessRecord> getRolePermissions(String serviceName, String resourceType, String resourceName, String roleName);
 
     @SqlQuery("select access_management_type from roles where role_name = :roleName")
-    String getRoleAccessType(String roleName);
+    AccessType getRoleAccessType(String roleName);
 }

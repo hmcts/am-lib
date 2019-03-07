@@ -51,7 +51,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenRowExistsAndHasReadPermissionsShouldReturnEnvelopeWithData() {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, READ_PERMISSION));
 
-        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, null, createResource(resourceId));
+        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
@@ -64,7 +64,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenRowExistsAndDoesNotHaveReadPermissionsShouldReturnEnvelopeWithoutData() {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, CREATE_PERMISSION));
 
-        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, null, createResource(resourceId));
+        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
@@ -99,7 +99,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenNoExplicitAccessAndRoleHasExplicitAccessType() {
+    void whenNoExplicitAccessAndRoleHasExplicitAccessTypeShouldReturnNull() {
         rolesService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.EXPLICIT);
         rolesService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
 

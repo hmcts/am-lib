@@ -53,7 +53,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
         revokeResourceAccess("");
 
-        assertThat(countResourcesById(resourceId)).isEqualTo(0);
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
 
     @Test
@@ -62,7 +62,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         grantExplicitResourceAccess(resourceId, "/test/childTest");
         revokeResourceAccess("/test");
 
-        assertThat(countResourcesById(resourceId)).isEqualTo(0);
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
 
     @Test
@@ -70,7 +70,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         grantExplicitResourceAccess(resourceId, "/test/childTest/secondChild/thirdChild");
         revokeResourceAccess("/test/childTest");
 
-        assertThat(countResourcesById(resourceId)).isEqualTo(0);
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
 
     @Test
@@ -78,7 +78,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         grantExplicitResourceAccess(resourceId, "/test/childTest");
         revokeResourceAccess("/test");
 
-        assertThat(countResourcesById(resourceId)).isEqualTo(0);
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
 
     @Test
@@ -88,7 +88,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         grantExplicitResourceAccess(resourceId, "/test/childTest");
         revokeResourceAccess("");
 
-        assertThat(countResourcesById(resourceId)).isEqualTo(0);
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
 
     @Test
@@ -97,8 +97,8 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         grantExplicitResourceAccess("resource2", "/test/childTest");
         revokeResourceAccess("/test/childTest");
 
-        assertThat(countResourcesById(resourceId)).isEqualTo(0);
-        assertThat(countResourcesById("resource2")).isEqualTo(1);
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
+        assertThat(databaseHelper.countExplicitPermissions("resource2")).isEqualTo(1);
     }
 
     @Test
@@ -109,7 +109,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         revokeResourceAccess("/amount");
 
-        assertThat(countResourcesById(resourceId)).isEqualTo(1);
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
     }
 
     @Test

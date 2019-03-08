@@ -8,8 +8,6 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class Service {
-
     private final String serviceName;
     private final String serviceDescription;
-
 }

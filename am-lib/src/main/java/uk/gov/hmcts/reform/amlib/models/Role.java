@@ -11,10 +11,8 @@ import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 @Builder
 @AllArgsConstructor
 public class Role {
-
     private final String roleName;
     private final RoleType roleType;
     private final SecurityClassification securityClassification;
     private final AccessType accessManagementType;
-
 }

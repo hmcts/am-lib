@@ -41,7 +41,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
 
     @Test
-    void whenRevokingResourceAccessResourceAccessRemovedFromDatabase() {
+    void whenRevokingResourceAccessResourceAccessShouldRemoveFromDatabase() {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
         ams.revokeResourceAccess(createMetadata(resourceId));
 
@@ -49,7 +49,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenRevokingResourceAccessOnRootResourceAccessRemovedFromDatabase() {
+    void whenRevokingResourceAccessOnRootShouldRemoveFromDatabase() {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
         revokeResourceAccess("");
 
@@ -57,7 +57,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenRevokingResourceAccessOnSingleNestedAttributeResourceAccessRemovedFromDatabase() {
+    void whenRevokingResourceAccessOnSingleNestedAttributeShouldRemoveFromDatabase() {
         grantExplicitResourceAccess(resourceId, "/test");
         grantExplicitResourceAccess(resourceId, "/test/childTest");
         revokeResourceAccess("/test");
@@ -66,7 +66,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenRevokingResourceAccessOnMultipleNestedAttributesResourceAccessRemovedFromDatabase() {
+    void whenRevokingResourceAccessOnMultipleNestedAttributesShouldRemoveFromDatabase() {
         grantExplicitResourceAccess(resourceId, "/test/childTest/secondChild/thirdChild");
         revokeResourceAccess("/test/childTest");
 
@@ -82,7 +82,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenPermissionRevokedFromRootAllChildAttributesDeleted() {
+    void whenPermissionRevokedFromRootShouldDeleteAllChildAttributes() {
         grantExplicitResourceAccess(resourceId, "/child");
         grantExplicitResourceAccess(resourceId, "/childTest");
         grantExplicitResourceAccess(resourceId, "/test/childTest");
@@ -102,7 +102,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenRevokingAccessOnAttributeOnlySpecifiedAttributeAndChildrenAreRemoved() {
+    void whenRevokingAccessOnAttributeShouldRemoveOnlySpecifiedAttributeAndChildren() {
         grantExplicitResourceAccess(resourceId, "/amount");
         grantExplicitResourceAccess(resourceId, "/amount/lastUpdated");
         grantExplicitResourceAccess(resourceId, "/amountInPounds");

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -19,7 +20,7 @@ public final class ExplicitAccessMetadata extends AbstractAccessMetadata {
                                    String resourceType,
                                    String resourceName,
                                    JsonPointer attribute,
-                                   String securityClassification) {
+                                   SecurityClassification securityClassification) {
         super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute,
             securityClassification);
     }

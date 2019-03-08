@@ -1,17 +1,22 @@
 package uk.gov.hmcts.reform.amlib.repositories;
 
+import org.jdbi.v3.sqlobject.config.RegisterColumnMapper;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
-import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
+import uk.gov.hmcts.reform.amlib.repositories.mappers.JsonPointerMapper;
+import uk.gov.hmcts.reform.amlib.repositories.mappers.PermissionSetMapper;
 
 import java.util.List;
 
 @SuppressWarnings("LineLength")
+@RegisterColumnMapper(JsonPointerMapper.class)
+@RegisterColumnMapper(PermissionSetMapper.class)
 public interface AccessManagementRepository {
 
     @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, access_type, service_name, resource_type, resource_name, attribute, security_classification) "
@@ -31,12 +36,11 @@ public interface AccessManagementRepository {
         + "or access_management.attribute ilike concat(:attributeAsString, '/','%')")
     void removeAccessManagementRecord(@BindBean ExplicitAccessMetadata explicitAccessMetadata);
 
-
     @SqlQuery("select accessor_id from access_management where exists "
         + "(select 1 from access_management where access_management.accessor_id = :accessorId "
         + "and access_management.resource_id = :resourceId) "
         + "and access_management.resource_id = :resourceId")
-    List<String> getAccessorsList(@Bind("accessorId") String accessorId, @Bind("resourceId") String resourceId);
+    List<String> getAccessorsList(String accessorId, String resourceId);
 
     @SqlQuery("select * from access_management where accessor_id=? and resource_id=?")
     @RegisterConstructorMapper(ExplicitAccessRecord.class)
@@ -46,4 +50,7 @@ public interface AccessManagementRepository {
     @SqlQuery("select * from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType and resource_name = :resourceName and role_name = :roleName")
     @RegisterConstructorMapper(RoleBasedAccessRecord.class)
     List<RoleBasedAccessRecord> getRolePermissions(String serviceName, String resourceType, String resourceName, String roleName);
+
+    @SqlQuery("select access_management_type from roles where role_name = :roleName")
+    AccessType getRoleAccessType(String roleName);
 }

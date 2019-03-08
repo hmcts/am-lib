@@ -124,7 +124,7 @@ public class DefaultRoleSetupImportService {
                         .resourceName(defaultPermissionGrant.getResourceName())
                         .resourceType(defaultPermissionGrant.getResourceType())
                         .attribute(attribute)
-                        .securityClassification(permissionAndClassification.getValue())
+                        .defaultSecurityClassification(permissionAndClassification.getValue())
                         .build()
                     );
 

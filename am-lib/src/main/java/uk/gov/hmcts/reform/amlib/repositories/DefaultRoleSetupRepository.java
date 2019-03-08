@@ -23,8 +23,8 @@ public interface DefaultRoleSetupRepository {
     void addResourceDefinition(String serviceName, String resourceType, String resourceName);
 
     @SqlUpdate("insert into resource_attributes (service_name, resource_type, resource_name, attribute, default_security_classification)"
-        + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, cast(:securityClassification as security_classification))"
-        + " on conflict on constraint resource_attributes_pkey do update set default_security_classification = cast(:securityClassification as security_classification)")
+        + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, cast(:defaultSecurityClassification as security_classification))"
+        + " on conflict on constraint resource_attributes_pkey do update set default_security_classification = cast(:defaultSecurityClassification as security_classification)")
     void createResourceAttribute(@BindBean ResourceAttribute resourceAttribute);
 
     @SqlUpdate("insert into default_permissions_for_roles (service_name, resource_type, resource_name, attribute, role_name, permissions)"

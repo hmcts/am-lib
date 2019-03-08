@@ -161,17 +161,20 @@ dependencyCheck {
     // Specifies if the build should be failed if a CVSS score above a specified level is identified.
     // range of 0-10 fails the build, anything greater and it doesn't fail the build
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
-    suppressionFile = 'dependency-check-suppressions.xml'
+    suppressionFile = 'config/owasp/suppressions.xml'
 }
 
 repositories {
     jcenter()
+    maven {
+      url  "https://dl.bintray.com/hmcts/hmcts-maven"
+    }
 }
 
 // it is important to specify logback classic and core packages explicitly as libraries like spring boot
 // enforces it's own (older) version which is not recommended.
 def versions = [
-        reformLogging   : '4.0.1',
+        reformLogging   : '5.0.1',
         springBoot      : springBoot.class.package.implementationVersion,
         springfoxSwagger: '2.9.2',
         flyway          : '5.2.4'
@@ -180,6 +183,9 @@ def versions = [
 dependencies {
     compile project(':am-lib')
 
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
+
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: versions.springBoot
@@ -187,6 +193,8 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
 
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
+    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.reformLogging
+
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     compile group: 'org.flywaydb', name: 'flyway-core', version: versions.flyway
 

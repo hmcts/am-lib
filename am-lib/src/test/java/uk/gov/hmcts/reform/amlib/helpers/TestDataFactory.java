@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonPointer;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
+import uk.gov.hmcts.reform.amlib.models.Resource;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Map;
 import java.util.Set;
@@ -11,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_TYPE;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
@@ -68,6 +71,18 @@ public final class TestDataFactory {
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attribute(JsonPointer.valueOf(""))
+            .build();
+    }
+
+    public static Resource createResource(String resourceId) {
+        return Resource.builder()
+            .resourceId(resourceId)
+            .type(ResourceDefinition.builder()
+                .resourceName(RESOURCE_NAME)
+                .resourceType(RESOURCE_TYPE)
+                .serviceName(SERVICE_NAME)
+                .build())
+            .resourceJson(DATA)
             .build();
     }
 }

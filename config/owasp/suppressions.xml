@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
   <suppress>
-    <notes><![CDATA[ pulled by springfox and hystrix ]]></notes>
+    <notes><![CDATA[file name: guava-20.0.jar]]></notes>
     <gav regex="true">^com\.google\.guava:guava:.*$</gav>
     <cpe>cpe:/a:google:guava</cpe>
   </suppress>
-  
   <suppress>
-    <notes><![CDATA[ slf4j only has a beta version released with the 'fix', looks like lots of changes in it... ]]></notes>
-    <cve>CVE-2018-8088</cve>
+    <notes><![CDATA[file name: groovy-xml-2.5.5.jar]]></notes>
+    <sha1>9de098bd721e65d54b11fbf44b28f47016a133fc</sha1>
+    <cpe>cpe:/a:apache:groovy</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[file name: groovy-json-2.5.5.jar]]></notes>
+    <sha1>03274bb68861c1ba9cf027ef54a592497555f365</sha1>
+    <cpe>cpe:/a:apache:groovy</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[file name: groovy-2.5.5.jar]]></notes>
+    <sha1>2388f952b369f6b11cde8e15ec872e9ca3e0ff3e</sha1>
+    <cpe>cpe:/a:apache:groovy</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[file name: applicationinsights-core-2.3.1.jar (shaded: io.netty:netty-tcnative-boringssl-static:2.0.17.Final)]]></notes>
+    <gav regex="true">^io\.netty:netty-tcnative-boringssl-static:.*$</gav>
+    <cpe>cpe:/a:netty_project:netty</cpe>
   </suppress>
 </suppressions>

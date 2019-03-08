@@ -91,8 +91,8 @@ public class AccessManagementService {
 
     /**
      * Removes explicit access to resource accordingly to record configuration.
-     * <p>
-     * IMPORTANT: This is a cascade delete function and so if called on a specific attribute
+     *
+     * <p>IMPORTANT: This is a cascade delete function and so if called on a specific attribute
      * it will remove specified attribute and all children attributes.
      *
      * @param explicitAccessMetadata an object to remove a specific explicit access record.
@@ -125,7 +125,7 @@ public class AccessManagementService {
      * @param resourceId   resource ID
      * @param resourceJson JSON resource
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
-     * to resource is configured, otherwise null.
+     *      to resource is configured, otherwise null.
      */
     public FilterResourceResponse filterResource(String userId, String resourceId, JsonNode resourceJson) {
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,

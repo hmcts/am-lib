@@ -58,6 +58,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenRevokingResourceAccessOnSingleNestedAttributeResourceAccessRemovedFromDatabase() {
+        grantExplicitResourceAccess(resourceId, "/test");
         grantExplicitResourceAccess(resourceId, "/test/childTest");
         revokeResourceAccess("/test");
 
@@ -101,19 +102,8 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenRevokingAccessShouldOnlyRemoveSpecifiedAttributeAndChildrAttributes() {
-        grantExplicitResourceAccess(resourceId, "/test/childTest");
-        grantExplicitResourceAccess(resourceId, "/test/childTest/secondChild");
-        grantExplicitResourceAccess(resourceId, "/test/child");
-
-        revokeResourceAccess("/test/childTest");
-
-        assertThat(countResourcesById(resourceId)).isEqualTo(1);
-    }
-
-    @Test
     void whenRevokingAccessOnAttributeOnlySpecifiedAttributeAndChildrenAreRemoved() {
-        grantExplicitResourceAccess(resourceId, "/amount/");
+        grantExplicitResourceAccess(resourceId, "/amount");
         grantExplicitResourceAccess(resourceId, "/amount/lastUpdated");
         grantExplicitResourceAccess(resourceId, "/amountInPounds");
 

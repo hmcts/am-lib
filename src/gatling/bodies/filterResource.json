@@ -1,7 +1,17 @@
 {
-  "resourceId": "${resourceId}",
   "userId": "${accessorId}",
-  "resourceJson": {
-    "json": "resource"
+  "userRoles": [
+    "Role 1"
+  ],
+  "resource": {
+    "resourceId": "${resourceId}",
+    "type": {
+      "serviceName": "Service 1",
+      "resourceType": "Resource Type 1",
+      "resourceName": "resource"
+    },
+    "resourceJson": {
+      "json": "resource"
+    }
   }
 }

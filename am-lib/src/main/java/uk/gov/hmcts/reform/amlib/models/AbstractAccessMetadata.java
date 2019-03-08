@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -17,5 +18,5 @@ public abstract class AbstractAccessMetadata {
     private final String resourceType;
     private final String resourceName;
     private final JsonPointer attribute;
-    private final String securityClassification;
+    private final SecurityClassification securityClassification;
 }

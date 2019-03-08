@@ -47,14 +47,11 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
         service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
 
-        assertThat(countDefaultPermissions(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ROOT_ATTRIBUTE.toString(), ROLE_NAME,
-            Permissions.sumOf(READ_PERMISSION)))
-            .isEqualTo(1);
+        assertThat(databaseHelper.countDefaultPermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+            ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(READ_PERMISSION))).isEqualTo(1);
 
-        assertThat(countResourceAttributes(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ROOT_ATTRIBUTE.toString(), SecurityClassification.PUBLIC))
-            .isEqualTo(1);
+        assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+            ROOT_ATTRIBUTE.toString(), SecurityClassification.PUBLIC)).isNotNull();
     }
 
     @Test
@@ -63,14 +60,11 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
         service.grantDefaultPermission(createDefaultPermissionGrant(CREATE_PERMISSION));
 
-        assertThat(countDefaultPermissions(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ROOT_ATTRIBUTE.toString(), ROLE_NAME,
-            Permissions.sumOf(CREATE_PERMISSION)))
-            .isEqualTo(1);
+        assertThat(databaseHelper.countDefaultPermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+            ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(CREATE_PERMISSION))).isEqualTo(1);
 
-        assertThat(countResourceAttributes(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ROOT_ATTRIBUTE.toString(), SecurityClassification.PUBLIC))
-            .isEqualTo(1);
+        assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+            ROOT_ATTRIBUTE.toString(), SecurityClassification.PUBLIC)).isNotNull();
     }
 
     @Test
@@ -90,13 +84,11 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
         service.truncateDefaultPermissionsForService(SERVICE_NAME, RESOURCE_TYPE);
 
-        assertThat(countDefaultPermissions(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE, ROLE_NAME, Permissions.sumOf(READ_PERMISSION)))
-            .isEqualTo(0);
+        assertThat(databaseHelper.countDefaultPermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+            ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(READ_PERMISSION))).isEqualTo(0);
 
-        assertThat(countResourceAttributes(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE, SecurityClassification.PUBLIC))
-            .isEqualTo(0);
+        assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+            ATTRIBUTE.toString(), SecurityClassification.PUBLIC)).isNull();
     }
 
     @Test
@@ -108,12 +100,10 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         service.truncateDefaultPermissionsByResourceDefinition(
             SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
 
-        assertThat(countDefaultPermissions(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE, ROLE_NAME, Permissions.sumOf(READ_PERMISSION)))
-            .isEqualTo(0);
+        assertThat(databaseHelper.countDefaultPermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+            ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(READ_PERMISSION))).isEqualTo(0);
 
-        assertThat(countResourceAttributes(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, ATTRIBUTE, SecurityClassification.PUBLIC))
-            .isEqualTo(0);
+        assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+            ATTRIBUTE.toString(), SecurityClassification.PUBLIC)).isNull();
     }
 }

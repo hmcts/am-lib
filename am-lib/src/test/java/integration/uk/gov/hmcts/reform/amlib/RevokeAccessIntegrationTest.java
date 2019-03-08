@@ -41,7 +41,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
 
     @Test
-    void whenRevokingResourceAccessResourceAccessShouldRemoveFromDatabase() {
+    void whenRevokingResourceAccessShouldRemoveFromDatabase() {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
         ams.revokeResourceAccess(createMetadata(resourceId));
 

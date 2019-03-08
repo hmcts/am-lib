@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
 import java.util.Map;
 import java.util.Set;
@@ -21,5 +22,5 @@ public class ExplicitAccessGrant {
     private final String resourceType;
     private final String resourceName;
     private final Map<JsonPointer, Set<Permission>> attributePermissions;
-    private final String securityClassification;
+    private final SecurityClassification securityClassification;
 }

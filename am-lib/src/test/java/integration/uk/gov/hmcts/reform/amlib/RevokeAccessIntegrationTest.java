@@ -45,7 +45,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
         ams.revokeResourceAccess(createMetadata(resourceId));
 
-        assertThat(countResourcesById(resourceId)).isEqualTo(0);
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
 
     @Test
@@ -116,7 +116,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenRevokingResourceAccessThatDoesNotExistNoErrorExpected() {
         ams.revokeResourceAccess(createMetadata(resourceId));
 
-        assertThat(countResourcesById(resourceId)).isEqualTo(0);
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
 
     private void grantExplicitResourceAccess(String resourceId, String attribute) {

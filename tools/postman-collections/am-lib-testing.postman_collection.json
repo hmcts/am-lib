@@ -79,7 +79,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n\t\"userId\": \"UNIQUE-USER-ID\",\n\t\"resourceId\": \"my-super-resource-id\",\n\t\"resourceJson\": {\n\t\t\"someKey\":\"some-value\"\n\t}\n}"
+          "raw": "{\n\t\"userId\": \"UNIQUE-USER-ID\",\n\t\"userRoles\": [\"\"],\n\t\"resource\": {\n\t\t\"resourceId\": \"my-super-resource-id\",\n\t\t\"type\": {\n\t\t\t\"serviceName\": \"Service 1\",\n\t\t\t\"resourceType\": \"Resource Type 1\",\n\t\t\t\"resourceName\": \"resource\"\n\t\t},\n\t\t\"resourceJson\": {\n\t\t\t\"test\": \"test\"\n\t\t}\n\t}\n}"
         },
         "url": {
           "raw": "http://localhost:3703/lib/filter-resource",

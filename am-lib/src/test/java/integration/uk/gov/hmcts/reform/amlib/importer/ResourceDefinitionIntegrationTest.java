@@ -32,7 +32,7 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
         service.addService(SERVICE_NAME);
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
 
-        assertThat(countResources(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME)).isEqualTo(1);
+        assertThat(databaseHelper.getResourcesDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME)).isNotNull();
     }
 
     @Test
@@ -41,7 +41,7 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
 
-        assertThat(countResources(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME)).isEqualTo(1);
+        assertThat(databaseHelper.getResourcesDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME)).isNotNull();
     }
 
     @Test
@@ -50,6 +50,6 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
         service.deleteResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
 
-        assertThat(countResources(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME)).isEqualTo(0);
+        assertThat(databaseHelper.getResourcesDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME)).isNull();
     }
 }

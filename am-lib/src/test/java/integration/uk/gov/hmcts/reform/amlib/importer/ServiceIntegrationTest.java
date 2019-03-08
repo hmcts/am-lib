@@ -4,6 +4,7 @@ import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.models.Service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
@@ -20,7 +21,7 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
     void shouldPutNewRowInputIntoDatabaseWhenUniqueServiceNameIsGiven() {
         service.addService(SERVICE_NAME);
 
-        assertThat(countServices(SERVICE_NAME)).hasSize(1);
+        assertThat(databaseHelper.getService(SERVICE_NAME)).isNotNull();
     }
 
     @Test
@@ -30,8 +31,9 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
         service.addService(SERVICE_NAME);
         service.addService(SERVICE_NAME, newDescription);
 
-        assertThat(countServices(SERVICE_NAME)).hasSize(1);
-        assertThat(countServices(SERVICE_NAME).get(0)).containsValue(newDescription);
+        Service service = databaseHelper.getService(SERVICE_NAME);
+        assertThat(service).isNotNull();
+        assertThat(service.getServiceDescription()).isEqualTo(newDescription);
     }
 
     @Test
@@ -39,6 +41,6 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
         service.addService(SERVICE_NAME);
         service.deleteService(SERVICE_NAME);
 
-        assertThat(countServices(SERVICE_NAME)).isEmpty();
+        assertThat(databaseHelper.getService(SERVICE_NAME)).isNull();
     }
 }

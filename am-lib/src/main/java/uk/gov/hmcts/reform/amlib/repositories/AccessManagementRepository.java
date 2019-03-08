@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.amlib.repositories;
 
 import org.jdbi.v3.sqlobject.config.RegisterColumnMapper;
-import org.jdbi.v3.sqlobject.config.RegisterColumnMappers;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -16,10 +15,8 @@ import uk.gov.hmcts.reform.amlib.repositories.mappers.PermissionSetMapper;
 import java.util.List;
 
 @SuppressWarnings("LineLength")
-@RegisterColumnMappers({
-    @RegisterColumnMapper(JsonPointerMapper.class),
-    @RegisterColumnMapper(PermissionSetMapper.class)
-})
+@RegisterColumnMapper(JsonPointerMapper.class)
+@RegisterColumnMapper(PermissionSetMapper.class)
 public interface AccessManagementRepository {
 
     @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, access_type, service_name, resource_type, resource_name, attribute, security_classification) "

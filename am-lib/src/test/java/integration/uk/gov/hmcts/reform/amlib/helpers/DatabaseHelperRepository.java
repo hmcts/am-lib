@@ -1,7 +1,6 @@
 package integration.uk.gov.hmcts.reform.amlib.helpers;
 
 import org.jdbi.v3.sqlobject.config.RegisterColumnMapper;
-import org.jdbi.v3.sqlobject.config.RegisterColumnMappers;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -14,10 +13,8 @@ import uk.gov.hmcts.reform.amlib.repositories.mappers.JsonPointerMapper;
 import uk.gov.hmcts.reform.amlib.repositories.mappers.PermissionSetMapper;
 
 @SuppressWarnings({"PMD", "LineLength"})
-@RegisterColumnMappers({
-    @RegisterColumnMapper(JsonPointerMapper.class),
-    @RegisterColumnMapper(PermissionSetMapper.class)
-})
+@RegisterColumnMapper(JsonPointerMapper.class)
+@RegisterColumnMapper(PermissionSetMapper.class)
 public interface DatabaseHelperRepository {
 
     @SqlUpdate("delete from access_management;"

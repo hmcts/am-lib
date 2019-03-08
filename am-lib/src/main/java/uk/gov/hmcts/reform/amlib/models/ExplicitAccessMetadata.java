@@ -20,7 +20,7 @@ public final class ExplicitAccessMetadata extends AbstractAccessMetadata {
                                    String resourceName,
                                    JsonPointer attribute,
                                    String securityClassification) {
-        super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute + "%",
+        super(resourceId, accessorId, accessType, serviceName, resourceType, resourceName, attribute,
             securityClassification);
     }
 

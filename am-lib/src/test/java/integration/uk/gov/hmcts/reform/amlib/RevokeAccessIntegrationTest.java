@@ -1,5 +1,6 @@
 package integration.uk.gov.hmcts.reform.amlib;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -111,6 +112,17 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
+    void whenRevokingAccessOnAttributeOnlySpecifiedAttributeAndChildrenAreRemoved() {
+        grantExplicitResourceAccess(resourceId, "/amount/");
+        grantExplicitResourceAccess(resourceId, "/amount/lastUpdated");
+        grantExplicitResourceAccess(resourceId, "/amountInPounds");
+
+        revokeResourceAccess("/amount");
+
+        assertThat(countResourcesById(resourceId)).isEqualTo(1);
+    }
+
+    @Test
     void whenRevokingResourceAccessThatDoesNotExistNoErrorExpected() {
         ams.revokeResourceAccess(createMetadata(resourceId));
 
@@ -138,7 +150,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
-            .attribute(attribute)
+            .attribute(JsonPointer.valueOf(attribute))
             .securityClassification(SECURITY_CLASSIFICATION)
             .build());
     }

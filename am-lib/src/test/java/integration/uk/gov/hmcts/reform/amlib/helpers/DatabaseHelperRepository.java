@@ -1,17 +1,19 @@
 package integration.uk.gov.hmcts.reform.amlib.helpers;
 
-import com.fasterxml.jackson.core.JsonPointer;
 import org.jdbi.v3.sqlobject.config.RegisterColumnMapper;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.ResourceAttribute;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.Role;
 import uk.gov.hmcts.reform.amlib.models.Service;
 import uk.gov.hmcts.reform.amlib.repositories.mappers.JsonPointerMapper;
 import uk.gov.hmcts.reform.amlib.repositories.mappers.PermissionSetMapper;
+
+import java.util.List;
 
 @SuppressWarnings({"PMD", "LineLength"})
 @RegisterColumnMapper(JsonPointerMapper.class)
@@ -30,18 +32,6 @@ public interface DatabaseHelperRepository {
         + "where role_name = :roleName")
     @RegisterConstructorMapper(Role.class)
     Role getRole(String roleName);
-
-    @SqlQuery("select attribute from access_management "
-        + "where access_management.resource_id = :resourceId "
-        + "and access_management.accessor_id = :accessorId "
-        + "and access_management.access_type = :accessType "
-        + "and access_management.service_name = :serviceName "
-        + "and access_management.resource_type = :resourceType "
-        + "and access_management.resource_name = :resourceName "
-        + "and access_management.attribute = :attribute ")
-    JsonPointer getAttributeForExplicitAccessRecord(String resourceId, String accessorId, String accessType,
-                                                    String serviceName, String resourceType, String resourceName,
-                                                    String attribute);
 
     @SqlQuery("select * from services "
         + "where service_name = :serviceName")
@@ -67,6 +57,11 @@ public interface DatabaseHelperRepository {
     @SqlQuery("select count(1) from access_management "
         + "where resource_id = :resourceId")
     int countExplicitPermissions(String resourceId);
+
+    @SqlQuery("select * from access_management "
+        + "where resource_id = :resourceId")
+    @RegisterConstructorMapper(ExplicitAccessRecord.class)
+    List<ExplicitAccessRecord> findExplicitPermissions(String resourceId);
 
     @SqlQuery("select count(1) from default_permissions_for_roles "
         + "where service_name = :serviceName "

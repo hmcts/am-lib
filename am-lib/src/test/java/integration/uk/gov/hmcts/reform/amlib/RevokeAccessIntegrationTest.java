@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 
 import java.util.UUID;
 
@@ -96,12 +97,9 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         grantExplicitResourceAccess("resource2", "/claimant/name");
         revokeResourceAccess("/claimant/name");
 
-        JsonPointer attribute = databaseHelper.getAttributeForExplicitAccessRecord("resource2",
-            ACCESSOR_ID, ACCESS_TYPE, SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, "/claimant/name");
-
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
-        assertThat(databaseHelper.countExplicitPermissions("resource2")).isEqualTo(1);
-        assertThat(attribute).isEqualTo(JsonPointer.valueOf("/claimant/name"));
+        assertThat(databaseHelper.findExplicitPermissions("resource2")).hasSize(1)
+            .first().extracting(ExplicitAccessRecord::getAttributeAsString).isEqualTo("/claimant/name");
     }
 
     @Test
@@ -111,11 +109,8 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         grantExplicitResourceAccess(resourceId, "/claimantAddress");
         revokeResourceAccess("/claimant");
 
-        JsonPointer attribute = databaseHelper.getAttributeForExplicitAccessRecord(resourceId,
-            ACCESSOR_ID, ACCESS_TYPE, SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, "/claimantAddress");
-
-        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
-        assertThat(attribute).isEqualTo(JsonPointer.valueOf("/claimantAddress"));
+        assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(1)
+            .first().extracting(ExplicitAccessRecord::getAttributeAsString).isEqualTo("/claimantAddress");
     }
 
     @Test

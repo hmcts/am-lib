@@ -8,5 +8,5 @@
   "attributePermissions": {
     "": ["CREATE", "READ", "UPDATE"]
   },
-  "securityClassification": "Public"
+  "securityClassification": "PUBLIC"
 }

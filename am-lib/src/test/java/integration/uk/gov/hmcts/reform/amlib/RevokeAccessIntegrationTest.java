@@ -24,7 +24,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createMetadata;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 
 @SuppressWarnings("PMD")
-//AvoidDuplicateLiterals multiple occurences of same string literal needed for testing purposes.
+// AvoidDuplicateLiterals: multiple occurrences of same string literal needed for testing purposes.
 class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private String resourceId;
     private static AccessManagementService ams;
@@ -58,34 +58,34 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenRevokingResourceAccessOnSingleNestedAttributeShouldRemoveFromDatabase() {
-        grantExplicitResourceAccess(resourceId, "/test");
-        grantExplicitResourceAccess(resourceId, "/test/childTest");
-        revokeResourceAccess("/test");
+        grantExplicitResourceAccess(resourceId, "/claimant");
+        grantExplicitResourceAccess(resourceId, "/claimant/name");
+        revokeResourceAccess("/claimant");
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
 
     @Test
     void whenRevokingResourceAccessOnMultipleNestedAttributesShouldRemoveFromDatabase() {
-        grantExplicitResourceAccess(resourceId, "/test/childTest/secondChild/thirdChild");
-        revokeResourceAccess("/test/childTest");
+        grantExplicitResourceAccess(resourceId, "/claimant/address/city/postcode");
+        revokeResourceAccess("/claimant/address");
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
 
     @Test
     void whenPermissionsOnlyOnChildAttributeRevokingPermissionsOnParentShouldCascade() {
-        grantExplicitResourceAccess(resourceId, "/test/childTest");
-        revokeResourceAccess("/test");
+        grantExplicitResourceAccess(resourceId, "/claimant/name");
+        revokeResourceAccess("/claimant");
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
 
     @Test
     void whenPermissionRevokedFromRootShouldDeleteAllChildAttributes() {
-        grantExplicitResourceAccess(resourceId, "/child");
-        grantExplicitResourceAccess(resourceId, "/childTest");
-        grantExplicitResourceAccess(resourceId, "/test/childTest");
+        grantExplicitResourceAccess(resourceId, "/claimant");
+        grantExplicitResourceAccess(resourceId, "/defendant");
+        grantExplicitResourceAccess(resourceId, "/defendant/name");
         revokeResourceAccess("");
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
@@ -93,23 +93,25 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenRevokingSpecificEntryShouldRemoveCorrectEntry() {
-        grantExplicitResourceAccess(resourceId, "/test/childTest");
-        grantExplicitResourceAccess("resource2", "/test/childTest");
-        revokeResourceAccess("/test/childTest");
+        grantExplicitResourceAccess(resourceId, "/claimant/name");
+        grantExplicitResourceAccess("resource2", "/claimant/name");
+        revokeResourceAccess("/claimant/name");
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
         assertThat(databaseHelper.countExplicitPermissions("resource2")).isEqualTo(1);
+        assertThat(databaseHelper.getResource("resource2")).isEqualTo("/claimant/name");
     }
 
     @Test
     void whenRevokingAccessOnAttributeShouldRemoveOnlySpecifiedAttributeAndChildren() {
-        grantExplicitResourceAccess(resourceId, "/amount");
-        grantExplicitResourceAccess(resourceId, "/amount/lastUpdated");
-        grantExplicitResourceAccess(resourceId, "/amountInPounds");
+        grantExplicitResourceAccess(resourceId, "/claimant");
+        grantExplicitResourceAccess(resourceId, "/claimant/name");
+        grantExplicitResourceAccess(resourceId, "/claimantAddress");
 
-        revokeResourceAccess("/amount");
+        revokeResourceAccess("/claimant");
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
+        assertThat(databaseHelper.getResource(resourceId)).isEqualTo("/claimantAddress");
     }
 
     @Test

@@ -30,6 +30,10 @@ public interface DatabaseHelperRepository {
     @RegisterConstructorMapper(Role.class)
     Role getRole(String roleName);
 
+    @SqlQuery("select attribute from access_management " +
+        "where access_management.resource_id = :resourceId")
+    String getResource(String resourceId);
+
     @SqlQuery("select * from services "
         + "where service_name = :serviceName")
     @RegisterConstructorMapper(Service.class)

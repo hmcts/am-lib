@@ -4,7 +4,7 @@ import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
-import uk.gov.hmcts.reform.amlib.internal.repositories.models.Service;
+import uk.gov.hmcts.reform.amlib.internal.models.Service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;

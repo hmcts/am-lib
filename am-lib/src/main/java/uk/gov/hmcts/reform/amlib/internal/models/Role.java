@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.amlib.internal.repositories.models;
+package uk.gov.hmcts.reform.amlib.internal.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -7,9 +7,9 @@ import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
+import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
+import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.DefaultRoleSetupRepository;
-import uk.gov.hmcts.reform.amlib.internal.repositories.models.ResourceAttribute;
-import uk.gov.hmcts.reform.amlib.internal.repositories.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 
 import javax.sql.DataSource;

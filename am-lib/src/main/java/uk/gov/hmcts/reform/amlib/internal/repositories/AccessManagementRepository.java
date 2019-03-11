@@ -8,8 +8,8 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.JsonPointerMapper;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.PermissionSetMapper;
-import uk.gov.hmcts.reform.amlib.internal.repositories.models.ExplicitAccessRecord;
-import uk.gov.hmcts.reform.amlib.internal.repositories.models.RoleBasedAccessRecord;
+import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 
 import java.util.List;

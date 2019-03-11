@@ -9,9 +9,9 @@ import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.FilterService;
+import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
-import uk.gov.hmcts.reform.amlib.internal.repositories.models.ExplicitAccessRecord;
-import uk.gov.hmcts.reform.amlib.internal.repositories.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
@@ -124,7 +124,7 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resources envelope {@link Resource} and corresponding metadata
      * @return envelope list of {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions
-     *     if access to resource is configured, otherwise null.
+     * if access to resource is configured, otherwise null.
      */
     public List<FilterResourceResponse> filterResource(String userId, Set<String> userRoles, List<Resource> resources) {
         return resources.stream()
@@ -140,7 +140,7 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
-     *     to resource is configured, otherwise null.
+     * to resource is configured, otherwise null.
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     public FilterResourceResponse filterResource(String userId, Set<String> userRoles, Resource resource) {

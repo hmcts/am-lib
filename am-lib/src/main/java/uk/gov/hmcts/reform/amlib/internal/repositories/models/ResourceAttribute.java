@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.amlib.models;
+package uk.gov.hmcts.reform.amlib.internal.repositories.models;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import lombok.AllArgsConstructor;
@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 @Data
 @Builder
 @AllArgsConstructor
-public class ResourceAttribute {
+public final class ResourceAttribute {
     private final String serviceName;
     private final String resourceType;
     private final String resourceName;

@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.amlib.FilterServiceTest.Resource.Address;
 import uk.gov.hmcts.reform.amlib.FilterServiceTest.Resource.Claimant;
 import uk.gov.hmcts.reform.amlib.FilterServiceTest.Resource.Defendant;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.internal.FilterService;
 
 import java.io.IOException;
 import java.util.Map;

@@ -5,12 +5,12 @@ import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
-import uk.gov.hmcts.reform.amlib.models.ResourceAttribute;
-import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
-import uk.gov.hmcts.reform.amlib.models.Role;
-import uk.gov.hmcts.reform.amlib.models.Service;
-import uk.gov.hmcts.reform.amlib.repositories.mappers.JsonPointerMapper;
-import uk.gov.hmcts.reform.amlib.repositories.mappers.PermissionSetMapper;
+import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.JsonPointerMapper;
+import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.PermissionSetMapper;
+import uk.gov.hmcts.reform.amlib.internal.repositories.models.ResourceAttribute;
+import uk.gov.hmcts.reform.amlib.internal.repositories.models.ResourceDefinition;
+import uk.gov.hmcts.reform.amlib.internal.repositories.models.Role;
+import uk.gov.hmcts.reform.amlib.internal.repositories.models.Service;
 
 @SuppressWarnings({"PMD", "LineLength"})
 @RegisterColumnMapper(JsonPointerMapper.class)

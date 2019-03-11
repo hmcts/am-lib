@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.amlib;
+package uk.gov.hmcts.reform.amlib.internal;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,7 +27,7 @@ public class FilterService {
 
     private static final JsonPointer WHOLE_RESOURCE_POINTER = JsonPointer.valueOf("");
 
-    JsonNode filterJson(JsonNode resource, Map<JsonPointer, Set<Permission>> attributePermissions) {
+    public JsonNode filterJson(JsonNode resource, Map<JsonPointer, Set<Permission>> attributePermissions) {
         List<JsonPointer> nodesWithRead = filterPointersWithReadPermission(attributePermissions);
         log.debug("> Nodes with READ access: " + nodesWithRead);
 

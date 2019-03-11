@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.amlib.models;
+package uk.gov.hmcts.reform.amlib.internal.repositories.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 @Data
 @Builder
 @AllArgsConstructor
-public class Role {
+public final class Role {
     private final String roleName;
     private final RoleType roleType;
     private final SecurityClassification securityClassification;

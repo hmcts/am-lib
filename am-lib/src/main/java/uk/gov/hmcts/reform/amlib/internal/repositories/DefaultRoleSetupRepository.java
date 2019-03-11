@@ -1,12 +1,12 @@
-package uk.gov.hmcts.reform.amlib.repositories;
+package uk.gov.hmcts.reform.amlib.internal.repositories;
 
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
-import uk.gov.hmcts.reform.amlib.models.ResourceAttribute;
-import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
+import uk.gov.hmcts.reform.amlib.internal.repositories.models.ResourceAttribute;
+import uk.gov.hmcts.reform.amlib.internal.repositories.models.RoleBasedAccessRecord;
 
 @SuppressWarnings({"LineLength", "PMD"})
 public interface DefaultRoleSetupRepository {

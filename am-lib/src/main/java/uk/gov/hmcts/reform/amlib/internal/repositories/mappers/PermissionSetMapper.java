@@ -1,9 +1,9 @@
-package uk.gov.hmcts.reform.amlib.repositories.mappers;
+package uk.gov.hmcts.reform.amlib.internal.repositories.mappers;
 
 import org.jdbi.v3.core.mapper.ColumnMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.utils.Permissions;
+import uk.gov.hmcts.reform.amlib.internal.utils.Permissions;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
-import uk.gov.hmcts.reform.amlib.utils.Pair;
+import uk.gov.hmcts.reform.amlib.models.Pair;
 
 import java.util.Map;
 import java.util.Set;

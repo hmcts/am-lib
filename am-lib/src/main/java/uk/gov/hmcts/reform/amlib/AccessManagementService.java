@@ -8,21 +8,21 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
+import uk.gov.hmcts.reform.amlib.internal.FilterService;
+import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
+import uk.gov.hmcts.reform.amlib.internal.repositories.models.ExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.internal.repositories.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
-import uk.gov.hmcts.reform.amlib.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.models.Resource;
-import uk.gov.hmcts.reform.amlib.models.RoleBasedAccessRecord;
-import uk.gov.hmcts.reform.amlib.repositories.AccessManagementRepository;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
 import javax.sql.DataSource;
 
 public class AccessManagementService {

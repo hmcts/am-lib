@@ -5,7 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.UnsupportedPermissionsException;
-import uk.gov.hmcts.reform.amlib.utils.Permissions;
+import uk.gov.hmcts.reform.amlib.internal.utils.Permissions;
 
 import java.util.Arrays;
 import java.util.HashSet;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.amlib.repositories.mappers;
+package uk.gov.hmcts.reform.amlib.internal.repositories.mappers;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import org.jdbi.v3.core.mapper.ColumnMapper;

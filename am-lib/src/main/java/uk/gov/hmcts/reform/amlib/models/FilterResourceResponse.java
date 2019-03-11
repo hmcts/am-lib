@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Data
 @Builder
-public class FilterResourceResponse {
+public final class FilterResourceResponse {
     private String resourceId;
     private JsonNode data;
     private Map<JsonPointer, Set<Permission>> permissions;

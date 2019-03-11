@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.amlib.utils;
+package uk.gov.hmcts.reform.amlib.models;
 
 import java.util.Map;
 

@@ -33,7 +33,7 @@ public interface AccessManagementRepository {
         + "and access_management.resource_type = :resourceType "
         + "and access_management.resource_name = :resourceName "
         + "and access_management.attribute = :attributeAsString "
-        + "or access_management.attribute like concat(:attributeAsString, '/','%')")
+        + "or access_management.attribute like concat( :attributeAsString, '/','%')")
     void removeAccessManagementRecord(@BindBean ExplicitAccessMetadata explicitAccessMetadata);
 
     @SqlQuery("select accessor_id from access_management where exists "

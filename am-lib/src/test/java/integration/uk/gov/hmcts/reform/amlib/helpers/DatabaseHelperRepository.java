@@ -32,8 +32,16 @@ public interface DatabaseHelperRepository {
     Role getRole(String roleName);
 
     @SqlQuery("select attribute from access_management "
-        + "where access_management.resource_id = :resourceId")
-    JsonPointer getAttributeForExplicitAccessRecord(String resourceId);
+        + "where access_management.resource_id = :resourceId "
+        + "and access_management.accessor_id = :accessorId "
+        + "and access_management.access_type = :accessType "
+        + "and access_management.service_name = :serviceName "
+        + "and access_management.resource_type = :resourceType "
+        + "and access_management.resource_name = :resourceName "
+        + "and access_management.attribute = :attribute ")
+    JsonPointer getAttributeForExplicitAccessRecord(String resourceId, String accessorId, String accessType,
+                                                    String serviceName, String resourceType, String resourceName,
+                                                    String attribute);
 
     @SqlQuery("select * from services "
         + "where service_name = :serviceName")

@@ -50,7 +50,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenRevokingResourceAccessOnRootShouldRemoveFromDatabase() {
-        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
+        grantExplicitResourceAccess(resourceId, "");
         revokeResourceAccess("");
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
@@ -97,9 +97,12 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         grantExplicitResourceAccess("resource2", "/claimant/name");
         revokeResourceAccess("/claimant/name");
 
+        JsonPointer attribute = databaseHelper.getAttributeForExplicitAccessRecord("resource2",
+            ACCESSOR_ID, ACCESS_TYPE, SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, "/claimant/name");
+
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
         assertThat(databaseHelper.countExplicitPermissions("resource2")).isEqualTo(1);
-        assertThat(databaseHelper.getAttributeForExplicitAccessRecord("resource2")).isEqualTo(JsonPointer.valueOf("/claimant/name"));
+        assertThat(attribute).isEqualTo(JsonPointer.valueOf("/claimant/name"));
     }
 
     @Test
@@ -110,8 +113,11 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         revokeResourceAccess("/claimant");
 
+        JsonPointer attribute = databaseHelper.getAttributeForExplicitAccessRecord(resourceId,
+            ACCESSOR_ID, ACCESS_TYPE, SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME, "/claimantAddress");
+
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
-        assertThat(databaseHelper.getAttributeForExplicitAccessRecord(resourceId)).isEqualTo(JsonPointer.valueOf("/claimantAddress"));
+        assertThat(attribute).isEqualTo(JsonPointer.valueOf("/claimantAddress"));
     }
 
     @Test

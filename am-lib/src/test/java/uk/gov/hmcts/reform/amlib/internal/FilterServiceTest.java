@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.amlib;
+package uk.gov.hmcts.reform.amlib.internal;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonPointer;
@@ -9,11 +9,10 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Builder;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.amlib.FilterServiceTest.Resource.Address;
-import uk.gov.hmcts.reform.amlib.FilterServiceTest.Resource.Claimant;
-import uk.gov.hmcts.reform.amlib.FilterServiceTest.Resource.Defendant;
+import uk.gov.hmcts.reform.amlib.internal.FilterServiceTest.Resource.Address;
+import uk.gov.hmcts.reform.amlib.internal.FilterServiceTest.Resource.Claimant;
+import uk.gov.hmcts.reform.amlib.internal.FilterServiceTest.Resource.Defendant;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.internal.FilterService;
 
 import java.io.IOException;
 import java.util.Map;

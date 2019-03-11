@@ -94,6 +94,9 @@ public class AccessManagementService {
     /**
      * Removes explicit access to resource accordingly to record configuration.
      *
+     * <p>IMPORTANT: This is a cascade delete function and so if called on a specific attribute
+     * it will remove specified attribute and all children attributes.
+     *
      * @param explicitAccessMetadata an object to remove a specific explicit access record.
      */
     public void revokeResourceAccess(ExplicitAccessMetadata explicitAccessMetadata) {
@@ -140,7 +143,7 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
-     *     to resource is configured, otherwise null.
+     *      to resource is configured, otherwise null.
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     public FilterResourceResponse filterResource(String userId, Set<String> userRoles, Resource resource) {

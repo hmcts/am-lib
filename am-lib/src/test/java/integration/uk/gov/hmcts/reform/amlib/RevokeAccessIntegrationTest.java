@@ -39,7 +39,6 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         resourceId = UUID.randomUUID().toString();
     }
 
-
     @Test
     void whenRevokingResourceAccessShouldRemoveFromDatabase() {
         ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
@@ -110,7 +109,6 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         grantExplicitResourceAccess(resourceId, "/claimant");
         grantExplicitResourceAccess(resourceId, "/claimant/name");
         grantExplicitResourceAccess(resourceId, "/claimantAddress");
-
         revokeResourceAccess("/claimant");
 
         JsonPointer attribute = databaseHelper.getAttributeForExplicitAccessRecord(resourceId,

@@ -32,7 +32,7 @@ public interface AccessManagementRepository {
         + "and access_management.service_name = :serviceName "
         + "and access_management.resource_type = :resourceType "
         + "and access_management.resource_name = :resourceName "
-        + "and access_management.attribute = :attributeAsString "git stat
+        + "and access_management.attribute = :attributeAsString "
         + "or access_management.attribute like concat(:attributeAsString, '/', '%')")
     void removeAccessManagementRecord(@BindBean ExplicitAccessMetadata explicitAccessMetadata);
 

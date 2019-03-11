@@ -79,7 +79,7 @@ dependencies {
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.12.1'
     testCompile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
     testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.10.6'
-    testCompile group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
+    testCompile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
     testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 }
 

@@ -99,7 +99,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
         assertThat(databaseHelper.countExplicitPermissions("resource2")).isEqualTo(1);
-        assertThat(databaseHelper.getResource("resource2")).isEqualTo("/claimant/name");
+        assertThat(databaseHelper.getAttributeForExplicitAccessRecord("resource2")).isEqualTo(JsonPointer.valueOf("/claimant/name"));
     }
 
     @Test
@@ -111,7 +111,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         revokeResourceAccess("/claimant");
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
-        assertThat(databaseHelper.getResource(resourceId)).isEqualTo("/claimantAddress");
+        assertThat(databaseHelper.getAttributeForExplicitAccessRecord(resourceId)).isEqualTo(JsonPointer.valueOf("/claimantAddress"));
     }
 
     @Test

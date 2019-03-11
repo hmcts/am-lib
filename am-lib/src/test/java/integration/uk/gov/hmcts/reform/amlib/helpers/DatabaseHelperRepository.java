@@ -1,5 +1,6 @@
 package integration.uk.gov.hmcts.reform.amlib.helpers;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import org.jdbi.v3.sqlobject.config.RegisterColumnMapper;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -32,7 +33,7 @@ public interface DatabaseHelperRepository {
 
     @SqlQuery("select attribute from access_management "
         + "where access_management.resource_id = :resourceId")
-    String getResource(String resourceId);
+    JsonPointer getAttributeForExplicitAccessRecord(String resourceId);
 
     @SqlQuery("select * from services "
         + "where service_name = :serviceName")

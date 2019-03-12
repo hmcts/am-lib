@@ -1,7 +1,7 @@
 package integration.uk.gov.hmcts.reform.amlib.importer;
 
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
@@ -25,12 +25,10 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
-    private static DefaultRoleSetupImportService service;
+    private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportService.class);
 
-    @BeforeAll
-    static void setUp() {
-        service = new DefaultRoleSetupImportService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
-
+    @BeforeEach
+    void setUp() {
         service.addService(SERVICE_NAME);
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
     }

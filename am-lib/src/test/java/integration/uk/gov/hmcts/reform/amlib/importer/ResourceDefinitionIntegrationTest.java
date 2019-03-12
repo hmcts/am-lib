@@ -2,7 +2,6 @@ package integration.uk.gov.hmcts.reform.amlib.importer;
 
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 
@@ -13,12 +12,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
-    private static DefaultRoleSetupImportService service;
-
-    @BeforeAll
-    static void setUp() {
-        service = new DefaultRoleSetupImportService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
-    }
+    private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportService.class);
 
     @Test
     void shouldNotBeAbleToCreateResourceForServiceThatDoesNotExist() {

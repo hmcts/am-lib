@@ -6,14 +6,16 @@ import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.testcontainers.containers.PostgreSQLContainer;
+
+import java.lang.reflect.Constructor;
 
 @SuppressWarnings("PMD")
 public abstract class IntegrationBaseTest {
 
-    protected static final PostgreSQLContainer db;
     protected static final DatabaseHelperRepository databaseHelper;
+    private static final PostgreSQLContainer db;
 
     static {
         db = createDatabaseContainer();
@@ -25,9 +27,18 @@ public abstract class IntegrationBaseTest {
             .onDemand(DatabaseHelperRepository.class);
     }
 
-    @AfterAll
-    static void cleanupDatabase() {
+    @AfterEach
+    void cleanupDatabase() {
         databaseHelper.truncateTables();
+    }
+
+    protected static <T> T initService(Class<T> serviceClass) {
+        try {
+            Constructor<T> constructor = serviceClass.getConstructor(String.class, String.class, String.class);
+            return constructor.newInstance(db.getJdbcUrl(), db.getUsername(), db.getPassword());
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot instantiate service " + serviceClass.getSimpleName(), e);
+        }
     }
 
     @SuppressWarnings("unchecked")

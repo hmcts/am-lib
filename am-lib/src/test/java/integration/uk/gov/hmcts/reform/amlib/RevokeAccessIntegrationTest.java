@@ -2,7 +2,6 @@ package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
@@ -27,23 +26,18 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermission
 @SuppressWarnings("PMD")
 // AvoidDuplicateLiterals: multiple occurrences of same string literal needed for testing purposes.
 class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
+    private static AccessManagementService service = initService(AccessManagementService.class);
     private String resourceId;
-    private static AccessManagementService ams;
-
-    @BeforeAll
-    static void setUp() {
-        ams = new AccessManagementService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
-    }
 
     @BeforeEach
-    void setupTest() {
+    void setUp() {
         resourceId = UUID.randomUUID().toString();
     }
 
     @Test
     void whenRevokingResourceAccessShouldRemoveFromDatabase() {
-        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
-        ams.revokeResourceAccess(createMetadata(resourceId));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
+        service.revokeResourceAccess(createMetadata(resourceId));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
@@ -115,13 +109,13 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenRevokingResourceAccessThatDoesNotExistNoErrorExpected() {
-        ams.revokeResourceAccess(createMetadata(resourceId));
+        service.revokeResourceAccess(createMetadata(resourceId));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
 
     private void grantExplicitResourceAccess(String resourceId, String attribute) {
-        ams.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
+        service.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorId(ACCESSOR_ID)
             .accessType(ACCESS_TYPE)
@@ -134,7 +128,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     private void revokeResourceAccess(String attribute) {
-        ams.revokeResourceAccess(ExplicitAccessMetadata.builder()
+        service.revokeResourceAccess(ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
             .accessorId(ACCESSOR_ID)
             .accessType(ACCESS_TYPE)

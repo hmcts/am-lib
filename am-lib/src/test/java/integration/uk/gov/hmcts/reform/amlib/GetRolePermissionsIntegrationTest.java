@@ -2,7 +2,7 @@ package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
@@ -29,18 +29,11 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest {
-    private static AccessManagementService ams;
-    private static DefaultRoleSetupImportService defaultRoleService;
+    private static AccessManagementService service = initService(AccessManagementService.class);
+    private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
 
-    @BeforeAll
-    static void setUp() {
-        ams = new AccessManagementService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
-        defaultRoleService = new DefaultRoleSetupImportService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
-
-        populateDatabaseWithRoleAndDefaultPermissions();
-    }
-
-    private static void populateDatabaseWithRoleAndDefaultPermissions() {
+    @BeforeEach
+    void setUp() {
         Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermissions =
             new ConcurrentHashMap<>();
 
@@ -54,8 +47,8 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         attributePermissions.put(JsonPointer.valueOf("/test2"), readPermission);
         attributePermissions.put(JsonPointer.valueOf("/testCreate"), createPermission);
 
-        defaultRoleService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        defaultRoleService.grantDefaultPermission(DefaultPermissionGrant.builder()
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
@@ -66,7 +59,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @Test
     void returnListOfPermissionsForRoleName() {
-        Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions(SERVICE_NAME,
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
             RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAMES);
 
         assertThat(accessRecord).hasSize(3);
@@ -77,7 +70,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @Test
     void shouldReturnNullWhenServiceNameDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions("Unknown Service",
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions("Unknown Service",
             RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAMES);
 
         assertThat(accessRecord).isNull();
@@ -85,7 +78,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @Test
     void shouldReturnNullWhenResourceTypeDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions(SERVICE_NAME,
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
             "Unknown Resource Type ", RESOURCE_NAME, ROLE_NAMES);
 
         assertThat(accessRecord).isNull();
@@ -93,7 +86,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @Test
     void shouldReturnNullWhenResourceNameDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions(SERVICE_NAME,
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
             RESOURCE_TYPE, "Unknown Resource Name", ROLE_NAMES);
 
         assertThat(accessRecord).isNull();
@@ -101,7 +94,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @Test
     void shouldReturnNullWhenDefaultRoleNameDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = ams.getRolePermissions(SERVICE_NAME,
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
             RESOURCE_TYPE, RESOURCE_NAME, Stream.of("Unknown Role").collect(toSet()));
 
         assertThat(accessRecord).isNull();

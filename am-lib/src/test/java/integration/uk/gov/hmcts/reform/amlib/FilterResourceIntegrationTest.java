@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
@@ -32,26 +31,20 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermission
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
 
 class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
+    private static AccessManagementService service = initService(AccessManagementService.class);
+    private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private String resourceId;
-    private static AccessManagementService ams;
-    private static DefaultRoleSetupImportService rolesService;
-
-    @BeforeAll
-    static void setUp() {
-        ams = new AccessManagementService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
-        rolesService = new DefaultRoleSetupImportService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
-    }
 
     @BeforeEach
-    void setupTest() {
+    void setUp() {
         resourceId = UUID.randomUUID().toString();
     }
 
     @Test
     void whenRowExistsAndHasReadPermissionsShouldReturnEnvelopeWithData() {
-        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, READ_PERMISSION));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, READ_PERMISSION));
 
-        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
+        FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
@@ -62,9 +55,9 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenRowExistsAndDoesNotHaveReadPermissionsShouldReturnEnvelopeWithoutData() {
-        ams.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, CREATE_PERMISSION));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, CREATE_PERMISSION));
 
-        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
+        FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
@@ -78,7 +71,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         String nonExistingUserId = "ijk";
         String nonExistingResourceId = "lmn";
 
-        FilterResourceResponse result = ams.filterResource(
+        FilterResourceResponse result = service.filterResource(
             nonExistingUserId, ROLE_NAMES, createResource(nonExistingResourceId));
 
         assertThat(result).isNull();
@@ -86,10 +79,10 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenNoExplicitAccessShouldUseRoleBasedAccess() {
-        rolesService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        rolesService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
 
-        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
+        FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
@@ -100,25 +93,25 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenNoExplicitAccessAndRoleHasExplicitAccessTypeShouldReturnNull() {
-        rolesService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.EXPLICIT);
-        rolesService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.EXPLICIT);
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
 
-        FilterResourceResponse result = ams.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
+        FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
         assertThat(result).isNull();
     }
 
     @Test
     void whenListOfResourcesShouldReturnListFilterResourceResponse() {
-        rolesService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        rolesService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
 
         List<Resource> resources = ImmutableList.<Resource>builder()
             .add(createResource(resourceId))
             .add(createResource(resourceId + "2"))
             .build();
 
-        List<FilterResourceResponse> result = ams.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
+        List<FilterResourceResponse> result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
 
         List<FilterResourceResponse> expectedResult = ImmutableList.<FilterResourceResponse>builder()
             .add(FilterResourceResponse.builder()
@@ -138,15 +131,15 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenListOfResourcesButNoReadAccessShouldReturnListOfEnvelopesWithNullDataValues() {
-        rolesService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        rolesService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, CREATE_PERMISSION));
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, CREATE_PERMISSION));
 
         List<Resource> resources = ImmutableList.<Resource>builder()
             .add(createResource(resourceId))
             .add(createResource(resourceId + "2"))
             .build();
 
-        List<FilterResourceResponse> result = ams.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
+        List<FilterResourceResponse> result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
 
         List<FilterResourceResponse> expectedResult = ImmutableList.<FilterResourceResponse>builder()
             .add(FilterResourceResponse.builder()
@@ -168,7 +161,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenEmptyListOfResourcesShouldReturnEmptyList() {
         List<Resource> resources = ImmutableList.<Resource>builder().build();
 
-        List<FilterResourceResponse> result = ams.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
+        List<FilterResourceResponse> result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
 
         assertThat(result).isEmpty();
     }

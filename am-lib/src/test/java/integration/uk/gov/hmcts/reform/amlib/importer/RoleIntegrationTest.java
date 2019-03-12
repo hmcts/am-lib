@@ -1,7 +1,6 @@
 package integration.uk.gov.hmcts.reform.amlib.importer;
 
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
@@ -13,12 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 
 class RoleIntegrationTest extends IntegrationBaseTest {
-    private static DefaultRoleSetupImportService service;
-
-    @BeforeAll
-    static void setUp() {
-        service = new DefaultRoleSetupImportService(db.getJdbcUrl(), db.getUsername(), db.getPassword());
-    }
+    private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportService.class);
 
     @Test
     void shouldAddNewEntryIntoDatabaseWhenNewRoleIsAdded() {

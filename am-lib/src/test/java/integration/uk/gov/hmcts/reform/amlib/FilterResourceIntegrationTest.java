@@ -20,6 +20,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_IDS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
@@ -42,7 +43,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenRowExistsAndHasReadPermissionsShouldReturnEnvelopeWithData() {
-        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, READ_PERMISSION));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_IDS, READ_PERMISSION));
 
         FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
@@ -55,7 +56,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenRowExistsAndDoesNotHaveReadPermissionsShouldReturnEnvelopeWithoutData() {
-        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, CREATE_PERMISSION));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_IDS, CREATE_PERMISSION));
 
         FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 

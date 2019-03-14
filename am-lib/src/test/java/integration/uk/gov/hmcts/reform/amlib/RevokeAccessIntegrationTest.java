@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_IDS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
@@ -117,7 +118,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private void grantExplicitResourceAccess(String resourceId, String attribute) {
         service.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
             .resourceId(resourceId)
-            .accessorId(ACCESSOR_ID)
+            .accessorId(ACCESSOR_IDS)
             .accessType(ACCESS_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)

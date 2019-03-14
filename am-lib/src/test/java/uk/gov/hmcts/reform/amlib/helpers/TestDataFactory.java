@@ -7,11 +7,13 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_IDS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
@@ -27,17 +29,17 @@ public final class TestDataFactory {
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
                                                                   Set<Permission> permissions) {
-        return createGrantForWholeDocument(resourceId, ACCESSOR_ID, permissions);
+        return createGrantForWholeDocument(resourceId, ACCESSOR_IDS, permissions);
     }
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
-                                                                  String accessorId,
+                                                                  List<String> accessorId,
                                                                   Set<Permission> permissions) {
         return createGrant(resourceId, accessorId, createPermissionsForWholeDocument(permissions));
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
-                                                  String accessorId,
+                                                  List<String> accessorId,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)

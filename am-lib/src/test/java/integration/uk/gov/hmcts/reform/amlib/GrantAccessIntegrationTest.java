@@ -15,8 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_IDS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.MULTIPLE_ACCESSOR_IDS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
@@ -36,7 +37,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         Map<JsonPointer, Set<Permission>> emptyAttributePermissions = new ConcurrentHashMap<>();
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-            service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, emptyAttributePermissions)))
+            service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_IDS, emptyAttributePermissions)))
             .withMessage("At least one attribute is required");
     }
 
@@ -46,7 +47,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         Map<JsonPointer, Set<Permission>> attributeNoPermissions = createPermissionsForWholeDocument(new HashSet<>());
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-            service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, attributeNoPermissions)))
+            service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_IDS, attributeNoPermissions)))
             .withMessage("At least one permission per attribute is required");
     }
 
@@ -63,7 +64,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         multipleAttributePermissions.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
         multipleAttributePermissions.put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
-        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, multipleAttributePermissions));
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_IDS, multipleAttributePermissions));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(2);
     }
@@ -74,5 +75,16 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
+    }
+
+    @Test
+    void whenGrantingForMultipleUsers() {
+        Map<JsonPointer, Set<Permission>> multipleAttributePermissions = new ConcurrentHashMap<>();
+        multipleAttributePermissions.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
+
+        service.grantExplicitResourceAccess(createGrant(resourceId, MULTIPLE_ACCESSOR_IDS,
+            multipleAttributePermissions));
+
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(3);
     }
 }

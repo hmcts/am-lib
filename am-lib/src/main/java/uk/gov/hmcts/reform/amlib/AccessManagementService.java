@@ -69,22 +69,25 @@ public class AccessManagementService {
             throw new IllegalArgumentException("At least one permission per attribute is required");
         }
 
+
         jdbi.useTransaction(handle -> {
             AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
             try {
-                explicitAccessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
-                    ExplicitAccessRecord.builder()
-                        .resourceId(explicitAccessGrant.getResourceId())
-                        .accessorId(explicitAccessGrant.getAccessorId())
-                        .permissions(attributePermission.getValue())
-                        .accessType(explicitAccessGrant.getAccessType())
-                        .serviceName(explicitAccessGrant.getServiceName())
-                        .resourceType(explicitAccessGrant.getResourceType())
-                        .resourceName(explicitAccessGrant.getResourceName())
-                        .attribute(attributePermission.getKey())
-                        .securityClassification(explicitAccessGrant.getSecurityClassification())
-                        .build())
-                    .forEach(dao::createAccessManagementRecord);
+                explicitAccessGrant.getAccessorId().forEach(accessorId ->
+                    explicitAccessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
+                        ExplicitAccessRecord.builder()
+                            .resourceId(explicitAccessGrant.getResourceId())
+                            .accessorId(accessorId)
+                            .permissions(attributePermission.getValue())
+                            .accessType(explicitAccessGrant.getAccessType())
+                            .serviceName(explicitAccessGrant.getServiceName())
+                            .resourceType(explicitAccessGrant.getResourceType())
+                            .resourceName(explicitAccessGrant.getResourceName())
+                            .attribute(attributePermission.getKey())
+                            .securityClassification(explicitAccessGrant.getSecurityClassification())
+                            .build())
+                        .forEach(dao::createAccessManagementRecord)
+                );
             } catch (Exception e) {
                 throw new PersistenceException(e);
             }

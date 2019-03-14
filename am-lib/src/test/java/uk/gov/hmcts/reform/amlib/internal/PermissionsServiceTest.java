@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 
-public class PermissionsServiceTest {
+class PermissionsServiceTest {
 
     private final PermissionsService permissionsService = new PermissionsService();
 
@@ -35,9 +35,8 @@ public class PermissionsServiceTest {
 
         Map<JsonPointer, Set<Permission>> result = permissionsService.mergePermissions(listOfPermissions);
 
-        System.out.println("result = " + result);
-
         assertThat(result).hasSize(1);
+        assertThat(result.get(JsonPointer.valueOf(""))).containsExactly(Permission.CREATE, Permission.READ);
     }
 
     @Test
@@ -57,6 +56,7 @@ public class PermissionsServiceTest {
         Map<JsonPointer, Set<Permission>> result = permissionsService.mergePermissions(listOfPermissions);
 
         assertThat(result).hasSize(1);
+        assertThat(result.get(JsonPointer.valueOf(""))).containsExactly(Permission.READ);
     }
 
     @Test
@@ -77,6 +77,8 @@ public class PermissionsServiceTest {
 
         Map<JsonPointer, Set<Permission>> result = permissionsService.mergePermissions(listOfPermissions);
 
-        System.out.println("result = " + result);
+        assertThat(result).hasSize(2);
+        assertThat(result.get(JsonPointer.valueOf("/test"))).containsExactly(Permission.READ);
+        assertThat(result.get(JsonPointer.valueOf("/test/test2"))).containsExactly(Permission.CREATE);
     }
 }

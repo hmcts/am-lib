@@ -36,7 +36,7 @@ class PermissionsServiceTest {
         Map<JsonPointer, Set<Permission>> result = permissionsService.mergePermissions(listOfPermissions);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(JsonPointer.valueOf(""))).containsExactly(Permission.CREATE, Permission.READ);
+        assertThat(result.get(JsonPointer.valueOf(""))).containsExactlyInAnyOrder(Permission.CREATE, Permission.READ);
     }
 
     @Test
@@ -56,13 +56,11 @@ class PermissionsServiceTest {
         Map<JsonPointer, Set<Permission>> result = permissionsService.mergePermissions(listOfPermissions);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(JsonPointer.valueOf(""))).containsExactly(Permission.READ);
+        assertThat(result.get(JsonPointer.valueOf(""))).containsExactlyInAnyOrder(Permission.READ);
     }
 
     @Test
     void whenParentAndChildAttributeShouldMergePermissions() {
-        //TODO: test outcome needs to combine permissions for attributePermission one due to parent child relationship
-
         Map<JsonPointer, Set<Permission>> attributePermissionsOne =
             ImmutableMap.of(JsonPointer.valueOf("/test/test2"), CREATE_PERMISSION);
 
@@ -78,7 +76,7 @@ class PermissionsServiceTest {
         Map<JsonPointer, Set<Permission>> result = permissionsService.mergePermissions(listOfPermissions);
 
         assertThat(result).hasSize(2);
-        assertThat(result.get(JsonPointer.valueOf("/test"))).containsExactly(Permission.READ);
-        assertThat(result.get(JsonPointer.valueOf("/test/test2"))).containsExactly(Permission.CREATE, Permission.READ);
+        assertThat(result.get(JsonPointer.valueOf("/test"))).containsExactlyInAnyOrder(Permission.READ);
+        assertThat(result.get(JsonPointer.valueOf("/test/test2"))).containsExactlyInAnyOrder(Permission.CREATE, Permission.READ);
     }
 }

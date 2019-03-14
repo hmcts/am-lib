@@ -72,4 +72,91 @@ class DefaultRoleSetupImportServiceValidationTest {
         );
     }
 
+    @ParameterizedTest
+    @MethodSource("invalidArgumentsForTruncateDefaultPermissionsForServiceMethod")
+    void truncateDefaultPermissionsForServiceShouldRejectInvalidArguments(String serviceName, String resourceType) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.truncateDefaultPermissionsForService(serviceName, resourceType))
+            .withMessageMatching(".*(serviceName|resourceType) - must not be blank");
+    }
+
+    private static Stream<Arguments> invalidArgumentsForTruncateDefaultPermissionsForServiceMethod() {
+        return Stream.of(
+            Arguments.of(null, RESOURCE_TYPE),
+            Arguments.of("", RESOURCE_TYPE),
+            Arguments.of(" ", RESOURCE_TYPE),
+            Arguments.of(SERVICE_NAME, null),
+            Arguments.of(SERVICE_NAME, ""),
+            Arguments.of(SERVICE_NAME, " ")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidArgumentsForTruncateDefaultPermissionsByResourceDefinitionMethod")
+    void truncateDefaultPermissionsByResourceDefinitionShouldRejectInvalidArguments(String serviceName, String resourceType, String resourceName) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.truncateDefaultPermissionsByResourceDefinition(serviceName, resourceType, resourceName))
+            .withMessageMatching(".*(serviceName|resourceType|resourceName) - must not be blank");
+    }
+
+    private static Stream<Arguments> invalidArgumentsForTruncateDefaultPermissionsByResourceDefinitionMethod() {
+        return Stream.of(
+            Arguments.of(null, RESOURCE_TYPE, RESOURCE_NAME),
+            Arguments.of("", RESOURCE_TYPE, RESOURCE_NAME),
+            Arguments.of(" ", RESOURCE_TYPE, RESOURCE_NAME),
+            Arguments.of(SERVICE_NAME, null, RESOURCE_NAME),
+            Arguments.of(SERVICE_NAME, "", RESOURCE_NAME),
+            Arguments.of(SERVICE_NAME, " ", RESOURCE_NAME),
+            Arguments.of(SERVICE_NAME, RESOURCE_TYPE, null),
+            Arguments.of(SERVICE_NAME, RESOURCE_TYPE, ""),
+            Arguments.of(SERVICE_NAME, RESOURCE_TYPE, " ")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidArgumentsForDeleteResourceDefinitionMethod")
+    void deleteResourceDefinitionShouldRejectInvalidArguments(String serviceName, String resourceType, String resourceName) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.deleteResourceDefinition(serviceName, resourceType, resourceName))
+            .withMessageMatching(".*(serviceName|resourceType|resourceName) - must not be blank");
+    }
+
+    private static Stream<Arguments> invalidArgumentsForDeleteResourceDefinitionMethod() {
+        return Stream.of(
+            Arguments.of(null, RESOURCE_TYPE, RESOURCE_NAME),
+            Arguments.of("", RESOURCE_TYPE, RESOURCE_NAME),
+            Arguments.of(" ", RESOURCE_TYPE, RESOURCE_NAME),
+            Arguments.of(SERVICE_NAME, null, RESOURCE_NAME),
+            Arguments.of(SERVICE_NAME, "", RESOURCE_NAME),
+            Arguments.of(SERVICE_NAME, " ", RESOURCE_NAME),
+            Arguments.of(SERVICE_NAME, RESOURCE_TYPE, null),
+            Arguments.of(SERVICE_NAME, RESOURCE_TYPE, ""),
+            Arguments.of(SERVICE_NAME, RESOURCE_TYPE, " ")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidArgumentsForDeleteRoleMethod")
+    void deleteRoleMethodShouldRejectInvalidArguments(String roleName) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.deleteRole(roleName))
+            .withMessageMatching(".*(roleName) - must not be blank");
+    }
+
+    private static Stream<String> invalidArgumentsForDeleteRoleMethod() {
+        return Stream.of(null, "", " ");
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidArgumentsForDeleteServiceMethod")
+    void deleteServiceMethodShouldRejectInvalidArguments(String serviceName) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.deleteService(serviceName))
+            .withMessageContaining("serviceName - must not be blank");
+    }
+
+    private static Stream<String> invalidArgumentsForDeleteServiceMethod() {
+        return Stream.of(null, "", " ");
+    }
+
 }

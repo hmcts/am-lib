@@ -139,7 +139,7 @@ public class DefaultRoleSetupImportService {
      * @param resourceType the type of resource to delete default permissions for
      * @throws PersistenceException if any errors were encountered causing transaction rollback
      */
-    public void truncateDefaultPermissionsForService(String serviceName, String resourceType) {
+    public void truncateDefaultPermissionsForService(@NotBlank String serviceName, @NotBlank String resourceType) {
         jdbi.useTransaction(handle -> {
             try {
                 DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
@@ -161,9 +161,9 @@ public class DefaultRoleSetupImportService {
      * @param resourceName the name of the resource to delete default permissions for
      * @throws PersistenceException if any errors were encountered causing transaction rollback
      */
-    public void truncateDefaultPermissionsByResourceDefinition(String serviceName,
-                                                               String resourceType,
-                                                               String resourceName) {
+    public void truncateDefaultPermissionsByResourceDefinition(@NotBlank String serviceName,
+                                                               @NotBlank String resourceType,
+                                                               @NotBlank String resourceName) {
         jdbi.useTransaction(handle -> {
             try {
                 DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
@@ -182,7 +182,9 @@ public class DefaultRoleSetupImportService {
      * @param resourceType the type of resource
      * @param resourceName the name of the resource
      */
-    public void deleteResourceDefinition(String serviceName, String resourceType, String resourceName) {
+    public void deleteResourceDefinition(@NotBlank String serviceName,
+                                         @NotBlank String resourceType,
+                                         @NotBlank String resourceName) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao ->
             dao.deleteResourceDefinition(serviceName, resourceType, resourceName));
     }
@@ -192,7 +194,7 @@ public class DefaultRoleSetupImportService {
      *
      * @param roleName the role name to delete
      */
-    public void deleteRole(String roleName) {
+    public void deleteRole(@NotBlank String roleName) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao -> dao.deleteRole(roleName));
     }
 
@@ -201,7 +203,7 @@ public class DefaultRoleSetupImportService {
      *
      * @param serviceName the service name to delete
      */
-    public void deleteService(String serviceName) {
+    public void deleteService(@NotBlank String serviceName) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao -> dao.deleteService(serviceName));
     }
 }

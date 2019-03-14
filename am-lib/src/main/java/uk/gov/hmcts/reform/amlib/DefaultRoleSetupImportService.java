@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.amlib;
 
-import lombok.NonNull;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
@@ -13,6 +12,8 @@ import uk.gov.hmcts.reform.amlib.internal.repositories.DefaultRoleSetupRepositor
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 
 import javax.sql.DataSource;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 public class DefaultRoleSetupImportService {
     private final Jdbi jdbi;
@@ -44,7 +45,7 @@ public class DefaultRoleSetupImportService {
      *
      * @param serviceName the name of the service
      */
-    public void addService(@NonNull String serviceName) {
+    public void addService(@NotBlank String serviceName) {
         addService(serviceName, null);
     }
 
@@ -54,11 +55,7 @@ public class DefaultRoleSetupImportService {
      * @param serviceName        the name of the service
      * @param serviceDescription a description of the service
      */
-    public void addService(@NonNull String serviceName, String serviceDescription) {
-        if (serviceName.isEmpty()) {
-            throw new IllegalArgumentException("Service name cannot be empty");
-        }
-
+    public void addService(@NotBlank String serviceName, String serviceDescription) {
         jdbi.useExtension(DefaultRoleSetupRepository.class,
             dao -> dao.addService(serviceName, serviceDescription));
     }
@@ -71,14 +68,10 @@ public class DefaultRoleSetupImportService {
      * @param securityClassification the security classification for the role
      * @param accessType             the access type for the role
      */
-    public void addRole(@NonNull String roleName,
-                        @NonNull RoleType roleType,
-                        @NonNull SecurityClassification securityClassification,
-                        @NonNull AccessType accessType) {
-        if (roleName.isEmpty()) {
-            throw new IllegalArgumentException("Role name cannot be empty");
-        }
-
+    public void addRole(@NotBlank String roleName,
+                        @NotNull RoleType roleType,
+                        @NotNull SecurityClassification securityClassification,
+                        @NotNull AccessType accessType) {
         jdbi.useExtension(DefaultRoleSetupRepository.class,
             dao -> dao.addRole(roleName, roleType, securityClassification, accessType));
     }
@@ -90,17 +83,9 @@ public class DefaultRoleSetupImportService {
      * @param resourceType the type of resource
      * @param resourceName the name of the resource
      */
-    public void addResourceDefinition(@NonNull String serviceName,
-                                      @NonNull String resourceType,
-                                      @NonNull String resourceName) {
-        if (serviceName.isEmpty()) {
-            throw new IllegalArgumentException("Service name cannot be empty");
-        }
-
-        if (resourceType.isEmpty() || resourceName.isEmpty()) {
-            throw new IllegalArgumentException("Resource cannot contain empty values");
-        }
-
+    public void addResourceDefinition(@NotBlank String serviceName,
+                                      @NotBlank String resourceType,
+                                      @NotBlank String resourceName) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao ->
             dao.addResourceDefinition(serviceName, resourceType, resourceName));
 

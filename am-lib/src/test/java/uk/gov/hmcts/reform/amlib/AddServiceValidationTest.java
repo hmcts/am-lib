@@ -9,20 +9,22 @@ class AddServiceValidationTest {
 
     @Test
     void whenOnlyParamIsServiceNameAndItIsNullShouldThrowNullPointerException() {
-        assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> service.addService(null));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.addService(null))
+            .withMessageContaining("serviceName - must not be blank");
     }
 
     @Test
     void whenServiceNameIsNullShouldThrowNullPointerException() {
-        assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> service.addService(null, ""));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.addService(null, ""))
+            .withMessageContaining("serviceName - must not be blank");
     }
 
     @Test
     void whenServiceNameIsEmptyShouldThrowIllegalArgumentException() {
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> service.addService("", ""))
-            .withMessage("Service name cannot be empty");
+            .withMessageContaining("serviceName - must not be blank");
     }
 }

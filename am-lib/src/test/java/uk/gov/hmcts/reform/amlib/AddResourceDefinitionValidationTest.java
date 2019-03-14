@@ -12,40 +12,43 @@ class AddResourceDefinitionValidationTest {
 
     @Test
     void whenServiceNameIsNullShouldThrowNullPointerException() {
-        assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> service.addResourceDefinition(null, RESOURCE_TYPE, RESOURCE_NAME));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.addResourceDefinition(null, RESOURCE_TYPE, RESOURCE_NAME))
+            .withMessageContaining("serviceName - must not be blank");
     }
 
     @Test
     void whenServiceNameIsEmptyShouldThrowIllegalArgumentException() {
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> service.addResourceDefinition("", RESOURCE_TYPE, RESOURCE_NAME))
-            .withMessage("Service name cannot be empty");
+            .withMessageContaining("serviceName - must not be blank");
     }
 
     @Test
     void whenResourceTypeIsNullShouldThrowNullPointerException() {
-        assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> service.addResourceDefinition(SERVICE_NAME, null, RESOURCE_NAME));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.addResourceDefinition(SERVICE_NAME, null, RESOURCE_NAME))
+            .withMessageContaining("resourceType - must not be blank");
     }
 
     @Test
     void whenResourceTypeIsEmptyShouldThrowNullPointerException() {
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> service.addResourceDefinition(SERVICE_NAME, "", RESOURCE_NAME))
-            .withMessage("Resource cannot contain empty values");
+            .withMessageContaining("resourceType - must not be blank");
     }
 
     @Test
     void whenResourceNameIsNullShouldThrowNullPointerException() {
-        assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, null));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, null))
+            .withMessageContaining("resourceName - must not be blank");
     }
 
     @Test
     void whenResourceNameIsEmptyShouldThrowIllegalArgumentException() {
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, ""))
-            .withMessage("Resource cannot contain empty values");
+            .withMessageContaining("resourceName - must not be blank");
     }
 }

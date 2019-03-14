@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.NonNull;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
@@ -24,6 +23,8 @@ import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 public class AccessManagementService {
 
@@ -205,8 +206,8 @@ public class AccessManagementService {
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     public Map<JsonPointer, Set<Permission>> getRolePermissions(
-        @NonNull String serviceName, @NonNull String resourceType,
-        @NonNull String resourceName, @NonNull Set<String> roleNames) {
+        @NotBlank String serviceName, @NotBlank String resourceType,
+        @NotBlank String resourceName, @NotNull Set<@NotBlank String> roleNames) {
         if (roleNames.size() > 1) {
             throw new IllegalArgumentException("Currently a single role only is supported. "
                 + "Future implementations will allow for multiple roles.");

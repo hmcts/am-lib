@@ -14,9 +14,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
-
 
 class PermissionsServiceTest {
 
@@ -27,8 +24,8 @@ class PermissionsServiceTest {
         JsonPointer attribute = JsonPointer.valueOf("");
 
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
-            ImmutableMap.of(attribute, READ_PERMISSION),
-            ImmutableMap.of(attribute, CREATE_PERMISSION)
+            ImmutableMap.of(attribute, ImmutableSet.of(READ)),
+            ImmutableMap.of(attribute, ImmutableSet.of(CREATE))
         );
 
         assertThat(permissionsService.mergePermissions(permissions))
@@ -41,8 +38,8 @@ class PermissionsServiceTest {
         JsonPointer attribute = JsonPointer.valueOf("");
 
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
-            ImmutableMap.of(attribute, READ_PERMISSION),
-            ImmutableMap.of(attribute, READ_PERMISSION)
+            ImmutableMap.of(attribute, ImmutableSet.of(READ)),
+            ImmutableMap.of(attribute, ImmutableSet.of(READ))
         );
 
         assertThat(permissionsService.mergePermissions(permissions))
@@ -51,23 +48,49 @@ class PermissionsServiceTest {
     }
 
     @Test
-    void whenParentAndChildAttributeShouldMergePermissions() {
+    void whenMultiplePermissionsForDifferentAttributesShouldMergeTogether() {
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
-            ImmutableMap.of(JsonPointer.valueOf("/claimant"), READ_PERMISSION),
-            ImmutableMap.of(JsonPointer.valueOf("/claimant/name"), CREATE_PERMISSION)
+            ImmutableMap.of(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ)),
+            ImmutableMap.of(JsonPointer.valueOf("/defendant"), ImmutableSet.of(CREATE))
         );
 
         assertThat(permissionsService.mergePermissions(permissions))
             .hasSize(2)
-            .containsEntry(JsonPointer.valueOf("/claimant"), READ_PERMISSION)
+            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ))
+            .containsEntry(JsonPointer.valueOf("/defendant"), ImmutableSet.of(CREATE));
+    }
+
+    @Test
+    void whenDuplicatePermissionsForDifferentAttributesShouldMergeTogether() {
+        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
+            ImmutableMap.of(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ)),
+            ImmutableMap.of(JsonPointer.valueOf("/defendant"), ImmutableSet.of(READ))
+        );
+
+        assertThat(permissionsService.mergePermissions(permissions))
+            .hasSize(2)
+            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ))
+            .containsEntry(JsonPointer.valueOf("/defendant"), ImmutableSet.of(READ));
+    }
+
+    @Test
+    void whenParentAndChildAttributeShouldMergePermissions() {
+        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
+            ImmutableMap.of(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ)),
+            ImmutableMap.of(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(CREATE))
+        );
+
+        assertThat(permissionsService.mergePermissions(permissions))
+            .hasSize(2)
+            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ))
             .containsEntry(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(CREATE, READ));
     }
 
     @Test
     void whenParentAndChildAttributeAreNotCloseShouldMergePermissions() {
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
-            ImmutableMap.of(JsonPointer.valueOf("/claimant"), READ_PERMISSION),
-            ImmutableMap.of(JsonPointer.valueOf("/claimant/address/city"), CREATE_PERMISSION)
+            ImmutableMap.of(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ)),
+            ImmutableMap.of(JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(CREATE))
         );
 
         assertThat(permissionsService.mergePermissions(permissions))

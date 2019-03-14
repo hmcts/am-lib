@@ -20,13 +20,12 @@ public class PermissionsServiceTest {
 
     @Test
     void whenMultiplePermissionsForSameAttributeShouldMergeTogether() {
-        Map<JsonPointer, Set<Permission>> attributePermissionsOne = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf(""), READ_PERMISSION)
-            .build();
 
-        Map<JsonPointer, Set<Permission>> attributePermissionsTwo = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf(""), CREATE_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissionsOne =
+            ImmutableMap.of(JsonPointer.valueOf(""), READ_PERMISSION);
+
+        Map<JsonPointer, Set<Permission>> attributePermissionsTwo =
+            ImmutableMap.of(JsonPointer.valueOf(""), CREATE_PERMISSION);
 
         List<Map<JsonPointer, Set<Permission>>> listOfPermissions =
             ImmutableList.<Map<JsonPointer, Set<Permission>>>builder()
@@ -36,18 +35,18 @@ public class PermissionsServiceTest {
 
         Map<JsonPointer, Set<Permission>> result = permissionsService.mergePermissions(listOfPermissions);
 
+        System.out.println("result = " + result);
+
         assertThat(result).hasSize(1);
     }
 
     @Test
     void whenDuplicatePermissionsForSameAttributeShouldMergeTogether() {
-        Map<JsonPointer, Set<Permission>> attributePermissionsOne = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf(""), READ_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissionsOne =
+            ImmutableMap.of(JsonPointer.valueOf(""), READ_PERMISSION);
 
-        Map<JsonPointer, Set<Permission>> attributePermissionsTwo = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf(""), READ_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissionsTwo =
+            ImmutableMap.of(JsonPointer.valueOf(""), READ_PERMISSION);
 
         List<Map<JsonPointer, Set<Permission>>> listOfPermissions =
             ImmutableList.<Map<JsonPointer, Set<Permission>>>builder()
@@ -62,13 +61,13 @@ public class PermissionsServiceTest {
 
     @Test
     void whenParentAndChildAttributeShouldMergePermissions() {
-        Map<JsonPointer, Set<Permission>> attributePermissionsOne = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf("/test/2"), READ_PERMISSION)
-            .build();
+        //TODO: test outcome needs to combine permissions for attributePermission one due to parent child relationship
 
-        Map<JsonPointer, Set<Permission>> attributePermissionsTwo = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf("/test"), CREATE_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissionsOne =
+            ImmutableMap.of(JsonPointer.valueOf("/test/test2"), CREATE_PERMISSION);
+
+        Map<JsonPointer, Set<Permission>> attributePermissionsTwo =
+            ImmutableMap.of(JsonPointer.valueOf("/test"), READ_PERMISSION);
 
         List<Map<JsonPointer, Set<Permission>>> listOfPermissions =
             ImmutableList.<Map<JsonPointer, Set<Permission>>>builder()

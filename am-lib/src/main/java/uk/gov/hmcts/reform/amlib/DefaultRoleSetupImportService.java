@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.amlib.internal.repositories.DefaultRoleSetupRepositor
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 
 import javax.sql.DataSource;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -99,7 +100,7 @@ public class DefaultRoleSetupImportService {
      * @param defaultPermissionGrant a container for granting default permissions
      * @throws PersistenceException if any errors were encountered causing transaction rollback
      */
-    public void grantDefaultPermission(DefaultPermissionGrant defaultPermissionGrant) {
+    public void grantDefaultPermission(@NotNull @Valid DefaultPermissionGrant defaultPermissionGrant) {
         jdbi.useTransaction(handle -> {
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
             try {

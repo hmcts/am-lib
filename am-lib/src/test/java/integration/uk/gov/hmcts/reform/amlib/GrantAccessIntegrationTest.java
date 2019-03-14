@@ -37,7 +37,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
             service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, emptyAttributePermissions)))
-            .withMessage("At least one attribute is required");
+            .withMessageContaining("explicitAccessGrant.attributePermissions - must not be empty");
     }
 
     @Test
@@ -47,7 +47,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
             service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, attributeNoPermissions)))
-            .withMessage("At least one permission per attribute is required");
+            .withMessageContaining("explicitAccessGrant.attributePermissions[].<map value> - must not be empty");
     }
 
     @Test

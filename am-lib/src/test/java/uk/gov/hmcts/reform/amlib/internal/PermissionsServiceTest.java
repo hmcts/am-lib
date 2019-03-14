@@ -79,6 +79,6 @@ class PermissionsServiceTest {
 
         assertThat(result).hasSize(2);
         assertThat(result.get(JsonPointer.valueOf("/test"))).containsExactly(Permission.READ);
-        assertThat(result.get(JsonPointer.valueOf("/test/test2"))).containsExactly(Permission.CREATE);
+        assertThat(result.get(JsonPointer.valueOf("/test/test2"))).containsExactly(Permission.CREATE, Permission.READ);
     }
 }

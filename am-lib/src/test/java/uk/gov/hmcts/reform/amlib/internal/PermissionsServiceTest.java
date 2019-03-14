@@ -79,4 +79,25 @@ class PermissionsServiceTest {
         assertThat(result.get(JsonPointer.valueOf("/test"))).containsExactlyInAnyOrder(Permission.READ);
         assertThat(result.get(JsonPointer.valueOf("/test/test2"))).containsExactlyInAnyOrder(Permission.CREATE, Permission.READ);
     }
+
+    @Test
+    void whenParentAndChildAttributeAreNotCloseShouldMergePermissions() {
+        Map<JsonPointer, Set<Permission>> attributePermissionsOne =
+            ImmutableMap.of(JsonPointer.valueOf("/test/test2/test3"), CREATE_PERMISSION);
+
+        Map<JsonPointer, Set<Permission>> attributePermissionsTwo =
+            ImmutableMap.of(JsonPointer.valueOf("/test"), READ_PERMISSION);
+
+        List<Map<JsonPointer, Set<Permission>>> listOfPermissions =
+            ImmutableList.<Map<JsonPointer, Set<Permission>>>builder()
+                .add(attributePermissionsOne)
+                .add(attributePermissionsTwo)
+                .build();
+
+        Map<JsonPointer, Set<Permission>> result = permissionsService.mergePermissions(listOfPermissions);
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(JsonPointer.valueOf("/test"))).containsExactlyInAnyOrder(Permission.READ);
+        assertThat(result.get(JsonPointer.valueOf("/test/test2/test3"))).containsExactlyInAnyOrder(Permission.CREATE, Permission.READ);
+    }
 }

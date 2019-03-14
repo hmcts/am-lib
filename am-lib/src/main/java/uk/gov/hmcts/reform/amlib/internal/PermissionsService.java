@@ -32,8 +32,13 @@ public class PermissionsService {
     private void propagateParentPermissionsToChildren(Map<JsonPointer, Set<Permission>> attributePermissions) {
         attributePermissions.forEach((key, value) -> {
             JsonPointer head = key.head();
-            if (head != null && attributePermissions.containsKey(head)) {
-                value.addAll(attributePermissions.get(head));
+
+            while (head != null) {
+                if (attributePermissions.containsKey(head)) {
+                    value.addAll(attributePermissions.get(head));
+                }
+
+                head = head.head();
             }
         });
     }

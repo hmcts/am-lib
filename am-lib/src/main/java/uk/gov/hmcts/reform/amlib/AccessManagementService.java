@@ -24,7 +24,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 
 public class AccessManagementService {
 
@@ -207,7 +207,7 @@ public class AccessManagementService {
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     public Map<JsonPointer, Set<Permission>> getRolePermissions(
         @NotBlank String serviceName, @NotBlank String resourceType,
-        @NotBlank String resourceName, @NotNull Set<@NotBlank String> roleNames) {
+        @NotBlank String resourceName, @NotEmpty Set<@NotBlank String> roleNames) {
         if (roleNames.size() > 1) {
             throw new IllegalArgumentException("Currently a single role only is supported. "
                 + "Future implementations will allow for multiple roles.");

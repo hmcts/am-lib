@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -226,14 +225,14 @@ public class AccessManagementService {
     }
 
     /**
-     * Retrieves a list of {@link ResourceDefinition} that user roles have create permissions for.
+     * Retrieves a set of {@link ResourceDefinition} that user roles have create permissions for.
      *
      * @param userRoles a set of roles
-     * @return a list of resource definitions
+     * @return a set of resource definitions
      */
-    public List<ResourceDefinition> getResourceDefinitionsWithCreatePermission(Set<String> userRoles) {
+    public Set<ResourceDefinition> getResourceDefinitionsWithCreatePermission(Set<String> userRoles) {
         return jdbi.withExtension(AccessManagementRepository.class, dao ->
-            new ArrayList<>(dao.getResourceDefinitionsWithCreatePermission(userRoles)));
+            dao.getResourceDefinitionsWithCreatePermission(userRoles));
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

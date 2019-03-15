@@ -1,6 +1,5 @@
 package integration.uk.gov.hmcts.reform.amlib;
 
-import com.fasterxml.jackson.core.JsonPointer;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,8 +31,8 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
 
-    private final ResourceDefinition resource = resourceBuilder(RESOURCE_NAME);
-    private final ResourceDefinition resource2 = resourceBuilder(RESOURCE_NAME + "2");
+    private final ResourceDefinition resource = buildResource(RESOURCE_NAME);
+    private final ResourceDefinition otherResource = buildResource(RESOURCE_NAME + "2");
 
     @BeforeEach
     void setUp() {
@@ -41,7 +40,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         importerService.addRole(
             OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
         importerService.addResourceDefinition(
-            resource2.getServiceName(), resource2.getResourceType(), resource2.getResourceName());
+            otherResource.getServiceName(), otherResource.getResourceType(), otherResource.getResourceName());
     }
 
     @Test
@@ -49,7 +48,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, CREATE_PERMISSION));
 
         List<ResourceDefinition> result =
-            service.getResourceDefinitionsWithCreatePermission(Collections.singleton(ROLE_NAME));
+            service.getResourceDefinitionsWithCreatePermission(ImmutableSet.of(ROLE_NAME));
 
         assertThat(result).containsExactly(ResourceDefinition.builder()
             .resourceName(RESOURCE_NAME)
@@ -65,7 +64,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, permissions));
 
         List<ResourceDefinition> result =
-            service.getResourceDefinitionsWithCreatePermission(Collections.singleton(ROLE_NAME));
+            service.getResourceDefinitionsWithCreatePermission(ImmutableSet.of(ROLE_NAME));
 
         assertThat(result).containsExactly(ResourceDefinition.builder()
             .resourceName(RESOURCE_NAME)
@@ -77,12 +76,12 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldRetrieveResourceDefinitionWhenMultipleRecordsExistWithDifferentAttributes() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            JsonPointer.valueOf("/adult"), CREATE_PERMISSION));
+            "/adult", CREATE_PERMISSION, resource, ROLE_NAME));
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            JsonPointer.valueOf("/child"), CREATE_PERMISSION));
+            "/child", CREATE_PERMISSION, resource, ROLE_NAME));
 
         List<ResourceDefinition> result =
-            service.getResourceDefinitionsWithCreatePermission(Collections.singleton(ROLE_NAME));
+            service.getResourceDefinitionsWithCreatePermission(ImmutableSet.of(ROLE_NAME));
 
         assertThat(result).containsExactly(ResourceDefinition.builder()
             .resourceName(RESOURCE_NAME)
@@ -93,10 +92,11 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @Test
     void shouldReturnEmptyListWhenRecordExistsButNoCreatePermission() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(
+            "", READ_PERMISSION, resource, ROLE_NAME));
 
         List<ResourceDefinition> result =
-            service.getResourceDefinitionsWithCreatePermission(Collections.singleton(ROLE_NAME));
+            service.getResourceDefinitionsWithCreatePermission(ImmutableSet.of(ROLE_NAME));
 
         assertThat(result).isEmpty();
     }
@@ -111,29 +111,46 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @Test
     void shouldRetrieveMultipleResourceDefinitionsWhenMultipleRecordExistsForTheSameRole() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(CREATE_PERMISSION, resource, ROLE_NAME));
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(CREATE_PERMISSION, resource2, ROLE_NAME));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(
+            "", CREATE_PERMISSION, resource, ROLE_NAME));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(
+            "", CREATE_PERMISSION, otherResource, ROLE_NAME));
 
         List<ResourceDefinition> result =
-            service.getResourceDefinitionsWithCreatePermission(Collections.singleton(ROLE_NAME));
+            service.getResourceDefinitionsWithCreatePermission(ImmutableSet.of(ROLE_NAME));
 
-        assertThat(result).containsExactly(resource2, resource);
+        assertThat(result).containsExactly(otherResource, resource);
     }
 
     @Test
     void shouldRetrieveMultipleResourceDefinitionsWhenDefaultPermissionsExistForDifferentRoles() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(CREATE_PERMISSION, resource, ROLE_NAME));
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            CREATE_PERMISSION, resource2, OTHER_ROLE_NAME));
+            "", CREATE_PERMISSION, resource, ROLE_NAME));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(
+            "", CREATE_PERMISSION, otherResource, OTHER_ROLE_NAME));
 
         Set<String> userRoles = ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME);
 
         List<ResourceDefinition> result = service.getResourceDefinitionsWithCreatePermission(userRoles);
 
-        assertThat(result).containsExactly(resource2, resource);
+        assertThat(result).containsExactly(otherResource, resource);
     }
 
-    private ResourceDefinition resourceBuilder(String resourceName) {
+    @Test
+    void shouldRetrieveOnlyOneResourceDefinitionWhenUserHasAccessWithTwoRoles() {
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(
+            "", CREATE_PERMISSION, resource, ROLE_NAME));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(
+            "", CREATE_PERMISSION, resource, OTHER_ROLE_NAME));
+
+        Set<String> userRoles = ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME);
+
+        List<ResourceDefinition> result = service.getResourceDefinitionsWithCreatePermission(userRoles);
+
+        assertThat(result).containsExactly(resource);
+    }
+
+    private ResourceDefinition buildResource(String resourceName) {
         return ResourceDefinition.builder()
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)

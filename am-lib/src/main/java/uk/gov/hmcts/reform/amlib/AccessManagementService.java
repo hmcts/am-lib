@@ -71,6 +71,11 @@ public class AccessManagementService {
             throw new IllegalArgumentException("At least one permission per attribute is required");
         }
 
+        if (explicitAccessGrant.getAccessorIds().stream()
+            .anyMatch(accessorIds -> accessorIds.isEmpty())) {
+            throw new IllegalArgumentException("At least one user id is required");
+        }
+
         jdbi.useTransaction(handle -> {
             AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
             try {

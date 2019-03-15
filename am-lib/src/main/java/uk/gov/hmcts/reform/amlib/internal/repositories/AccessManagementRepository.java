@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.amlib.internal.repositories;
 
 import org.jdbi.v3.sqlobject.config.RegisterColumnMapper;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
+import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
+import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
@@ -56,7 +58,7 @@ public interface AccessManagementRepository {
     @SqlQuery("select access_management_type from roles where role_name = :roleName")
     AccessType getRoleAccessType(String roleName);
 
-    @SqlQuery("select distinct service_name, resource_type, resource_name from default_permissions_for_roles where role_name = :roleName and permissions & 1 = 1")
+    @SqlQuery("select distinct service_name, resource_type, resource_name from default_permissions_for_roles where role_name in (<userRoles>) and permissions & 1 = 1")
     @RegisterConstructorMapper(ResourceDefinition.class)
-    Set<ResourceDefinition> resourceCreationAllowedList(String roleName);
+    Set<ResourceDefinition> getResourceDefinitionsWithCreatePermission(@BindList("userRoles") Set<String> userRoles);
 }

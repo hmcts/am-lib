@@ -130,7 +130,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
         List<ResourceDefinition> result = service.getResourceDefinitionsWithCreatePermission(userRoles);
 
-        assertThat(result).containsExactly(resource, resource2);
+        assertThat(result).containsExactly(resource2, resource);
     }
 
     private ResourceDefinition resourceBuilder(String resourceName) {

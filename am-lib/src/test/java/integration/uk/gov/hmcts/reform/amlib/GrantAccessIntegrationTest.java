@@ -112,6 +112,6 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
         service.grantExplicitResourceAccess(createGrant(resourceId, Stream.of("").collect(toSet()),
-            multipleAttributePermissions))).withMessage("At least one user id is required");
+            multipleAttributePermissions))).withMessage("At least one accessor id is required");
     }
 }

@@ -73,7 +73,7 @@ public class AccessManagementService {
 
         if (explicitAccessGrant.getAccessorIds().stream()
             .anyMatch(accessorIds -> accessorIds.isEmpty())) {
-            throw new IllegalArgumentException("At least one user id is required");
+            throw new IllegalArgumentException("At least one accessor id is required");
         }
 
         jdbi.useTransaction(handle -> {

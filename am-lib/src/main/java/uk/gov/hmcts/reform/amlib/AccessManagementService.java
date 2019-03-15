@@ -231,7 +231,7 @@ public class AccessManagementService {
      * @param userRoles a set of roles
      * @return a list of resource definitions
      */
-    public List<ResourceDefinition> resourceCreationAllowedList(Set<String> userRoles) {
+    public List<ResourceDefinition> getResourceDefinitionsWithCreatePermission(Set<String> userRoles) {
         return jdbi.withExtension(AccessManagementRepository.class, dao ->
             userRoles.stream().map(dao::resourceCreationAllowedList).flatMap(Collection::stream)
                 .collect(Collectors.toList()));

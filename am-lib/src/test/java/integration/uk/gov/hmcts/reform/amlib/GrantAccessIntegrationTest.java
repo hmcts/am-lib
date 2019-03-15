@@ -13,9 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_IDS;
@@ -103,15 +101,5 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(6)
             .extracting(ExplicitAccessRecord::getAccessorId).contains("a","b","c");
-    }
-
-    @Test
-    void whenNoUserIdsArePresentShouldThrowIllegalArgumentException() {
-        Map<JsonPointer, Set<Permission>> multipleAttributePermissions = new ConcurrentHashMap<>();
-        multipleAttributePermissions.put(JsonPointer.valueOf("/claimant"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
-
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-        service.grantExplicitResourceAccess(createGrant(resourceId, Stream.of("").collect(toSet()),
-            multipleAttributePermissions))).withMessage("At least one accessor id is required");
     }
 }

@@ -1,5 +1,6 @@
 package integration.uk.gov.hmcts.reform.amlib.importer;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -103,5 +104,45 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
         assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
             ATTRIBUTE.toString(), SecurityClassification.PUBLIC)).isNull();
+    }
+
+    @Test
+    void whenStoringStateShouldAllowEntryWithSecurityClassificationEqualNone() {
+        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+
+        service.grantDefaultPermission(DefaultPermissionGrant.builder()
+            .roleName(ROLE_NAME)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attributePermissions(
+                createReadPermissionsForAttribute(
+                    JsonPointer.valueOf("/__state/closed"),
+                    READ_PERMISSION,
+                    SecurityClassification.NONE))
+            .build());
+
+        assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+            "/__state/closed", SecurityClassification.NONE)).isNotNull();
+    }
+
+    @Test
+    void whenStoringEventShouldAllowEntryWithSecurityClassificationEqualNone() {
+        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+
+        service.grantDefaultPermission(DefaultPermissionGrant.builder()
+            .roleName(ROLE_NAME)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attributePermissions(
+                createReadPermissionsForAttribute(
+                    JsonPointer.valueOf("/__event/closed"),
+                    READ_PERMISSION,
+                    SecurityClassification.NONE))
+            .build());
+
+        assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+            "/__event/closed", SecurityClassification.NONE)).isNotNull();
     }
 }

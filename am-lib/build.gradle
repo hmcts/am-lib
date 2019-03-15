@@ -21,7 +21,7 @@ test {
 }
 
 checkstyle {
-    toolVersion = '8.17'
+    toolVersion = '8.18'
     maxWarnings = 0
     configDir = new File("config/checkstyle")
 }

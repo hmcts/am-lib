@@ -118,7 +118,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private void grantExplicitResourceAccess(String resourceId, String attribute) {
         service.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
             .resourceId(resourceId)
-            .accessorId(ACCESSOR_IDS)
+            .accessorIds(ACCESSOR_IDS)
             .accessType(ACCESS_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)

@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+
 import javax.sql.DataSource;
 
 public class AccessManagementService {
@@ -55,6 +56,7 @@ public class AccessManagementService {
 
     /**
      * Grants explicit access to resource accordingly to record configuration.
+     * Access can be granted to a user or multiple users for a resource.
      *
      * <p>Operation is performed in a transaction so that if not all records can be created then whole grant will fail.
      *
@@ -69,15 +71,14 @@ public class AccessManagementService {
             throw new IllegalArgumentException("At least one permission per attribute is required");
         }
 
-
         jdbi.useTransaction(handle -> {
             AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
             try {
-                explicitAccessGrant.getAccessorId().forEach(accessorId ->
+                explicitAccessGrant.getAccessorIds().forEach(accessorIds ->
                     explicitAccessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
                         ExplicitAccessRecord.builder()
                             .resourceId(explicitAccessGrant.getResourceId())
-                            .accessorId(accessorId)
+                            .accessorId(accessorIds)
                             .permissions(attributePermission.getValue())
                             .accessType(explicitAccessGrant.getAccessType())
                             .serviceName(explicitAccessGrant.getServiceName())
@@ -130,7 +131,7 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resources envelope {@link Resource} and corresponding metadata
      * @return envelope list of {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions
-     *     if access to resource is configured, otherwise null.
+     *      if access to resource is configured, otherwise null.
      */
     public List<FilterResourceResponse> filterResource(String userId, Set<String> userRoles, List<Resource> resources) {
         return resources.stream()

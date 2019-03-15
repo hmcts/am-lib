@@ -7,10 +7,11 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_IDS;
@@ -33,17 +34,24 @@ public final class TestDataFactory {
     }
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
-                                                                  List<String> accessorId,
+                                                                  String accessorId,
+                                                                  Set<Permission> permissions) {
+        return createGrant(resourceId, Stream.of(accessorId).collect(Collectors.toSet()),
+            createPermissionsForWholeDocument(permissions));
+    }
+
+    public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
+                                                                  Set<String> accessorId,
                                                                   Set<Permission> permissions) {
         return createGrant(resourceId, accessorId, createPermissionsForWholeDocument(permissions));
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
-                                                  List<String> accessorId,
+                                                  Set<String> accessorId,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
-            .accessorId(accessorId)
+            .accessorIds(accessorId)
             .accessType(ACCESS_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)

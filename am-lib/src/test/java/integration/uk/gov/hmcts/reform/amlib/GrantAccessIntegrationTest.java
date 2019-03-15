@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -86,5 +87,30 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             multipleAttributePermissions));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(3);
+    }
+
+    @Test
+    void whenGrantingAccessForMultipleUsersEntriesShouldAppearInDatabase() {
+        Map<JsonPointer, Set<Permission>> multipleAttributePermissions = new ConcurrentHashMap<>();
+        multipleAttributePermissions.put(JsonPointer.valueOf("/claimant"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
+
+        service.grantExplicitResourceAccess(createGrant(resourceId, MULTIPLE_ACCESSOR_IDS,
+            multipleAttributePermissions));
+
+        assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(3)
+            .extracting(ExplicitAccessRecord::getAccessorId).contains("a","b","c");
+    }
+
+    @Test
+    void whenGrantingAccessForMultipleUsersAndMultipleAttributesEntriesShouldAppearInDatabase() {
+        Map<JsonPointer, Set<Permission>> multipleAttributePermissions = new ConcurrentHashMap<>();
+        multipleAttributePermissions.put(JsonPointer.valueOf("/claimant"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
+        multipleAttributePermissions.put(JsonPointer.valueOf("/defendant"), READ_PERMISSION);
+
+        service.grantExplicitResourceAccess(createGrant(resourceId, MULTIPLE_ACCESSOR_IDS,
+            multipleAttributePermissions));
+
+        assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(6)
+            .extracting(ExplicitAccessRecord::getAccessorId).contains("a","b","c");
     }
 }

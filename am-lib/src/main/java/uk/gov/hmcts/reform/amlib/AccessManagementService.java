@@ -205,7 +205,6 @@ public class AccessManagementService {
      * @param userRoles    A set of user roles
      * @return a map of attributes and their corresponding permissions or null
      */
-    @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     public Map<JsonPointer, Set<Permission>> getRolePermissions(@NonNull String serviceName,
                                                                 @NonNull String resourceType,
                                                                 @NonNull String resourceName,

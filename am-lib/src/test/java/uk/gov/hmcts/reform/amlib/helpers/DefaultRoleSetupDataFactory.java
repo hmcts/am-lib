@@ -59,9 +59,9 @@ public final class DefaultRoleSetupDataFactory {
     }
 
     public static DefaultPermissionGrant createDefaultPermissionGrant(
-        Set<Permission> permissions, ResourceDefinition resource) {
+        Set<Permission> permissions, ResourceDefinition resource, String roleName) {
         return DefaultPermissionGrant.builder()
-            .roleName(ROLE_NAME)
+            .roleName(roleName)
             .serviceName(resource.getServiceName())
             .resourceType(resource.getResourceType())
             .resourceName(resource.getResourceName())

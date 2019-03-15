@@ -79,17 +79,6 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenGrantingForMultipleUsers() {
-        Map<JsonPointer, Set<Permission>> multipleAttributePermissions = new ConcurrentHashMap<>();
-        multipleAttributePermissions.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
-
-        service.grantExplicitResourceAccess(createGrant(resourceId, MULTIPLE_ACCESSOR_IDS,
-            multipleAttributePermissions));
-
-        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(3);
-    }
-
-    @Test
     void whenGrantingAccessForMultipleUsersEntriesShouldAppearInDatabase() {
         Map<JsonPointer, Set<Permission>> multipleAttributePermissions = new ConcurrentHashMap<>();
         multipleAttributePermissions.put(JsonPointer.valueOf("/claimant"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);

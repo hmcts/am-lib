@@ -11,8 +11,10 @@ import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.JsonPointerMapper;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.PermissionSetMapper;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings("LineLength")
 @RegisterColumnMapper(JsonPointerMapper.class)
@@ -53,4 +55,8 @@ public interface AccessManagementRepository {
 
     @SqlQuery("select access_management_type from roles where role_name = :roleName")
     AccessType getRoleAccessType(String roleName);
+
+    @SqlQuery("select service_name, resource_type, resource_name from default_permissions_for_roles where role_name = :roleName and default_permissions_for_roles.permissions = 1")
+    @RegisterConstructorMapper(ResourceDefinition.class)
+    Set<ResourceDefinition> resourceCreationAllowedList(String roleName);
 }

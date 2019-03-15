@@ -17,12 +17,15 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.models.Resource;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+
 import javax.sql.DataSource;
 
 public class AccessManagementService {
@@ -143,7 +146,7 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
-     *      to resource is configured, otherwise null.
+     *     to resource is configured, otherwise null.
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     public FilterResourceResponse filterResource(String userId, Set<String> userRoles, Resource resource) {
@@ -220,6 +223,13 @@ public class AccessManagementService {
         }
 
         return roleBasedAccessRecords.stream().collect(getMapCollector());
+    }
+
+    //TODO: java docs :(
+    public List<ResourceDefinition> resourceCreationAllowedList(Set<String> userRoles) {
+        return jdbi.withExtension(AccessManagementRepository.class, dao ->
+            userRoles.stream().map(dao::resourceCreationAllowedList).flatMap(Collection::stream)
+                .collect(Collectors.toList()));
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

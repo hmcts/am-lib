@@ -2,9 +2,9 @@
   "resourceId": "${resourceId}",
   "accessorId": "${accessorId}",
   "accessType": "user",
-  "serviceName": "Service 1",
-  "resourceType": "Resource Type 1",
-  "resourceName": "resource",
+  "serviceName": "cmc",
+  "resourceType": "case",
+  "resourceName": "claim",
   "attributePermissions": {
     "": ["CREATE", "READ", "UPDATE"]
   },

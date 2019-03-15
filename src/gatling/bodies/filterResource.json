@@ -6,9 +6,9 @@
   "resource": {
     "resourceId": "${resourceId}",
     "type": {
-      "serviceName": "Service 1",
-      "resourceType": "Resource Type 1",
-      "resourceName": "resource"
+      "serviceName": "cmc",
+      "resourceType": "case",
+      "resourceName": "claim"
     },
     "resourceJson": {
       "json": "resource"

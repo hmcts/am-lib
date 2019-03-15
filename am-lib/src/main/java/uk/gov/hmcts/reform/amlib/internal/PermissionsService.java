@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 public class PermissionsService {
 
-    public Map<JsonPointer, Set<Permission>> mergePermissions(List<Map<JsonPointer, Set<Permission>>> permissions) {
+    public Map<JsonPointer, Set<Permission>> merge(List<Map<JsonPointer, Set<Permission>>> permissions) {
         Map<JsonPointer, Set<Permission>> mergedAttributePermissions = mergePermissionMaps(permissions);
         propagateParentPermissionsToChildren(mergedAttributePermissions);
         return mergedAttributePermissions;

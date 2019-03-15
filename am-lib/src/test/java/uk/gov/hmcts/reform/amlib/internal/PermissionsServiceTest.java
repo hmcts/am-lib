@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
+@SuppressWarnings("PMD")
 class PermissionsServiceTest {
 
     private final PermissionsService permissionsService = new PermissionsService();
@@ -30,7 +31,7 @@ class PermissionsServiceTest {
             ImmutableMap.of(attribute, ImmutableSet.of(CREATE))
         );
 
-        assertThat(permissionsService.mergePermissions(permissions))
+        assertThat(permissionsService.merge(permissions))
             .hasSize(1)
             .containsEntry(attribute, ImmutableSet.of(CREATE, READ));
     }
@@ -44,7 +45,7 @@ class PermissionsServiceTest {
             ImmutableMap.of(attribute, ImmutableSet.of(READ))
         );
 
-        assertThat(permissionsService.mergePermissions(permissions))
+        assertThat(permissionsService.merge(permissions))
             .hasSize(1)
             .containsEntry(attribute, ImmutableSet.of(READ));
     }
@@ -56,7 +57,7 @@ class PermissionsServiceTest {
             ImmutableMap.of(JsonPointer.valueOf("/defendant"), ImmutableSet.of(CREATE))
         );
 
-        assertThat(permissionsService.mergePermissions(permissions))
+        assertThat(permissionsService.merge(permissions))
             .hasSize(2)
             .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ))
             .containsEntry(JsonPointer.valueOf("/defendant"), ImmutableSet.of(CREATE));
@@ -69,7 +70,7 @@ class PermissionsServiceTest {
             ImmutableMap.of(JsonPointer.valueOf("/defendant"), ImmutableSet.of(READ))
         );
 
-        assertThat(permissionsService.mergePermissions(permissions))
+        assertThat(permissionsService.merge(permissions))
             .hasSize(2)
             .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ))
             .containsEntry(JsonPointer.valueOf("/defendant"), ImmutableSet.of(READ));
@@ -82,7 +83,7 @@ class PermissionsServiceTest {
             ImmutableMap.of(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(CREATE))
         );
 
-        assertThat(permissionsService.mergePermissions(permissions))
+        assertThat(permissionsService.merge(permissions))
             .hasSize(2)
             .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ))
             .containsEntry(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(CREATE, READ));
@@ -95,7 +96,7 @@ class PermissionsServiceTest {
             ImmutableMap.of(JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(CREATE))
         );
 
-        assertThat(permissionsService.mergePermissions(permissions))
+        assertThat(permissionsService.merge(permissions))
             .hasSize(2)
             .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ))
             .containsEntry(JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(CREATE, READ));
@@ -114,7 +115,7 @@ class PermissionsServiceTest {
             )
         );
 
-        assertThat(permissionsService.mergePermissions(permissions))
+        assertThat(permissionsService.merge(permissions))
             .hasSize(2)
             .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE, READ))
             .containsEntry(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(CREATE, READ, UPDATE, DELETE));
@@ -130,7 +131,7 @@ class PermissionsServiceTest {
             )
         );
 
-        assertThat(permissionsService.mergePermissions(permissions))
+        assertThat(permissionsService.merge(permissions))
             .hasSize(3)
             .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(READ))
             .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE, READ))

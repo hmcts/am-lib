@@ -37,6 +37,7 @@ public class PermissionsService {
             while (head != null) {
                 if (attributePermissions.containsKey(head)) {
                     attributePermissions.put(key, mergePermissions(value, attributePermissions.get(head)));
+                    return;
                 }
 
                 head = head.head();

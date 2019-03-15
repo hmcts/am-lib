@@ -13,7 +13,9 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
 class PermissionsServiceTest {
 
@@ -97,5 +99,41 @@ class PermissionsServiceTest {
             .hasSize(2)
             .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ))
             .containsEntry(JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(CREATE, READ));
+    }
+
+    @Test
+    void whenMultiplePermissionsForSameAttributeShouldPropagateMergedPermissionsToChildren() {
+        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ),
+                JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(UPDATE)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
+                JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(DELETE)
+            )
+        );
+
+        assertThat(permissionsService.mergePermissions(permissions))
+            .hasSize(2)
+            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE, READ))
+            .containsEntry(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(CREATE, READ, UPDATE, DELETE));
+    }
+
+    @Test
+    void whenRootAttributeIsUsedShouldPropagatePermissionsToAllChildren() {
+        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
+            ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(READ)),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
+                JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(DELETE)
+            )
+        );
+
+        assertThat(permissionsService.mergePermissions(permissions))
+            .hasSize(3)
+            .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(READ))
+            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE, READ))
+            .containsEntry(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(CREATE, READ, DELETE));
     }
 }

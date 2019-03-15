@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
-import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createReadPermissionsForAttribute;
+import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createPermissionsForAttribute;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
@@ -37,7 +37,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     void shouldNotBeAbleToCreateDefaultPermissionWhenRoleDoesNotExist() {
         assertThatExceptionOfType(PersistenceException.class)
             .isThrownBy(() -> service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION)))
-            .withMessageContaining("(role_name)=(Role Name) is not present in table \"roles\"");
+            .withMessageContaining("(role_name)=(Solicitor) is not present in table \"roles\"");
     }
 
     @Test
@@ -77,7 +77,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME + "2")
-            .attributePermissions(createReadPermissionsForAttribute(ROOT_ATTRIBUTE, READ_PERMISSION))
+            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, READ_PERMISSION))
             .build());
 
         service.truncateDefaultPermissionsForService(SERVICE_NAME, RESOURCE_TYPE);

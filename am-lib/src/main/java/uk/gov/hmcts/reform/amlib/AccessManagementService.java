@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.FilterService;
+import uk.gov.hmcts.reform.amlib.internal.PermissionsService;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
@@ -23,11 +24,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+
 import javax.sql.DataSource;
 
 public class AccessManagementService {
 
     private final FilterService filterService = new FilterService();
+    private final PermissionsService permissionsService = new PermissionsService();
 
     private final Jdbi jdbi;
 
@@ -143,7 +146,7 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
-     *      to resource is configured, otherwise null.
+     *     to resource is configured, otherwise null.
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     public FilterResourceResponse filterResource(String userId, Set<String> userRoles, Resource resource) {
@@ -199,27 +202,26 @@ public class AccessManagementService {
      * @param serviceName  name of service
      * @param resourceType type of resource
      * @param resourceName name of a resource
-     * @param roleNames    A set of role names. Currently only one role name is supported but
-     *                     in future implementations we shall support having multiple role names
+     * @param userRoles    A set of user roles
      * @return a map of attributes and their corresponding permissions or null
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
-    public Map<JsonPointer, Set<Permission>> getRolePermissions(
-        @NonNull String serviceName, @NonNull String resourceType,
-        @NonNull String resourceName, @NonNull Set<String> roleNames) {
-        if (roleNames.size() > 1) {
-            throw new IllegalArgumentException("Currently a single role only is supported. "
-                + "Future implementations will allow for multiple roles.");
-        }
-
-        List<RoleBasedAccessRecord> roleBasedAccessRecords = jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getRolePermissions(serviceName, resourceType, resourceName, roleNames.iterator().next()));
+    public Map<JsonPointer, Set<Permission>> getRolePermissions(@NonNull String serviceName,
+                                                                @NonNull String resourceType,
+                                                                @NonNull String resourceName,
+                                                                @NonNull Set<String> userRoles) {
+        List<List<RoleBasedAccessRecord>> roleBasedAccessRecords =
+            jdbi.withExtension(AccessManagementRepository.class, dao ->
+                userRoles.stream().map(role -> dao.getRolePermissions(serviceName, resourceType, resourceName, role))
+                    .collect(Collectors.toList()));
 
         if (roleBasedAccessRecords.isEmpty()) {
             return null;
         }
 
-        return roleBasedAccessRecords.stream().collect(getMapCollector());
+        return permissionsService.merge(roleBasedAccessRecords.stream().map(record ->
+            record.stream().collect(getMapCollector()))
+            .collect(Collectors.toList()));
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

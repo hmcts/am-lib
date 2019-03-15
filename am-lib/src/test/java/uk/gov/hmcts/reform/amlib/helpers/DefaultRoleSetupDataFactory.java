@@ -23,7 +23,7 @@ public final class DefaultRoleSetupDataFactory {
     }
 
     public static Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>>
-        createReadPermissionsForAttribute(JsonPointer attribute, Set<Permission> permissions) {
+        createPermissionsForAttribute(JsonPointer attribute, Set<Permission> permissions) {
 
         Pair<Set<Permission>, SecurityClassification> pair =
             new Pair<>(permissions, SecurityClassification.PUBLIC);
@@ -42,7 +42,7 @@ public final class DefaultRoleSetupDataFactory {
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
-            .attributePermissions(createReadPermissionsForAttribute(ROOT_ATTRIBUTE, permissions))
+            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, permissions))
             .build();
     }
 
@@ -53,7 +53,7 @@ public final class DefaultRoleSetupDataFactory {
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
-            .attributePermissions(createReadPermissionsForAttribute(attribute, permissions))
+            .attributePermissions(createPermissionsForAttribute(attribute, permissions))
             .build();
     }
 }

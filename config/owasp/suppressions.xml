@@ -25,11 +25,4 @@
     <gav regex="true">^io\.netty:netty-tcnative-boringssl-static:.*$</gav>
     <cpe>cpe:/a:netty_project:netty</cpe>
   </suppress>
-  <suppress>
-    <notes><![CDATA[
-   file name: checkstyle-8.17.jar
-   ]]></notes>
-    <sha1>25a2d83e60cd868075053f5d0b6388f73cddd541</sha1>
-    <cpe>cpe:/a:checkstyle:checkstyle</cpe>
-  </suppress>
 </suppressions>

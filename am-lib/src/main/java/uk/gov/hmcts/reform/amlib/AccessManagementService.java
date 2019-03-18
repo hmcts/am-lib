@@ -217,7 +217,7 @@ public class AccessManagementService {
                         .collect(getMapCollector()))
                     .collect(Collectors.toList()));
 
-        if (permissionsForRoles.stream().anyMatch(Map::isEmpty)) {
+        if (permissionsForRoles.stream().allMatch(Map::isEmpty)) {
             return null;
         }
 

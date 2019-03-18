@@ -27,7 +27,7 @@ checkstyle {
 }
 
 pmd {
-    toolVersion = "6.11.0"
+    toolVersion = "6.12.0"
     sourceSets = [sourceSets.main, sourceSets.test]
     reportsDir = file("$buildDir/reports/pmd/$project.name")
     ruleSetFiles = files("$projectDir/config/pmd/ruleset.xml")

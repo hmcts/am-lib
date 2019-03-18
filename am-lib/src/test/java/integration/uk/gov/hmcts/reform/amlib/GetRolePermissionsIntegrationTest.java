@@ -41,17 +41,17 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         importerService.addRole(
             OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
 
-        Pair<Set<Permission>, SecurityClassification> readPermission =
+        Map.Entry<Set<Permission>, SecurityClassification> readPermission =
             new Pair<>(READ_PERMISSION, SecurityClassification.PUBLIC);
 
-        Pair<Set<Permission>, SecurityClassification> createPermission =
+        Map.Entry<Set<Permission>, SecurityClassification> createPermission =
             new Pair<>(CREATE_PERMISSION, SecurityClassification.PUBLIC);
 
-        Pair<Set<Permission>, SecurityClassification> updatePermission =
+        Map.Entry<Set<Permission>, SecurityClassification> updatePermission =
             new Pair<>(ImmutableSet.of(Permission.UPDATE), SecurityClassification.PUBLIC);
 
-        Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermissionsForRole =
-            ImmutableMap.<JsonPointer, Pair<Set<Permission>, SecurityClassification>>builder()
+        Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermissionsForRole =
+            ImmutableMap.<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>>builder()
                 .put(JsonPointer.valueOf("/child"), readPermission)
                 .put(JsonPointer.valueOf("/parent/age"), createPermission)
                 .put(JsonPointer.valueOf("/address/street/line1"), createPermission)
@@ -66,8 +66,8 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
                 .attributePermissions(attributePermissionsForRole)
                 .build());
 
-        Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermissionsForOtherRole =
-            ImmutableMap.<JsonPointer, Pair<Set<Permission>, SecurityClassification>>builder()
+        Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermissionsForOtherRole =
+            ImmutableMap.<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>>builder()
                 .put(JsonPointer.valueOf(""), updatePermission)
                 .put(JsonPointer.valueOf("/address"), createPermission)
                 .build();

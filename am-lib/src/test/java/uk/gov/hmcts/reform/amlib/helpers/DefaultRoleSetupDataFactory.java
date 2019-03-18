@@ -22,13 +22,13 @@ public final class DefaultRoleSetupDataFactory {
         throw new UnsupportedOperationException("Constructing utility class is not supported");
     }
 
-    public static Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>>
+    public static Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>>
         createPermissionsForAttribute(JsonPointer attribute, Set<Permission> permissions) {
 
-        Pair<Set<Permission>, SecurityClassification> pair =
+        Map.Entry<Set<Permission>, SecurityClassification> pair =
             new Pair<>(permissions, SecurityClassification.PUBLIC);
 
-        Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermission =
+        Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermission =
             new ConcurrentHashMap<>();
 
         attributePermission.put(attribute, pair);

@@ -17,7 +17,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_IDS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
@@ -40,7 +39,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .build();
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-            service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_IDS, emptyAttributePermissions)))
+            service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, emptyAttributePermissions)))
             .withMessage("At least one attribute is required");
     }
 
@@ -50,13 +49,13 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         Map<JsonPointer, Set<Permission>> attributeNoPermissions = createPermissionsForWholeDocument(new HashSet<>());
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-            service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_IDS, attributeNoPermissions)))
+            service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, attributeNoPermissions)))
             .withMessage("At least one permission per attribute is required");
     }
 
     @Test
     void whenCreatingResourceAccessResourceAccessAppearsInDatabase() {
-        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, READ_PERMISSION));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
     }
@@ -69,16 +68,16 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS)
                 .build();
 
-        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_IDS, multipleAttributePermissions));
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, multipleAttributePermissions));
 
-        assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(4)
-            .extracting(ExplicitAccessRecord::getAccessorId).contains("y", "z");
+        assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(2)
+            .extracting(ExplicitAccessRecord::getAccessorId).contains("a");
     }
 
     @Test
     void whenCreatingDuplicateResourceAccessEntryIsOverwritten() {
-        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, READ_PERMISSION));
-        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, READ_PERMISSION));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
     }

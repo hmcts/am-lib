@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.amlib.helpers;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
@@ -43,6 +44,21 @@ public final class TestDataFactory {
                                                                   Set<String> accessorId,
                                                                   Set<Permission> permissions) {
         return createGrant(resourceId, accessorId, createPermissionsForWholeDocument(permissions));
+    }
+
+    public static ExplicitAccessGrant createGrant(String resourceId,
+                                                  String accessorId,
+                                                  Map<JsonPointer, Set<Permission>> attributePermissions) {
+        return ExplicitAccessGrant.builder()
+            .resourceId(resourceId)
+            .accessorIds(ImmutableSet.of(accessorId))
+            .accessType(ACCESS_TYPE)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attributePermissions(attributePermissions)
+            .securityClassification(SECURITY_CLASSIFICATION)
+            .build();
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,

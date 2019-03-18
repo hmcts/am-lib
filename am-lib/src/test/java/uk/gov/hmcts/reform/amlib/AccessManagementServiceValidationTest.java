@@ -87,4 +87,15 @@ class AccessManagementServiceValidationTest {
                 "roleNames\\[\\].<iterable element> - must not be blank"
             ));
     }
+
+    @ParameterizedTest
+    @ArgumentsSource(InvalidArgumentsProvider.class)
+    void getResourceDefinitionsWithRootCreatePermissionMethodShouldRejectInvalidArguments(Set<String> userRoles) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.getResourceDefinitionsWithRootCreatePermission(userRoles))
+            .withMessageMatching(expectedValidationMessagesRegex(
+                "userRoles - must not be empty",
+                "userRoles\\[\\].<iterable element> - must not be blank"
+            ));
+    }
 }

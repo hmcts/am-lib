@@ -230,7 +230,8 @@ public class AccessManagementService {
      * @param userRoles a set of roles
      * @return a set of resource definitions
      */
-    public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(Set<String> userRoles) {
+    @SuppressWarnings("LineLength")
+    public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@NotEmpty Set<@NotBlank String> userRoles) {
         return jdbi.withExtension(AccessManagementRepository.class, dao ->
             dao.getResourceDefinitionsWithRootCreatePermission(userRoles));
     }

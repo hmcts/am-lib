@@ -34,13 +34,13 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @BeforeEach
     void setUp() {
-        Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermissions =
+        Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermissions =
             new ConcurrentHashMap<>();
 
-        Pair<Set<Permission>, SecurityClassification> readPermission =
+        Map.Entry<Set<Permission>, SecurityClassification> readPermission =
             new Pair<>(READ_PERMISSION, SecurityClassification.PUBLIC);
 
-        Pair<Set<Permission>, SecurityClassification> createPermission =
+        Map.Entry<Set<Permission>, SecurityClassification> createPermission =
             new Pair<>(CREATE_PERMISSION, SecurityClassification.PUBLIC);
 
         attributePermissions.put(JsonPointer.valueOf("/test"), readPermission);

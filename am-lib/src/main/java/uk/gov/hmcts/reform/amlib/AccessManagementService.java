@@ -213,7 +213,7 @@ public class AccessManagementService {
             jdbi.withExtension(AccessManagementRepository.class, dao ->
                 userRoles.stream()
                     .map(role -> dao.getRolePermissions(serviceName, resourceType, resourceName, role))
-                    .map(record -> record.stream()
+                    .map(roleBasedAccessRecords -> roleBasedAccessRecords.stream()
                         .collect(getMapCollector()))
                     .collect(Collectors.toList()));
 

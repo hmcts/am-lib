@@ -218,9 +218,16 @@ public class AccessManagementService {
             return null;
         }
 
-        return permissionsService.merge(roleBasedAccessRecords.stream().map(record ->
-            record.stream().collect(getMapCollector()))
-            .collect(Collectors.toList()));
+        List<Map<JsonPointer, Set<Permission>>> permissionsForRoles =
+            roleBasedAccessRecords.stream().map(recordsForRole ->
+                recordsForRole.stream().collect(getMapCollector()))
+                .collect(Collectors.toList());
+
+        if (permissionsForRoles.stream().anyMatch(Map::isEmpty)) {
+            return null;
+        }
+
+        return permissionsService.merge(permissionsForRoles);
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

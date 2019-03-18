@@ -48,7 +48,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
             new Pair<>(CREATE_PERMISSION, SecurityClassification.PUBLIC);
 
         Pair<Set<Permission>, SecurityClassification> updatePermission =
-            new Pair<>(Stream.of(Permission.UPDATE).collect(toSet()), SecurityClassification.PUBLIC);
+            new Pair<>(ImmutableSet.of(Permission.UPDATE), SecurityClassification.PUBLIC);
 
         Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermissionsForRole =
             ImmutableMap.<JsonPointer, Pair<Set<Permission>, SecurityClassification>>builder()
@@ -86,10 +86,11 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
             RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAMES);
 
-        assertThat(accessRecord).hasSize(3);
-        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/child"), READ_PERMISSION);
-        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/parent/age"), CREATE_PERMISSION);
-        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/address/street/line1"), CREATE_PERMISSION);
+        assertThat(accessRecord)
+            .hasSize(3)
+            .containsEntry(JsonPointer.valueOf("/child"), READ_PERMISSION)
+            .containsEntry(JsonPointer.valueOf("/parent/age"), CREATE_PERMISSION)
+            .containsEntry(JsonPointer.valueOf("/address/street/line1"), CREATE_PERMISSION);
     }
 
     @Test
@@ -97,7 +98,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions("Unknown Service",
             RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAMES);
 
-        assertThat(accessRecord).isEmpty();
+        assertThat(accessRecord).isNull();
     }
 
     @Test
@@ -105,7 +106,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
             "Unknown Resource Type", RESOURCE_NAME, ROLE_NAMES);
 
-        assertThat(accessRecord).isEmpty();
+        assertThat(accessRecord).isNull();
     }
 
     @Test
@@ -113,7 +114,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
             RESOURCE_TYPE, "Unknown Resource Name", ROLE_NAMES);
 
-        assertThat(accessRecord).isEmpty();
+        assertThat(accessRecord).isNull();
     }
 
     @Test
@@ -121,7 +122,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
             RESOURCE_TYPE, RESOURCE_NAME, Stream.of("Unknown Role").collect(toSet()));
 
-        assertThat(accessRecord).isEmpty();
+        assertThat(accessRecord).isNull();
     }
 
     @Test
@@ -133,11 +134,12 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
             RESOURCE_TYPE, RESOURCE_NAME, userRoles);
 
-        assertThat(accessRecord).hasSize(5);
-        assertThat(accessRecord).containsEntry(JsonPointer.valueOf(""), UPDATE_PERMISSION);
-        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/address"), createUpdate);
-        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/address/street/line1"), createUpdate);
-        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/child"), readUpdate);
-        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/parent/age"), createUpdate);
+        assertThat(accessRecord)
+            .hasSize(5)
+            .containsEntry(JsonPointer.valueOf(""), UPDATE_PERMISSION)
+            .containsEntry(JsonPointer.valueOf("/address"), createUpdate)
+            .containsEntry(JsonPointer.valueOf("/address/street/line1"), createUpdate)
+            .containsEntry(JsonPointer.valueOf("/child"), readUpdate)
+            .containsEntry(JsonPointer.valueOf("/parent/age"), createUpdate);
     }
 }

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.NonNull;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
@@ -26,6 +25,10 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 public class AccessManagementService {
 
@@ -62,15 +65,7 @@ public class AccessManagementService {
      *
      * @param explicitAccessGrant an object that describes explicit access to resource
      */
-    public void grantExplicitResourceAccess(ExplicitAccessGrant explicitAccessGrant) {
-        if (explicitAccessGrant.getAttributePermissions().size() == 0) {
-            throw new IllegalArgumentException("At least one attribute is required");
-        }
-        if (explicitAccessGrant.getAttributePermissions().entrySet().stream()
-            .anyMatch(attributePermission -> attributePermission.getValue().isEmpty())) {
-            throw new IllegalArgumentException("At least one permission per attribute is required");
-        }
-
+    public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant explicitAccessGrant) {
         jdbi.useTransaction(handle -> {
             AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
             try {
@@ -101,7 +96,7 @@ public class AccessManagementService {
      *
      * @param explicitAccessMetadata an object to remove a specific explicit access record.
      */
-    public void revokeResourceAccess(ExplicitAccessMetadata explicitAccessMetadata) {
+    public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata explicitAccessMetadata) {
         jdbi.useExtension(AccessManagementRepository.class,
             dao -> dao.removeAccessManagementRecord(explicitAccessMetadata));
     }
@@ -131,7 +126,9 @@ public class AccessManagementService {
      * @return envelope list of {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions
      *     if access to resource is configured, otherwise null.
      */
-    public List<FilterResourceResponse> filterResource(String userId, Set<String> userRoles, List<Resource> resources) {
+    public List<FilterResourceResponse> filterResource(@NotBlank String userId,
+                                                       @NotEmpty Set<@NotBlank String> userRoles,
+                                                       @NotNull List<@NotNull @Valid Resource> resources) {
         return resources.stream()
             .map(resource -> filterResource(userId, userRoles, resource))
             .collect(Collectors.toList());
@@ -148,7 +145,9 @@ public class AccessManagementService {
      *     to resource is configured, otherwise null.
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
-    public FilterResourceResponse filterResource(String userId, Set<String> userRoles, Resource resource) {
+    public FilterResourceResponse filterResource(@NotBlank String userId,
+                                                 @NotEmpty Set<@NotBlank String> userRoles,
+                                                 @NotNull @Valid Resource resource) {
         if (userRoles.size() > 1) {
             throw new IllegalArgumentException("Currently a single role only is supported. "
                 + "Future implementations will allow for multiple roles.");
@@ -206,9 +205,10 @@ public class AccessManagementService {
      * @return a map of attributes and their corresponding permissions or null
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
-    public Map<JsonPointer, Set<Permission>> getRolePermissions(
-        @NonNull String serviceName, @NonNull String resourceType,
-        @NonNull String resourceName, @NonNull Set<String> roleNames) {
+    public Map<JsonPointer, Set<Permission>> getRolePermissions(@NotBlank String serviceName,
+                                                                @NotBlank String resourceType,
+                                                                @NotBlank String resourceName,
+                                                                @NotEmpty Set<@NotBlank String> roleNames) {
         if (roleNames.size() > 1) {
             throw new IllegalArgumentException("Currently a single role only is supported. "
                 + "Future implementations will allow for multiple roles.");

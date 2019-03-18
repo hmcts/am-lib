@@ -32,25 +32,6 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void noAttributesShouldThrowException() {
-        Map<JsonPointer, Set<Permission>> emptyAttributePermissions = new ConcurrentHashMap<>();
-
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-            service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, emptyAttributePermissions)))
-            .withMessageContaining("explicitAccessGrant.attributePermissions - must not be empty");
-    }
-
-    @Test
-    @SuppressWarnings("PMD")
-    void noPermissionsForAttributesShouldThrowException() {
-        Map<JsonPointer, Set<Permission>> attributeNoPermissions = createPermissionsForWholeDocument(new HashSet<>());
-
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-            service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, attributeNoPermissions)))
-            .withMessageContaining("explicitAccessGrant.attributePermissions[].<map value> - must not be empty");
-    }
-
-    @Test
     void whenCreatingResourceAccessResourceAccessAppearsInDatabase() {
         service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
 

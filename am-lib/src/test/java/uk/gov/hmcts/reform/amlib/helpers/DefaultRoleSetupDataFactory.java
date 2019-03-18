@@ -36,20 +36,6 @@ public final class DefaultRoleSetupDataFactory {
         return attributePermission;
     }
 
-    public static Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> createReadPermissionsForAttribute(
-        JsonPointer attribute, Set<Permission> permissions, SecurityClassification securityClassification) {
-
-        Pair<Set<Permission>, SecurityClassification> pair =
-            new Pair<>(permissions, securityClassification);
-
-        Map<JsonPointer, Pair<Set<Permission>, SecurityClassification>> attributePermission =
-            new ConcurrentHashMap<>();
-
-        attributePermission.put(attribute, pair);
-
-        return attributePermission;
-    }
-
     public static DefaultPermissionGrant createDefaultPermissionGrant(Set<Permission> permissions) {
         return DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
@@ -68,17 +54,6 @@ public final class DefaultRoleSetupDataFactory {
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attributePermissions(createReadPermissionsForAttribute(attribute, permissions))
-            .build();
-    }
-
-    public static DefaultPermissionGrant createDefaultPermissionGrant(
-        JsonPointer attribute, Set<Permission> permissions, SecurityClassification securityClassification) {
-        return DefaultPermissionGrant.builder()
-            .roleName(ROLE_NAME)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .attributePermissions(createReadPermissionsForAttribute(attribute, permissions, securityClassification))
             .build();
     }
 }

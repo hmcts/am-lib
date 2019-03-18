@@ -225,14 +225,14 @@ public class AccessManagementService {
     }
 
     /**
-     * Retrieves a set of {@link ResourceDefinition} that user roles have create permissions for.
+     * Retrieves a set of {@link ResourceDefinition} that user roles have root level create permissions for.
      *
      * @param userRoles a set of roles
      * @return a set of resource definitions
      */
-    public Set<ResourceDefinition> getResourceDefinitionsWithCreatePermission(Set<String> userRoles) {
+    public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(Set<String> userRoles) {
         return jdbi.withExtension(AccessManagementRepository.class, dao ->
-            dao.getResourceDefinitionsWithCreatePermission(userRoles));
+            dao.getResourceDefinitionsWithRootCreatePermission(userRoles));
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

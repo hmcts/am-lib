@@ -57,7 +57,7 @@ public interface AccessManagementRepository {
     @SqlQuery("select access_management_type from roles where role_name = :roleName")
     AccessType getRoleAccessType(String roleName);
 
-    @SqlQuery("select distinct service_name, resource_type, resource_name from default_permissions_for_roles where role_name in (<userRoles>) and permissions & 1 = 1")
+    @SqlQuery("select distinct service_name, resource_type, resource_name from default_permissions_for_roles where role_name in (<userRoles>) and permissions & 1 = 1 and attribute = ''")
     @RegisterConstructorMapper(ResourceDefinition.class)
-    Set<ResourceDefinition> getResourceDefinitionsWithCreatePermission(@BindList("userRoles") Set<String> userRoles);
+    Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@BindList("userRoles") Set<String> userRoles);
 }

@@ -47,7 +47,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, CREATE_PERMISSION));
 
         Set<ResourceDefinition> result =
-            service.getResourceDefinitionsWithCreatePermission(ImmutableSet.of(ROLE_NAME));
+            service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
 
         assertThat(result).containsExactly(ResourceDefinition.builder()
             .resourceName(RESOURCE_NAME)
@@ -63,7 +63,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, permissions));
 
         Set<ResourceDefinition> result =
-            service.getResourceDefinitionsWithCreatePermission(ImmutableSet.of(ROLE_NAME));
+            service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
 
         assertThat(result).containsExactly(ResourceDefinition.builder()
             .resourceName(RESOURCE_NAME)
@@ -73,20 +73,14 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     }
 
     @Test
-    void shouldRetrieveResourceDefinitionWhenMultipleRecordsExistWithDifferentAttributes() {
+    void shouldNotRetrieveResourceDefinitionWhenRecordExistsWithoutRootAttribute() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
             "/adult", CREATE_PERMISSION, resource, ROLE_NAME));
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            "/child", CREATE_PERMISSION, resource, ROLE_NAME));
 
         Set<ResourceDefinition> result =
-            service.getResourceDefinitionsWithCreatePermission(ImmutableSet.of(ROLE_NAME));
+            service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
 
-        assertThat(result).containsExactly(ResourceDefinition.builder()
-            .resourceName(RESOURCE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .serviceName(SERVICE_NAME)
-            .build());
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -95,7 +89,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
             "", READ_PERMISSION, resource, ROLE_NAME));
 
         Set<ResourceDefinition> result =
-            service.getResourceDefinitionsWithCreatePermission(ImmutableSet.of(ROLE_NAME));
+            service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
 
         assertThat(result).isEmpty();
     }
@@ -103,7 +97,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldReturnEmptyListWhenNoRecords() {
         Set<ResourceDefinition> result =
-            service.getResourceDefinitionsWithCreatePermission(Collections.singleton(ROLE_NAME));
+            service.getResourceDefinitionsWithRootCreatePermission(Collections.singleton(ROLE_NAME));
 
         assertThat(result).isEmpty();
     }
@@ -116,7 +110,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
             "", CREATE_PERMISSION, otherResource, ROLE_NAME));
 
         Set<ResourceDefinition> result =
-            service.getResourceDefinitionsWithCreatePermission(ImmutableSet.of(ROLE_NAME));
+            service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
 
         assertThat(result).containsExactly(otherResource, resource);
     }
@@ -130,7 +124,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
         Set<String> userRoles = ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME);
 
-        Set<ResourceDefinition> result = service.getResourceDefinitionsWithCreatePermission(userRoles);
+        Set<ResourceDefinition> result = service.getResourceDefinitionsWithRootCreatePermission(userRoles);
 
         assertThat(result).containsExactly(otherResource, resource);
     }
@@ -144,7 +138,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
         Set<String> userRoles = ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME);
 
-        Set<ResourceDefinition> result = service.getResourceDefinitionsWithCreatePermission(userRoles);
+        Set<ResourceDefinition> result = service.getResourceDefinitionsWithRootCreatePermission(userRoles);
 
         assertThat(result).containsExactly(resource);
     }

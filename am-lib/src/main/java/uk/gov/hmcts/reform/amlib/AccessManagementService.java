@@ -209,19 +209,13 @@ public class AccessManagementService {
                                                                 @NonNull String resourceType,
                                                                 @NonNull String resourceName,
                                                                 @NonNull Set<String> userRoles) {
-        List<List<RoleBasedAccessRecord>> roleBasedAccessRecords =
-            jdbi.withExtension(AccessManagementRepository.class, dao ->
-                userRoles.stream().map(role -> dao.getRolePermissions(serviceName, resourceType, resourceName, role))
-                    .collect(Collectors.toList()));
-
-        if (roleBasedAccessRecords.isEmpty()) {
-            return null;
-        }
-
         List<Map<JsonPointer, Set<Permission>>> permissionsForRoles =
-            roleBasedAccessRecords.stream().map(recordsForRole ->
-                recordsForRole.stream().collect(getMapCollector()))
-                .collect(Collectors.toList());
+            jdbi.withExtension(AccessManagementRepository.class, dao ->
+                userRoles.stream()
+                    .map(role -> dao.getRolePermissions(serviceName, resourceType, resourceName, role))
+                    .map(record -> record.stream()
+                        .collect(getMapCollector()))
+                    .collect(Collectors.toList()));
 
         if (permissionsForRoles.stream().anyMatch(Map::isEmpty)) {
             return null;

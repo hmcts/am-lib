@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_IDS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
@@ -30,7 +29,7 @@ public final class TestDataFactory {
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
                                                                   Set<Permission> permissions) {
-        return createGrantForWholeDocument(resourceId, ACCESSOR_IDS, permissions);
+        return createGrantForWholeDocument(resourceId, ACCESSOR_ID, permissions);
     }
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,

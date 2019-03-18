@@ -24,10 +24,8 @@ public final class TestConstants {
     public static final JsonPointer ROOT_ATTRIBUTE = JsonPointer.valueOf("");
     public static final JsonPointer ATTRIBUTE = JsonPointer.valueOf("/test");
     public static final String ACCESSOR_ID = "a";
-    public static final String DIFFERENT_ACCESSOR_ID = "b";
-    public static final Set<String> ACCESSOR_IDS = Stream.of("a").collect(toSet());
-    public static final Set<String> MULTIPLE_ACCESSOR_IDS = Stream.of("a","b","c").collect(toSet());
-    public static final Set<String> DIFFERENT_ACCESSOR_IDS = Stream.of("d","e","f").collect(toSet());
+    public static final String OTHER_ACCESSOR_ID = "b";
+    public static final Set<String> ACCESSOR_IDS = Stream.of("y","z").collect(toSet());
     public static final Set<String> ROLE_NAMES = Stream.of("Role Name").collect(toSet());
     public static final String ROLE_NAME = "Role Name";
     public static final Set<Permission> EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS =

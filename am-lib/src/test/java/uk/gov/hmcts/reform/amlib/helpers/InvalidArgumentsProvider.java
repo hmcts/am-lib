@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+@SuppressWarnings("PMD")
 public class InvalidArgumentsProvider implements ArgumentsProvider {
 
     @Override
@@ -70,18 +71,6 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
         throw new IllegalArgumentException("Unsupported type: " + parameterType);
     }
 
-    private Object[] generateInvalidCollections(Class<?> invalidValueClass,
-                                                Collection<?> emptyCollection,
-                                                Function<Object, Collection<Object>> collectionCreationFn) {
-        Object[] invalidValues = generateInvalidValues(invalidValueClass);
-
-        return ObjectArrays.concat(
-            new Object[]{null, emptyCollection},
-            Arrays.stream(invalidValues).filter(Objects::nonNull).map(collectionCreationFn).toArray(),
-            Object.class
-        );
-    }
-
     private Object[] generateInvalidValues(Class<?> parameterType) {
         if (parameterType.equals(String.class)) {
             return new Object[]{null, "", " "};
@@ -107,6 +96,18 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
             }
         }
         throw new IllegalArgumentException("Unsupported type: " + parameterType);
+    }
+
+    private Object[] generateInvalidCollections(Class<?> invalidValueClass,
+                                                Collection<?> emptyCollection,
+                                                Function<Object, Collection<Object>> collectionCreationFn) {
+        Object[] invalidValues = generateInvalidValues(invalidValueClass);
+
+        return ObjectArrays.concat(
+            new Object[]{null, emptyCollection},
+            Arrays.stream(invalidValues).filter(Objects::nonNull).map(collectionCreationFn).toArray(),
+            Object.class
+        );
     }
 
     private Object generateValidValue(Type parameterType) {

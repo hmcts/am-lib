@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
+@SuppressWarnings("LineLength")
 public final class DefaultPermissionGrant {
     @NotBlank
     private final String serviceName;

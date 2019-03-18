@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.amlib;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
@@ -26,12 +25,7 @@ public class ValidationAspect {
         .getValidator()
         .forExecutables();
 
-    @Pointcut("execution(public * uk.gov.hmcts.reform.amlib.*Service.*(..))")
-    public void publicServiceMethods() {
-        // No-OP
-    }
-
-    @Around("publicServiceMethods()")
+    @Around("execution(public * uk.gov.hmcts.reform.amlib.*Service.*(..))")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         Set<ConstraintViolation<Object>> violations = validate(joinPoint);
 

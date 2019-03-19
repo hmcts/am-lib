@@ -61,13 +61,12 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenCreatingResourceForMultipleUsersShouldAppearInDatabase() {
         Map<JsonPointer, Set<Permission>> multipleAttributePermissions =
             ImmutableMap.<JsonPointer, Set<Permission>>builder()
-                .put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS)
                 .put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS)
                 .build();
 
         service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_IDS, multipleAttributePermissions));
 
-        assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(4)
-            .extracting(ExplicitAccessRecord::getAccessorId).contains("y", "z");
+        assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(2)
+            .extracting(ExplicitAccessRecord::getAccessorId).containsExactly("y", "z");
     }
 }

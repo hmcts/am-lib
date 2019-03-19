@@ -4,6 +4,7 @@ import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -16,7 +17,7 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void shouldNotBeAbleToCreateResourceForServiceThatDoesNotExist() {
-        assertThatExceptionOfType(UnableToExecuteStatementException.class).isThrownBy(() ->
+        assertThatExceptionOfType(PersistenceException.class).isThrownBy(() ->
             service.addResourceDefinition("fake service", RESOURCE_TYPE, RESOURCE_NAME))
             .withMessageContaining("(service_name)=(fake service) is not present in table \"services\"");
     }

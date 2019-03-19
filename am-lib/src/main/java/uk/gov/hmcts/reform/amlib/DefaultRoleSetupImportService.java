@@ -103,31 +103,26 @@ public class DefaultRoleSetupImportService {
     public void grantDefaultPermission(@NotNull @Valid DefaultPermissionGrant defaultPermissionGrant) {
         jdbi.useTransaction(handle -> {
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
-            try {
-                defaultPermissionGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
-                    dao.createResourceAttribute(ResourceAttribute.builder()
+            defaultPermissionGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
+                dao.createResourceAttribute(ResourceAttribute.builder()
+                    .serviceName(defaultPermissionGrant.getServiceName())
+                    .resourceName(defaultPermissionGrant.getResourceName())
+                    .resourceType(defaultPermissionGrant.getResourceType())
+                    .attribute(attribute)
+                    .defaultSecurityClassification(permissionAndClassification.getValue())
+                    .build()
+                );
+
+                dao.grantDefaultPermission(
+                    RoleBasedAccessRecord.builder()
                         .serviceName(defaultPermissionGrant.getServiceName())
-                        .resourceName(defaultPermissionGrant.getResourceName())
                         .resourceType(defaultPermissionGrant.getResourceType())
+                        .resourceName(defaultPermissionGrant.getResourceName())
                         .attribute(attribute)
-                        .defaultSecurityClassification(permissionAndClassification.getValue())
-                        .build()
-                    );
-
-                    dao.grantDefaultPermission(
-                        RoleBasedAccessRecord.builder()
-                            .serviceName(defaultPermissionGrant.getServiceName())
-                            .resourceType(defaultPermissionGrant.getResourceType())
-                            .resourceName(defaultPermissionGrant.getResourceName())
-                            .attribute(attribute)
-                            .roleName(defaultPermissionGrant.getRoleName())
-                            .permissions(permissionAndClassification.getKey())
-                            .build());
-                });
-
-            } catch (Exception e) {
-                throw new PersistenceException(e);
-            }
+                        .roleName(defaultPermissionGrant.getRoleName())
+                        .permissions(permissionAndClassification.getKey())
+                        .build());
+            });
         });
     }
 
@@ -142,13 +137,9 @@ public class DefaultRoleSetupImportService {
      */
     public void truncateDefaultPermissionsForService(@NotBlank String serviceName, @NotBlank String resourceType) {
         jdbi.useTransaction(handle -> {
-            try {
-                DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
-                dao.deleteDefaultPermissionsForRoles(serviceName, resourceType);
-                dao.deleteResourceAttributes(serviceName, resourceType);
-            } catch (Exception e) {
-                throw new PersistenceException(e);
-            }
+            DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
+            dao.deleteDefaultPermissionsForRoles(serviceName, resourceType);
+            dao.deleteResourceAttributes(serviceName, resourceType);
         });
     }
 
@@ -166,13 +157,9 @@ public class DefaultRoleSetupImportService {
                                                                @NotBlank String resourceType,
                                                                @NotBlank String resourceName) {
         jdbi.useTransaction(handle -> {
-            try {
-                DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
-                dao.deleteDefaultPermissionsForRoles(serviceName, resourceType, resourceName);
-                dao.deleteResourceAttributes(serviceName, resourceType, resourceName);
-            } catch (Exception e) {
-                throw new PersistenceException(e);
-            }
+            DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
+            dao.deleteDefaultPermissionsForRoles(serviceName, resourceType, resourceName);
+            dao.deleteResourceAttributes(serviceName, resourceType, resourceName);
         });
     }
 

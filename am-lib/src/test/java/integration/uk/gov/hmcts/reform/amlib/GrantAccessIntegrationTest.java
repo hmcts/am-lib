@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_IDS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
@@ -56,5 +57,19 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, READ_PERMISSION));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
+    }
+
+    @Test
+    void whenCreatingResourceForMultipleUsersShouldAppearInDatabase() {
+        Map<JsonPointer, Set<Permission>> multipleAttributePermissions =
+            ImmutableMap.<JsonPointer, Set<Permission>>builder()
+                .put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS)
+                .put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS)
+                .build();
+
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_IDS, multipleAttributePermissions));
+
+        assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(4)
+            .extracting(ExplicitAccessRecord::getAccessorId).contains("y", "z");
     }
 }

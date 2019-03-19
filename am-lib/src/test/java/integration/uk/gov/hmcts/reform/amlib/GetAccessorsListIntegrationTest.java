@@ -27,10 +27,11 @@ class GetAccessorsListIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @SuppressWarnings("LineLength")
     void ifUserHasAccessShouldReturnUserIds() {
         service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_ID, READ_PERMISSION));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, OTHER_ACCESSOR_ID, READ_PERMISSION));
 
         List<String> list = service.getAccessorsList(ACCESSOR_ID, resourceId);
 
-        assertThat(list).containsExactly(ACCESSOR_ID);
+        assertThat(list).containsExactly(ACCESSOR_ID, OTHER_ACCESSOR_ID);
     }
 
     @Test

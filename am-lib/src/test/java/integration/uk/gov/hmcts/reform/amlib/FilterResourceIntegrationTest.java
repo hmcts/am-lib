@@ -3,6 +3,7 @@ package integration.uk.gov.hmcts.reform.amlib;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
+import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 
@@ -19,13 +21,18 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
+import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createPermissionsForAttribute;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
@@ -99,6 +106,29 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    void whenNoExplicitAccessAndMultipleRolesWhereOneHasExplicitAccessTypeShouldReturnOnlyRoleBasedPermissions() {
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        importerService.addRole(OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.EXPLICIT);
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
+        importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
+            .roleName(OTHER_ROLE_NAME)
+            .resourceName(RESOURCE_NAME)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf("/child"), READ_PERMISSION))
+            .build());
+
+        FilterResourceResponse result = service.filterResource(
+            ACCESSOR_ID, ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME), createResource(resourceId));
+
+        assertThat(result).isEqualTo(FilterResourceResponse.builder()
+            .resourceId(resourceId)
+            .data(DATA)
+            .permissions(ImmutableMap.of(ROOT_ATTRIBUTE, READ_PERMISSION))
+            .build());
     }
 
     @Test

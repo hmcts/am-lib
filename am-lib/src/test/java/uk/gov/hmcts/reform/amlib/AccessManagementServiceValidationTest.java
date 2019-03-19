@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.amlib.helpers.InvalidArgumentsProvider;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Set;
 
@@ -73,16 +74,15 @@ class AccessManagementServiceValidationTest {
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
-    void getRolePermissionsMethodShouldRejectInvalidArguments(String serviceName,
-                                                              String resourceType,
-                                                              String resourceName,
+    void getRolePermissionsMethodShouldRejectInvalidArguments(ResourceDefinition resource,
                                                               Set<String> roleNames) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.getRolePermissions(serviceName, resourceType, resourceName, roleNames))
+            .isThrownBy(() -> service.getRolePermissions(resource, roleNames))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "serviceName - must not be blank",
-                "resourceType - must not be blank",
-                "resourceName - must not be blank",
+                "resource - must not be null",
+                "resource.serviceName - must not be blank",
+                "resource.resourceType - must not be blank",
+                "resource.resourceName - must not be blank",
                 "userRoles - must not be empty",
                 "userRoles\\[\\].<iterable element> - must not be blank"
             ));

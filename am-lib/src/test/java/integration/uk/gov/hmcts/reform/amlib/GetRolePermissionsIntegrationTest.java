@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.Pair;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Map;
 import java.util.Set;
@@ -83,8 +84,8 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @Test
     void returnListOfPermissionsForRoleName() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
-            RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAMES);
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(buildResource(SERVICE_NAME,
+            RESOURCE_TYPE, RESOURCE_NAME), ROLE_NAMES);
 
         assertThat(accessRecord)
             .hasSize(3)
@@ -95,32 +96,32 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @Test
     void shouldReturnNullWhenServiceNameDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions("Unknown Service",
-            RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAMES);
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
+            buildResource("Unknown Service", RESOURCE_TYPE, RESOURCE_NAME), ROLE_NAMES);
 
         assertThat(accessRecord).isNull();
     }
 
     @Test
     void shouldReturnNullWhenResourceTypeDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
-            "Unknown Resource Type", RESOURCE_NAME, ROLE_NAMES);
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
+            buildResource(SERVICE_NAME, "Unknown Resource Type", RESOURCE_NAME), ROLE_NAMES);
 
         assertThat(accessRecord).isNull();
     }
 
     @Test
     void shouldReturnNullWhenResourceNameDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
-            RESOURCE_TYPE, "Unknown Resource Name", ROLE_NAMES);
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
+            buildResource(SERVICE_NAME, RESOURCE_TYPE, "Unknown Resource Name"), ROLE_NAMES);
 
         assertThat(accessRecord).isNull();
     }
 
     @Test
     void shouldReturnNullWhenDefaultRoleNameDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
-            RESOURCE_TYPE, RESOURCE_NAME, Stream.of("Unknown Role").collect(toSet()));
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
+            buildResource(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME), ImmutableSet.of("Unknown Role"));
 
         assertThat(accessRecord).isNull();
     }
@@ -131,8 +132,8 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         Set<Permission> readUpdate = Stream.of(Permission.READ, Permission.UPDATE).collect(toSet());
         Set<Permission> createUpdate = Stream.of(Permission.CREATE, Permission.UPDATE).collect(toSet());
 
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
-            RESOURCE_TYPE, RESOURCE_NAME, userRoles);
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
+            buildResource(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME), userRoles);
 
         assertThat(accessRecord)
             .hasSize(5)
@@ -141,5 +142,13 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
             .containsEntry(JsonPointer.valueOf("/address/street/line1"), createUpdate)
             .containsEntry(JsonPointer.valueOf("/child"), readUpdate)
             .containsEntry(JsonPointer.valueOf("/parent/age"), createUpdate);
+    }
+
+    private ResourceDefinition buildResource(String serviceName, String resourceType, String resourceName) {
+        return ResourceDefinition.builder()
+            .resourceName(resourceName)
+            .resourceType(resourceType)
+            .serviceName(serviceName)
+            .build();
     }
 }

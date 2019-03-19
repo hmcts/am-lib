@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.models.Resource;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.List;
 import java.util.Map;
@@ -149,33 +150,17 @@ public class AccessManagementService {
     public FilterResourceResponse filterResource(@NotBlank String userId,
                                                  @NotEmpty Set<@NotBlank String> userRoles,
                                                  @NotNull @Valid Resource resource) {
-        if (userRoles.size() > 1) {
-            throw new IllegalArgumentException("Currently a single role only is supported. "
-                + "Future implementations will allow for multiple roles.");
-        }
-
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resource.getResourceId()));
 
         Map<JsonPointer, Set<Permission>> attributePermissions;
 
         if (explicitAccess.isEmpty()) {
-            List<RoleBasedAccessRecord> roleBasedAccess = jdbi.withExtension(AccessManagementRepository.class,
-                dao -> dao.getRolePermissions(
-                    resource.getType().getServiceName(),
-                    resource.getType().getResourceType(),
-                    resource.getType().getResourceName(),
-                    userRoles.iterator().next()));
+            attributePermissions = getRolePermissions(resource.getType(), userRoles);
 
-            if (roleBasedAccess.isEmpty()) {
+            if (attributePermissions == null) {
                 return null;
             }
-
-            if (explicitAccessType(userRoles)) {
-                return null;
-            }
-
-            attributePermissions = roleBasedAccess.stream().collect(getMapCollector());
 
         } else {
             attributePermissions = explicitAccess.stream().collect(getMapCollector());
@@ -190,29 +175,26 @@ public class AccessManagementService {
             .build();
     }
 
-    private boolean explicitAccessType(Set<String> userRoles) {
+    private boolean explicitAccessType(String userRole) {
         return jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getRoleAccessType(userRoles.iterator().next())).equals(AccessType.EXPLICIT);
+            dao -> dao.getRoleAccessType(userRole).equals(AccessType.EXPLICIT));
     }
 
     /**
      * Retrieves a list of {@link RoleBasedAccessRecord } and returns attribute and permissions values.
      *
-     * @param serviceName  name of service
-     * @param resourceType type of resource
-     * @param resourceName name of a resource
-     * @param userRoles    A set of user roles
+     * @param resource  {@link ResourceDefinition} a unique service name, resource type and resource name
+     * @param userRoles A set of user roles
      * @return a map of attributes and their corresponding permissions or null
      */
-    public Map<JsonPointer, Set<Permission>> getRolePermissions(@NotBlank String serviceName,
-                                                                @NotBlank String resourceType,
-                                                                @NotBlank String resourceName,
+    public Map<JsonPointer, Set<Permission>> getRolePermissions(@NotNull @Valid ResourceDefinition resource,
                                                                 @NotEmpty Set<@NotBlank String> userRoles) {
         List<Map<JsonPointer, Set<Permission>>> permissionsForRoles =
             jdbi.withExtension(AccessManagementRepository.class, dao ->
                 userRoles.stream()
-                    .map(role -> dao.getRolePermissions(serviceName, resourceType, resourceName, role))
+                    .map(role -> dao.getRolePermissions(resource, role))
                     .map(roleBasedAccessRecords -> roleBasedAccessRecords.stream()
+                        .filter(record -> !explicitAccessType(record.getRoleName()))
                         .collect(getMapCollector()))
                     .collect(Collectors.toList()));
 

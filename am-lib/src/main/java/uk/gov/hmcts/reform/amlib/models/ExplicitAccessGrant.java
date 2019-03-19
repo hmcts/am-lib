@@ -18,7 +18,7 @@ public final class ExplicitAccessGrant {
     @NotBlank
     private final String resourceId;
     @NotEmpty
-    private final Set<@NotNull String> accessorIds;
+    private final Set<@NotBlank String> accessorIds;
     @NotBlank
     private final String accessType;
     @NotBlank

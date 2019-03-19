@@ -48,21 +48,6 @@ public final class TestDataFactory {
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
-                                                  String accessorId,
-                                                  Map<JsonPointer, Set<Permission>> attributePermissions) {
-        return ExplicitAccessGrant.builder()
-            .resourceId(resourceId)
-            .accessorIds(ImmutableSet.of(accessorId))
-            .accessType(ACCESS_TYPE)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .attributePermissions(attributePermissions)
-            .securityClassification(SECURITY_CLASSIFICATION)
-            .build();
-    }
-
-    public static ExplicitAccessGrant createGrant(String resourceId,
                                                   Set<String> accessorId,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
         return ExplicitAccessGrant.builder()
@@ -75,6 +60,12 @@ public final class TestDataFactory {
             .attributePermissions(attributePermissions)
             .securityClassification(SECURITY_CLASSIFICATION)
             .build();
+    }
+
+    public static ExplicitAccessGrant createGrant(String resourceId,
+                                                  String accessorId,
+                                                  Map<JsonPointer, Set<Permission>> attributePermissions) {
+        return createGrant(resourceId, ImmutableSet.of(accessorId), attributePermissions);
     }
 
     public static Map<JsonPointer, Set<Permission>> createPermissionsForWholeDocument(Set<Permission> permissions) {
@@ -97,7 +88,7 @@ public final class TestDataFactory {
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attribute(JsonPointer.valueOf(""))
-            .securityClassification(SecurityClassification.PRIVATE)
+            .securityClassification(SecurityClassification.PUBLIC)
             .build();
     }
 

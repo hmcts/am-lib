@@ -24,7 +24,7 @@ class AccessManagementServiceValidationTest {
             .withMessageMatching(expectedValidationMessagesRegex(
                 "explicitAccessGrant - must not be null",
                 "explicitAccessGrant.resourceId - must not be blank",
-                "explicitAccessGrant.accessorId - must not be blank",
+                "explicitAccessGrant.accessorIds - must not be empty",
                 "explicitAccessGrant.accessType - must not be blank",
                 "explicitAccessGrant.serviceName - must not be blank",
                 "explicitAccessGrant.resourceType - must not be blank",

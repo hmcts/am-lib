@@ -97,7 +97,7 @@ public final class TestDataFactory {
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attribute(JsonPointer.valueOf(""))
-            .securityClassification(SecurityClassification.PUBLIC)
+            .securityClassification(SecurityClassification.PRIVATE)
             .build();
     }
 

@@ -17,10 +17,8 @@ import javax.validation.constraints.NotNull;
 public final class ExplicitAccessGrant {
     @NotBlank
     private final String resourceId;
-    @NotBlank
-    private final Set<String> accessorIds;
-    @NotBlank
-    private final String accessorId;
+    @NotEmpty
+    private final Set<@NotNull String> accessorIds;
     @NotBlank
     private final String accessType;
     @NotBlank

@@ -27,7 +27,6 @@ public class ValidationAspect {
 
     @Around("execution(public * uk.gov.hmcts.reform.amlib.*Service.*(..))")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
-        System.out.println("ValidationAspect.around");
         Set<ConstraintViolation<Object>> violations = validate(joinPoint);
 
         if (!violations.isEmpty()) {

@@ -11,7 +11,6 @@ public class ErrorHandlingAspect {
 
     @Around("execution(public * uk.gov.hmcts.reform.amlib.*Service.*(..))")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
-        System.out.println("ErrorHandlingAspect.around");
         try {
             return joinPoint.proceed();
         } catch (JdbiException ex) {

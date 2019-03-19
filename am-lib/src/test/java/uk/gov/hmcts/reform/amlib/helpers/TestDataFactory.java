@@ -12,8 +12,6 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_TYPE;
@@ -37,7 +35,7 @@ public final class TestDataFactory {
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
                                                                   String accessorId,
                                                                   Set<Permission> permissions) {
-        return createGrant(resourceId, Stream.of(accessorId).collect(Collectors.toSet()),
+        return createGrant(resourceId, ImmutableSet.of(accessorId),
             createPermissionsForWholeDocument(permissions));
     }
 
@@ -45,6 +43,12 @@ public final class TestDataFactory {
                                                                   Set<String> accessorId,
                                                                   Set<Permission> permissions) {
         return createGrant(resourceId, accessorId, createPermissionsForWholeDocument(permissions));
+    }
+
+    public static ExplicitAccessGrant createGrant(String resourceId,
+                                                  String accessorId,
+                                                  Map<JsonPointer, Set<Permission>> attributePermissions) {
+        return createGrant(resourceId, ImmutableSet.of(accessorId), attributePermissions);
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
@@ -60,12 +64,6 @@ public final class TestDataFactory {
             .attributePermissions(attributePermissions)
             .securityClassification(SECURITY_CLASSIFICATION)
             .build();
-    }
-
-    public static ExplicitAccessGrant createGrant(String resourceId,
-                                                  String accessorId,
-                                                  Map<JsonPointer, Set<Permission>> attributePermissions) {
-        return createGrant(resourceId, ImmutableSet.of(accessorId), attributePermissions);
     }
 
     public static Map<JsonPointer, Set<Permission>> createPermissionsForWholeDocument(Set<Permission> permissions) {

@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.models.Resource;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.List;
 import java.util.Map;
@@ -144,7 +145,7 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
-     *      to resource is configured, otherwise null.
+     *     to resource is configured, otherwise null.
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     public FilterResourceResponse filterResource(@NotBlank String userId,
@@ -224,6 +225,18 @@ public class AccessManagementService {
         }
 
         return roleBasedAccessRecords.stream().collect(getMapCollector());
+    }
+
+    /**
+     * Retrieves a set of {@link ResourceDefinition} that user roles have root level create permissions for.
+     *
+     * @param userRoles a set of roles
+     * @return a set of resource definitions
+     */
+    @SuppressWarnings("LineLength")
+    public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@NotEmpty Set<@NotBlank String> userRoles) {
+        return jdbi.withExtension(AccessManagementRepository.class, dao ->
+            dao.getResourceDefinitionsWithRootCreatePermission(userRoles));
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

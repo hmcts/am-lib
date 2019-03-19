@@ -45,6 +45,7 @@ public class DefaultRoleSetupImportService {
      * Creates a new unique service or updates description if already exists.
      *
      * @param serviceName the name of the service
+     * @throws PersistenceException if any persistence errors were encountered
      */
     public void addService(@NotBlank String serviceName) {
         addService(serviceName, null);
@@ -55,6 +56,7 @@ public class DefaultRoleSetupImportService {
      *
      * @param serviceName        the name of the service
      * @param serviceDescription a description of the service
+     * @throws PersistenceException if any persistence errors were encountered
      */
     public void addService(@NotBlank String serviceName, String serviceDescription) {
         jdbi.useExtension(DefaultRoleSetupRepository.class,
@@ -68,6 +70,7 @@ public class DefaultRoleSetupImportService {
      * @param roleType               the type of role
      * @param securityClassification the security classification for the role
      * @param accessType             the access type for the role
+     * @throws PersistenceException if any persistence errors were encountered
      */
     public void addRole(@NotBlank String roleName,
                         @NotNull RoleType roleType,
@@ -83,6 +86,7 @@ public class DefaultRoleSetupImportService {
      * @param serviceName  the name of the service the resource belongs to
      * @param resourceType the type of resource
      * @param resourceName the name of the resource
+     * @throws PersistenceException if any persistence errors were encountered
      */
     public void addResourceDefinition(@NotBlank String serviceName,
                                       @NotBlank String resourceType,
@@ -98,7 +102,7 @@ public class DefaultRoleSetupImportService {
      * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *
      * @param defaultPermissionGrant a container for granting default permissions
-     * @throws PersistenceException if any errors were encountered causing transaction rollback
+     * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
     public void grantDefaultPermission(@NotNull @Valid DefaultPermissionGrant defaultPermissionGrant) {
         jdbi.useTransaction(handle -> {
@@ -133,7 +137,7 @@ public class DefaultRoleSetupImportService {
      *
      * @param serviceName  the name of the service to delete default permissions for
      * @param resourceType the type of resource to delete default permissions for
-     * @throws PersistenceException if any errors were encountered causing transaction rollback
+     * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
     public void truncateDefaultPermissionsForService(@NotBlank String serviceName, @NotBlank String resourceType) {
         jdbi.useTransaction(handle -> {
@@ -151,7 +155,7 @@ public class DefaultRoleSetupImportService {
      * @param serviceName  the name of the service to delete default permissions for
      * @param resourceType the type of resource to delete default permissions for
      * @param resourceName the name of the resource to delete default permissions for
-     * @throws PersistenceException if any errors were encountered causing transaction rollback
+     * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
     public void truncateDefaultPermissionsByResourceDefinition(@NotBlank String serviceName,
                                                                @NotBlank String resourceType,
@@ -169,6 +173,7 @@ public class DefaultRoleSetupImportService {
      * @param serviceName  the name of the service the resource attribute belongs to
      * @param resourceType the type of resource
      * @param resourceName the name of the resource
+     * @throws PersistenceException if any persistence errors were encountered
      */
     public void deleteResourceDefinition(@NotBlank String serviceName,
                                          @NotBlank String resourceType,
@@ -181,6 +186,7 @@ public class DefaultRoleSetupImportService {
      * Deletes a role.
      *
      * @param roleName the role name to delete
+     * @throws PersistenceException if any persistence errors were encountered
      */
     public void deleteRole(@NotBlank String roleName) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao -> dao.deleteRole(roleName));
@@ -190,6 +196,7 @@ public class DefaultRoleSetupImportService {
      * Deletes a service.
      *
      * @param serviceName the service name to delete
+     * @throws PersistenceException if any persistence errors were encountered
      */
     public void deleteService(@NotBlank String serviceName) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao -> dao.deleteService(serviceName));

@@ -6,6 +6,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.FilterService;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
@@ -61,6 +62,7 @@ public class AccessManagementService {
      * <p>Operation is performed in a transaction so that if not all records can be created then whole grant will fail.
      *
      * @param explicitAccessGrant an object that describes explicit access to resource
+     * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
     public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant explicitAccessGrant) {
         jdbi.useTransaction(handle -> {
@@ -87,7 +89,8 @@ public class AccessManagementService {
      * <p>IMPORTANT: This is a cascade delete function and so if called on a specific attribute
      * it will remove specified attribute and all children attributes.
      *
-     * @param explicitAccessMetadata an object to remove a specific explicit access record.
+     * @param explicitAccessMetadata an object to remove a specific explicit access record
+     * @throws PersistenceException if any persistence errors were encountered
      */
     public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata explicitAccessMetadata) {
         jdbi.useExtension(AccessManagementRepository.class,
@@ -99,7 +102,8 @@ public class AccessManagementService {
      *
      * @param userId     (accessorId)
      * @param resourceId resource Id
-     * @return List of user ids (accessor id) or null
+     * @return list of user ids (accessor id) or null
+     * @throws PersistenceException if any persistence errors were encountered
      */
     public List<String> getAccessorsList(String userId, String resourceId) {
         return jdbi.withExtension(AccessManagementRepository.class, dao -> {
@@ -117,7 +121,8 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resources envelope {@link Resource} and corresponding metadata
      * @return envelope list of {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions
-     * if access to resource is configured, otherwise null.
+     * if access to resource is configured, otherwise null
+     * @throws PersistenceException if any persistence errors were encountered
      */
     public List<FilterResourceResponse> filterResource(@NotBlank String userId,
                                                        @NotEmpty Set<@NotBlank String> userRoles,
@@ -135,7 +140,8 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
-     * to resource is configured, otherwise null.
+     * to resource is configured, otherwise null
+     * @throws PersistenceException if any persistence errors were encountered
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     public FilterResourceResponse filterResource(@NotBlank String userId,
@@ -196,6 +202,7 @@ public class AccessManagementService {
      * @param roleNames    A set of role names. Currently only one role name is supported but
      *                     in future implementations we shall support having multiple role names
      * @return a map of attributes and their corresponding permissions or null
+     * @throws PersistenceException if any persistence errors were encountered
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     public Map<JsonPointer, Set<Permission>> getRolePermissions(@NotBlank String serviceName,

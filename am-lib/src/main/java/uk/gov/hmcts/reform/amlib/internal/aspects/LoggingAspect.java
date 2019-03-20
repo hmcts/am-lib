@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,30 +32,7 @@ public class LoggingAspect {
         AuditLog auditLog = methodSignature.getMethod().getAnnotation(AuditLog.class);
 
         if (isEnabled(auditLog.severity())) {
-            Metadata metadata = cache.computeIfAbsent(methodSignature, method -> {
-                Matcher matcher = VARIABLE_PATTERN.matcher(auditLog.value());
-
-                Metadata instance = new Metadata();
-                while (matcher.find()) {
-                    Metadata.Expression expression = new Metadata.Expression();
-                    expression.template = matcher.group(0);
-                    expression.value = matcher.group(1);
-
-                    if (expression.value.contains(".")) {
-                        expression.beanName = extractBeanName(expression.value);
-                        expression.beanProperties = extractBeanProperties(expression.value);
-                    } else {
-                        expression.beanName = expression.value;
-                        expression.beanProperties = null;
-                    }
-
-                    String[] parameterNames = methodSignature.getParameterNames();
-                    expression.argumentPosition = Arrays.asList(parameterNames).indexOf(expression.beanName);
-
-                    instance.expressions.add(expression);
-                }
-                return instance;
-            });
+            Metadata metadata = cache.computeIfAbsent(methodSignature, createMetadata(methodSignature, auditLog));
 
             String template = auditLog.value();
             for (Metadata.Expression expression : metadata.expressions) {
@@ -71,6 +49,33 @@ public class LoggingAspect {
             }
             log(auditLog.severity(), "[Access Management audit]: " + template);
         }
+    }
+
+    private Function<MethodSignature, Metadata> createMetadata(MethodSignature methodSignature, AuditLog auditLog) {
+        return method -> {
+            Matcher matcher = VARIABLE_PATTERN.matcher(auditLog.value());
+
+            Metadata instance = new Metadata();
+            while (matcher.find()) {
+                Metadata.Expression expression = new Metadata.Expression();
+                expression.template = matcher.group(0);
+                expression.value = matcher.group(1);
+
+                if (expression.value.contains(".")) {
+                    expression.beanName = extractBeanName(expression.value);
+                    expression.beanProperties = extractBeanProperties(expression.value);
+                } else {
+                    expression.beanName = expression.value;
+                    expression.beanProperties = null;
+                }
+
+                String[] parameterNames = methodSignature.getParameterNames();
+                expression.argumentPosition = Arrays.asList(parameterNames).indexOf(expression.beanName);
+
+                instance.expressions.add(expression);
+            }
+            return instance;
+        };
     }
 
     private boolean isEnabled(AuditLog.Severity severity) {

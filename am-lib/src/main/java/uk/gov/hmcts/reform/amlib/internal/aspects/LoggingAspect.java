@@ -32,7 +32,8 @@ public class LoggingAspect {
         AuditLog auditLog = methodSignature.getMethod().getAnnotation(AuditLog.class);
 
         if (isEnabled(auditLog.severity())) {
-            Metadata metadata = cache.computeIfAbsent(methodSignature, createMetadata(methodSignature, auditLog));
+            Metadata metadata = cache.computeIfAbsent(methodSignature,
+                createMetadata(auditLog.value(), methodSignature.getParameterNames()));
 
             String template = auditLog.value();
             for (Metadata.Expression expression : metadata.expressions) {
@@ -51,9 +52,9 @@ public class LoggingAspect {
         }
     }
 
-    private Function<MethodSignature, Metadata> createMetadata(MethodSignature methodSignature, AuditLog auditLog) {
+    private Function<MethodSignature, Metadata> createMetadata(String template, String[] parameterNames) {
         return method -> {
-            Matcher matcher = VARIABLE_PATTERN.matcher(auditLog.value());
+            Matcher matcher = VARIABLE_PATTERN.matcher(template);
 
             Metadata instance = new Metadata();
             while (matcher.find()) {
@@ -69,7 +70,6 @@ public class LoggingAspect {
                     expression.beanProperties = null;
                 }
 
-                String[] parameterNames = methodSignature.getParameterNames();
                 expression.argumentPosition = Arrays.asList(parameterNames).indexOf(expression.beanName);
 
                 instance.expressions.add(expression);

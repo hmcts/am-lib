@@ -4,6 +4,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.DeclarePrecedence;
 
 @Aspect
-@DeclarePrecedence("ValidationAspect, ErrorHandlingAspect")
+@DeclarePrecedence("ValidationAspect, ErrorHandlingAspect, LoggingAspect")
 public class AspectsSuite {
 }

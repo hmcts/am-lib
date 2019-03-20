@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.FilterService;
+import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
@@ -61,23 +62,26 @@ public class AccessManagementService {
      *
      * <p>Operation is performed in a transaction so that if not all records can be created then whole grant will fail.
      *
-     * @param explicitAccessGrant an object that describes explicit access to resource
+     * @param accessGrant an object that describes explicit access to resource
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
-    public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant explicitAccessGrant) {
+    @AuditLog("explicit access granted to resource '{{in#accessGrant.resourceId}}' "
+        + "defined as '{{in#accessGrant.serviceName}}|{{in#accessGrant.resourceType}}|{{in#accessGrant.resourceName}}' "
+        + "for user '{{in#accessGrant.accessorId}}': {{in#accessGrant.attributePermissions}}")
+    public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant accessGrant) {
         jdbi.useTransaction(handle -> {
             AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
-            explicitAccessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
+            accessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
                 ExplicitAccessRecord.builder()
-                    .resourceId(explicitAccessGrant.getResourceId())
-                    .accessorId(explicitAccessGrant.getAccessorId())
+                    .resourceId(accessGrant.getResourceId())
+                    .accessorId(accessGrant.getAccessorId())
                     .permissions(attributePermission.getValue())
-                    .accessType(explicitAccessGrant.getAccessType())
-                    .serviceName(explicitAccessGrant.getServiceName())
-                    .resourceType(explicitAccessGrant.getResourceType())
-                    .resourceName(explicitAccessGrant.getResourceName())
+                    .accessType(accessGrant.getAccessType())
+                    .serviceName(accessGrant.getServiceName())
+                    .resourceType(accessGrant.getResourceType())
+                    .resourceName(accessGrant.getResourceName())
                     .attribute(attributePermission.getKey())
-                    .securityClassification(explicitAccessGrant.getSecurityClassification())
+                    .securityClassification(accessGrant.getSecurityClassification())
                     .build())
                 .forEach(dao::createAccessManagementRecord);
         });
@@ -89,12 +93,15 @@ public class AccessManagementService {
      * <p>IMPORTANT: This is a cascade delete function and so if called on a specific attribute
      * it will remove specified attribute and all children attributes.
      *
-     * @param explicitAccessMetadata an object to remove a specific explicit access record
+     * @param accessMetadata an object to remove a specific explicit access record
      * @throws PersistenceException if any persistence errors were encountered
      */
-    public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata explicitAccessMetadata) {
+    @AuditLog("explicit access revoked to resource '{{in#accessMetadata.resourceId}}' "
+        + "defined as '{{in#accessMetadata.serviceName}}|{{in#accessMetadata.resourceType}}|{{in#accessMetadata.resourceName}}' "
+        + "from user '{{in#accessMetadata.accessorId}}': {{in#accessMetadata.attribute}}")
+    public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata accessMetadata) {
         jdbi.useExtension(AccessManagementRepository.class,
-            dao -> dao.removeAccessManagementRecord(explicitAccessMetadata));
+            dao -> dao.removeAccessManagementRecord(accessMetadata));
     }
 
     /**
@@ -121,7 +128,7 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resources envelope {@link Resource} and corresponding metadata
      * @return envelope list of {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions
-     *     if access to resource is configured, otherwise null
+     * if access to resource is configured, otherwise null
      * @throws PersistenceException if any persistence errors were encountered
      */
     public List<FilterResourceResponse> filterResource(@NotBlank String userId,
@@ -140,10 +147,13 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
-     *     to resource is configured, otherwise null
+     * to resource is configured, otherwise null
      * @throws PersistenceException if any persistence errors were encountered
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
+    @AuditLog("filtered access to resource '{{in#resource.resourceId}}' "
+        + "defined as '{{in#resource.type.serviceName}}|{{in#resource.type.resourceType}}|{{in#resource.type.resourceName}}' "
+        + "for user '{{in#userId}}' in roles '{{in#userRoles}}': {{out#permissions}}")
     public FilterResourceResponse filterResource(@NotBlank String userId,
                                                  @NotEmpty Set<@NotBlank String> userRoles,
                                                  @NotNull @Valid Resource resource) {
@@ -205,6 +215,8 @@ public class AccessManagementService {
      * @throws PersistenceException if any persistence errors were encountered
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
+    @AuditLog("returned role access to resource defined as '{{in#serviceName}}|{{in#resourceType}}|{{in#resourceName}}'"
+        + " for roles '{{in#roleNames}}': {{out}}")
     public Map<JsonPointer, Set<Permission>> getRolePermissions(@NotBlank String serviceName,
                                                                 @NotBlank String resourceType,
                                                                 @NotBlank String resourceName,

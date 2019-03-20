@@ -22,9 +22,11 @@ public class LoggingAspect {
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         Object result = joinPoint.proceed();
 
-        if (log.isInfoEnabled()) {
-            MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-            String template = methodSignature.getMethod().getAnnotation(AuditLog.class).value();
+        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+        AuditLog auditLog = methodSignature.getMethod().getAnnotation(AuditLog.class);
+
+        if (isEnabled(auditLog.severity())) {
+            String template = auditLog.value();
 
             Matcher matcher = VARIABLE_PATTERN.matcher(template);
             while (matcher.find()) {
@@ -53,10 +55,34 @@ public class LoggingAspect {
                 template = template.replace(matcher.group(0), Objects.toString(arg));
             }
 
-            log.info("[Access Management audit]: " + template);
+            log(auditLog.severity(), "[Access Management audit]: " + template);
         }
 
         return result;
+    }
+
+    private boolean isEnabled(AuditLog.Severity severity) {
+        switch (severity) {
+            case DEBUG:
+                return log.isDebugEnabled();
+            case INFO:
+                return log.isInfoEnabled();
+            default:
+                throw new AuditException("Unsupported severity: " + severity);
+        }
+    }
+
+    private void log(AuditLog.Severity severity, String msg) {
+        switch (severity) {
+            case DEBUG:
+                log.debug(msg);
+                break;
+            case INFO:
+                log.info(msg);
+                break;
+            default:
+                throw new AuditException("Unsupported severity: " + severity);
+        }
     }
 
     private Object extractValue(Object object, String path) {
@@ -89,6 +115,10 @@ public class LoggingAspect {
     }
 
     private static class AuditException extends RuntimeException {
+        public AuditException(String message) {
+            super(message);
+        }
+
         private AuditException(String message, Throwable cause) {
             super(message, cause);
         }

@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
+import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog.Severity;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.DefaultRoleSetupRepository;
@@ -59,7 +60,7 @@ public class DefaultRoleSetupImportService {
      * @param serviceDescription a description of the service
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog("service '{{serviceName}}' described as '{{serviceDescription}}' added")
+    @AuditLog(value = "service '{{serviceName}}' described as '{{serviceDescription}}' added", severity = Severity.DEBUG)
     public void addService(@NotBlank String serviceName, String serviceDescription) {
         jdbi.useExtension(DefaultRoleSetupRepository.class,
             dao -> dao.addService(serviceName, serviceDescription));
@@ -74,7 +75,7 @@ public class DefaultRoleSetupImportService {
      * @param accessType             the access type for the role
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog("role '{{roleName}}' of type '{{roleType}}' added")
+    @AuditLog(value = "role '{{roleName}}' of type '{{roleType}}' added", severity = Severity.DEBUG)
     public void addRole(@NotBlank String roleName,
                         @NotNull RoleType roleType,
                         @NotNull SecurityClassification securityClassification,
@@ -91,7 +92,7 @@ public class DefaultRoleSetupImportService {
      * @param resourceName the name of the resource
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog("resource definition defined as '{{serviceName}}|{{resourceType}}|{{resourceName}}' added")
+    @AuditLog(value = "resource definition defined as '{{serviceName}}|{{resourceType}}|{{resourceName}}' added", severity = Severity.DEBUG)
     public void addResourceDefinition(@NotBlank String serviceName,
                                       @NotBlank String resourceType,
                                       @NotBlank String resourceName) {
@@ -184,7 +185,7 @@ public class DefaultRoleSetupImportService {
      * @param resourceName the name of the resource
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog("resource definition defined as '{{serviceName}}|{{resourceType}}|{{resourceName}}' deleted")
+    @AuditLog(value = "resource definition defined as '{{serviceName}}|{{resourceType}}|{{resourceName}}' deleted", severity = Severity.DEBUG)
     public void deleteResourceDefinition(@NotBlank String serviceName,
                                          @NotBlank String resourceType,
                                          @NotBlank String resourceName) {
@@ -198,7 +199,7 @@ public class DefaultRoleSetupImportService {
      * @param roleName the role name to delete
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog("role '{{roleName}}' deleted")
+    @AuditLog(value = "role '{{roleName}}' deleted", severity = Severity.DEBUG)
     public void deleteRole(@NotBlank String roleName) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao -> dao.deleteRole(roleName));
     }
@@ -209,7 +210,7 @@ public class DefaultRoleSetupImportService {
      * @param serviceName the service name to delete
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog("service '{{serviceName}}' deleted")
+    @AuditLog(value = "service '{{serviceName}}' deleted", severity = Severity.DEBUG)
     public void deleteService(@NotBlank String serviceName) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao -> dao.deleteService(serviceName));
     }

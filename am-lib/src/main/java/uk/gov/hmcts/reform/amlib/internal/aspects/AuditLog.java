@@ -12,4 +12,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface AuditLog {
     String value();
+
+    Severity severity() default Severity.INFO;
+
+    enum Severity {
+        DEBUG,
+        INFO
+    }
 }

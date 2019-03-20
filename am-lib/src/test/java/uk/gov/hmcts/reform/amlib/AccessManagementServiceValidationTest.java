@@ -18,37 +18,37 @@ class AccessManagementServiceValidationTest {
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
-    void grantExplicitResourceAccessMethodShouldRejectInvalidArguments(ExplicitAccessGrant explicitAccessGrant) {
+    void grantExplicitResourceAccessMethodShouldRejectInvalidArguments(ExplicitAccessGrant accessGrant) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.grantExplicitResourceAccess(explicitAccessGrant))
+            .isThrownBy(() -> service.grantExplicitResourceAccess(accessGrant))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "explicitAccessGrant - must not be null",
-                "explicitAccessGrant.resourceId - must not be blank",
-                "explicitAccessGrant.accessorId - must not be blank",
-                "explicitAccessGrant.accessType - must not be blank",
-                "explicitAccessGrant.serviceName - must not be blank",
-                "explicitAccessGrant.resourceType - must not be blank",
-                "explicitAccessGrant.resourceName - must not be blank",
-                "explicitAccessGrant.attributePermissions - must not be empty",
-                "explicitAccessGrant.securityClassification - must not be null"
+                "accessGrant - must not be null",
+                "accessGrant.resourceId - must not be blank",
+                "accessGrant.accessorId - must not be blank",
+                "accessGrant.accessType - must not be blank",
+                "accessGrant.serviceName - must not be blank",
+                "accessGrant.resourceType - must not be blank",
+                "accessGrant.resourceName - must not be blank",
+                "accessGrant.attributePermissions - must not be empty",
+                "accessGrant.securityClassification - must not be null"
             ));
     }
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
-    void revokeResourceAccessMethodShouldRejectInvalidArguments(ExplicitAccessMetadata explicitAccessMetadata) {
+    void revokeResourceAccessMethodShouldRejectInvalidArguments(ExplicitAccessMetadata accessMetadata) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.revokeResourceAccess(explicitAccessMetadata))
+            .isThrownBy(() -> service.revokeResourceAccess(accessMetadata))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "explicitAccessMetadata - must not be null",
-                "explicitAccessMetadata.resourceId - must not be blank",
-                "explicitAccessMetadata.accessorId - must not be blank",
-                "explicitAccessMetadata.accessType - must not be blank",
-                "explicitAccessMetadata.serviceName - must not be blank",
-                "explicitAccessMetadata.resourceType - must not be blank",
-                "explicitAccessMetadata.resourceName - must not be blank",
-                "explicitAccessMetadata.attribute - must not be null",
-                "explicitAccessMetadata.securityClassification - must not be null"
+                "accessMetadata - must not be null",
+                "accessMetadata.resourceId - must not be blank",
+                "accessMetadata.accessorId - must not be blank",
+                "accessMetadata.accessType - must not be blank",
+                "accessMetadata.serviceName - must not be blank",
+                "accessMetadata.resourceType - must not be blank",
+                "accessMetadata.resourceName - must not be blank",
+                "accessMetadata.attribute - must not be null",
+                "accessMetadata.securityClassification - must not be null"
             ));
     }
 

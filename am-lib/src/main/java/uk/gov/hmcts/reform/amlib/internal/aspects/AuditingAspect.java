@@ -21,8 +21,7 @@ import static java.lang.String.format;
 
 @Aspect
 @Slf4j
-@SuppressWarnings("LineLenght")
-public class LoggingAspect {
+public class AuditingAspect {
 
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{\\{([^{}]+)}}");
 

@@ -37,7 +37,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     void shouldNotBeAbleToCreateDefaultPermissionWhenRoleDoesNotExist() {
         assertThatExceptionOfType(PersistenceException.class)
             .isThrownBy(() -> service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION)))
-            .withMessageContaining("(role_name)=(Role Name) is not present in table \"roles\"");
+            .withMessageContaining("(role_name)=(Solicitor) is not present in table \"roles\"");
     }
 
     @Test

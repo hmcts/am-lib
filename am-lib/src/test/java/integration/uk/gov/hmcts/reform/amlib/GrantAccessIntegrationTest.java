@@ -1,7 +1,6 @@
 package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.google.common.collect.ImmutableMap;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,12 +58,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenCreatingResourceForMultipleUsersShouldAppearInDatabase() {
-        Map<JsonPointer, Set<Permission>> multipleAttributePermissions =
-            ImmutableMap.<JsonPointer, Set<Permission>>builder()
-                .put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS)
-                .build();
-
-        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_IDS, multipleAttributePermissions));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_IDS, READ_PERMISSION));
 
         assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(2)
             .extracting(ExplicitAccessRecord::getAccessorId).containsOnly("y", "z");

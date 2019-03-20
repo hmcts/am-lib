@@ -7,16 +7,23 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Aspect
 @Slf4j
+@SuppressWarnings("LineLenght")
 public class LoggingAspect {
 
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{\\{([^{}]+)}}");
+
+    private final Map<MethodSignature, Metadata> cache = new ConcurrentHashMap<>();
 
     @AfterReturning(pointcut = "within(uk.gov.hmcts.reform.amlib.*Service) && execution(@AuditLog public * *(..))", returning = "result")
     public void after(JoinPoint joinPoint, Object result) {
@@ -24,35 +31,44 @@ public class LoggingAspect {
         AuditLog auditLog = methodSignature.getMethod().getAnnotation(AuditLog.class);
 
         if (isEnabled(auditLog.severity())) {
+            Metadata metadata = cache.computeIfAbsent(methodSignature, method -> {
+                Matcher matcher = VARIABLE_PATTERN.matcher(auditLog.value());
+
+                Metadata instance = new Metadata();
+                while (matcher.find()) {
+                    Metadata.Expression expression = new Metadata.Expression();
+                    expression.template = matcher.group(0);
+                    expression.value = matcher.group(1);
+
+                    if (expression.value.contains(".")) {
+                        expression.beanName = extractBeanName(expression.value);
+                        expression.beanProperties = extractBeanProperties(expression.value);
+                    } else {
+                        expression.beanName = expression.value;
+                        expression.beanProperties = null;
+                    }
+
+                    String[] parameterNames = methodSignature.getParameterNames();
+                    expression.argumentPosition = Arrays.asList(parameterNames).indexOf(expression.beanName);
+
+                    instance.expressions.add(expression);
+                }
+                return instance;
+            });
+
             String template = auditLog.value();
+            for (Metadata.Expression expression : metadata.expressions) {
+                Object value;
 
-            Matcher matcher = VARIABLE_PATTERN.matcher(template);
-            while (matcher.find()) {
-                String expression = matcher.group(1);
-
-                Object arg;
-                if (expression.startsWith("result")) {
-                    if (expression.contains(".")) {
-                        arg = extractValue(result, extractBeanProperties(expression));
-                    } else {
-                        arg = result;
-                    }
+                Object beanInstance = expression.value.startsWith("result") ? result : joinPoint.getArgs()[expression.argumentPosition];
+                if (expression.beanProperties != null) {
+                    value = extractValue(beanInstance, expression.beanProperties);
                 } else {
-                    String[] parameterNames = ((MethodSignature) joinPoint.getSignature()).getParameterNames();
-                    int index = Arrays.asList(parameterNames).indexOf(
-                        expression.contains(".") ? extractBeanName(expression) : expression
-                    );
-
-                    if (expression.contains(".")) {
-                        arg = extractValue(joinPoint.getArgs()[index], extractBeanProperties(expression));
-                    } else {
-                        arg = joinPoint.getArgs()[index];
-                    }
+                    value = beanInstance;
                 }
 
-                template = template.replace(matcher.group(0), Objects.toString(arg));
+                template = template.replace(expression.template, Objects.toString(value));
             }
-
             log(auditLog.severity(), "[Access Management audit]: " + template);
         }
     }
@@ -118,6 +134,18 @@ public class LoggingAspect {
         return result;
     }
 
+    private static class Metadata {
+        private List<Expression> expressions = new ArrayList<>();
+
+        private static class Expression {
+            private String value;
+            private String template;
+            private String beanName;
+            private String beanProperties;
+            private Integer argumentPosition;
+        }
+    }
+
     private static class InvalidTemplateExpressionException extends AuditException {
         private InvalidTemplateExpressionException(String message, Throwable cause) {
             super(message, cause);
@@ -133,5 +161,4 @@ public class LoggingAspect {
             super(message, cause);
         }
     }
-
 }

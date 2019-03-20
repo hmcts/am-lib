@@ -146,7 +146,6 @@ public class AccessManagementService {
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
      *     to resource is configured, otherwise null.
      */
-    @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     public FilterResourceResponse filterResource(@NotBlank String userId,
                                                  @NotEmpty Set<@NotBlank String> userRoles,
                                                  @NotNull @Valid Resource resource) {
@@ -175,9 +174,11 @@ public class AccessManagementService {
             .build();
     }
 
-    private boolean explicitAccessType(String userRole) {
-        return jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getRoleAccessType(userRole).equals(AccessType.EXPLICIT));
+    private boolean roleBasedAccessType(String userRole) {
+        AccessType accessType = jdbi.withExtension(AccessManagementRepository.class,
+            dao -> dao.getRoleAccessType(userRole));
+
+        return accessType != null && accessType.equals(AccessType.ROLE_BASED);
     }
 
     /**
@@ -192,9 +193,9 @@ public class AccessManagementService {
         List<Map<JsonPointer, Set<Permission>>> permissionsForRoles =
             jdbi.withExtension(AccessManagementRepository.class, dao ->
                 userRoles.stream()
+                    .filter(this::roleBasedAccessType)
                     .map(role -> dao.getRolePermissions(resource, role))
                     .map(roleBasedAccessRecords -> roleBasedAccessRecords.stream()
-                        .filter(record -> !explicitAccessType(record.getRoleName()))
                         .collect(getMapCollector()))
                     .collect(Collectors.toList()));
 

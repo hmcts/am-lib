@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.amlib;
+package uk.gov.hmcts.reform.amlib.internal.aspects;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

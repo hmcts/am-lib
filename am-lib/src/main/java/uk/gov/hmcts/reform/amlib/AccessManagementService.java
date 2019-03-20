@@ -65,9 +65,9 @@ public class AccessManagementService {
      * @param accessGrant an object that describes explicit access to resource
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
-    @AuditLog("explicit access granted to resource '{{in#accessGrant.resourceId}}' "
-        + "defined as '{{in#accessGrant.serviceName}}|{{in#accessGrant.resourceType}}|{{in#accessGrant.resourceName}}' "
-        + "for user '{{in#accessGrant.accessorId}}': {{in#accessGrant.attributePermissions}}")
+    @AuditLog("explicit access granted to resource '{{accessGrant.resourceId}}' "
+        + "defined as '{{accessGrant.serviceName}}|{{accessGrant.resourceType}}|{{accessGrant.resourceName}}' "
+        + "for user '{{accessGrant.accessorId}}': {{accessGrant.attributePermissions}}")
     public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant accessGrant) {
         jdbi.useTransaction(handle -> {
             AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
@@ -96,9 +96,9 @@ public class AccessManagementService {
      * @param accessMetadata an object to remove a specific explicit access record
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog("explicit access revoked to resource '{{in#accessMetadata.resourceId}}' "
-        + "defined as '{{in#accessMetadata.serviceName}}|{{in#accessMetadata.resourceType}}|{{in#accessMetadata.resourceName}}' "
-        + "from user '{{in#accessMetadata.accessorId}}': {{in#accessMetadata.attribute}}")
+    @AuditLog("explicit access revoked to resource '{{accessMetadata.resourceId}}' "
+        + "defined as '{{accessMetadata.serviceName}}|{{accessMetadata.resourceType}}|{{accessMetadata.resourceName}}' "
+        + "from user '{{accessMetadata.accessorId}}': {{accessMetadata.attribute}}")
     public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata accessMetadata) {
         jdbi.useExtension(AccessManagementRepository.class,
             dao -> dao.removeAccessManagementRecord(accessMetadata));
@@ -151,9 +151,9 @@ public class AccessManagementService {
      * @throws PersistenceException if any persistence errors were encountered
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
-    @AuditLog("filtered access to resource '{{in#resource.resourceId}}' "
-        + "defined as '{{in#resource.type.serviceName}}|{{in#resource.type.resourceType}}|{{in#resource.type.resourceName}}' "
-        + "for user '{{in#userId}}' in roles '{{in#userRoles}}': {{out#permissions}}")
+    @AuditLog("filtered access to resource '{{resource.resourceId}}' "
+        + "defined as '{{resource.type.serviceName}}|{{resource.type.resourceType}}|{{resource.type.resourceName}}' "
+        + "for user '{{userId}}' in roles '{{userRoles}}': {{result.permissions}}")
     public FilterResourceResponse filterResource(@NotBlank String userId,
                                                  @NotEmpty Set<@NotBlank String> userRoles,
                                                  @NotNull @Valid Resource resource) {
@@ -215,8 +215,8 @@ public class AccessManagementService {
      * @throws PersistenceException if any persistence errors were encountered
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
-    @AuditLog("returned role access to resource defined as '{{in#serviceName}}|{{in#resourceType}}|{{in#resourceName}}'"
-        + " for roles '{{in#roleNames}}': {{out}}")
+    @AuditLog("returned role access to resource defined as '{{serviceName}}|{{resourceType}}|{{resourceName}}'"
+        + " for roles '{{roleNames}}': {{result}}")
     public Map<JsonPointer, Set<Permission>> getRolePermissions(@NotBlank String serviceName,
                                                                 @NotBlank String resourceType,
                                                                 @NotBlank String resourceName,

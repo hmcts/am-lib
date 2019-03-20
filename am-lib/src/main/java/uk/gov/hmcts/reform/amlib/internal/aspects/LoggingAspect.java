@@ -28,59 +28,70 @@ public class LoggingAspect {
 
             Matcher matcher = VARIABLE_PATTERN.matcher(template);
             while (matcher.find()) {
-                String[] split = matcher.group(1).split("#", 2);
-                String source = split[0];
-                String variable = split.length == 2 ? split[1] : null;
+                String expression = matcher.group(1);
 
                 Object arg;
-                switch (source) {
-                    case "in":
-                        String[] parameterNames = ((MethodSignature) joinPoint.getSignature()).getParameterNames();
-                        int index = Arrays.asList(parameterNames).indexOf(
-                            variable.contains(".") ? variable.substring(0, variable.indexOf('.')) : variable
-                        );
+                if (expression.startsWith("result")) {
+                    if (expression.contains(".")) {
+                        arg = extractValue(result, expression.substring(expression.indexOf('.') + 1));
+                    } else {
+                        arg = result;
+                    }
+                } else {
+                    String[] parameterNames = ((MethodSignature) joinPoint.getSignature()).getParameterNames();
+                    int index = Arrays.asList(parameterNames).indexOf(
+                        expression.contains(".") ? expression.substring(0, expression.indexOf('.')) : expression
+                    );
 
-                        if (variable.contains(".")) {
-                            arg = extractValue(joinPoint.getArgs()[index], variable.substring(variable.indexOf('.') + 1));
-                        } else {
-                            arg = joinPoint.getArgs()[index];
-                        }
-                        break;
-                    case "out":
-                        if (variable == null) {
-                            arg = result;
-                        } else {
-                            arg = extractValue(result, variable);
-                        }
-                        break;
-                    default:
-                        throw new RuntimeException("Unknown source");
+                    if (expression.contains(".")) {
+                        arg = extractValue(joinPoint.getArgs()[index], expression.substring(expression.indexOf('.') + 1));
+                    } else {
+                        arg = joinPoint.getArgs()[index];
+                    }
                 }
 
                 template = template.replace(matcher.group(0), Objects.toString(arg));
             }
 
-            log.info("[AccessManagement audit]: " + template);
+            log.info("[Access Management audit]: " + template);
         }
 
         return result;
     }
 
     private Object extractValue(Object object, String path) {
-        String[] fragments = path.split("\\.");
+        if (object == null) {
+            return null;
+        }
 
         Object result = object;
-        for (String fragment : fragments) {
+        for (String fragment : path.split("\\.")) {
+            if (result == null) {
+                break;
+            }
             try {
                 Field field = result.getClass().getDeclaredField(fragment);
                 field.setAccessible(true);
                 result = field.get(result);
             } catch (Exception e) {
-                e.printStackTrace();
+                String template = "Cannot find fragment %s in expression %s against instance of %s class";
+                throw new InvalidTemplateExpressionException(String.format(template, fragment, path, object.getClass()), e);
             }
         }
 
         return result;
+    }
+
+    private static class InvalidTemplateExpressionException extends AuditException {
+        private InvalidTemplateExpressionException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
+    private static class AuditException extends RuntimeException {
+        private AuditException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 
 }

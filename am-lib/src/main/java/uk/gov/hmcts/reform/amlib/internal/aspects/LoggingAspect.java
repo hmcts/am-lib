@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.amlib.internal.aspects;
 
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 
@@ -18,10 +18,8 @@ public class LoggingAspect {
 
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{\\{([^{}]+)}}");
 
-    @Around("within(uk.gov.hmcts.reform.amlib.*Service) && execution(@AuditLog public * *(..))")
-    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
-        Object result = joinPoint.proceed();
-
+    @AfterReturning(pointcut = "within(uk.gov.hmcts.reform.amlib.*Service) && execution(@AuditLog public * *(..))", returning = "result")
+    public void after(JoinPoint joinPoint, Object result) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         AuditLog auditLog = methodSignature.getMethod().getAnnotation(AuditLog.class);
 
@@ -35,18 +33,18 @@ public class LoggingAspect {
                 Object arg;
                 if (expression.startsWith("result")) {
                     if (expression.contains(".")) {
-                        arg = extractValue(result, expression.substring(expression.indexOf('.') + 1));
+                        arg = extractValue(result, extractBeanProperties(expression));
                     } else {
                         arg = result;
                     }
                 } else {
                     String[] parameterNames = ((MethodSignature) joinPoint.getSignature()).getParameterNames();
                     int index = Arrays.asList(parameterNames).indexOf(
-                        expression.contains(".") ? expression.substring(0, expression.indexOf('.')) : expression
+                        expression.contains(".") ? extractBeanName(expression) : expression
                     );
 
                     if (expression.contains(".")) {
-                        arg = extractValue(joinPoint.getArgs()[index], expression.substring(expression.indexOf('.') + 1));
+                        arg = extractValue(joinPoint.getArgs()[index], extractBeanProperties(expression));
                     } else {
                         arg = joinPoint.getArgs()[index];
                     }
@@ -57,8 +55,6 @@ public class LoggingAspect {
 
             log(auditLog.severity(), "[Access Management audit]: " + template);
         }
-
-        return result;
     }
 
     private boolean isEnabled(AuditLog.Severity severity) {
@@ -83,6 +79,20 @@ public class LoggingAspect {
             default:
                 throw new AuditException("Unsupported severity: " + severity);
         }
+    }
+
+    /**
+     * Removes bean name from expression formatted as <bean name>[.<property name>]+ leaving bean properties.
+     */
+    private String extractBeanProperties(String expression) {
+        return expression.substring(expression.indexOf('.') + 1);
+    }
+
+    /**
+     * Removes property names from expression formatted as <bean name>[.<property name>]+ leaving bean name.
+     */
+    private String extractBeanName(String expression) {
+        return expression.substring(0, expression.indexOf('.'));
     }
 
     private Object extractValue(Object object, String path) {
@@ -115,7 +125,7 @@ public class LoggingAspect {
     }
 
     private static class AuditException extends RuntimeException {
-        public AuditException(String message) {
+        private AuditException(String message) {
             super(message);
         }
 

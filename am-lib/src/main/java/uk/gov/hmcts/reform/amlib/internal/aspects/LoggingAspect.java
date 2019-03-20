@@ -17,6 +17,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.String.format;
+
 @Aspect
 @Slf4j
 @SuppressWarnings("LineLenght")
@@ -26,7 +28,8 @@ public class LoggingAspect {
 
     private final Map<MethodSignature, Metadata> cache = new ConcurrentHashMap<>();
 
-    @AfterReturning(pointcut = "within(uk.gov.hmcts.reform.amlib.*Service) && execution(@AuditLog public * *(..))", returning = "result")
+    @AfterReturning(pointcut = "within(uk.gov.hmcts.reform.amlib.*Service) && execution(@AuditLog public * *(..))",
+        returning = "result")
     public void after(JoinPoint joinPoint, Object result) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         AuditLog auditLog = methodSignature.getMethod().getAnnotation(AuditLog.class);
@@ -39,11 +42,12 @@ public class LoggingAspect {
             for (Metadata.Expression expression : metadata.expressions) {
                 Object value;
 
-                Object beanInstance = expression.value.startsWith("result") ? result : joinPoint.getArgs()[expression.argumentPosition];
-                if (expression.beanProperties != null) {
-                    value = extractValue(beanInstance, expression.beanProperties);
-                } else {
+                Object beanInstance = expression.value.startsWith("result")
+                    ? result : joinPoint.getArgs()[expression.argumentPosition];
+                if (expression.beanProperties == null) {
                     value = beanInstance;
+                } else {
+                    value = extractValue(beanInstance, expression.beanProperties);
                 }
 
                 template = template.replace(expression.template, Objects.toString(value));
@@ -52,7 +56,8 @@ public class LoggingAspect {
         }
     }
 
-    private Function<MethodSignature, Metadata> createMetadata(String template, String[] parameterNames) {
+    @SuppressWarnings("PMD") // AvoidInstantiatingObjectsInLoops: new objects need to be created in while loop
+    private Function<MethodSignature, Metadata> createMetadata(String template, String... parameterNames) {
         return method -> {
             Matcher matcher = VARIABLE_PATTERN.matcher(template);
 
@@ -67,7 +72,6 @@ public class LoggingAspect {
                     expression.beanProperties = extractBeanProperties(expression.value);
                 } else {
                     expression.beanName = expression.value;
-                    expression.beanProperties = null;
                 }
 
                 expression.argumentPosition = Arrays.asList(parameterNames).indexOf(expression.beanName);
@@ -103,14 +107,14 @@ public class LoggingAspect {
     }
 
     /**
-     * Removes bean name from expression formatted as <bean name>[.<property name>]+ leaving bean properties.
+     * Removes bean name from expression formatted as {@code <bean name>[.<property name>]+} leaving bean properties.
      */
     private String extractBeanProperties(String expression) {
         return expression.substring(expression.indexOf('.') + 1);
     }
 
     /**
-     * Removes property names from expression formatted as <bean name>[.<property name>]+ leaving bean name.
+     * Removes property names from expression formatted as {@code <bean name>[.<property name>]+} leaving bean name.
      */
     private String extractBeanName(String expression) {
         return expression.substring(0, expression.indexOf('.'));
@@ -132,7 +136,7 @@ public class LoggingAspect {
                 result = field.get(result);
             } catch (Exception e) {
                 String template = "Cannot find fragment %s in expression %s against instance of %s class";
-                throw new InvalidTemplateExpressionException(String.format(template, fragment, path, object.getClass()), e);
+                throw new InvalidTemplateExpressionException(format(template, fragment, path, object.getClass()), e);
             }
         }
 
@@ -140,7 +144,7 @@ public class LoggingAspect {
     }
 
     private static class Metadata {
-        private List<Expression> expressions = new ArrayList<>();
+        private final List<Expression> expressions = new ArrayList<>();
 
         private static class Expression {
             private String value;
@@ -152,12 +156,16 @@ public class LoggingAspect {
     }
 
     private static class InvalidTemplateExpressionException extends AuditException {
+        private static final long serialVersionUID = 1L;
+
         private InvalidTemplateExpressionException(String message, Throwable cause) {
             super(message, cause);
         }
     }
 
     private static class AuditException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
         private AuditException(String message) {
             super(message);
         }

@@ -112,6 +112,7 @@ public class AccessManagementService {
      * @return list of user ids (accessor id) or null
      * @throws PersistenceException if any persistence errors were encountered
      */
+    @AuditLog("returned accessors to resource '{{resourceId}}' for user '{{userId}}': {{result}}")
     public List<String> getAccessorsList(String userId, String resourceId) {
         return jdbi.withExtension(AccessManagementRepository.class, dao -> {
             List<String> userIds = dao.getAccessorsList(userId, resourceId);
@@ -128,7 +129,7 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resources envelope {@link Resource} and corresponding metadata
      * @return envelope list of {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions
-     * if access to resource is configured, otherwise null
+     *         if access to resource is configured, otherwise null
      * @throws PersistenceException if any persistence errors were encountered
      */
     public List<FilterResourceResponse> filterResource(@NotBlank String userId,
@@ -147,7 +148,7 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
-     * to resource is configured, otherwise null
+     *         to resource is configured, otherwise null
      * @throws PersistenceException if any persistence errors were encountered
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
@@ -215,8 +216,8 @@ public class AccessManagementService {
      * @throws PersistenceException if any persistence errors were encountered
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
-    @AuditLog("returned role access to resource defined as '{{serviceName}}|{{resourceType}}|{{resourceName}}'"
-        + " for roles '{{roleNames}}': {{result}}")
+    @AuditLog("returned role access to resource defined as '{{serviceName}}|{{resourceType}}|{{resourceName}}' "
+        + "for roles '{{roleNames}}': {{result}}")
     public Map<JsonPointer, Set<Permission>> getRolePermissions(@NotBlank String serviceName,
                                                                 @NotBlank String resourceType,
                                                                 @NotBlank String resourceName,

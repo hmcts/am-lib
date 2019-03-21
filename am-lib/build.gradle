@@ -61,6 +61,9 @@ repositories {
     mavenLocal()
     mavenCentral()
     jcenter()
+    maven {
+      url  "https://dl.bintray.com/hmcts/hmcts-maven"
+    }
 }
 
 dependencies {
@@ -83,7 +86,8 @@ dependencies {
     testCompile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
     testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.10.7'
     testCompile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
-    testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'
+    testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: '5.0.1'
 }
 
 task codeCoverageReport(type: JacocoReport, dependsOn: test) {

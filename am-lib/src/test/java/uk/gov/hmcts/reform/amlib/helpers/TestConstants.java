@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Set;
 
@@ -36,6 +37,11 @@ public final class TestConstants {
     public static final JsonNode DATA = JsonNodeFactory.instance.objectNode()
         .put("name", "John")
         .put("age", 18);
+    public static final ResourceDefinition RESOURCE_DEFINITION = ResourceDefinition.builder()
+        .serviceName(SERVICE_NAME)
+        .resourceType(RESOURCE_TYPE)
+        .resourceName(RESOURCE_NAME)
+        .build();
 
     private TestConstants() {
         //NO-OP

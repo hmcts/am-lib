@@ -12,10 +12,11 @@ import uk.gov.hmcts.reform.amlib.internal.PermissionsService;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
+import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
 import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
-import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
+import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
@@ -125,12 +126,12 @@ public class AccessManagementService {
      * @param userId    accessor ID
      * @param userRoles accessor roles
      * @param resources envelope {@link Resource} and corresponding metadata
-     * @return envelope list of {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions
+     * @return envelope list of {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions
      *     if access to resource is configured, otherwise null.
      */
-    public List<FilterResourceResponse> filterResource(@NotBlank String userId,
-                                                       @NotEmpty Set<@NotBlank String> userRoles,
-                                                       @NotNull List<@NotNull @Valid Resource> resources) {
+    public List<FilteredResourceEnvelope> filterResource(@NotBlank String userId,
+                                                         @NotEmpty Set<@NotBlank String> userRoles,
+                                                         @NotNull List<@NotNull @Valid Resource> resources) {
         return resources.stream()
             .map(resource -> filterResource(userId, userRoles, resource))
             .collect(Collectors.toList());
@@ -143,16 +144,17 @@ public class AccessManagementService {
      * @param userId    accessor ID
      * @param userRoles accessor roles
      * @param resource  envelope {@link Resource} and corresponding metadata
-     * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
-     *     to resource is configured, otherwise null.
+     * @return envelope {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions if
+     *     access to resource is configured, otherwise null.
      */
-    public FilterResourceResponse filterResource(@NotBlank String userId,
-                                                 @NotEmpty Set<@NotBlank String> userRoles,
-                                                 @NotNull @Valid Resource resource) {
+    public FilteredResourceEnvelope filterResource(@NotBlank String userId,
+                                                   @NotEmpty Set<@NotBlank String> userRoles,
+                                                   @NotNull @Valid Resource resource) {
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resource.getResourceId()));
 
         Map<JsonPointer, Set<Permission>> attributePermissions;
+        AccessType accessManagementType;
 
         if (explicitAccess.isEmpty()) {
             attributePermissions = getRolePermissions(resource.getType(), userRoles);
@@ -161,16 +163,23 @@ public class AccessManagementService {
                 return null;
             }
 
+            accessManagementType = AccessType.ROLE_BASED;
+
         } else {
             attributePermissions = explicitAccess.stream().collect(getMapCollector());
+            accessManagementType = AccessType.EXPLICIT;
         }
 
         JsonNode filteredJson = filterService.filterJson(resource.getResourceJson(), attributePermissions);
 
-        return FilterResourceResponse.builder()
+        return FilteredResourceEnvelope.builder()
             .resourceId(resource.getResourceId())
+            .resourceDefinition(resource.getType())
             .data(filteredJson)
-            .permissions(attributePermissions)
+            .access(AccessEnvelope.builder()
+                .permissions(attributePermissions)
+                .accessManagementType(accessManagementType)
+                .build())
             .build();
     }
 

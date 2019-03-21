@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amapi.models.FilterResource;
-import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
+import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +42,7 @@ public class AmLibProxyController {
     }
 
     @PostMapping("/filter-resource")
-    public FilterResourceResponse filterResource(@RequestBody FilterResource request) {
+    public FilteredResourceEnvelope filterResource(@RequestBody FilterResource request) {
         return am.filterResource(request.getUserId(), request.getUserRoles(), request.getResource());
     }
 }

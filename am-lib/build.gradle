@@ -73,6 +73,10 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.15.Final'
     compile group: 'org.aspectj', name: 'aspectjrt', version: '1.9.2'
+    compile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
+    compile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
+
+  annotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.21'
 
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'

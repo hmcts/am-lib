@@ -28,4 +28,9 @@ public final class Pair<K, V> implements Map.Entry<K, V> {
         this.value = value;
         return old;
     }
+
+    @Override
+    public String toString() {
+        return "{" + key + "=" + value + '}';
+    }
 }

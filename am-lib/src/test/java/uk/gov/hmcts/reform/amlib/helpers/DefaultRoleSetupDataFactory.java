@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.Pair;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +55,19 @@ public final class DefaultRoleSetupDataFactory {
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attributePermissions(createPermissionsForAttribute(attribute, permissions))
+            .build();
+    }
+
+    public static DefaultPermissionGrant createDefaultPermissionGrant(String attribute,
+                                                                      Set<Permission> permissions,
+                                                                      ResourceDefinition resource,
+                                                                      String roleName) {
+        return DefaultPermissionGrant.builder()
+            .roleName(roleName)
+            .serviceName(resource.getServiceName())
+            .resourceType(resource.getResourceType())
+            .resourceName(resource.getResourceName())
+            .attributePermissions(createReadPermissionsForAttribute(JsonPointer.valueOf(attribute), permissions))
             .build();
     }
 }

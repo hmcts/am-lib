@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.FilterService;
 import uk.gov.hmcts.reform.amlib.internal.PermissionsService;
+import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 import uk.gov.hmcts.reform.amlib.models.Resource;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.List;
 import java.util.Map;
@@ -61,31 +63,33 @@ public class AccessManagementService {
 
     /**
      * Grants explicit access to resource accordingly to record configuration.
+     * Access can be granted to a user or multiple users for a resource.
      *
      * <p>Operation is performed in a transaction so that if not all records can be created then whole grant will fail.
      *
-     * @param explicitAccessGrant an object that describes explicit access to resource
+     * @param accessGrant an object that describes explicit access to resource
+     * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
-    public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant explicitAccessGrant) {
+    @AuditLog("explicit access granted to resource '{{accessGrant.resourceId}}' "
+        + "defined as '{{accessGrant.serviceName}}|{{accessGrant.resourceType}}|{{accessGrant.resourceName}}' "
+        + "for accessors '{{accessGrant.accessorIds}}': {{accessGrant.attributePermissions}}")
+    public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant accessGrant) {
         jdbi.useTransaction(handle -> {
             AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
-            try {
-                explicitAccessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
+            accessGrant.getAccessorIds().forEach(accessorIds ->
+                accessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
                     ExplicitAccessRecord.builder()
-                        .resourceId(explicitAccessGrant.getResourceId())
-                        .accessorId(explicitAccessGrant.getAccessorId())
+                        .resourceId(accessGrant.getResourceId())
+                        .accessorId(accessorIds)
                         .permissions(attributePermission.getValue())
-                        .accessType(explicitAccessGrant.getAccessType())
-                        .serviceName(explicitAccessGrant.getServiceName())
-                        .resourceType(explicitAccessGrant.getResourceType())
-                        .resourceName(explicitAccessGrant.getResourceName())
+                        .accessType(accessGrant.getAccessType())
+                        .serviceName(accessGrant.getServiceName())
+                        .resourceType(accessGrant.getResourceType())
+                        .resourceName(accessGrant.getResourceName())
                         .attribute(attributePermission.getKey())
-                        .securityClassification(explicitAccessGrant.getSecurityClassification())
+                        .securityClassification(accessGrant.getSecurityClassification())
                         .build())
-                    .forEach(dao::createAccessManagementRecord);
-            } catch (Exception e) {
-                throw new PersistenceException(e);
-            }
+                    .forEach(dao::createAccessManagementRecord));
         });
     }
 
@@ -95,11 +99,15 @@ public class AccessManagementService {
      * <p>IMPORTANT: This is a cascade delete function and so if called on a specific attribute
      * it will remove specified attribute and all children attributes.
      *
-     * @param explicitAccessMetadata an object to remove a specific explicit access record.
+     * @param accessMetadata an object to remove a specific explicit access record
+     * @throws PersistenceException if any persistence errors were encountered
      */
-    public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata explicitAccessMetadata) {
+    @AuditLog("explicit access revoked to resource '{{accessMetadata.resourceId}}' "
+        + "defined as '{{accessMetadata.serviceName}}|{{accessMetadata.resourceType}}|{{accessMetadata.resourceName}}' "
+        + "from accessor '{{accessMetadata.accessorId}}': {{accessMetadata.attribute}}")
+    public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata accessMetadata) {
         jdbi.useExtension(AccessManagementRepository.class,
-            dao -> dao.removeAccessManagementRecord(explicitAccessMetadata));
+            dao -> dao.removeAccessManagementRecord(accessMetadata));
     }
 
     /**
@@ -107,8 +115,10 @@ public class AccessManagementService {
      *
      * @param userId     (accessorId)
      * @param resourceId resource Id
-     * @return List of user ids (accessor id) or null
+     * @return list of user ids (accessor id) or null
+     * @throws PersistenceException if any persistence errors were encountered
      */
+    @AuditLog("returned accessors to resource '{{resourceId}}' for accessor '{{userId}}': {{result}}")
     public List<String> getAccessorsList(String userId, String resourceId) {
         return jdbi.withExtension(AccessManagementRepository.class, dao -> {
             List<String> userIds = dao.getAccessorsList(userId, resourceId);
@@ -125,7 +135,8 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resources envelope {@link Resource} and corresponding metadata
      * @return envelope list of {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions
-     *     if access to resource is configured, otherwise null.
+     *         if access to resource is configured, otherwise null
+     * @throws PersistenceException if any persistence errors were encountered
      */
     public List<FilterResourceResponse> filterResource(@NotBlank String userId,
                                                        @NotEmpty Set<@NotBlank String> userRoles,
@@ -143,9 +154,13 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
-     *     to resource is configured, otherwise null.
+     *         to resource is configured, otherwise null
+     * @throws PersistenceException if any persistence errors were encountered
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
+    @AuditLog("filtered access to resource '{{resource.resourceId}}' "
+        + "defined as '{{resource.type.serviceName}}|{{resource.type.resourceType}}|{{resource.type.resourceName}}' "
+        + "for accessor '{{userId}}' in roles '{{userRoles}}': {{result.permissions}}")
     public FilterResourceResponse filterResource(@NotBlank String userId,
                                                  @NotEmpty Set<@NotBlank String> userRoles,
                                                  @NotNull @Valid Resource resource) {
@@ -203,7 +218,10 @@ public class AccessManagementService {
      * @param resourceName name of a resource
      * @param userRoles    A set of user roles
      * @return a map of attributes and their corresponding permissions or null
+     * @throws PersistenceException if any persistence errors were encountered
      */
+    @AuditLog("returned role access to resource defined as '{{serviceName}}|{{resourceType}}|{{resourceName}}' "
+        + "for roles '{{roleNames}}': {{result}}")
     public Map<JsonPointer, Set<Permission>> getRolePermissions(@NotBlank String serviceName,
                                                                 @NotBlank String resourceType,
                                                                 @NotBlank String resourceName,
@@ -221,6 +239,19 @@ public class AccessManagementService {
         }
 
         return permissionsService.merge(permissionsForRoles);
+    }
+
+    /**
+     * Retrieves a set of {@link ResourceDefinition} that user roles have root level create permissions for.
+     *
+     * @param userRoles a set of roles
+     * @return a set of resource definitions
+     */
+    @SuppressWarnings("LineLength")
+    @AuditLog("returned resources that user with roles '{{userRoles}}' has create permission to: {{result}}")
+    public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@NotEmpty Set<@NotBlank String> userRoles) {
+        return jdbi.withExtension(AccessManagementRepository.class, dao ->
+            dao.getResourceDefinitionsWithRootCreatePermission(userRoles));
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

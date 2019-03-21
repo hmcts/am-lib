@@ -69,7 +69,7 @@ public class AccessManagementService {
      */
     @AuditLog("explicit access granted to resource '{{accessGrant.resourceId}}' "
         + "defined as '{{accessGrant.serviceName}}|{{accessGrant.resourceType}}|{{accessGrant.resourceName}}' "
-        + "for user '{{accessGrant.accessorId}}': {{accessGrant.attributePermissions}}")
+        + "for accessor '{{accessGrant.accessorId}}': {{accessGrant.attributePermissions}}")
     public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant accessGrant) {
         jdbi.useTransaction(handle -> {
             AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
@@ -100,7 +100,7 @@ public class AccessManagementService {
      */
     @AuditLog("explicit access revoked to resource '{{accessMetadata.resourceId}}' "
         + "defined as '{{accessMetadata.serviceName}}|{{accessMetadata.resourceType}}|{{accessMetadata.resourceName}}' "
-        + "from user '{{accessMetadata.accessorId}}': {{accessMetadata.attribute}}")
+        + "from accessor '{{accessMetadata.accessorId}}': {{accessMetadata.attribute}}")
     public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata accessMetadata) {
         jdbi.useExtension(AccessManagementRepository.class,
             dao -> dao.removeAccessManagementRecord(accessMetadata));
@@ -114,7 +114,7 @@ public class AccessManagementService {
      * @return list of user ids (accessor id) or null
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog("returned accessors to resource '{{resourceId}}' for user '{{userId}}': {{result}}")
+    @AuditLog("returned accessors to resource '{{resourceId}}' for accessor '{{userId}}': {{result}}")
     public List<String> getAccessorsList(String userId, String resourceId) {
         return jdbi.withExtension(AccessManagementRepository.class, dao -> {
             List<String> userIds = dao.getAccessorsList(userId, resourceId);
@@ -156,7 +156,7 @@ public class AccessManagementService {
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     @AuditLog("filtered access to resource '{{resource.resourceId}}' "
         + "defined as '{{resource.type.serviceName}}|{{resource.type.resourceType}}|{{resource.type.resourceName}}' "
-        + "for user '{{userId}}' in roles '{{userRoles}}': {{result.permissions}}")
+        + "for accessor '{{userId}}' in roles '{{userRoles}}': {{result.permissions}}")
     public FilterResourceResponse filterResource(@NotBlank String userId,
                                                  @NotEmpty Set<@NotBlank String> userRoles,
                                                  @NotNull @Valid Resource resource) {

@@ -22,9 +22,9 @@ import java.util.stream.Stream;
 public class AccessManagementServiceBenchmarks {
 
     @State(Scope.Thread)
+    @SuppressWarnings("LineLength")
     public static class RecordState {
         AccessManagementService service =
-//            new AccessManagementService("jdbc:postgresql://localhost:5433/am", "amuser", "ampass");
             new AccessManagementService("jdbc:postgresql://am-lib-test-aat.postgres.database.azure.com:5432/{am}?user=amuser@am-lib-test-aat&password={ampass}&sslmode=required", "amuser", "ampass");
 
         String resourceId = UUID.randomUUID().toString();

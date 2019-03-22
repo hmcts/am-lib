@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -25,7 +26,7 @@ public class AccessManagementServiceBenchmarks {
     @SuppressWarnings("LineLength")
     public static class RecordState {
         AccessManagementService service =
-            new AccessManagementService("jdbc:postgresql://am-lib-test-aat.postgres.database.azure.com:5432/{am}?user=amuser@am-lib-test-aat&password={ampass}&sslmode=required", "amuser", "ampass");
+            new AccessManagementService("jdbc:postgresql://am-lib-test-aat.postgres.database.azure.com:5432/am?user=amuser@am-lib-test-aat&password=ampass&sslmode=require", "amuser@am-lib-test-aat", "ampass");
 
         String resourceId = UUID.randomUUID().toString();
         String accessorId = UUID.randomUUID().toString();
@@ -48,7 +49,7 @@ public class AccessManagementServiceBenchmarks {
     }
 
     @Benchmark
-    public void grantExplicitResourceAccess(RecordState state) {
+    public void grantExplicitResourceAccess(RecordState state) throws SQLException {
         state.service.grantExplicitResourceAccess(state.grant);
     }
 }

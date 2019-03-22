@@ -2,9 +2,10 @@ package uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.ImmutableMap;
-import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
@@ -16,14 +17,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@State(Scope.Benchmark)
-public class SpikeSetup {
+@BenchmarkMode(Mode.Throughput)
+public class AccessManagementServiceBenchmarks {
 
-    public ExplicitAccessGrant grant;
-    public AccessManagementService service = new AccessManagementService("jdbc:postgresql://localhost:5433/am", "amuser", "ampass");
-
-    @Setup(Level.Invocation)
-    public void setup() {
+    @State(Scope.Thread)
+    public static class RecordState {
+        AccessManagementService service =
+            new AccessManagementService("jdbc:postgresql://localhost:5433/am", "amuser", "ampass");
 
         String resourceId = UUID.randomUUID().toString();
         String accessorId = UUID.randomUUID().toString();
@@ -33,8 +33,7 @@ public class SpikeSetup {
                 JsonPointer.valueOf("/" + UUID.randomUUID().toString()),
                 Stream.of(Permission.READ).collect(Collectors.toSet()));
 
-
-        grant = ExplicitAccessGrant.builder()
+        ExplicitAccessGrant grant = ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorId(accessorId)
             .accessType("EXPLICIT")
@@ -44,5 +43,10 @@ public class SpikeSetup {
             .attributePermissions(attributePermissions)
             .securityClassification(SecurityClassification.PUBLIC)
             .build();
+    }
+
+    @Benchmark
+    public void grantExplicitResourceAccess(RecordState state) {
+        state.service.grantExplicitResourceAccess(state.grant);
     }
 }

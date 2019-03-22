@@ -7,13 +7,13 @@ def product = "am"
 def component = "lib-test"
 
 withPipeline(type, product, component) {
-  setVaultName('am')
-  enableDockerBuild()
-  installCharts()
-  enableDbMigration()
+    setVaultName('am')
+    enableDockerBuild()
+    installCharts()
+    enableDbMigration()
 
-  before('buildinfra:prod') {
-    currentBuild.description = "Success!"
-    error 'Access management project should not be built on prod environment yet.'
-  }
+    before('buildinfra:prod') {
+        currentBuild.description = "Success!"
+        error 'Access management project should not be built on prod environment yet.'
+    }
 }

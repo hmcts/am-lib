@@ -72,11 +72,7 @@ public final class TestDataFactory {
 
     public static Map<JsonPointer, Set<Permission>> createPermissions(String attribute,
                                                                       Set<Permission> permissions) {
-        Map<JsonPointer, Set<Permission>> attributePermissions =
-            ImmutableMap.<JsonPointer, Set<Permission>>builder()
-                .put(JsonPointer.valueOf(attribute), permissions)
-                .build();
-        return attributePermissions;
+        return ImmutableMap.of(JsonPointer.valueOf(attribute), permissions);
     }
 
     public static ExplicitAccessMetadata createMetadata(String resourceId) {

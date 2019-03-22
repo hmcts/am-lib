@@ -29,12 +29,7 @@ public final class DefaultRoleSetupDataFactory {
         Map.Entry<Set<Permission>, SecurityClassification> pair =
             new Pair<>(permissions, SecurityClassification.PUBLIC);
 
-        Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermission =
-            ImmutableMap.<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>>builder()
-                .put(attribute, pair)
-                .build();
-
-        return attributePermission;
+        return ImmutableMap.of(attribute, pair);
     }
 
     public static DefaultPermissionGrant createDefaultPermissionGrant(Set<Permission> permissions) {

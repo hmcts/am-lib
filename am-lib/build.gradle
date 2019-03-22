@@ -78,9 +78,6 @@ dependencies {
   compile group: 'org.aspectj', name: 'aspectjrt', version: '1.9.2'
   compile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
 
-  testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
-  testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
-
   annotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.21'
   compile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
 

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
@@ -35,7 +36,7 @@ public class AccessManagementServiceBenchmarks {
 
         ExplicitAccessGrant grant = ExplicitAccessGrant.builder()
             .resourceId(resourceId)
-            .accessorId(accessorId)
+            .accessorIds(ImmutableSet.of(accessorId))
             .accessType("EXPLICIT")
             .serviceName("Service 1")
             .resourceType("Resource Type 1")

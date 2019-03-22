@@ -25,6 +25,7 @@ public final class TestConstants {
     public static final String ACCESSOR_ID = "a";
     public static final String OTHER_ACCESSOR_ID = "b";
     public static final Set<String> ROLE_NAMES = ImmutableSet.of("Solicitor");
+    public static final Set<String> ACCESSOR_IDS = ImmutableSet.of("y", "z");
     public static final String ROLE_NAME = "Solicitor";
     public static final String OTHER_ROLE_NAME = "Local Authority";
     public static final Set<Permission> EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS =

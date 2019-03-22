@@ -1,0 +1,64 @@
+[
+    {
+        "jmhVersion" : "1.21",
+        "benchmark" : "uk.gov.hmcts.reform.amlib.AccessManagementServiceBenchmarks.grantExplicitResourceAccess",
+        "mode" : "thrpt",
+        "threads" : 1,
+        "forks" : 0,
+        "jvm" : "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home/jre/bin/java",
+        "jvmArgs" : [
+            "-Djava.security.manager=worker.org.gradle.process.internal.worker.child.BootstrapSecurityManager",
+            "-Dorg.gradle.native=false",
+            "-javaagent:build/tmp/expandedArchives/org.jacoco.agent-0.8.2.jar_2aca8b620b19ecd063f63feff8caaa38/jacocoagent.jar=destfile=build/jacoco/test.exec,append=true,inclnolocationclasses=false,dumponexit=true,output=file,jmx=false",
+            "-Xmx512m",
+            "-Dfile.encoding=UTF-8",
+            "-Duser.country=GB",
+            "-Duser.language=en",
+            "-Duser.variant",
+            "-ea"
+        ],
+        "jdkVersion" : "1.8.0_152",
+        "vmName" : "Java HotSpot(TM) 64-Bit Server VM",
+        "vmVersion" : "25.152-b16",
+        "warmupIterations" : 5,
+        "warmupTime" : "10 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 5,
+        "measurementTime" : "10 s",
+        "measurementBatchSize" : 1,
+        "primaryMetric" : {
+            "score" : 104.14936480480455,
+            "scoreError" : 78.26793028646308,
+            "scoreConfidence" : [
+                25.881434518341464,
+                182.41729509126765
+            ],
+            "scorePercentiles" : {
+                "0.0" : 80.34587936917879,
+                "50.0" : 100.00750935507058,
+                "90.0" : 133.92718542319707,
+                "95.0" : 133.92718542319707,
+                "99.0" : 133.92718542319707,
+                "99.9" : 133.92718542319707,
+                "99.99" : 133.92718542319707,
+                "99.999" : 133.92718542319707,
+                "99.9999" : 133.92718542319707,
+                "100.0" : 133.92718542319707
+            },
+            "scoreUnit" : "ops/s",
+            "rawData" : [
+                [
+                    112.73090686644265,
+                    100.00750935507058,
+                    80.34587936917879,
+                    93.73534301013365,
+                    133.92718542319707
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+        }
+    }
+]
+
+

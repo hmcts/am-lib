@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.amlib.helpers;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.google.common.collect.ImmutableMap;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
@@ -9,7 +10,6 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
@@ -24,15 +24,15 @@ public final class DefaultRoleSetupDataFactory {
     }
 
     public static Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>>
-        createReadPermissionsForAttribute(JsonPointer attribute, Set<Permission> permissions) {
+    createReadPermissionsForAttribute(JsonPointer attribute, Set<Permission> permissions) {
 
         Map.Entry<Set<Permission>, SecurityClassification> pair =
             new Pair<>(permissions, SecurityClassification.PUBLIC);
 
         Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermission =
-            new ConcurrentHashMap<>();
-
-        attributePermission.put(attribute, pair);
+            ImmutableMap.<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>>builder()
+                .put(attribute, pair)
+                .build();
 
         return attributePermission;
     }

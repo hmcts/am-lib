@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.amlib.helpers;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
@@ -25,6 +26,7 @@ public final class TestConstants {
     public static final JsonPointer ATTRIBUTE = JsonPointer.valueOf("/test");
     public static final String ACCESSOR_ID = "a";
     public static final String OTHER_ACCESSOR_ID = "b";
+    public static final Set<String> ACCESSOR_IDS = ImmutableSet.of("y", "z");
     public static final Set<String> ROLE_NAMES = Stream.of("Solicitor").collect(toSet());
     public static final String ROLE_NAME = "Solicitor";
     public static final String OTHER_ROLE_NAME = "Local Authority";

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -117,7 +118,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private void grantExplicitResourceAccess(String resourceId, String attribute) {
         service.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
             .resourceId(resourceId)
-            .accessorId(ACCESSOR_ID)
+            .accessorIds(ImmutableSet.of(ACCESSOR_ID))
             .accessType(ACCESS_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)

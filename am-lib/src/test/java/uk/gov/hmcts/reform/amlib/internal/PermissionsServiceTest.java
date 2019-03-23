@@ -118,7 +118,7 @@ class PermissionsServiceTest {
         assertThat(permissionsService.merge(permissions))
             .hasSize(2)
             .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE, READ))
-            .containsEntry(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(CREATE, READ, UPDATE, DELETE));
+            .containsEntry(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(UPDATE, DELETE));
     }
 
     @Test
@@ -135,6 +135,83 @@ class PermissionsServiceTest {
             .hasSize(3)
             .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(READ))
             .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE, READ))
-            .containsEntry(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(CREATE, READ, DELETE));
+            .containsEntry(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(READ, DELETE));
     }
+
+    @Test
+    void x() {
+        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
+            ImmutableMap.of(
+                JsonPointer.valueOf(""), ImmutableSet.of(READ),
+                JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(UPDATE)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
+                JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(DELETE)
+            )
+        );
+
+        assertThat(permissionsService.merge(permissions))
+            .hasSize(3)
+            .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(READ))
+            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE, READ))
+            .containsEntry(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(UPDATE, DELETE));
+    }
+
+    @Test
+    void y() {
+        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
+            ImmutableMap.of(
+                JsonPointer.valueOf(""), ImmutableSet.of(READ),
+                JsonPointer.valueOf("/defendant"), ImmutableSet.of(UPDATE)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
+                JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(DELETE)
+            )
+        );
+
+        assertThat(permissionsService.merge(permissions))
+            .hasSize(4)
+            .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(READ))
+            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE, READ))
+            .containsEntry(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(READ, DELETE))
+            .containsEntry(JsonPointer.valueOf("/defendant"), ImmutableSet.of(UPDATE));
+    }
+
+    @Test
+    void z() {
+        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
+            ImmutableMap.of(
+                JsonPointer.valueOf(""), ImmutableSet.of(READ),
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(UPDATE)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(CREATE),
+                JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(DELETE)
+            )
+        );
+
+        assertThat(permissionsService.merge(permissions))
+            .hasSize(4)
+            .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(READ))
+            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(UPDATE))
+            .containsEntry(JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(CREATE, UPDATE))
+            .containsEntry(JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(UPDATE, DELETE));
+    }
+
+    @Test
+    void whenOnlyOneRoleIsUsedShouldReturnUnchangedPermissions() {
+        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
+                JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(DELETE)
+            )
+        );
+
+        assertThat(permissionsService.merge(permissions)).isEqualTo(permissions.get(0));
+    }
+
+    // more than two maps
+
 }

@@ -26,7 +26,7 @@ public class AccessManagementServiceBenchmarks {
     @SuppressWarnings("LineLength")
     public static class RecordState {
         AccessManagementService service =
-            new AccessManagementService("jdbc:postgresql://am-lib-test-aat.postgres.database.azure.com:5432/am?user=amuser@am-lib-test-aat&password=ampass&sslmode=require", "amuser@am-lib-test-aat", "ampass");
+            new AccessManagementService("jdbc:postgresql://am-lib-test-aat.postgres.database.azure.com:5432/am?user=amuser@am-lib-test-aat&password=upF#99gf7RAZ?77H&sslmode=require", "amuser@am-lib-test-aat", "THIS_IS_NOT_THE_PASSWORD");
 
         String resourceId = UUID.randomUUID().toString();
         String accessorId = UUID.randomUUID().toString();

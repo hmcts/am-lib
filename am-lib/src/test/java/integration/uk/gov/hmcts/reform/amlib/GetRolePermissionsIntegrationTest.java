@@ -21,6 +21,9 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
@@ -29,7 +32,6 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.UPDATE_PERMISSION;
 
 class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
@@ -48,7 +50,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
             new Pair<>(CREATE_PERMISSION, SecurityClassification.PUBLIC);
 
         Map.Entry<Set<Permission>, SecurityClassification> updatePermission =
-            new Pair<>(ImmutableSet.of(Permission.UPDATE), SecurityClassification.PUBLIC);
+            new Pair<>(ImmutableSet.of(UPDATE), SecurityClassification.PUBLIC);
 
         Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermissionsForRole =
             ImmutableMap.<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>>builder()
@@ -128,18 +130,16 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     @Test
     void shouldMergeDataAsExpectedWhenRetrievingPermissionsForMultipleRoles() {
         Set<String> userRoles = ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME);
-        Set<Permission> readUpdate = Stream.of(Permission.READ, Permission.UPDATE).collect(toSet());
-        Set<Permission> createUpdate = Stream.of(Permission.CREATE, Permission.UPDATE).collect(toSet());
 
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
             RESOURCE_TYPE, RESOURCE_NAME, userRoles);
 
         assertThat(accessRecord)
             .hasSize(5)
-            .containsEntry(JsonPointer.valueOf(""), UPDATE_PERMISSION)
-            .containsEntry(JsonPointer.valueOf("/address"), createUpdate)
-            .containsEntry(JsonPointer.valueOf("/address/street/line1"), createUpdate)
-            .containsEntry(JsonPointer.valueOf("/child"), readUpdate)
-            .containsEntry(JsonPointer.valueOf("/parent/age"), createUpdate);
+            .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(UPDATE))
+            .containsEntry(JsonPointer.valueOf("/address"), ImmutableSet.of(CREATE))
+            .containsEntry(JsonPointer.valueOf("/address/street/line1"), ImmutableSet.of(CREATE))
+            .containsEntry(JsonPointer.valueOf("/child"), ImmutableSet.of(READ, UPDATE))
+            .containsEntry(JsonPointer.valueOf("/parent/age"), ImmutableSet.of(CREATE, UPDATE));
     }
 }

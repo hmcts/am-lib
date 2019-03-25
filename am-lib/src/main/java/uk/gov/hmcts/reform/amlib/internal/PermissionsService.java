@@ -7,11 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.reverseOrder;
@@ -49,6 +49,7 @@ public class PermissionsService {
      * @param permissions list of permission maps representing for example permissions per user role
      * @return merged map of permissions per attribute sorted in reverse order by attribute name
      */
+    @SuppressWarnings("PMD") // UseConcurrentHashMap: TreeMap is used for a reason, concurrent map would not help
     private Map<JsonPointer, Merge> combinePermissionByAttribute(List<Map<JsonPointer, Set<Permission>>> permissions) {
         Map<JsonPointer, Merge> mergedPermissions = new TreeMap<>(reverseOrder(comparing(Object::toString)));
         for (int i = 0; i < permissions.size(); i++) {
@@ -62,6 +63,7 @@ public class PermissionsService {
         return mergedPermissions;
     }
 
+    @SuppressWarnings("PMD") // AvoidDeeplyNestedIfStmts: refactoring would not help much in that case
     private void propagateParentPermissionsToClosestChild(Map<JsonPointer, Merge> attributePermissions,
                                                           int numberOfSources) {
         log.debug("> Attempting to propagate permissions onto child in pre-merged map: {}", attributePermissions);
@@ -113,7 +115,7 @@ public class PermissionsService {
     @Data
     @ToString
     private class Merge {
-        private final Map<Integer, Set<Permission>> permissions = new HashMap<>();
+        private final Map<Integer, Set<Permission>> permissions = new ConcurrentHashMap<>();
 
         private Set<Integer> getSourceIndexes() {
             return permissions.keySet();

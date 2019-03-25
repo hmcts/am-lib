@@ -23,7 +23,7 @@ class PermissionsServiceTest {
     private final PermissionsService permissionsService = new PermissionsService();
 
     @Test
-    void whenMultiplePermissionsForSameAttributeShouldMergeTogether() {
+    void whenDifferentPermissionsForSameAttributeShouldMergePermissionsForAttribute() {
         JsonPointer attribute = JsonPointer.valueOf("");
 
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
@@ -37,7 +37,7 @@ class PermissionsServiceTest {
     }
 
     @Test
-    void whenDuplicatePermissionsForSameAttributeShouldMergeTogether() {
+    void whenSamePermissionsForSameAttributeShouldMergePermissionsForAttributeWithoutDuplicates() {
         JsonPointer attribute = JsonPointer.valueOf("");
 
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
@@ -51,7 +51,7 @@ class PermissionsServiceTest {
     }
 
     @Test
-    void whenMultiplePermissionsForDifferentAttributesShouldMergeTogether() {
+    void whenDifferentPermissionsForDifferentAttributesShouldMergeWithoutChangingAttributePermissions() {
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
             ImmutableMap.of(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ)),
             ImmutableMap.of(JsonPointer.valueOf("/defendant"), ImmutableSet.of(CREATE))
@@ -64,7 +64,7 @@ class PermissionsServiceTest {
     }
 
     @Test
-    void whenDuplicatePermissionsForDifferentAttributesShouldMergeTogether() {
+    void whenSamePermissionsForDifferentAttributesShouldMergeWithoutChangingAttributePermissions() {
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
             ImmutableMap.of(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ)),
             ImmutableMap.of(JsonPointer.valueOf("/defendant"), ImmutableSet.of(READ))
@@ -77,7 +77,7 @@ class PermissionsServiceTest {
     }
 
     @Test
-    void whenParentAndChildAttributeShouldMergePermissions() {
+    void whenPermissionsForParentAndChildAttributesShouldPropagateParentPermissionsOntoChild() {
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
             ImmutableMap.of(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ)),
             ImmutableMap.of(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(CREATE))
@@ -90,7 +90,7 @@ class PermissionsServiceTest {
     }
 
     @Test
-    void whenParentAndChildAttributeAreNotCloseShouldMergePermissions() {
+    void whenPermissionsForIndirectAncestorAndChildAttributesShouldPropagateAncestorPermissionsOntoChild() {
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
             ImmutableMap.of(JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ)),
             ImmutableMap.of(JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(CREATE))
@@ -103,7 +103,7 @@ class PermissionsServiceTest {
     }
 
     @Test
-    void whenMultiplePermissionsForSameAttributeShouldPropagateMergedPermissionsToChildren() {
+    void whenDifferentPermissionsForSameAttributesShouldMergePermissionsForAttributes() {
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
             ImmutableMap.of(
                 JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ),
@@ -122,7 +122,7 @@ class PermissionsServiceTest {
     }
 
     @Test
-    void whenRootAttributeIsUsedShouldPropagatePermissionsToAllChildren() {
+    void whenOnlyRootAttributeIsUsedInGroupOneShouldPropagatePermissionsOntoAllChildrenDefinedInGroupTwo() {
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
             ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(READ)),
             ImmutableMap.of(
@@ -139,27 +139,8 @@ class PermissionsServiceTest {
     }
 
     @Test
-    void x() {
-        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
-            ImmutableMap.of(
-                JsonPointer.valueOf(""), ImmutableSet.of(READ),
-                JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(UPDATE)
-            ),
-            ImmutableMap.of(
-                JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
-                JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(DELETE)
-            )
-        );
-
-        assertThat(permissionsService.merge(permissions))
-            .hasSize(3)
-            .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(READ))
-            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE, READ))
-            .containsEntry(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(UPDATE, DELETE));
-    }
-
-    @Test
-    void y() {
+    @SuppressWarnings("LineLength")
+    void whenRootAttributeIsUsedInGroupOneAlongsideOtherAttributeShouldOnlyPropagatePermissionsOntoChildrenInGroupTwo() {
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
             ImmutableMap.of(
                 JsonPointer.valueOf(""), ImmutableSet.of(READ),
@@ -180,7 +161,29 @@ class PermissionsServiceTest {
     }
 
     @Test
-    void z() {
+    @SuppressWarnings("LineLength")
+    void whenRootAttributeIsUsedInGroupOneAlongsideAttributeAppearingInBothGroupsShouldOnlyPropagatePermissionsOntoUniqueChildFromGroupTwo() {
+        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
+            ImmutableMap.of(
+                JsonPointer.valueOf(""), ImmutableSet.of(READ),
+                JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(UPDATE)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
+                JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(DELETE)
+            )
+        );
+
+        assertThat(permissionsService.merge(permissions))
+            .hasSize(3)
+            .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(READ))
+            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE, READ))
+            .containsEntry(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(UPDATE, DELETE));
+    }
+
+    @Test
+    @SuppressWarnings("LineLength")
+    void whenManyAncestorAttributesDefinedInGroupOneShouldOnlyPropagatePermissionsOntoChildrenInGroupTwoFromClosestAncestorInGroupOne() {
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
             ImmutableMap.of(
                 JsonPointer.valueOf(""), ImmutableSet.of(READ),
@@ -201,7 +204,72 @@ class PermissionsServiceTest {
     }
 
     @Test
-    void whenOnlyOneRoleIsUsedShouldReturnUnchangedPermissions() {
+    @SuppressWarnings("LineLength")
+    void whenDirectParentIsDefinedInBothGroupsShouldOnlyPropagateParentPermissionsDefinedInOtherGroupOntoChild() {
+        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
+            ImmutableMap.of(
+                JsonPointer.valueOf(""), ImmutableSet.of(READ),
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(UPDATE)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
+                JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(DELETE)
+            )
+        );
+
+        assertThat(permissionsService.merge(permissions))
+            .hasSize(3)
+            .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(READ))
+            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE, UPDATE))
+            .containsEntry(JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(UPDATE, DELETE));
+    }
+
+    @Test
+    void whenDirectParentIsDefinedInBothGroupsShouldOnlyPropagateParentPermissionsDefinedInOtherGroupsOntoChild() {
+        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
+            ImmutableMap.of(
+                JsonPointer.valueOf(""), ImmutableSet.of(READ),
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(UPDATE)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(CREATE)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(DELETE)
+            )
+        );
+
+        assertThat(permissionsService.merge(permissions))
+            .hasSize(3)
+            .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(READ))
+            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(UPDATE, DELETE))
+            .containsEntry(JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(CREATE, UPDATE, DELETE));
+    }
+
+    @Test
+    void whenThreeGroupsAreUsedShouldProperlyMergePermissions() {
+        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
+            ImmutableMap.of(
+                JsonPointer.valueOf(""), ImmutableSet.of(READ),
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(UPDATE)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(CREATE)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(DELETE)
+            )
+        );
+
+        assertThat(permissionsService.merge(permissions))
+            .hasSize(3)
+            .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(READ))
+            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(UPDATE))
+            .containsEntry(JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(CREATE, UPDATE, DELETE));
+    }
+
+    @Test
+    void whenOnlyOneGroupIsUsedShouldReturnUnchangedPermissions() {
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
             ImmutableMap.of(
                 JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
@@ -211,7 +279,4 @@ class PermissionsServiceTest {
 
         assertThat(permissionsService.merge(permissions)).isEqualTo(permissions.get(0));
     }
-
-    // more than two maps
-
 }

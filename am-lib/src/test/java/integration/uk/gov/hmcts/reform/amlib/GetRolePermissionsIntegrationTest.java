@@ -41,11 +41,9 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
             new Pair<>(CREATE_PERMISSION, SecurityClassification.PUBLIC);
 
         Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermissions =
-            ImmutableMap.<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>>builder()
-                .put(JsonPointer.valueOf("/test"), readPermission)
-                .put(JsonPointer.valueOf("/test2"), readPermission)
-                .put(JsonPointer.valueOf("/testCreate"), createPermission)
-                .build();
+            ImmutableMap.of(JsonPointer.valueOf("/test"), readPermission,
+                JsonPointer.valueOf("/test2"), readPermission,
+                JsonPointer.valueOf("/testCreate"), createPermission);
 
         importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()

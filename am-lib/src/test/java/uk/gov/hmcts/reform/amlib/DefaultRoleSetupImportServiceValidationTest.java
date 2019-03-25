@@ -59,16 +59,16 @@ class DefaultRoleSetupImportServiceValidationTest {
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
-    void grantDefaultPermissionMethodShouldRejectInvalidArguments(DefaultPermissionGrant defaultPermissionGrant) {
+    void grantDefaultPermissionMethodShouldRejectInvalidArguments(DefaultPermissionGrant accessGrant) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.grantDefaultPermission(defaultPermissionGrant))
+            .isThrownBy(() -> service.grantDefaultPermission(accessGrant))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "defaultPermissionGrant - must not be null",
-                "defaultPermissionGrant.serviceName - must not be blank",
-                "defaultPermissionGrant.resourceType - must not be blank",
-                "defaultPermissionGrant.resourceName - must not be blank",
-                "defaultPermissionGrant.roleName - must not be blank",
-                "defaultPermissionGrant.attributePermissions - must not be empty"
+                "accessGrant - must not be null",
+                "accessGrant.serviceName - must not be blank",
+                "accessGrant.resourceType - must not be blank",
+                "accessGrant.resourceName - must not be blank",
+                "accessGrant.roleName - must not be blank",
+                "accessGrant.attributePermissions - must not be empty"
             ));
     }
 

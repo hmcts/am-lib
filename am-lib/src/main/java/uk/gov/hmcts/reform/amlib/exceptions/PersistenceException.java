@@ -1,9 +1,14 @@
 package uk.gov.hmcts.reform.amlib.exceptions;
 
-public class PersistenceException extends RuntimeException {
+/**
+ * Exception thrown when operation requiring persistent data store has failed,
+ * usually wrapping exceptions from persistence framework of choice.
+ */
+public class PersistenceException extends AccessManagementException {
     private static final long serialVersionUID = 1L;
 
-    public PersistenceException(Throwable throwable) {
-        super("The transaction has been rolled back. Cause: " + throwable);
+    public PersistenceException(Throwable ex) {
+        super("Operation on persistent store failed. If transaction was used, it has been rolled back. "
+            + "Cause: " + ex, ex);
     }
 }

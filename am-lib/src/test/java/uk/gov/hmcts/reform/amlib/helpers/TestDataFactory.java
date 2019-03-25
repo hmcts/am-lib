@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.amlib.helpers;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -34,15 +35,28 @@ public final class TestDataFactory {
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
                                                                   String accessorId,
                                                                   Set<Permission> permissions) {
+        return createGrant(resourceId, ImmutableSet.of(accessorId),
+            createPermissionsForWholeDocument(permissions));
+    }
+
+    public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
+                                                                  Set<String> accessorId,
+                                                                  Set<Permission> permissions) {
         return createGrant(resourceId, accessorId, createPermissionsForWholeDocument(permissions));
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
                                                   String accessorId,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
+        return createGrant(resourceId, ImmutableSet.of(accessorId), attributePermissions);
+    }
+
+    public static ExplicitAccessGrant createGrant(String resourceId,
+                                                  Set<String> accessorId,
+                                                  Map<JsonPointer, Set<Permission>> attributePermissions) {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
-            .accessorId(accessorId)
+            .accessorIds(accessorId)
             .accessType(ACCESS_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)

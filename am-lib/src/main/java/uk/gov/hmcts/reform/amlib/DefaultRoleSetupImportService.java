@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
+import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.DefaultRoleSetupRepository;
@@ -15,6 +16,8 @@ import javax.sql.DataSource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import static uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog.Severity.DEBUG;
 
 public class DefaultRoleSetupImportService {
     private final Jdbi jdbi;
@@ -45,6 +48,7 @@ public class DefaultRoleSetupImportService {
      * Creates a new unique service or updates description if already exists.
      *
      * @param serviceName the name of the service
+     * @throws PersistenceException if any persistence errors were encountered
      */
     public void addService(@NotBlank String serviceName) {
         addService(serviceName, null);
@@ -55,7 +59,9 @@ public class DefaultRoleSetupImportService {
      *
      * @param serviceName        the name of the service
      * @param serviceDescription a description of the service
+     * @throws PersistenceException if any persistence errors were encountered
      */
+    @AuditLog(value = "added service '{{serviceName}}' described as '{{serviceDescription}}'", severity = DEBUG)
     public void addService(@NotBlank String serviceName, String serviceDescription) {
         jdbi.useExtension(DefaultRoleSetupRepository.class,
             dao -> dao.addService(serviceName, serviceDescription));
@@ -68,7 +74,9 @@ public class DefaultRoleSetupImportService {
      * @param roleType               the type of role
      * @param securityClassification the security classification for the role
      * @param accessType             the access type for the role
+     * @throws PersistenceException if any persistence errors were encountered
      */
+    @AuditLog(value = "added role '{{roleName}}' of type '{{roleType}}/{{accessType}}'", severity = DEBUG)
     public void addRole(@NotBlank String roleName,
                         @NotNull RoleType roleType,
                         @NotNull SecurityClassification securityClassification,
@@ -83,7 +91,9 @@ public class DefaultRoleSetupImportService {
      * @param serviceName  the name of the service the resource belongs to
      * @param resourceType the type of resource
      * @param resourceName the name of the resource
+     * @throws PersistenceException if any persistence errors were encountered
      */
+    @AuditLog(value = "added resource defined as '{{serviceName}}|{{resourceType}}|{{resourceName}}'", severity = DEBUG)
     public void addResourceDefinition(@NotBlank String serviceName,
                                       @NotBlank String resourceType,
                                       @NotBlank String resourceName) {
@@ -97,37 +107,35 @@ public class DefaultRoleSetupImportService {
      *
      * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *
-     * @param defaultPermissionGrant a container for granting default permissions
-     * @throws PersistenceException if any errors were encountered causing transaction rollback
+     * @param accessGrant a container for granting default permissions
+     * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
-    public void grantDefaultPermission(@NotNull @Valid DefaultPermissionGrant defaultPermissionGrant) {
+    @AuditLog("default role access granted to resource "
+        + "defined as '{{accessGrant.serviceName}}|{{accessGrant.resourceType}}|{{accessGrant.resourceName}}' "
+        + "for role '{{accessGrant.roleName}}': {{accessGrant.attributePermissions}}")
+    public void grantDefaultPermission(@NotNull @Valid DefaultPermissionGrant accessGrant) {
         jdbi.useTransaction(handle -> {
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
-            try {
-                defaultPermissionGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
-                    dao.createResourceAttribute(ResourceAttribute.builder()
-                        .serviceName(defaultPermissionGrant.getServiceName())
-                        .resourceName(defaultPermissionGrant.getResourceName())
-                        .resourceType(defaultPermissionGrant.getResourceType())
+            accessGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
+                dao.createResourceAttribute(ResourceAttribute.builder()
+                    .serviceName(accessGrant.getServiceName())
+                    .resourceName(accessGrant.getResourceName())
+                    .resourceType(accessGrant.getResourceType())
+                    .attribute(attribute)
+                    .defaultSecurityClassification(permissionAndClassification.getValue())
+                    .build()
+                );
+
+                dao.grantDefaultPermission(
+                    RoleBasedAccessRecord.builder()
+                        .serviceName(accessGrant.getServiceName())
+                        .resourceType(accessGrant.getResourceType())
+                        .resourceName(accessGrant.getResourceName())
                         .attribute(attribute)
-                        .defaultSecurityClassification(permissionAndClassification.getValue())
-                        .build()
-                    );
-
-                    dao.grantDefaultPermission(
-                        RoleBasedAccessRecord.builder()
-                            .serviceName(defaultPermissionGrant.getServiceName())
-                            .resourceType(defaultPermissionGrant.getResourceType())
-                            .resourceName(defaultPermissionGrant.getResourceName())
-                            .attribute(attribute)
-                            .roleName(defaultPermissionGrant.getRoleName())
-                            .permissions(permissionAndClassification.getKey())
-                            .build());
-                });
-
-            } catch (Exception e) {
-                throw new PersistenceException(e);
-            }
+                        .roleName(accessGrant.getRoleName())
+                        .permissions(permissionAndClassification.getKey())
+                        .build());
+            });
         });
     }
 
@@ -138,17 +146,14 @@ public class DefaultRoleSetupImportService {
      *
      * @param serviceName  the name of the service to delete default permissions for
      * @param resourceType the type of resource to delete default permissions for
-     * @throws PersistenceException if any errors were encountered causing transaction rollback
+     * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
+    @AuditLog("default role access revoked for service defined as '{{serviceName}}|{{resourceType}}'")
     public void truncateDefaultPermissionsForService(@NotBlank String serviceName, @NotBlank String resourceType) {
         jdbi.useTransaction(handle -> {
-            try {
-                DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
-                dao.deleteDefaultPermissionsForRoles(serviceName, resourceType);
-                dao.deleteResourceAttributes(serviceName, resourceType);
-            } catch (Exception e) {
-                throw new PersistenceException(e);
-            }
+            DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
+            dao.deleteDefaultPermissionsForRoles(serviceName, resourceType);
+            dao.deleteResourceAttributes(serviceName, resourceType);
         });
     }
 
@@ -160,19 +165,16 @@ public class DefaultRoleSetupImportService {
      * @param serviceName  the name of the service to delete default permissions for
      * @param resourceType the type of resource to delete default permissions for
      * @param resourceName the name of the resource to delete default permissions for
-     * @throws PersistenceException if any errors were encountered causing transaction rollback
+     * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
+    @AuditLog("default role access revoked for resource defined as '{{serviceName}}|{{resourceType}}|{{resourceName}}'")
     public void truncateDefaultPermissionsByResourceDefinition(@NotBlank String serviceName,
                                                                @NotBlank String resourceType,
                                                                @NotBlank String resourceName) {
         jdbi.useTransaction(handle -> {
-            try {
-                DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
-                dao.deleteDefaultPermissionsForRoles(serviceName, resourceType, resourceName);
-                dao.deleteResourceAttributes(serviceName, resourceType, resourceName);
-            } catch (Exception e) {
-                throw new PersistenceException(e);
-            }
+            DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
+            dao.deleteDefaultPermissionsForRoles(serviceName, resourceType, resourceName);
+            dao.deleteResourceAttributes(serviceName, resourceType, resourceName);
         });
     }
 
@@ -182,7 +184,10 @@ public class DefaultRoleSetupImportService {
      * @param serviceName  the name of the service the resource attribute belongs to
      * @param resourceType the type of resource
      * @param resourceName the name of the resource
+     * @throws PersistenceException if any persistence errors were encountered
      */
+    @SuppressWarnings("LineLength")
+    @AuditLog(value = "deleted resource defined as '{{serviceName}}|{{resourceType}}|{{resourceName}}'", severity = DEBUG)
     public void deleteResourceDefinition(@NotBlank String serviceName,
                                          @NotBlank String resourceType,
                                          @NotBlank String resourceName) {
@@ -194,7 +199,9 @@ public class DefaultRoleSetupImportService {
      * Deletes a role.
      *
      * @param roleName the role name to delete
+     * @throws PersistenceException if any persistence errors were encountered
      */
+    @AuditLog(value = "deleted role '{{roleName}}'", severity = DEBUG)
     public void deleteRole(@NotBlank String roleName) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao -> dao.deleteRole(roleName));
     }
@@ -203,7 +210,9 @@ public class DefaultRoleSetupImportService {
      * Deletes a service.
      *
      * @param serviceName the service name to delete
+     * @throws PersistenceException if any persistence errors were encountered
      */
+    @AuditLog(value = "deleted service '{{serviceName}}'", severity = DEBUG)
     public void deleteService(@NotBlank String serviceName) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao -> dao.deleteService(serviceName));
     }

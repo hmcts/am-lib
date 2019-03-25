@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.amlib.internal.aspects;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -18,12 +20,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.lang.String.format;
+import static java.lang.String.join;
 
 @Aspect
 @Slf4j
 public class AuditingAspect {
 
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{\\{([^{}]+)}}");
+    private static final List<String> RESTRICTED_BEAN_NAMES = Arrays.asList("result");
 
     private final Map<MethodSignature, Metadata> cache = new ConcurrentHashMap<>();
 
@@ -74,6 +78,11 @@ public class AuditingAspect {
                 }
 
                 expression.argumentPosition = Arrays.asList(parameterNames).indexOf(expression.beanName);
+                if (!RESTRICTED_BEAN_NAMES.contains(expression.beanName) && expression.argumentPosition < 0) {
+                    String msgTemplate = "Argument '%s' does not exist among method arguments '%s'";
+                    throw new InvalidTemplateExpressionException(format(msgTemplate, expression.beanName,
+                        join(", ", parameterNames)));
+                }
 
                 instance.expressions.add(expression);
             }
@@ -134,17 +143,21 @@ public class AuditingAspect {
                 field.setAccessible(true);
                 result = field.get(result);
             } catch (Exception e) {
-                String template = "Cannot find fragment %s in expression %s against instance of %s class";
-                throw new InvalidTemplateExpressionException(format(template, fragment, path, object.getClass()), e);
+                String msgTemplate = "Cannot find fragment %s in expression %s against instance of %s class";
+                throw new InvalidTemplateExpressionException(format(msgTemplate, fragment, path, object.getClass()), e);
             }
         }
 
         return result;
     }
 
+    @EqualsAndHashCode
+    @ToString
     private static class Metadata {
         private final List<Expression> expressions = new ArrayList<>();
 
+        @EqualsAndHashCode
+        @ToString
         private static class Expression {
             private String value;
             private String template;
@@ -156,6 +169,10 @@ public class AuditingAspect {
 
     private static class InvalidTemplateExpressionException extends AuditException {
         private static final long serialVersionUID = 1L;
+
+        private InvalidTemplateExpressionException(String message) {
+            super(message);
+        }
 
         private InvalidTemplateExpressionException(String message, Throwable cause) {
             super(message, cause);

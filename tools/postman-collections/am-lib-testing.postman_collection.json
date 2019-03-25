@@ -85,7 +85,7 @@
           "raw": "http://localhost:3703/lib/filter-resource",
           "protocol": "http",
           "host": [
-            "localhost"git 
+            "localhost"
           ],
           "port": "3703",
           "path": [

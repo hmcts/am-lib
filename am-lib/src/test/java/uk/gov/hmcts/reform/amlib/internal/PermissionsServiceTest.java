@@ -17,7 +17,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
-@SuppressWarnings("PMD")
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals"})
 class PermissionsServiceTest {
 
     private final PermissionsService permissionsService = new PermissionsService();

@@ -39,9 +39,9 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenCreatingResourceAccessMultipleEntriesAppearInDatabase() {
-        Map<JsonPointer, Set<Permission>> multipleAttributePermissions =
-            ImmutableMap.of(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS,
-                JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
+        Map<JsonPointer, Set<Permission>> multipleAttributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS,
+            JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
         service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, multipleAttributePermissions));
 

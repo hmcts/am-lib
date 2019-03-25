@@ -43,10 +43,9 @@ class FilterServiceTest {
     void itShouldBePossibleToShowEverythingExceptTopLevelValue() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf(""), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/amount"), CREATE_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf(""), READ_PERMISSION,
+            JsonPointer.valueOf("/amount"), CREATE_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -77,10 +76,9 @@ class FilterServiceTest {
     void itShouldBePossibleToShowEverythingExceptTopLevelObject() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf(""), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant"), CREATE_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf(""), READ_PERMISSION,
+            JsonPointer.valueOf("/claimant"), CREATE_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -103,10 +101,9 @@ class FilterServiceTest {
     void itShouldBePossibleToShowEverythingExceptLeafLevelValue() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf(""), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant/age"), CREATE_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf(""), READ_PERMISSION,
+            JsonPointer.valueOf("/claimant/age"), CREATE_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -137,10 +134,9 @@ class FilterServiceTest {
     void itShouldBePossibleToShowEverythingExceptLeafLevelObject() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf(""), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant/address"), CREATE_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf(""), READ_PERMISSION,
+            JsonPointer.valueOf("/claimant/address"), CREATE_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -168,9 +164,8 @@ class FilterServiceTest {
     void itShouldBePossibleToShowTopLevelValueOnly() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf("/amount"), READ_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf("/amount"), READ_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -186,9 +181,8 @@ class FilterServiceTest {
     void itShouldBePossibleToShowTopLevelObjectOnly() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf("/claimant"), READ_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf("/claimant"), READ_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -211,9 +205,8 @@ class FilterServiceTest {
     void itShouldBePossibleToShowLeafLevelValueOnly() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf("/claimant/age"), READ_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf("/claimant/age"), READ_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -232,9 +225,8 @@ class FilterServiceTest {
     void itShouldBePossibleToShowLeafLevelObjectOnly() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf("/claimant/address"), READ_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf("/claimant/address"), READ_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -256,10 +248,9 @@ class FilterServiceTest {
     void itShouldBePossibleToShowManyTopLevelObjects() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf("/claimant"), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/defendant"), READ_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf("/claimant"), READ_PERMISSION,
+            JsonPointer.valueOf("/defendant"), READ_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -291,10 +282,9 @@ class FilterServiceTest {
     void itShouldBePossibleToShowManyLeafLevelObjectsFromSameParent() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf("/claimant/name"), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant/address"), READ_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf("/claimant/name"), READ_PERMISSION,
+            JsonPointer.valueOf("/claimant/address"), READ_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -317,10 +307,9 @@ class FilterServiceTest {
     void itShouldBePossibleToShowManyLeafLevelObjectsFromDifferentParents() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf("/claimant/address"), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/defendant/address"), READ_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf("/claimant/address"), READ_PERMISSION,
+            JsonPointer.valueOf("/defendant/address"), READ_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -349,11 +338,10 @@ class FilterServiceTest {
     void itShouldBePossibleToShowEverythingExceptTopLevelObjectWithLeafLevelException() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf(""), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant/address/city"), READ_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf(""), READ_PERMISSION,
+            JsonPointer.valueOf("/claimant"), CREATE_PERMISSION,
+            JsonPointer.valueOf("/claimant/address/city"), READ_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -383,11 +371,10 @@ class FilterServiceTest {
     void itShouldBePossibleToShowEverythingExceptLeafLevelObjectWithChildException() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf(""), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant/address"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant/address/city"), READ_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf(""), READ_PERMISSION,
+            JsonPointer.valueOf("/claimant/address"), CREATE_PERMISSION,
+            JsonPointer.valueOf("/claimant/address/city"), READ_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -452,10 +439,9 @@ class FilterServiceTest {
     void itShouldBePossibleToShowLeafLevelValueOnlyWhenParentIsForbidden() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf("/claimant"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant/name"), READ_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf("/claimant"), CREATE_PERMISSION,
+            JsonPointer.valueOf("/claimant/name"), READ_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -474,10 +460,9 @@ class FilterServiceTest {
     void itShouldBePossibleToShowLeafLevelValueOnlyWhenSiblingIsForbidden() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf("/claimant/name"), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant/age"), CREATE_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf("/claimant/name"), READ_PERMISSION,
+            JsonPointer.valueOf("/claimant/age"), CREATE_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -496,12 +481,11 @@ class FilterServiceTest {
     void itShouldReturnEmptyNodeWhenFieldsDoNotExist() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf("/version"), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant/id"), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/defendant/mobile"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/updated"), CREATE_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf("/version"), READ_PERMISSION,
+            JsonPointer.valueOf("/claimant/id"), READ_PERMISSION,
+            JsonPointer.valueOf("/defendant/mobile"), CREATE_PERMISSION,
+            JsonPointer.valueOf("/updated"), CREATE_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -512,11 +496,10 @@ class FilterServiceTest {
     void itShouldNotLeakAttributeValueWhenAccessIsGrantedToAnotherAttributeThatStartsSameWay() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf(""), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/amountInPounds"), READ_PERMISSION)
-            .put(JsonPointer.valueOf("/amount"), CREATE_PERMISSION)
-            .build();
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf(""), READ_PERMISSION,
+            JsonPointer.valueOf("/amountInPounds"), READ_PERMISSION,
+            JsonPointer.valueOf("/amount"), CREATE_PERMISSION);
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 

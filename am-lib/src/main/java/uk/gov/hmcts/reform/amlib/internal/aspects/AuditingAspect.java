@@ -46,10 +46,10 @@ public class AuditingAspect {
                 Object value;
 
                 Object beanInstance;
-                if ("result".equals(expression.beanName)) {
-                    beanInstance = result;
-                } else if (expression.beanName.startsWith("mdc")) {
+                if (Keyword.MDC.matches(expression.beanName)) {
                     beanInstance = MDC.get(expression.beanName.substring(expression.beanName.indexOf(':') + 1));
+                } else if (Keyword.RESULT.matches(expression.beanName)) {
+                    beanInstance = result;
                 } else {
                     beanInstance = joinPoint.getArgs()[expression.argumentPosition];
                 }
@@ -83,7 +83,7 @@ public class AuditingAspect {
                     expression.beanName = expression.value;
                 }
 
-                if (!"result".equals(expression.beanName) && !expression.beanName.startsWith("mdc")) {
+                if (!Keyword.MDC.matches(expression.beanName) && !Keyword.RESULT.matches(expression.beanName)) {
                     expression.argumentPosition = Arrays.asList(parameterNames).indexOf(expression.beanName);
                     if (expression.argumentPosition < 0) {
                         String msgTemplate = "Argument '%s' does not exist among method arguments '%s'";
@@ -157,6 +157,21 @@ public class AuditingAspect {
         }
 
         return result;
+    }
+
+    private enum Keyword {
+        MDC("mdc:"),
+        RESULT("result");
+
+        private String prefix;
+
+        Keyword(String prefix) {
+            this.prefix = prefix;
+        }
+
+        boolean matches(String value) {
+            return value.startsWith(prefix);
+        }
     }
 
     @EqualsAndHashCode

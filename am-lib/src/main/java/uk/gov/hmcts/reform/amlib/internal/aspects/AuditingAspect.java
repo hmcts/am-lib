@@ -46,7 +46,7 @@ public class AuditingAspect {
                 Object value;
 
                 Object beanInstance;
-                if (expression.beanName.equals("result")) {
+                if ("result".equals(expression.beanName)) {
                     beanInstance = result;
                 } else if (expression.beanName.startsWith("mdc")) {
                     beanInstance = MDC.get(expression.beanName.substring(expression.beanName.indexOf(':') + 1));
@@ -83,7 +83,7 @@ public class AuditingAspect {
                     expression.beanName = expression.value;
                 }
 
-                if (!expression.beanName.equals("result") && !expression.beanName.startsWith("mdc")) {
+                if (!"result".equals(expression.beanName) && !expression.beanName.startsWith("mdc")) {
                     expression.argumentPosition = Arrays.asList(parameterNames).indexOf(expression.beanName);
                     if (expression.argumentPosition < 0) {
                         String msgTemplate = "Argument '%s' does not exist among method arguments '%s'";

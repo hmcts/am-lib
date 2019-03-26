@@ -84,7 +84,7 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.25.1'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.12.2'
     testCompile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
-    testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.10.7'
+    testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.11.0'
     testCompile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: '5.0.1'

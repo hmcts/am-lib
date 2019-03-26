@@ -7,6 +7,7 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.MDC;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -27,7 +28,6 @@ import static java.lang.String.join;
 public class AuditingAspect {
 
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{\\{([^{}]+)}}");
-    private static final List<String> RESTRICTED_BEAN_NAMES = Arrays.asList("result");
 
     private final Map<MethodSignature, Metadata> cache = new ConcurrentHashMap<>();
 
@@ -45,8 +45,14 @@ public class AuditingAspect {
             for (Metadata.Expression expression : metadata.expressions) {
                 Object value;
 
-                Object beanInstance = expression.value.startsWith("result")
-                    ? result : joinPoint.getArgs()[expression.argumentPosition];
+                Object beanInstance;
+                if (expression.beanName.equals("result")) {
+                    beanInstance = result;
+                } else if (expression.beanName.startsWith("mdc")) {
+                    beanInstance = MDC.get(expression.beanName.substring(expression.beanName.indexOf(':') + 1));
+                } else {
+                    beanInstance = joinPoint.getArgs()[expression.argumentPosition];
+                }
                 if (expression.beanProperties == null) {
                     value = beanInstance;
                 } else {
@@ -59,7 +65,7 @@ public class AuditingAspect {
         }
     }
 
-    @SuppressWarnings("PMD") // AvoidInstantiatingObjectsInLoops: new objects need to be created in while loop
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops") // New objects need to be created in while loop
     private Function<MethodSignature, Metadata> createMetadata(String template, String... parameterNames) {
         return method -> {
             Matcher matcher = VARIABLE_PATTERN.matcher(template);
@@ -77,11 +83,13 @@ public class AuditingAspect {
                     expression.beanName = expression.value;
                 }
 
-                expression.argumentPosition = Arrays.asList(parameterNames).indexOf(expression.beanName);
-                if (!RESTRICTED_BEAN_NAMES.contains(expression.beanName) && expression.argumentPosition < 0) {
-                    String msgTemplate = "Argument '%s' does not exist among method arguments '%s'";
-                    throw new InvalidTemplateExpressionException(format(msgTemplate, expression.beanName,
-                        join(", ", parameterNames)));
+                if (!expression.beanName.equals("result") && !expression.beanName.startsWith("mdc")) {
+                    expression.argumentPosition = Arrays.asList(parameterNames).indexOf(expression.beanName);
+                    if (expression.argumentPosition < 0) {
+                        String msgTemplate = "Argument '%s' does not exist among method arguments '%s'";
+                        throw new InvalidTemplateExpressionException(format(msgTemplate, expression.beanName,
+                            join(", ", parameterNames)));
+                    }
                 }
 
                 instance.expressions.add(expression);

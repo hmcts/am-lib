@@ -6,10 +6,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.UnsupportedPermissionsException;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -44,7 +42,7 @@ class PermissionsTest {
     @ParameterizedTest
     @MethodSource("createArguments")
     void sumOf_shouldCalculateSumOfPermissionsFromSet(Arguments args) {
-        int sumOfPermissions = Permissions.sumOf(Arrays.stream(args.permissions).collect(Collectors.toSet()));
+        int sumOfPermissions = Permissions.sumOf(args.permissions);
         assertThat(sumOfPermissions).isEqualTo(args.sumOfPermissions);
     }
 

@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.amlib;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-import uk.gov.hmcts.reform.amlib.enums.AccessType;
+import uk.gov.hmcts.reform.amlib.enums.AccessManagementType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.helpers.InvalidArgumentsProvider;
@@ -30,14 +30,14 @@ class DefaultRoleSetupImportServiceValidationTest {
     void addRoleMethodShouldRejectInvalidArguments(String roleName,
                                                    RoleType roleType,
                                                    SecurityClassification securityClassification,
-                                                   AccessType accessType) {
+                                                   AccessManagementType accessManagementType) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.addRole(roleName, roleType, securityClassification, accessType))
+            .isThrownBy(() -> service.addRole(roleName, roleType, securityClassification, accessManagementType))
             .withMessageMatching(expectedValidationMessagesRegex(
                 "roleName - must not be blank",
                 "roleType - must not be null",
                 "securityClassification - must not be null",
-                "accessType - must not be null"
+                "accessManagementType - must not be null"
             ));
     }
 

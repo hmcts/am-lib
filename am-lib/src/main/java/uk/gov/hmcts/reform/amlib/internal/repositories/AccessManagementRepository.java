@@ -6,7 +6,7 @@ import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import uk.gov.hmcts.reform.amlib.enums.AccessType;
+import uk.gov.hmcts.reform.amlib.enums.AccessManagementType;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.JsonPointerMapper;
@@ -55,7 +55,7 @@ public interface AccessManagementRepository {
     List<RoleBasedAccessRecord> getRolePermissions(String serviceName, String resourceType, String resourceName, String roleName);
 
     @SqlQuery("select access_management_type from roles where role_name = :roleName")
-    AccessType getRoleAccessType(String roleName);
+    AccessManagementType getRoleAccessType(String roleName);
 
     @SqlQuery("select distinct service_name, resource_type, resource_name from default_permissions_for_roles where role_name in (<userRoles>) and permissions & 1 = 1 and attribute = ''")
     @RegisterConstructorMapper(ResourceDefinition.class)

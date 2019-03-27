@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import uk.gov.hmcts.reform.amlib.enums.AccessType;
+import uk.gov.hmcts.reform.amlib.enums.AccessManagementType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.FilterService;
@@ -205,7 +205,7 @@ public class AccessManagementService {
 
     private boolean explicitAccessType(Set<String> userRoles) {
         return jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getRoleAccessType(userRoles.iterator().next())).equals(AccessType.EXPLICIT);
+            dao -> dao.getRoleAccessType(userRoles.iterator().next())).equals(AccessManagementType.EXPLICIT);
     }
 
     /**

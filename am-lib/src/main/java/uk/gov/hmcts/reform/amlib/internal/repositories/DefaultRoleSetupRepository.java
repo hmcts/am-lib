@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.amlib.internal.repositories;
 
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import uk.gov.hmcts.reform.amlib.enums.AccessType;
+import uk.gov.hmcts.reform.amlib.enums.AccessManagementType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
@@ -14,9 +14,9 @@ public interface DefaultRoleSetupRepository {
         + " on conflict on constraint services_pkey do update set service_description = :serviceDescription")
     void addService(String serviceName, String serviceDescription);
 
-    @SqlUpdate("insert into roles (role_name, role_type, security_classification, access_management_type) values (:roleName, cast(:roleType as role_type), cast(:securityClassification as security_classification), cast(:accessType as access_type))"
-        + " on conflict on constraint roles_pkey do update set role_type = cast(:roleType as role_type), security_classification = cast(:securityClassification as security_classification), access_management_type = cast(:accessType as access_type)")
-    void addRole(String roleName, RoleType roleType, SecurityClassification securityClassification, AccessType accessType);
+    @SqlUpdate("insert into roles (role_name, role_type, security_classification, access_management_type) values (:roleName, cast(:roleType as role_type), cast(:securityClassification as security_classification), cast(:accessManagementType as access_management_type))"
+        + " on conflict on constraint roles_pkey do update set role_type = cast(:roleType as role_type), security_classification = cast(:securityClassification as security_classification), access_management_type = cast(:accessManagementType as access_management_type)")
+    void addRole(String roleName, RoleType roleType, SecurityClassification securityClassification, AccessManagementType accessManagementType);
 
     @SqlUpdate("insert into resources (service_name, resource_type, resource_name) values (:serviceName, :resourceType, :resourceName)"
         + "on conflict on constraint resources_pkey do nothing")

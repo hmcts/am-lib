@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.amlib;
 
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import uk.gov.hmcts.reform.amlib.enums.AccessType;
+import uk.gov.hmcts.reform.amlib.enums.AccessManagementType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
@@ -73,16 +73,16 @@ public class DefaultRoleSetupImportService {
      * @param roleName               the name of the role
      * @param roleType               the type of role
      * @param securityClassification the security classification for the role
-     * @param accessType             the access type for the role
+     * @param accessManagementType             the access type for the role
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog(value = "added role '{{roleName}}' of type '{{roleType}}/{{accessType}}'", severity = DEBUG)
+    @AuditLog(value = "added role '{{roleName}}' of type '{{roleType}}/{{accessManagementType}}'", severity = DEBUG)
     public void addRole(@NotBlank String roleName,
                         @NotNull RoleType roleType,
                         @NotNull SecurityClassification securityClassification,
-                        @NotNull AccessType accessType) {
+                        @NotNull AccessManagementType accessManagementType) {
         jdbi.useExtension(DefaultRoleSetupRepository.class,
-            dao -> dao.addRole(roleName, roleType, securityClassification, accessType));
+            dao -> dao.addRole(roleName, roleType, securityClassification, accessManagementType));
     }
 
     /**

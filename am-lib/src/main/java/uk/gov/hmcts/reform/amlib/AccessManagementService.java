@@ -109,23 +109,6 @@ public class AccessManagementService {
     }
 
     /**
-     * Returns list of user ids who have access to resource or null if user has no access to this resource.
-     *
-     * @param userId     (accessorId)
-     * @param resourceId resource Id
-     * @return list of user ids (accessor id) or null
-     * @throws PersistenceException if any persistence errors were encountered
-     */
-    @AuditLog("returned accessors to resource '{{resourceId}}' for accessor '{{userId}}': {{result}}")
-    public List<String> getAccessorsList(String userId, String resourceId) {
-        return jdbi.withExtension(AccessManagementRepository.class, dao -> {
-            List<String> userIds = dao.getAccessorsList(userId, resourceId);
-
-            return userIds.isEmpty() ? null : userIds;
-        });
-    }
-
-    /**
      * Filters a list of {@link JsonNode} to remove fields that user has no access to (no READ permission) and returns
      * an envelope response consisting of resourceId, filtered json and permissions for attributes.
      *

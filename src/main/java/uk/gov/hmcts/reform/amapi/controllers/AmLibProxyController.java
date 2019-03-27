@@ -13,17 +13,12 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.FilterResourceResponse;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * Default endpoints per application.
  */
 @RestController
 @RequestMapping("lib")
 public class AmLibProxyController {
-
-    private static final String RESOURCE_ID_KEY = "resourceId";
 
     @Autowired
     private AccessManagementService am;
@@ -48,11 +43,6 @@ public class AmLibProxyController {
         } finally {
             MDC.clear();
         }
-    }
-
-    @PostMapping("/get-accessors-list")
-    public List<String> getAccessorsList(@RequestBody Map<String, Object> request) {
-        return am.getAccessorsList(request.get("userId").toString(), request.get(RESOURCE_ID_KEY).toString());
     }
 
     @PostMapping("/filter-resource")

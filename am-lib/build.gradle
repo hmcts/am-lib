@@ -1,48 +1,48 @@
 plugins {
-  id 'java-library'
-  id 'maven-publish'
-  id 'checkstyle'
-  id 'pmd'
-  id 'jacoco'
-  id 'org.sonarqube' version '2.7'
-  id 'com.jfrog.bintray' version '1.8.4'
-  id 'com.github.johnrengelman.shadow' version '4.0.4'
-  id "io.freefair.aspectj.post-compile-weaving" version "3.1.4"
+    id 'java-library'
+    id 'maven-publish'
+    id 'checkstyle'
+    id 'pmd'
+    id 'jacoco'
+    id 'org.sonarqube' version '2.7'
+    id 'com.jfrog.bintray' version '1.8.4'
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
+    id "io.freefair.aspectj.post-compile-weaving" version "3.1.4"
 }
 
 group 'uk.gov.hmcts.reform'
 version "${version}"
 
 configurations {
-  testOutput.extendsFrom(testCompile)
+    testOutput.extendsFrom(testCompile)
 }
 
 test {
-  useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 checkstyle {
-  toolVersion = '8.18'
-  maxWarnings = 0
-  configDir = new File("config/checkstyle")
+    toolVersion = '8.18'
+    maxWarnings = 0
+    configDir = new File("config/checkstyle")
 }
 
 pmd {
-  toolVersion = "6.12.0"
-  sourceSets = [sourceSets.main, sourceSets.test]
-  reportsDir = file("$buildDir/reports/pmd/$project.name")
-  ruleSetFiles = files("$projectDir/config/pmd/ruleset.xml")
-  ruleSets = []
+    toolVersion = "6.12.0"
+    sourceSets = [sourceSets.main, sourceSets.test]
+    reportsDir = file("$buildDir/reports/pmd/$project.name")
+    ruleSetFiles = files("$projectDir/config/pmd/ruleset.xml")
+    ruleSets = []
 }
 
 sonarqube {
-  properties {
-    property "sonar.projectName", "Reform :: am-lib"
-    property "sonar.projectKey", "uk.gov.hmcts.reform:am-lib"
-    property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
-    property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
-    property "sonar.coverage.exclusions", "**/models/**"
-  }
+    properties {
+        property "sonar.projectName", "Reform :: am-lib"
+        property "sonar.projectKey", "uk.gov.hmcts.reform:am-lib"
+        property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
+        property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
+        property "sonar.coverage.exclusions", "**/models/**"
+    }
 }
 
 project.tasks['sonarqube'].dependsOn test
@@ -50,11 +50,11 @@ project.tasks['sonarqube'].dependsOn test
 sourceCompatibility = 1.8
 
 compileJava {
-  options.compilerArgs << '-parameters'
+    options.compilerArgs << '-parameters'
 }
 
 compileTestJava {
-  options.compilerArgs << '-parameters'
+    options.compilerArgs << '-parameters'
 }
 
 repositories {
@@ -67,113 +67,112 @@ repositories {
 }
 
 dependencies {
-  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
-  compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
 
-  compile group: 'org.jdbi', name: 'jdbi3-core', version: '3.6.0'
-  compile group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.6.0'
-  compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
-  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
-  compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.15.Final'
-  compile group: 'org.aspectj', name: 'aspectjrt', version: '1.9.2'
-  compile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
-  compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: '2.1.3.RELEASE'
+    compile group: 'org.jdbi', name: 'jdbi3-core', version: '3.6.0'
+    compile group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.6.0'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
+    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.16.Final'
+    compile group: 'org.aspectj', name: 'aspectjrt', version: '1.9.2'
+    compile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: '2.1.3.RELEASE'
 
-  testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
-  testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
+    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
 
-  annotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.21'
-  compile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
+    annotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.21'
+    compile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
 
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.1'
-  testCompile group: 'org.mockito', name: 'mockito-core', version: '2.25.1'
-  testCompile group: 'org.assertj', name: 'assertj-core', version: '3.12.2'
-  testCompile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
-  testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.10.7'
-  testCompile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
-  testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'
-  testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: '5.0.1'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.1'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.25.1'
+    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.12.2'
+    testCompile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
+    testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.11.0'
+    testCompile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
+    testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 }
 
 task codeCoverageReport(type: JacocoReport, dependsOn: test) {
 
-  // Gather execution data from all subprojects
-  // (change this if you e.g. want to calculate unit test/integration test coverage separately)
-  executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+    // Gather execution data from all subprojects
+    // (change this if you e.g. want to calculate unit test/integration test coverage separately)
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
 
-  reports {
-    csv.enabled = false
-    html.enabled = true
-    html.destination = file("${buildDir}/reports/jacoco/html")
-    xml.enabled = true
-    xml.destination = file("${buildDir}/reports/jacoco/jacocoTestReport.xml")
-  }
+    reports {
+        csv.enabled = false
+        html.enabled = true
+        html.destination = file("${buildDir}/reports/jacoco/html")
+        xml.enabled = true
+        xml.destination = file("${buildDir}/reports/jacoco/jacocoTestReport.xml")
+    }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-  archiveClassifier = 'sources'
-  from sourceSets.main.allSource
+    archiveClassifier = 'sources'
+    from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-  archiveClassifier = 'javadoc'
-  from javadoc.destinationDir
+    archiveClassifier = 'javadoc'
+    from javadoc.destinationDir
 }
 
 task jarTest(type: Jar, dependsOn: testClasses) {
-  from sourceSets.test.output
+    from sourceSets.test.output
 }
 
 shadowJar {
-  from('src/main/java') {
-    include '**/*.sql'
-  }
-  def packages = [
-    'org.aspectj',
-    'org.hibernate.validator',
-    'org.hibernate.validator',
-    'javax.validation',
-    'org.jboss.logging',
-    'com.fasterxml.classmate'
-  ]
-  packages.each({ pkg ->
-    relocate pkg, 'shaded.' + pkg
-  })
-  archiveClassifier = 'all'
+    from('src/main/java') {
+        include '**/*.sql'
+    }
+    def packages = [
+        'org.aspectj',
+        'org.hibernate.validator',
+        'org.hibernate.validator',
+        'javax.validation',
+        'org.jboss.logging',
+        'com.fasterxml.classmate'
+    ]
+    packages.each({pkg ->
+      relocate pkg, 'shaded.' + pkg
+    })
+    archiveClassifier = 'all'
 }
 
 artifacts {
-  archives shadowJar
-  archives javadocJar
-  testOutput jarTest
+    archives shadowJar
+    archives javadocJar
+    testOutput jarTest
 }
 
 publishing {
-  publications {
-    Main(MavenPublication) {
-      from components.java
-      artifact shadowJar
-      artifact javadocJar
-      groupId project.group
-      artifactId 'am-lib'
-      version project.version
+    publications {
+        Main(MavenPublication) {
+            from components.java
+            artifact shadowJar
+            artifact javadocJar
+            groupId project.group
+            artifactId 'am-lib'
+            version project.version
+        }
     }
-  }
 }
 
 bintray {
-  user = System.getenv('BINTRAY_USER')
-  key = System.getenv('BINTRAY_KEY')
-  publications = ['Main']
-  publish = true
-  pkg {
-    repo = 'hmcts-maven'
-    name = 'am-lib'
-    userOrg = 'hmcts'
-    licenses = ['MIT']
-    vcsUrl = 'https://github.com/hmcts/am-lib'
-    version {
-      name = project.version
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['Main']
+    publish = true
+    pkg {
+        repo = 'hmcts-maven'
+        name = 'am-lib'
+        userOrg = 'hmcts'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/hmcts/am-lib'
+        version {
+            name = project.version
+        }
     }
-  }
 }

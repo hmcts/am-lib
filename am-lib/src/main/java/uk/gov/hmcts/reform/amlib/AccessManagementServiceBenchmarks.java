@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -112,7 +111,7 @@ public class AccessManagementServiceBenchmarks {
     }
 
     @Benchmark
-    public void filterResourceBenchmark(RecordState state) throws SQLException {
+    public void filterResourceBenchmark(RecordState state) {
         state.service.filterResource(state.accessorId, ImmutableSet.of("DOES_NOT_EXIST"), state.resource);
     }
 }

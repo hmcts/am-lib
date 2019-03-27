@@ -8,6 +8,7 @@ import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -26,7 +27,13 @@ public class AccessManagementServiceBenchmarks {
     @SuppressWarnings("LineLength")
     public static class RecordState {
         AccessManagementService service =
-            new AccessManagementService("jdbc:postgresql://am-lib-test-aat.postgres.database.azure.com:5432/am?user=amuser@am-lib-test-aat&password=upF#99gf7RAZ?77H&sslmode=require", "amuser@am-lib-test-aat", "THIS_IS_NOT_THE_PASSWORD");
+            new AccessManagementService(DataSourceBuilder
+                .create()
+                .username("amuser@am-lib-test-aat")
+                .password("upF#99gf7RAZ?77H")
+                .url("jdbc:postgresql://am-lib-test-aat.postgres.database.azure.com:5432/am?user=amuser@am-lib-test-aat&password=upF#99gf7RAZ?77H&sslmode=require")
+                .build()
+            );
 
         String resourceId = UUID.randomUUID().toString();
         String accessorId = UUID.randomUUID().toString();

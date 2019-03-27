@@ -110,7 +110,7 @@ public class DefaultRoleSetupImportService {
      * @param accessGrant a container for granting default permissions
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
-    @AuditLog("default role access granted to resource "
+    @AuditLog("default role access granted by '{{mdc:caller}}' to resource "
         + "defined as '{{accessGrant.serviceName}}|{{accessGrant.resourceType}}|{{accessGrant.resourceName}}' "
         + "for role '{{accessGrant.roleName}}': {{accessGrant.attributePermissions}}")
     public void grantDefaultPermission(@NotNull @Valid DefaultPermissionGrant accessGrant) {
@@ -148,7 +148,8 @@ public class DefaultRoleSetupImportService {
      * @param resourceType the type of resource to delete default permissions for
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
-    @AuditLog("default role access revoked for service defined as '{{serviceName}}|{{resourceType}}'")
+    @AuditLog("default role access revoked by '{{mdc:caller}}' for service "
+        + "defined as '{{serviceName}}|{{resourceType}}'")
     public void truncateDefaultPermissionsForService(@NotBlank String serviceName, @NotBlank String resourceType) {
         jdbi.useTransaction(handle -> {
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
@@ -167,7 +168,8 @@ public class DefaultRoleSetupImportService {
      * @param resourceName the name of the resource to delete default permissions for
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
-    @AuditLog("default role access revoked for resource defined as '{{serviceName}}|{{resourceType}}|{{resourceName}}'")
+    @AuditLog("default role access revoked by '{{mdc:caller}}' for resource "
+        + "defined as '{{serviceName}}|{{resourceType}}|{{resourceName}}'")
     public void truncateDefaultPermissionsByResourceDefinition(@NotBlank String serviceName,
                                                                @NotBlank String resourceType,
                                                                @NotBlank String resourceName) {

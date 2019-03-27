@@ -29,9 +29,10 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
 @BenchmarkMode(Mode.Throughput)
+@SuppressWarnings({"PMD.NonStaticInitializer", "PMD.EmptyCatchBlock"})
 public class AccessManagementServiceBenchmarks {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @State(Scope.Thread)
     @SuppressWarnings("LineLength")
@@ -44,9 +45,9 @@ public class AccessManagementServiceBenchmarks {
 
         {
             try {
-                inputJson = mapper.readTree(ClassLoader.getSystemResource("mock_case_data.json"));
+                inputJson = MAPPER.readTree(ClassLoader.getSystemResource("mock_case_data.json"));
             } catch (IOException e) {
-                e.printStackTrace();
+                //NO-OP
             }
         }
 

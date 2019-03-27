@@ -86,6 +86,7 @@ public class AccessManagementService {
                         .resourceName(accessGrant.getResourceName())
                         .attribute(attributePermission.getKey())
                         .securityClassification(accessGrant.getSecurityClassification())
+                        .relationship(accessGrant.getRelationship())
                         .build())
                     .forEach(dao::createAccessManagementRecord));
         });
@@ -170,6 +171,8 @@ public class AccessManagementService {
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resource.getResourceId()));
 
+        System.out.println("explicitAccess = " + explicitAccess);
+
         Map<JsonPointer, Set<Permission>> attributePermissions;
 
         if (explicitAccess.isEmpty()) {
@@ -196,8 +199,13 @@ public class AccessManagementService {
 
         JsonNode filteredJson = filterService.filterJson(resource.getResourceJson(), attributePermissions);
 
+        Set<String> relationships = explicitAccess.stream()
+            .map(ExplicitAccessRecord::getRelationship)
+            .collect(Collectors.toSet());
+
         return FilterResourceResponse.builder()
             .resourceId(resource.getResourceId())
+            .relationships(relationships)
             .data(filteredJson)
             .permissions(attributePermissions)
             .build();

@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
@@ -63,6 +64,7 @@ public final class TestDataFactory {
             .resourceName(RESOURCE_NAME)
             .attributePermissions(attributePermissions)
             .securityClassification(SECURITY_CLASSIFICATION)
+            .relationship(ROLE_NAME)
             .build();
     }
 
@@ -87,6 +89,7 @@ public final class TestDataFactory {
             .resourceName(RESOURCE_NAME)
             .attribute(JsonPointer.valueOf(""))
             .securityClassification(SecurityClassification.PUBLIC)
+            .relationship(ROLE_NAME)
             .build();
     }
 

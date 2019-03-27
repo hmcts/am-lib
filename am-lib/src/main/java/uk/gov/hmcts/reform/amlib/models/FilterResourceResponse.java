@@ -13,6 +13,7 @@ import java.util.Set;
 @Builder
 public final class FilterResourceResponse {
     private String resourceId;
+    private Set<String> relationships;
     private JsonNode data;
     private Map<JsonPointer, Set<Permission>> permissions;
 }

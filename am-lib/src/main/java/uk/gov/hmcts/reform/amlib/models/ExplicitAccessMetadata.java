@@ -27,6 +27,8 @@ public final class ExplicitAccessMetadata {
     private final JsonPointer attribute;
     @NotNull
     private final SecurityClassification securityClassification;
+    @NotNull
+    private final String relationship;
 
     public String getAttributeAsString() {
         return getAttribute().toString();

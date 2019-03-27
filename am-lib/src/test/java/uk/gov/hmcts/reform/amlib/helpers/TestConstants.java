@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.ImmutableSet;
+import uk.gov.hmcts.reform.amlib.enums.AccessManagementType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
 import java.util.Set;
@@ -18,9 +20,11 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 public final class TestConstants {
 
     public static final String ACCESS_TYPE = "user";
+    public static final AccessManagementType ACCESS_MANAGEMENT_TYPE = AccessManagementType.EXPLICIT;
     public static final String SERVICE_NAME = "Service";
     public static final String RESOURCE_TYPE = "Resource Type";
     public static final String RESOURCE_NAME = "resource";
+    public static final RoleType ROLE_TYPE = RoleType.IDAM;
     public static final SecurityClassification SECURITY_CLASSIFICATION = SecurityClassification.PUBLIC;
     public static final JsonPointer ROOT_ATTRIBUTE = JsonPointer.valueOf("");
     public static final JsonPointer ATTRIBUTE = JsonPointer.valueOf("/test");

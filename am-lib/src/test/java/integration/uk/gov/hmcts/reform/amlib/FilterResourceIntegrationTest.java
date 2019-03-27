@@ -3,6 +3,7 @@ package integration.uk.gov.hmcts.reform.amlib;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,12 +21,15 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_MANAGEMENT_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
@@ -38,6 +42,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @BeforeEach
     void setUp() {
         resourceId = UUID.randomUUID().toString();
+        importerService.addRole(ROLE_NAME,ROLE_TYPE,SECURITY_CLASSIFICATION,ACCESS_MANAGEMENT_TYPE);
     }
 
     @Test
@@ -46,8 +51,10 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
+        System.out.println("result = " + result);
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
+            .relationships(ImmutableSet.of(ROLE_NAME))
             .data(DATA)
             .permissions(ImmutableMap.of(JsonPointer.valueOf(""), READ_PERMISSION))
             .build());
@@ -61,6 +68,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
+            .relationships(ImmutableSet.of(ROLE_NAME))
             .data(null)
             .permissions(ImmutableMap.of(JsonPointer.valueOf(""), CREATE_PERMISSION))
             .build());
@@ -86,6 +94,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
+            .relationships(ImmutableSet.of())
             .data(DATA)
             .permissions(ImmutableMap.of(ROOT_ATTRIBUTE, READ_PERMISSION))
             .build());
@@ -116,11 +125,13 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         List<FilterResourceResponse> expectedResult = ImmutableList.<FilterResourceResponse>builder()
             .add(FilterResourceResponse.builder()
                 .resourceId(resourceId)
+                .relationships(ImmutableSet.of())
                 .data(DATA)
                 .permissions(createPermissions("", READ_PERMISSION))
                 .build())
             .add(FilterResourceResponse.builder()
                 .resourceId(resourceId + "2")
+                .relationships(ImmutableSet.of())
                 .data(DATA)
                 .permissions(createPermissions("", READ_PERMISSION))
                 .build())
@@ -144,11 +155,13 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         List<FilterResourceResponse> expectedResult = ImmutableList.<FilterResourceResponse>builder()
             .add(FilterResourceResponse.builder()
                 .resourceId(resourceId)
+                .relationships(ImmutableSet.of())
                 .data(null)
                 .permissions(createPermissions("", CREATE_PERMISSION))
                 .build())
             .add(FilterResourceResponse.builder()
                 .resourceId(resourceId + "2")
+                .relationships(ImmutableSet.of())
                 .data(null)
                 .permissions(createPermissions("", CREATE_PERMISSION))
                 .build())

@@ -24,6 +24,7 @@ public final class ExplicitAccessRecord implements AttributeAccessDefinition {
     private final JsonPointer attribute;
     private final Set<Permission> permissions;
     private final SecurityClassification securityClassification;
+    private final String relationship;
 
     @Override
     public String getAttributeAsString() {

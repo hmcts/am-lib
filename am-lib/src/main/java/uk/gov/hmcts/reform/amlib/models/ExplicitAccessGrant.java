@@ -31,4 +31,6 @@ public final class ExplicitAccessGrant {
     private final Map<@NotNull JsonPointer, @NotEmpty Set<@NotNull Permission>> attributePermissions;
     @NotNull
     private final SecurityClassification securityClassification;
+    @NotNull
+    private final String relationship;
 }

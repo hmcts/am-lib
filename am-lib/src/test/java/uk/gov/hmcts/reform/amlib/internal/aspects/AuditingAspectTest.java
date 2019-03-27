@@ -126,7 +126,7 @@ class AuditingAspectTest {
         @Test
         void whenTemplateHasPlaceholderWithMethodArgumentExpressionShouldPrintMessageWithExtractedValue() {
             JoinPoint joinPoint = createJoinPoint("access to '{{resource.id}}' changed");
-            mockInputArgs(joinPoint, "resource", new Resource("ae4c7"));
+            mockInputArgs(joinPoint, "resource", new Resource("ae4c7", null));
 
             aspect.after(joinPoint, null);
 
@@ -134,9 +134,26 @@ class AuditingAspectTest {
                 .isEqualTo("[Access Management audit]: access to 'ae4c7' changed");
         }
 
+        @Test
+        void whenTemplateHasPlaceholderWithMethodResultExpressionShouldPrintMessageWithExtractedValue1() {
+            JoinPoint joinPoint = createJoinPoint("access for {{resource.type.serviceName}} changed");
+            mockInputArgs(joinPoint, "resource", new Resource("ae4c7", null));
+
+            aspect.after(joinPoint, null);
+
+            assertThat(StaticLogAppender.getMessage())
+                .isEqualTo("[Access Management audit]: access for null changed");
+        }
+
         @AllArgsConstructor
         class Resource {
             private final String id;
+            private final Definition type;
+
+            @AllArgsConstructor
+            class Definition {
+                private final String serviceName;
+            }
         }
 
         @Test

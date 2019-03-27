@@ -1,6 +1,7 @@
 package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.google.common.collect.ImmutableMap;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,6 @@ import uk.gov.hmcts.reform.amlib.models.Pair;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
@@ -34,18 +34,16 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @BeforeEach
     void setUp() {
-        Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermissions =
-            new ConcurrentHashMap<>();
-
         Map.Entry<Set<Permission>, SecurityClassification> readPermission =
             new Pair<>(READ_PERMISSION, SecurityClassification.PUBLIC);
 
         Map.Entry<Set<Permission>, SecurityClassification> createPermission =
             new Pair<>(CREATE_PERMISSION, SecurityClassification.PUBLIC);
 
-        attributePermissions.put(JsonPointer.valueOf("/test"), readPermission);
-        attributePermissions.put(JsonPointer.valueOf("/test2"), readPermission);
-        attributePermissions.put(JsonPointer.valueOf("/testCreate"), createPermission);
+        Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermissions =
+            ImmutableMap.of(JsonPointer.valueOf("/test"), readPermission,
+                JsonPointer.valueOf("/test2"), readPermission,
+                JsonPointer.valueOf("/testCreate"), createPermission);
 
         importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()

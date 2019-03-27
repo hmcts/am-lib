@@ -3,6 +3,7 @@ package integration.uk.gov.hmcts.reform.amlib.importer;
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
@@ -31,6 +32,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     void setUp() {
         service.addService(SERVICE_NAME);
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
+        MDC.put("caller", "Administrator");
     }
 
     @Test

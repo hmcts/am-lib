@@ -53,11 +53,11 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
             new Pair<>(ImmutableSet.of(UPDATE), SecurityClassification.PUBLIC);
 
         Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermissionsForRole =
-            ImmutableMap.<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>>builder()
-                .put(JsonPointer.valueOf("/child"), readPermission)
-                .put(JsonPointer.valueOf("/parent/age"), createPermission)
-                .put(JsonPointer.valueOf("/address/street/line1"), createPermission)
-                .build();
+            ImmutableMap.of(
+                JsonPointer.valueOf("/child"), readPermission,
+                JsonPointer.valueOf("/parent/age"), createPermission,
+                JsonPointer.valueOf("/address/street/line1"), createPermission
+            );
 
         importerService.grantDefaultPermission(
             DefaultPermissionGrant.builder()
@@ -69,10 +69,10 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
                 .build());
 
         Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermissionsForOtherRole =
-            ImmutableMap.<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>>builder()
-                .put(JsonPointer.valueOf(""), updatePermission)
-                .put(JsonPointer.valueOf("/address"), createPermission)
-                .build();
+            ImmutableMap.of(
+                JsonPointer.valueOf(""), updatePermission,
+                JsonPointer.valueOf("/address"), createPermission
+            );
 
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(OTHER_ROLE_NAME)

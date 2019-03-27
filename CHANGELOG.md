@@ -1,3 +1,15 @@
+# [0.4.0](https://github.com/hmcts/am-lib/compare/0.3.0...0.4.0) (2019-03-26)
+
+
+### Features
+
+* add auditing of method calls (AM-213) ([#103](https://github.com/hmcts/am-lib/issues/103)) ([8cd63bd](https://github.com/hmcts/am-lib/commit/8cd63bd))
+* add method to return resources with create permission (AM-221) ([#96](https://github.com/hmcts/am-lib/issues/96)) ([268b9be](https://github.com/hmcts/am-lib/commit/268b9be))
+* add NONE value to security classification enum (AM-231) ([#94](https://github.com/hmcts/am-lib/issues/94)) ([1febec8](https://github.com/hmcts/am-lib/commit/1febec8))
+* support granting explicit permissions of a resource to multiple users in a transaction (AM-218) ([#93](https://github.com/hmcts/am-lib/issues/93)) ([902e216](https://github.com/hmcts/am-lib/commit/902e216))
+
+
+
 # [0.3.0](https://github.com/hmcts/am-lib/compare/0.2.0...0.3.0) (2019-03-11)
 
 

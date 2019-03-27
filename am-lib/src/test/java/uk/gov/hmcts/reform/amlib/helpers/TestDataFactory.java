@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.amlib.helpers;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
@@ -11,7 +12,6 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_TYPE;
@@ -72,9 +72,7 @@ public final class TestDataFactory {
 
     public static Map<JsonPointer, Set<Permission>> createPermissions(String attribute,
                                                                       Set<Permission> permissions) {
-        Map<JsonPointer, Set<Permission>> attributePermissions = new ConcurrentHashMap<>();
-        attributePermissions.put(JsonPointer.valueOf(attribute), permissions);
-        return attributePermissions;
+        return ImmutableMap.of(JsonPointer.valueOf(attribute), permissions);
     }
 
     public static ExplicitAccessMetadata createMetadata(String resourceId) {

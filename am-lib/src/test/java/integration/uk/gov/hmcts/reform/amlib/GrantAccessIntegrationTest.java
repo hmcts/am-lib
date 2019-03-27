@@ -1,6 +1,7 @@
 package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.google.common.collect.ImmutableMap;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,6 @@ import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
@@ -41,9 +41,9 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenCreatingResourceAccessMultipleEntriesAppearInDatabase() {
-        Map<JsonPointer, Set<Permission>> multipleAttributePermissions = new ConcurrentHashMap<>();
-        multipleAttributePermissions.put(JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
-        multipleAttributePermissions.put(JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
+        Map<JsonPointer, Set<Permission>> multipleAttributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS,
+            JsonPointer.valueOf("/name"), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
         service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, multipleAttributePermissions));
 

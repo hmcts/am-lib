@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+  <appender name="static-appender" class="uk.gov.hmcts.reform.amlib.internal.aspects.StaticLogAppender" />
+
+  <logger name="uk.gov.hmcts.reform.amlib.internal.aspects.AuditingAspect" level="DEBUG">
+    <appender-ref ref="static-appender" />
+  </logger>
+</included>

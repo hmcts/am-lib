@@ -151,7 +151,7 @@ public class AuditingAspect {
                 field.setAccessible(true);
                 result = field.get(result);
             } catch (Exception e) {
-                String msgTemplate = "Cannot find fragment %s in expression %s against instance of %s class";
+                String msgTemplate = "Cannot find fragment %s in expression %s against instance of %s";
                 throw new InvalidTemplateExpressionException(format(msgTemplate, fragment, path, object.getClass()), e);
             }
         }
@@ -190,7 +190,7 @@ public class AuditingAspect {
         }
     }
 
-    private static class InvalidTemplateExpressionException extends AuditException {
+    static class InvalidTemplateExpressionException extends AuditException {
         private static final long serialVersionUID = 1L;
 
         private InvalidTemplateExpressionException(String message) {
@@ -202,7 +202,7 @@ public class AuditingAspect {
         }
     }
 
-    private static class AuditException extends RuntimeException {
+    static class AuditException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
         private AuditException(String message) {

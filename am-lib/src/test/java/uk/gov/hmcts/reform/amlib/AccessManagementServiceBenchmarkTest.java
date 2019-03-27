@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.amlib;
 
 import org.junit.jupiter.api.Test;
+import org.openjdk.jmh.profile.StackProfiler;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
@@ -26,6 +27,8 @@ class AccessManagementServiceBenchmarkTest {
             .forks(0)
             .resultFormat(ResultFormatType.JSON)
             .result("performance.json")
+            .addProfiler(StackProfiler.class)
+            .jvmArgs("-prof")
             .build();
 
         Collection<RunResult> results = new Runner(opt).run();

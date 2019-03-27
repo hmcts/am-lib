@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.amlib.internal.aspects;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.MDC;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.lang.String.format;
+import static java.lang.String.join;
 
 @Aspect
 @Slf4j
@@ -41,8 +45,14 @@ public class AuditingAspect {
             for (Metadata.Expression expression : metadata.expressions) {
                 Object value;
 
-                Object beanInstance = expression.value.startsWith("result")
-                    ? result : joinPoint.getArgs()[expression.argumentPosition];
+                Object beanInstance;
+                if (Keyword.MDC.matches(expression.beanName)) {
+                    beanInstance = MDC.get(expression.beanName.substring(expression.beanName.indexOf(':') + 1));
+                } else if (Keyword.RESULT.matches(expression.beanName)) {
+                    beanInstance = result;
+                } else {
+                    beanInstance = joinPoint.getArgs()[expression.argumentPosition];
+                }
                 if (expression.beanProperties == null) {
                     value = beanInstance;
                 } else {
@@ -55,7 +65,7 @@ public class AuditingAspect {
         }
     }
 
-    @SuppressWarnings("PMD") // AvoidInstantiatingObjectsInLoops: new objects need to be created in while loop
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops") // New objects need to be created in while loop
     private Function<MethodSignature, Metadata> createMetadata(String template, String... parameterNames) {
         return method -> {
             Matcher matcher = VARIABLE_PATTERN.matcher(template);
@@ -73,7 +83,14 @@ public class AuditingAspect {
                     expression.beanName = expression.value;
                 }
 
-                expression.argumentPosition = Arrays.asList(parameterNames).indexOf(expression.beanName);
+                if (!Keyword.MDC.matches(expression.beanName) && !Keyword.RESULT.matches(expression.beanName)) {
+                    expression.argumentPosition = Arrays.asList(parameterNames).indexOf(expression.beanName);
+                    if (expression.argumentPosition < 0) {
+                        String msgTemplate = "Argument '%s' does not exist among method arguments '%s'";
+                        throw new InvalidTemplateExpressionException(format(msgTemplate, expression.beanName,
+                            join(", ", parameterNames)));
+                    }
+                }
 
                 instance.expressions.add(expression);
             }
@@ -134,17 +151,36 @@ public class AuditingAspect {
                 field.setAccessible(true);
                 result = field.get(result);
             } catch (Exception e) {
-                String template = "Cannot find fragment %s in expression %s against instance of %s class";
-                throw new InvalidTemplateExpressionException(format(template, fragment, path, object.getClass()), e);
+                String msgTemplate = "Cannot find fragment %s in expression %s against instance of %s";
+                throw new InvalidTemplateExpressionException(format(msgTemplate, fragment, path, object.getClass()), e);
             }
         }
 
         return result;
     }
 
+    private enum Keyword {
+        MDC("mdc:"),
+        RESULT("result");
+
+        private String prefix;
+
+        Keyword(String prefix) {
+            this.prefix = prefix;
+        }
+
+        boolean matches(String value) {
+            return value.startsWith(prefix);
+        }
+    }
+
+    @EqualsAndHashCode
+    @ToString
     private static class Metadata {
         private final List<Expression> expressions = new ArrayList<>();
 
+        @EqualsAndHashCode
+        @ToString
         private static class Expression {
             private String value;
             private String template;
@@ -154,15 +190,19 @@ public class AuditingAspect {
         }
     }
 
-    private static class InvalidTemplateExpressionException extends AuditException {
+    static class InvalidTemplateExpressionException extends AuditException {
         private static final long serialVersionUID = 1L;
+
+        private InvalidTemplateExpressionException(String message) {
+            super(message);
+        }
 
         private InvalidTemplateExpressionException(String message, Throwable cause) {
             super(message, cause);
         }
     }
 
-    private static class AuditException extends RuntimeException {
+    static class AuditException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
         private AuditException(String message) {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
@@ -33,6 +34,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @BeforeEach
     void setUp() {
         resourceId = UUID.randomUUID().toString();
+        MDC.put("caller", "Administrator");
     }
 
     @Test

@@ -70,7 +70,7 @@ public class AccessManagementService {
      * @param accessGrant an object that describes explicit access to resource
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
-    @AuditLog("explicit access granted to resource '{{accessGrant.resourceId}}' "
+    @AuditLog("explicit access granted by '{{mdc:caller}}' to resource '{{accessGrant.resourceId}}' "
         + "defined as '{{accessGrant.serviceName}}|{{accessGrant.resourceType}}|{{accessGrant.resourceName}}' "
         + "for accessors '{{accessGrant.accessorIds}}': {{accessGrant.attributePermissions}}")
     public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant accessGrant) {
@@ -102,7 +102,7 @@ public class AccessManagementService {
      * @param accessMetadata an object to remove a specific explicit access record
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog("explicit access revoked to resource '{{accessMetadata.resourceId}}' "
+    @AuditLog("explicit access revoked by '{{mdc:caller}}' to resource '{{accessMetadata.resourceId}}' "
         + "defined as '{{accessMetadata.serviceName}}|{{accessMetadata.resourceType}}|{{accessMetadata.resourceName}}' "
         + "from accessor '{{accessMetadata.accessorId}}': {{accessMetadata.attribute}}")
     public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata accessMetadata) {

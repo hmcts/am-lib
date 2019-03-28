@@ -85,8 +85,8 @@ class AccessManagementServiceValidationTest {
                 "serviceName - must not be blank",
                 "resourceType - must not be blank",
                 "resourceName - must not be blank",
-                "roleNames - must not be empty",
-                "roleNames\\[\\].<iterable element> - must not be blank"
+                "userRoles - must not be empty",
+                "userRoles\\[\\].<iterable element> - must not be blank"
             ));
     }
 

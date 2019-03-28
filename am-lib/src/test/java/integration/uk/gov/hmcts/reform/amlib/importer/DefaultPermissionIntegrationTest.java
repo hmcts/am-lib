@@ -3,6 +3,7 @@ package integration.uk.gov.hmcts.reform.amlib.importer;
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.AccessManagementType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
@@ -14,7 +15,7 @@ import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
-import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createReadPermissionsForAttribute;
+import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createPermissionsForAttribute;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
@@ -31,6 +32,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     void setUp() {
         service.addService(SERVICE_NAME);
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
+        MDC.put("caller", "Administrator");
     }
 
     @Test
@@ -77,7 +79,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME + "2")
-            .attributePermissions(createReadPermissionsForAttribute(ROOT_ATTRIBUTE, READ_PERMISSION))
+            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, READ_PERMISSION))
             .build());
 
         service.truncateDefaultPermissionsForService(SERVICE_NAME, RESOURCE_TYPE);

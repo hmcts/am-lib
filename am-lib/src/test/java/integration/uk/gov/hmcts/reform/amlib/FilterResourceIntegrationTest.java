@@ -117,27 +117,25 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             AccessManagementType.ROLE_BASED);
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
 
-        List<Resource> resources = ImmutableList.<Resource>builder()
-            .add(createResource(resourceId))
-            .add(createResource(resourceId + "2"))
-            .build();
+        List<Resource> resources = ImmutableList.of(
+            createResource(resourceId),
+            createResource(resourceId + "2"));
 
         List<FilterResourceResponse> result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
 
-        List<FilterResourceResponse> expectedResult = ImmutableList.<FilterResourceResponse>builder()
-            .add(FilterResourceResponse.builder()
+        List<FilterResourceResponse> expectedResult = ImmutableList.of(
+            FilterResourceResponse.builder()
                 .resourceId(resourceId)
                 .relationships(ImmutableSet.of())
                 .data(DATA)
                 .permissions(createPermissions("", READ_PERMISSION))
-                .build())
-            .add(FilterResourceResponse.builder()
+                .build(),
+            FilterResourceResponse.builder()
                 .resourceId(resourceId + "2")
                 .relationships(ImmutableSet.of())
                 .data(DATA)
                 .permissions(createPermissions("", READ_PERMISSION))
-                .build())
-            .build();
+                .build());
 
         assertThat(result).isEqualTo(expectedResult);
     }
@@ -148,34 +146,32 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             AccessManagementType.ROLE_BASED);
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, CREATE_PERMISSION));
 
-        List<Resource> resources = ImmutableList.<Resource>builder()
-            .add(createResource(resourceId))
-            .add(createResource(resourceId + "2"))
-            .build();
+        List<Resource> resources = ImmutableList.of(
+            createResource(resourceId),
+            createResource(resourceId + "2"));
 
         List<FilterResourceResponse> result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
 
-        List<FilterResourceResponse> expectedResult = ImmutableList.<FilterResourceResponse>builder()
-            .add(FilterResourceResponse.builder()
+        List<FilterResourceResponse> expectedResult = ImmutableList.of(
+            FilterResourceResponse.builder()
                 .resourceId(resourceId)
                 .relationships(ImmutableSet.of())
                 .data(null)
                 .permissions(createPermissions("", CREATE_PERMISSION))
-                .build())
-            .add(FilterResourceResponse.builder()
+                .build(),
+            FilterResourceResponse.builder()
                 .resourceId(resourceId + "2")
                 .relationships(ImmutableSet.of())
                 .data(null)
                 .permissions(createPermissions("", CREATE_PERMISSION))
-                .build())
-            .build();
+                .build());
 
         assertThat(result).isEqualTo(expectedResult);
     }
 
     @Test
     void whenEmptyListOfResourcesShouldReturnEmptyList() {
-        List<Resource> resources = ImmutableList.<Resource>builder().build();
+        List<Resource> resources = ImmutableList.of();
 
         List<FilterResourceResponse> result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
 

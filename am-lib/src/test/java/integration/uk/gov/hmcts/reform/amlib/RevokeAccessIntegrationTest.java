@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
@@ -39,6 +40,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void setUp() {
         resourceId = UUID.randomUUID().toString();
         importerService.addRole(ROLE_NAME,ROLE_TYPE,SECURITY_CLASSIFICATION,ACCESS_MANAGEMENT_TYPE);
+        MDC.put("caller", "Administrator");
     }
 
     @Test

@@ -39,12 +39,6 @@ public interface AccessManagementRepository {
         + "or access_management.attribute like concat(:attributeAsString, '/', '%')")
     void removeAccessManagementRecord(@BindBean ExplicitAccessMetadata explicitAccessMetadata);
 
-    @SqlQuery("select accessor_id from access_management where exists "
-        + "(select 1 from access_management where access_management.accessor_id = :accessorId "
-        + "and access_management.resource_id = :resourceId) "
-        + "and access_management.resource_id = :resourceId")
-    List<String> getAccessorsList(String accessorId, String resourceId);
-
     @SqlQuery("select * from access_management where accessor_id=? and resource_id=?")
     @RegisterConstructorMapper(ExplicitAccessRecord.class)
     List<ExplicitAccessRecord> getExplicitAccess(String accessorId, String resourceId);

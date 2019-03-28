@@ -194,7 +194,7 @@ public class AccessManagementService {
      * @throws PersistenceException if any persistence errors were encountered
      */
     @AuditLog("returned role access to resource "
-        + "defined as '{{resource.serviceName}}|{{resource.resourceType}}|{{resource.resourceType}} "
+        + "defined as '{{resource.serviceName}}|{{resource.resourceType}}|{{resource.resourceName}}' "
         + "for roles '{{userRoles}}': {{result}}")
     public Map<JsonPointer, Set<Permission>> getRolePermissions(@NotNull @Valid ResourceDefinition resource,
                                                                 @NotEmpty Set<@NotBlank String> userRoles) {

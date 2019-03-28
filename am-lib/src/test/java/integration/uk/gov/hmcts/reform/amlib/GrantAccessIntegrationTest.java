@@ -102,6 +102,4 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .isThrownBy(() -> service.grantExplicitResourceAccess(nonExistingRole))
             .withMessageContaining("(relationship)=(NonExistingRoleName) is not present in table \"roles\"");
     }
-
-
 }

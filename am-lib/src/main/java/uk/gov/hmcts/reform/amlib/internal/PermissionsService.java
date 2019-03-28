@@ -88,7 +88,6 @@ public class PermissionsService {
                             log.debug(">>> Applying permissions {} from attribute '{}' to attribute '{}'",
                                 missingPermissions, head, attribute);
                             attributePermissions.get(attribute).permissions.putAll(missingPermissions);
-                            return;
                         }
                     }
 

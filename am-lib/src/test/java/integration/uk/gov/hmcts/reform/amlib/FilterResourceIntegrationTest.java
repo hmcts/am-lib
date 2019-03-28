@@ -155,15 +155,14 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
 
-        List<Resource> resources = ImmutableList.<Resource>builder()
-            .add(createResource(resourceId))
-            .add(createResource(resourceId + "2"))
-            .build();
+        List<Resource> resources = ImmutableList.of(
+            createResource(resourceId),
+            createResource(resourceId + "2"));
 
         List<FilteredResourceEnvelope> result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
 
-        List<FilteredResourceEnvelope> expectedResult = ImmutableList.<FilteredResourceEnvelope>builder()
-            .add(FilteredResourceEnvelope.builder()
+        List<FilteredResourceEnvelope> expectedResult = ImmutableList.of(
+            FilteredResourceEnvelope.builder()
                 .resourceId(resourceId)
                 .resourceDefinition(RESOURCE_DEFINITION)
                 .data(DATA)
@@ -171,8 +170,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                     .permissions(createPermissions("", READ_PERMISSION))
                     .accessManagementType(AccessType.ROLE_BASED)
                     .build())
-                .build())
-            .add(FilteredResourceEnvelope.builder()
+                .build(),
+            FilteredResourceEnvelope.builder()
                 .resourceId(resourceId + "2")
                 .resourceDefinition(RESOURCE_DEFINITION)
                 .data(DATA)
@@ -180,8 +179,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                     .permissions(createPermissions("", READ_PERMISSION))
                     .accessManagementType(AccessType.ROLE_BASED)
                     .build())
-                .build())
-            .build();
+                .build()
+        );
 
         assertThat(result).isEqualTo(expectedResult);
     }
@@ -191,15 +190,14 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, CREATE_PERMISSION));
 
-        List<Resource> resources = ImmutableList.<Resource>builder()
-            .add(createResource(resourceId))
-            .add(createResource(resourceId + "2"))
-            .build();
+        List<Resource> resources = ImmutableList.of(
+            createResource(resourceId),
+            createResource(resourceId + "2"));
 
         List<FilteredResourceEnvelope> result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
 
-        List<FilteredResourceEnvelope> expectedResult = ImmutableList.<FilteredResourceEnvelope>builder()
-            .add(FilteredResourceEnvelope.builder()
+        List<FilteredResourceEnvelope> expectedResult = ImmutableList.of(
+            FilteredResourceEnvelope.builder()
                 .resourceId(resourceId)
                 .resourceDefinition(RESOURCE_DEFINITION)
                 .data(null)
@@ -207,8 +205,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                     .permissions(createPermissions("", CREATE_PERMISSION))
                     .accessManagementType(AccessType.ROLE_BASED)
                     .build())
-                .build())
-            .add(FilteredResourceEnvelope.builder()
+                .build(),
+            FilteredResourceEnvelope.builder()
                 .resourceId(resourceId + "2")
                 .resourceDefinition(RESOURCE_DEFINITION)
                 .data(null)
@@ -216,15 +214,15 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                     .permissions(createPermissions("", CREATE_PERMISSION))
                     .accessManagementType(AccessType.ROLE_BASED)
                     .build())
-                .build())
-            .build();
+                .build()
+        );
 
         assertThat(result).isEqualTo(expectedResult);
     }
 
     @Test
     void whenEmptyListOfResourcesShouldReturnEmptyList() {
-        List<Resource> resources = ImmutableList.<Resource>builder().build();
+        List<Resource> resources = ImmutableList.of();
 
         List<FilteredResourceEnvelope> result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
 

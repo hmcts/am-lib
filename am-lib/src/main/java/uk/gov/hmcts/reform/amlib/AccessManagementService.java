@@ -71,7 +71,7 @@ public class AccessManagementService {
      * @param accessGrant an object that describes explicit access to resource
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
-    @AuditLog("explicit access granted to resource '{{accessGrant.resourceId}}' "
+    @AuditLog("explicit access granted by '{{mdc:caller}}' to resource '{{accessGrant.resourceId}}' "
         + "defined as '{{accessGrant.serviceName}}|{{accessGrant.resourceType}}|{{accessGrant.resourceName}}' "
         + "for accessors '{{accessGrant.accessorIds}}': {{accessGrant.attributePermissions}}")
     public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant accessGrant) {
@@ -103,29 +103,12 @@ public class AccessManagementService {
      * @param accessMetadata an object to remove a specific explicit access record
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog("explicit access revoked to resource '{{accessMetadata.resourceId}}' "
+    @AuditLog("explicit access revoked by '{{mdc:caller}}' to resource '{{accessMetadata.resourceId}}' "
         + "defined as '{{accessMetadata.serviceName}}|{{accessMetadata.resourceType}}|{{accessMetadata.resourceName}}' "
         + "from accessor '{{accessMetadata.accessorId}}': {{accessMetadata.attribute}}")
     public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata accessMetadata) {
         jdbi.useExtension(AccessManagementRepository.class,
             dao -> dao.removeAccessManagementRecord(accessMetadata));
-    }
-
-    /**
-     * Returns list of user ids who have access to resource or null if user has no access to this resource.
-     *
-     * @param userId     (accessorId)
-     * @param resourceId resource Id
-     * @return list of user ids (accessor id) or null
-     * @throws PersistenceException if any persistence errors were encountered
-     */
-    @AuditLog("returned accessors to resource '{{resourceId}}' for accessor '{{userId}}': {{result}}")
-    public List<String> getAccessorsList(String userId, String resourceId) {
-        return jdbi.withExtension(AccessManagementRepository.class, dao -> {
-            List<String> userIds = dao.getAccessorsList(userId, resourceId);
-
-            return userIds.isEmpty() ? null : userIds;
-        });
     }
 
     /**
@@ -210,7 +193,9 @@ public class AccessManagementService {
      * @return a map of attributes and their corresponding permissions or null
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog("returned role access to resource defined as '{{resource}} for roles '{{userRoles}}': {{result}}")
+    @AuditLog("returned role access to resource "
+        + "defined as '{{resource.serviceName}}|{{resource.resourceType}}|{{resource.resourceType}} "
+        + "for roles '{{userRoles}}': {{result}}")
     public Map<JsonPointer, Set<Permission>> getRolePermissions(@NotNull @Valid ResourceDefinition resource,
                                                                 @NotEmpty Set<@NotBlank String> userRoles) {
         List<Map<JsonPointer, Set<Permission>>> permissionsForRoles =

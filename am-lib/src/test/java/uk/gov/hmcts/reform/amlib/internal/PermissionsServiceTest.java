@@ -250,6 +250,27 @@ class PermissionsServiceTest {
     void whenThreeGroupsAreUsedShouldProperlyMergePermissions() {
         List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
             ImmutableMap.of(
+                JsonPointer.valueOf(""), ImmutableSet.of(READ)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(DELETE)
+            )
+        );
+
+        assertThat(permissionsService.merge(permissions))
+            .hasSize(3)
+            .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(READ))
+            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE, READ))
+            .containsEntry(JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(CREATE, READ, DELETE));
+    }
+
+    @Test
+    void whenThreeGroupsAreUsedWithAttributeAppearingMoreThenOnceShouldProperlyMergePermissions() {
+        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
+            ImmutableMap.of(
                 JsonPointer.valueOf(""), ImmutableSet.of(READ),
                 JsonPointer.valueOf("/claimant"), ImmutableSet.of(UPDATE)
             ),
@@ -266,6 +287,31 @@ class PermissionsServiceTest {
             .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(READ))
             .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(UPDATE))
             .containsEntry(JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(CREATE, UPDATE, DELETE));
+    }
+
+    @Test
+    void whenFourGroupsAreUsedShouldProperlyMergePermissions() {
+        List<Map<JsonPointer, Set<Permission>>> permissions = ImmutableList.of(
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(READ, UPDATE)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(READ, UPDATE, DELETE)
+            ),
+            ImmutableMap.of(
+                JsonPointer.valueOf("/claimant/address/postcode"), ImmutableSet.of(READ)
+            )
+        );
+
+        assertThat(permissionsService.merge(permissions))
+            .hasSize(4)
+            .containsEntry(JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE))
+            .containsEntry(JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(CREATE, READ, UPDATE))
+            .containsEntry(JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(CREATE, READ, UPDATE, DELETE))
+            .containsEntry(JsonPointer.valueOf("/claimant/address/postcode"), ImmutableSet.of(CREATE, READ, UPDATE));
     }
 
     @Test

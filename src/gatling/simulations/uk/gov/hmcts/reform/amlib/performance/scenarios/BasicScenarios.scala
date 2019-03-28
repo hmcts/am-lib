@@ -24,14 +24,6 @@ object BasicScenarios {
         .pause(1.second)
     )
 
-  val getAccessorsList: ScenarioBuilder = scenario("Get Accessors List")
-    .forever(
-      feed(CreateResourceAccess.feed)
-        .exec(AccessManagement.createResourceAssess)
-        .exec(AccessManagement.getAccessorsList)
-        .pause(1.second)
-    )
-
   val revokeResourceAccess: ScenarioBuilder = scenario("Revoke Resource Access")
     .forever(
       feed(CreateResourceAccess.feed)

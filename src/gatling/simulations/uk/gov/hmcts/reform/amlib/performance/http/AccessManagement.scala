@@ -18,9 +18,6 @@ object AccessManagement {
   def filterResource: HttpRequestBuilder =
     postRequest("/filter-resource", "filterResource.json")
 
-  def getAccessorsList: HttpRequestBuilder =
-    postRequest("/get-accessors-list", "getAccessorsList.json")
-
   def revokeResourceAccess: HttpRequestBuilder =
     postRequest("/revoke-resource-access", "revokeResourceAccess.json")
 }

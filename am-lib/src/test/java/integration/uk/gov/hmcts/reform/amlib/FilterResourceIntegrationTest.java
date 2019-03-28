@@ -42,7 +42,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @BeforeEach
     void setUp() {
         resourceId = UUID.randomUUID().toString();
-        importerService.addRole(ROLE_NAME,ROLE_TYPE,SECURITY_CLASSIFICATION,ACCESS_MANAGEMENT_TYPE);
+        importerService.addRole(ROLE_NAME, ROLE_TYPE, SECURITY_CLASSIFICATION, ACCESS_MANAGEMENT_TYPE);
     }
 
     @Test
@@ -51,7 +51,6 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
-        System.out.println("result = " + result);
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
             .relationships(ImmutableSet.of(ROLE_NAME))
@@ -87,7 +86,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenNoExplicitAccessShouldUseRoleBasedAccess() {
-        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessManagementType.ROLE_BASED);
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC,
+            AccessManagementType.ROLE_BASED);
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
 
         FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
@@ -102,7 +102,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenNoExplicitAccessAndRoleHasExplicitAccessTypeShouldReturnNull() {
-        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessManagementType.EXPLICIT);
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC,
+            AccessManagementType.EXPLICIT);
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
 
         FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
@@ -112,7 +113,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenListOfResourcesShouldReturnListFilterResourceResponse() {
-        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessManagementType.ROLE_BASED);
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC,
+            AccessManagementType.ROLE_BASED);
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
 
         List<Resource> resources = ImmutableList.<Resource>builder()
@@ -142,7 +144,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenListOfResourcesButNoReadAccessShouldReturnListOfEnvelopesWithNullDataValues() {
-        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessManagementType.ROLE_BASED);
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC,
+            AccessManagementType.ROLE_BASED);
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, CREATE_PERMISSION));
 
         List<Resource> resources = ImmutableList.<Resource>builder()

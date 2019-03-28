@@ -47,7 +47,8 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         attributePermissions.put(JsonPointer.valueOf("/test2"), readPermission);
         attributePermissions.put(JsonPointer.valueOf("/testCreate"), createPermission);
 
-        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessManagementType.ROLE_BASED);
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC,
+            AccessManagementType.ROLE_BASED);
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
             .serviceName(SERVICE_NAME)

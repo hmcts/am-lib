@@ -35,7 +35,8 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @BeforeEach
     void setUp() {
-        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessManagementType.ROLE_BASED);
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC,
+            AccessManagementType.ROLE_BASED);
         importerService.addRole(
             OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessManagementType.ROLE_BASED);
         importerService.addResourceDefinition(

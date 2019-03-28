@@ -27,7 +27,7 @@ class GetAccessorsListIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @BeforeEach
     void setUp() {
         resourceId = UUID.randomUUID().toString();
-        importerService .addRole(ROLE_NAME,ROLE_TYPE,SECURITY_CLASSIFICATION,ACCESS_MANAGEMENT_TYPE);
+        importerService.addRole(ROLE_NAME,ROLE_TYPE,SECURITY_CLASSIFICATION,ACCESS_MANAGEMENT_TYPE);
     }
 
     @Test

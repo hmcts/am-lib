@@ -53,6 +53,23 @@ public final class TestDataFactory {
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
+                                                  String accessorId,
+                                                  String relationship,
+                                                  Map<JsonPointer, Set<Permission>> attributePermissions) {
+        return ExplicitAccessGrant.builder()
+            .resourceId(resourceId)
+            .accessorIds(ImmutableSet.of(accessorId))
+            .accessType(ACCESS_TYPE)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attributePermissions(attributePermissions)
+            .securityClassification(SECURITY_CLASSIFICATION)
+            .relationship(relationship)
+            .build();
+    }
+
+    public static ExplicitAccessGrant createGrant(String resourceId,
                                                   Set<String> accessorId,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
         return ExplicitAccessGrant.builder()

@@ -24,7 +24,7 @@ public interface AccessManagementRepository {
 
     @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, access_type, service_name, resource_type, resource_name, attribute, security_classification, relationship) "
         + "values (:resourceId, :accessorId, :permissionsAsInt, :accessType, :serviceName, :resourceType, :resourceName, :attributeAsString, :securityClassification, :relationship)"
-        + "on conflict on constraint relationship_unique do update set permissions = :permissionsAsInt"
+        + "on conflict on constraint access_management_unique do update set permissions = :permissionsAsInt"
     )
     void createAccessManagementRecord(@BindBean ExplicitAccessRecord explicitAccessRecord);
 

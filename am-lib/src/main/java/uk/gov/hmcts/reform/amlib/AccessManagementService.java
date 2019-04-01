@@ -32,6 +32,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import static java.util.stream.Collectors.toList;
+
 public class AccessManagementService {
 
     private final FilterService filterService = new FilterService();
@@ -119,7 +121,7 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resources envelope {@link Resource} and corresponding metadata
      * @return envelope list of {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions
-     *         if access to resource is configured, otherwise null
+     *     if access to resource is configured, otherwise null
      * @throws PersistenceException if any persistence errors were encountered
      */
     public List<FilterResourceResponse> filterResource(@NotBlank String userId,
@@ -127,7 +129,7 @@ public class AccessManagementService {
                                                        @NotNull List<@NotNull @Valid Resource> resources) {
         return resources.stream()
             .map(resource -> filterResource(userId, userRoles, resource))
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 
     /**
@@ -138,7 +140,7 @@ public class AccessManagementService {
      * @param userRoles accessor roles
      * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilterResourceResponse} with resource ID, filtered JSON and map of permissions if access
-     *         to resource is configured, otherwise null
+     *     to resource is configured, otherwise null
      * @throws PersistenceException if any persistence errors were encountered
      */
     @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
@@ -155,6 +157,10 @@ public class AccessManagementService {
 
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resource.getResourceId()));
+
+        // need to create a List<Map<JsonPointer, Set<Permission>>> where:
+        // each entry in the list is all attribute permissions for a single relationship.
+        // should be able to stream explicit access and do some cool collecting stuff.
 
         System.out.println("explicitAccess = " + explicitAccess);
 
@@ -223,7 +229,7 @@ public class AccessManagementService {
                     .map(role -> dao.getRolePermissions(serviceName, resourceType, resourceName, role))
                     .map(roleBasedAccessRecords -> roleBasedAccessRecords.stream()
                         .collect(getMapCollector()))
-                    .collect(Collectors.toList()));
+                    .collect(toList()));
 
         if (permissionsForRoles.stream().allMatch(Map::isEmpty)) {
             return null;

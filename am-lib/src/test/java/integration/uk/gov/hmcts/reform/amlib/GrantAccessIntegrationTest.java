@@ -83,7 +83,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenCreatingResourceWithInvalidRelationshipShouldThrowPersistenceException() {
         Map<JsonPointer, Set<Permission>> multipleAttributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
+            JsonPointer.valueOf(""), EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS);
 
         ExplicitAccessGrant nonExistingRole = ExplicitAccessGrant.builder()
             .resourceId(resourceId)

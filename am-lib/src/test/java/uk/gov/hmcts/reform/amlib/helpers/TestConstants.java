@@ -28,6 +28,7 @@ public final class TestConstants {
     public static final JsonPointer ATTRIBUTE = JsonPointer.valueOf("/test");
     public static final String ACCESSOR_ID = "a";
     public static final String OTHER_ACCESSOR_ID = "b";
+    public static final String RELATIONSHIP = "Solicitor";
     public static final Set<String> ROLE_NAMES = ImmutableSet.of("Solicitor");
     public static final Set<String> ACCESSOR_IDS = ImmutableSet.of("y", "z");
     public static final String ROLE_NAME = "Solicitor";

@@ -19,17 +19,21 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_MANAGEMENT_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RELATIONSHIP;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
@@ -176,5 +180,68 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         List<FilterResourceResponse> result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void whenGrantingExplicitAccessWithDifferentRelationshipSameAttributeAndDiffPermissionsShouldMergePermissions() {
+        importerService.addRole("Defendant", ROLE_TYPE, SECURITY_CLASSIFICATION, ACCESS_MANAGEMENT_TYPE);
+
+        service.grantExplicitResourceAccess(
+            createGrant(resourceId, ACCESSOR_ID, RELATIONSHIP,
+                createPermissions("/Parent", READ_PERMISSION)));
+        service.grantExplicitResourceAccess(
+            createGrant(resourceId, ACCESSOR_ID, "Defendant",
+                createPermissions("/Parent", CREATE_PERMISSION)));
+
+        FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
+
+        assertThat(result).isEqualTo(FilterResourceResponse.builder()
+            .resourceId(resourceId)
+            .relationships(ImmutableSet.of(RELATIONSHIP,"Defendant"))
+            .data(DATA)
+            .permissions(ImmutableMap.of(JsonPointer.valueOf("/Parent"), ImmutableSet.of(CREATE,READ)))
+            .build());
+    }
+
+    @Test
+    void whenGrantExplicitAccessWithSameRelationshipParentChildAttributeWithDiffPermissionsShouldNotMergePermissions() {
+        service.grantExplicitResourceAccess(
+            createGrant(resourceId, ACCESSOR_ID, RELATIONSHIP,
+                createPermissions("/Parent", READ_PERMISSION)));
+        service.grantExplicitResourceAccess(
+            createGrant(resourceId, ACCESSOR_ID, RELATIONSHIP,
+                createPermissions("/Parent/Child", CREATE_PERMISSION)));
+
+        FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
+
+        assertThat(result).isEqualTo(FilterResourceResponse.builder()
+            .resourceId(resourceId)
+            .relationships(ImmutableSet.of(RELATIONSHIP))
+            .data(DATA)
+            .permissions(ImmutableMap.of(JsonPointer.valueOf("/Parent"), ImmutableSet.of(READ),
+                JsonPointer.valueOf("/Parent/Child"), ImmutableSet.of(CREATE,READ)))
+            .build());
+    }
+
+    @Test
+    void whenGrantExplicitAccessWithDifferentRelationshipParentChildAttributeDiffPermissionsShouldMergePermissions() {
+        importerService.addRole("Defendant", ROLE_TYPE, SECURITY_CLASSIFICATION, ACCESS_MANAGEMENT_TYPE);
+
+        service.grantExplicitResourceAccess(
+            createGrant(resourceId, ACCESSOR_ID, RELATIONSHIP,
+                createPermissions("/Parent", READ_PERMISSION)));
+        service.grantExplicitResourceAccess(
+            createGrant(resourceId, ACCESSOR_ID, "Defendant",
+                createPermissions("/Parent/Child", CREATE_PERMISSION)));
+
+        FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
+
+        assertThat(result).isEqualTo(FilterResourceResponse.builder()
+            .resourceId(resourceId)
+            .relationships(ImmutableSet.of(RELATIONSHIP, "Defendant"))
+            .data(DATA)
+            .permissions(ImmutableMap.of(JsonPointer.valueOf("/Parent"), ImmutableSet.of(READ),
+                JsonPointer.valueOf("/Parent/Child"), ImmutableSet.of(CREATE,READ)))
+            .build());
     }
 }

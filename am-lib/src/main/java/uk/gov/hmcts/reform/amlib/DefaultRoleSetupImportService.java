@@ -140,7 +140,7 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * Deletes all default permissions within a service for a given resource definition.
+     * Deletes all default permissions within a service for a given resource type.
      *
      * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *

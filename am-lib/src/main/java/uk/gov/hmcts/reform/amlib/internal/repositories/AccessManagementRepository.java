@@ -46,7 +46,7 @@ public interface AccessManagementRepository {
     @SuppressWarnings("PMD") // UseObjectForClearerAPI: more than 3 parameters makes sense for now, subject to change
     @SqlQuery("select * from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType and resource_name = :resourceName and role_name = :roleName")
     @RegisterConstructorMapper(RoleBasedAccessRecord.class)
-    List<RoleBasedAccessRecord> getRolePermissions(@BindBean ResourceDefinition resource, String roleName);
+    List<RoleBasedAccessRecord> getRolePermissions(@BindBean ResourceDefinition resourceDefinition, String roleName);
 
     @SqlQuery("select access_management_type from roles where role_name = :roleName")
     AccessType getRoleAccessType(String roleName);

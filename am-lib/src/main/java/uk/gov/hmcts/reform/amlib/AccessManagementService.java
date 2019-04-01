@@ -153,13 +153,15 @@ public class AccessManagementService {
         AccessType accessType;
 
         if (explicitAccess.isEmpty()) {
-            Set<String> filterRoles = userRoles.stream().filter(this::roleBasedAccessType).collect(Collectors.toSet());
+            Set<String> filteredRoles = userRoles.stream()
+                .filter(this::roleBasedAccessType)
+                .collect(Collectors.toSet());
 
-            if (filterRoles.isEmpty()) {
+            if (filteredRoles.isEmpty()) {
                 return null;
             }
 
-            attributePermissions = getRolePermissions(resource.getDefinition(), filterRoles);
+            attributePermissions = getRolePermissions(resource.getDefinition(), filteredRoles);
 
             if (attributePermissions == null) {
                 return null;

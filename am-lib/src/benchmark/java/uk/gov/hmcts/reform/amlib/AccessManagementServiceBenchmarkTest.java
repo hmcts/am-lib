@@ -23,7 +23,7 @@ class AccessManagementServiceBenchmarkTest {
         Options opt = new OptionsBuilder()
             .include(AccessManagementServiceBenchmarks.class.getSimpleName())
             .warmupIterations(2)
-            .measurementIterations(5)
+            .measurementIterations(4)
             .forks(0)
             .resultFormat(ResultFormatType.JSON)
             .result("performance.json")

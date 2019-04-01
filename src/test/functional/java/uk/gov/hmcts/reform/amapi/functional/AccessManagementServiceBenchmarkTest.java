@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.amlib;
+package uk.gov.hmcts.reform.amapi.functional;
 
 import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.profile.StackProfiler;
@@ -8,10 +8,11 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import uk.gov.hmcts.reform.amapi.AccessManagementServiceBenchmarks;
 
 import java.util.Collection;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
 class AccessManagementServiceBenchmarkTest {

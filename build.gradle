@@ -200,7 +200,13 @@ dependencies {
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     compile group: 'org.flywaydb', name: 'flyway-core', version: versions.flyway
 
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.1'
+    annotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.21'
+    compile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
+
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
+
+
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.1'
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 
     testCompile (group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot) {

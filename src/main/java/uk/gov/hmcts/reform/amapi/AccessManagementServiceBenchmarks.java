@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.amlib;
+package uk.gov.hmcts.reform.amapi;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -12,6 +12,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -56,8 +57,8 @@ public class AccessManagementServiceBenchmarks {
             new AccessManagementService(DataSourceBuilder
                 .create()
                 .username("amuser@am-lib-test-aat")
-                .password("upF#99gf7RAZ?77H")
-                .url("jdbc:postgresql://am-lib-test-aat.postgres.database.azure.com:5432/am?user=amuser@am-lib-test-aat&password=upF#99gf7RAZ?77H&sslmode=require")
+                .password("PASSWORD")
+                .url("jdbc:postgresql://am-lib-test-aat.postgres.database.azure.com:5432/am?user=amuser@am-lib-test-aat&password=PASSWORD&sslmode=require")
                 .build()
             );
 

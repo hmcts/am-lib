@@ -2,6 +2,7 @@
 <included>
   <appender name="static-appender" class="uk.gov.hmcts.reform.amlib.internal.aspects.StaticLogAppender" />
 
+  <logger name="uk.gov.hmcts.reform.amlib" level="DEBUG" />
   <logger name="uk.gov.hmcts.reform.amlib.internal.aspects.AuditingAspect" level="DEBUG">
     <appender-ref ref="static-appender" />
   </logger>

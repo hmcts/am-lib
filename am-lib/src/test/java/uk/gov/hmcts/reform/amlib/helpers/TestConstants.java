@@ -28,8 +28,7 @@ public final class TestConstants {
     public static final Set<String> ACCESSOR_IDS = ImmutableSet.of("y", "z");
     public static final String ROLE_NAME = "Solicitor";
     public static final String OTHER_ROLE_NAME = "Local Authority";
-    public static final Set<Permission> EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS =
-        ImmutableSet.of(CREATE, READ, UPDATE);
+    public static final Set<Permission> EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS = ImmutableSet.of(CREATE, READ, UPDATE);
     public static final Set<Permission> CREATE_PERMISSION = ImmutableSet.of(CREATE);
     public static final Set<Permission> READ_PERMISSION = ImmutableSet.of(READ);
     public static final JsonNode DATA = JsonNodeFactory.instance.objectNode()

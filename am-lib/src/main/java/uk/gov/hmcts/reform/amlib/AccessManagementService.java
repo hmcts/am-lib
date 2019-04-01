@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.FilterService;
+import uk.gov.hmcts.reform.amlib.internal.PermissionsService;
 import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
@@ -34,6 +35,7 @@ import javax.validation.constraints.NotNull;
 public class AccessManagementService {
 
     private final FilterService filterService = new FilterService();
+    private final PermissionsService permissionsService = new PermissionsService();
 
     private final Jdbi jdbi;
 
@@ -106,23 +108,6 @@ public class AccessManagementService {
     public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata accessMetadata) {
         jdbi.useExtension(AccessManagementRepository.class,
             dao -> dao.removeAccessManagementRecord(accessMetadata));
-    }
-
-    /**
-     * Returns list of user ids who have access to resource or null if user has no access to this resource.
-     *
-     * @param userId     (accessorId)
-     * @param resourceId resource Id
-     * @return list of user ids (accessor id) or null
-     * @throws PersistenceException if any persistence errors were encountered
-     */
-    @AuditLog("returned accessors to resource '{{resourceId}}' for accessor '{{userId}}': {{result}}")
-    public List<String> getAccessorsList(String userId, String resourceId) {
-        return jdbi.withExtension(AccessManagementRepository.class, dao -> {
-            List<String> userIds = dao.getAccessorsList(userId, resourceId);
-
-            return userIds.isEmpty() ? null : userIds;
-        });
     }
 
     /**
@@ -214,31 +199,29 @@ public class AccessManagementService {
      * @param serviceName  name of service
      * @param resourceType type of resource
      * @param resourceName name of a resource
-     * @param roleNames    A set of role names. Currently only one role name is supported but
-     *                     in future implementations we shall support having multiple role names
+     * @param userRoles    A set of user roles
      * @return a map of attributes and their corresponding permissions or null
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
     @AuditLog("returned role access to resource defined as '{{serviceName}}|{{resourceType}}|{{resourceName}}' "
-        + "for roles '{{roleNames}}': {{result}}")
+        + "for roles '{{userRoles}}': {{result}}")
     public Map<JsonPointer, Set<Permission>> getRolePermissions(@NotBlank String serviceName,
                                                                 @NotBlank String resourceType,
                                                                 @NotBlank String resourceName,
-                                                                @NotEmpty Set<@NotBlank String> roleNames) {
-        if (roleNames.size() > 1) {
-            throw new IllegalArgumentException("Currently a single role only is supported. "
-                + "Future implementations will allow for multiple roles.");
-        }
+                                                                @NotEmpty Set<@NotBlank String> userRoles) {
+        List<Map<JsonPointer, Set<Permission>>> permissionsForRoles =
+            jdbi.withExtension(AccessManagementRepository.class, dao ->
+                userRoles.stream()
+                    .map(role -> dao.getRolePermissions(serviceName, resourceType, resourceName, role))
+                    .map(roleBasedAccessRecords -> roleBasedAccessRecords.stream()
+                        .collect(getMapCollector()))
+                    .collect(Collectors.toList()));
 
-        List<RoleBasedAccessRecord> roleBasedAccessRecords = jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getRolePermissions(serviceName, resourceType, resourceName, roleNames.iterator().next()));
-
-        if (roleBasedAccessRecords.isEmpty()) {
+        if (permissionsForRoles.stream().allMatch(Map::isEmpty)) {
             return null;
         }
 
-        return roleBasedAccessRecords.stream().collect(getMapCollector());
+        return permissionsService.merge(permissionsForRoles);
     }
 
     /**

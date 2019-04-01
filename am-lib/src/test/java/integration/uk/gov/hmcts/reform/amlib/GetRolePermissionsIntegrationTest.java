@@ -2,6 +2,7 @@ package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,11 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
@@ -34,24 +39,47 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @BeforeEach
     void setUp() {
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        importerService.addRole(
+            OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+
         Map.Entry<Set<Permission>, SecurityClassification> readPermission =
             new Pair<>(READ_PERMISSION, SecurityClassification.PUBLIC);
 
         Map.Entry<Set<Permission>, SecurityClassification> createPermission =
             new Pair<>(CREATE_PERMISSION, SecurityClassification.PUBLIC);
 
-        Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermissions =
-            ImmutableMap.of(JsonPointer.valueOf("/test"), readPermission,
-                JsonPointer.valueOf("/test2"), readPermission,
-                JsonPointer.valueOf("/testCreate"), createPermission);
+        Map.Entry<Set<Permission>, SecurityClassification> updatePermission =
+            new Pair<>(ImmutableSet.of(UPDATE), SecurityClassification.PUBLIC);
 
-        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermissionsForRole =
+            ImmutableMap.of(
+                JsonPointer.valueOf("/child"), readPermission,
+                JsonPointer.valueOf("/parent/age"), createPermission,
+                JsonPointer.valueOf("/address/street/line1"), createPermission
+            );
+
+        importerService.grantDefaultPermission(
+            DefaultPermissionGrant.builder()
+                .roleName(ROLE_NAME)
+                .serviceName(SERVICE_NAME)
+                .resourceType(RESOURCE_TYPE)
+                .resourceName(RESOURCE_NAME)
+                .attributePermissions(attributePermissionsForRole)
+                .build());
+
+        Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermissionsForOtherRole =
+            ImmutableMap.of(
+                JsonPointer.valueOf(""), updatePermission,
+                JsonPointer.valueOf("/address"), createPermission
+            );
+
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
-            .roleName(ROLE_NAME)
+            .roleName(OTHER_ROLE_NAME)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
-            .attributePermissions(attributePermissions)
+            .attributePermissions(attributePermissionsForOtherRole)
             .build());
     }
 
@@ -60,10 +88,11 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
             RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAMES);
 
-        assertThat(accessRecord).hasSize(3);
-        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/test"), READ_PERMISSION);
-        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/test2"), READ_PERMISSION);
-        assertThat(accessRecord).containsEntry(JsonPointer.valueOf("/testCreate"), CREATE_PERMISSION);
+        assertThat(accessRecord)
+            .hasSize(3)
+            .containsEntry(JsonPointer.valueOf("/child"), READ_PERMISSION)
+            .containsEntry(JsonPointer.valueOf("/parent/age"), CREATE_PERMISSION)
+            .containsEntry(JsonPointer.valueOf("/address/street/line1"), CREATE_PERMISSION);
     }
 
     @Test
@@ -77,7 +106,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     @Test
     void shouldReturnNullWhenResourceTypeDoesNotExist() {
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
-            "Unknown Resource Type ", RESOURCE_NAME, ROLE_NAMES);
+            "Unknown Resource Type", RESOURCE_NAME, ROLE_NAMES);
 
         assertThat(accessRecord).isNull();
     }
@@ -96,5 +125,21 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
             RESOURCE_TYPE, RESOURCE_NAME, Stream.of("Unknown Role").collect(toSet()));
 
         assertThat(accessRecord).isNull();
+    }
+
+    @Test
+    void shouldMergeDataAsExpectedWhenRetrievingPermissionsForMultipleRoles() {
+        Set<String> userRoles = ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME);
+
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
+            RESOURCE_TYPE, RESOURCE_NAME, userRoles);
+
+        assertThat(accessRecord)
+            .hasSize(5)
+            .containsEntry(JsonPointer.valueOf(""), ImmutableSet.of(UPDATE))
+            .containsEntry(JsonPointer.valueOf("/address"), ImmutableSet.of(CREATE))
+            .containsEntry(JsonPointer.valueOf("/address/street/line1"), ImmutableSet.of(CREATE))
+            .containsEntry(JsonPointer.valueOf("/child"), ImmutableSet.of(READ, UPDATE))
+            .containsEntry(JsonPointer.valueOf("/parent/age"), ImmutableSet.of(CREATE, UPDATE));
     }
 }

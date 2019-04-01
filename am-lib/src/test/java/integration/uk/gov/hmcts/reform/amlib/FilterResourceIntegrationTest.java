@@ -48,7 +48,9 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @BeforeEach
     void setUp() {
         resourceId = UUID.randomUUID().toString();
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
     }
+
 
     @Test
     void whenRowExistsAndHasReadPermissionsShouldReturnEnvelopeWithData() {
@@ -57,9 +59,11 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         FilteredResourceEnvelope result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
-            .resourceId(resourceId)
-            .resourceDefinition(RESOURCE_DEFINITION)
-            .data(DATA)
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(RESOURCE_DEFINITION)
+                .data(DATA)
+                .build())
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(JsonPointer.valueOf(""), READ_PERMISSION))
                 .accessManagementType(AccessType.EXPLICIT)
@@ -74,9 +78,11 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         FilteredResourceEnvelope result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
-            .resourceId(resourceId)
-            .resourceDefinition(RESOURCE_DEFINITION)
-            .data(null)
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(RESOURCE_DEFINITION)
+                .data(null)
+                .build())
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(JsonPointer.valueOf(""), CREATE_PERMISSION))
                 .accessManagementType(AccessType.EXPLICIT)
@@ -103,9 +109,11 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         FilteredResourceEnvelope result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
-            .resourceId(resourceId)
-            .resourceDefinition(RESOURCE_DEFINITION)
-            .data(DATA)
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(RESOURCE_DEFINITION)
+                .data(DATA)
+                .build())
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(ROOT_ATTRIBUTE, READ_PERMISSION))
                 .accessManagementType(AccessType.ROLE_BASED)
@@ -140,9 +148,11 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             ACCESSOR_ID, ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME), createResource(resourceId));
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
-            .resourceId(resourceId)
-            .resourceDefinition(RESOURCE_DEFINITION)
-            .data(DATA)
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(RESOURCE_DEFINITION)
+                .data(DATA)
+                .build())
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(ROOT_ATTRIBUTE, READ_PERMISSION))
                 .accessManagementType(AccessType.ROLE_BASED)
@@ -163,18 +173,22 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         List<FilteredResourceEnvelope> expectedResult = ImmutableList.of(
             FilteredResourceEnvelope.builder()
-                .resourceId(resourceId)
-                .resourceDefinition(RESOURCE_DEFINITION)
-                .data(DATA)
+                .resource(Resource.builder()
+                    .id(resourceId)
+                    .definition(RESOURCE_DEFINITION)
+                    .data(DATA)
+                    .build())
                 .access(AccessEnvelope.builder()
                     .permissions(createPermissions("", READ_PERMISSION))
                     .accessManagementType(AccessType.ROLE_BASED)
                     .build())
                 .build(),
             FilteredResourceEnvelope.builder()
-                .resourceId(resourceId + "2")
-                .resourceDefinition(RESOURCE_DEFINITION)
-                .data(DATA)
+                .resource(Resource.builder()
+                    .id(resourceId + "2")
+                    .definition(RESOURCE_DEFINITION)
+                    .data(DATA)
+                    .build())
                 .access(AccessEnvelope.builder()
                     .permissions(createPermissions("", READ_PERMISSION))
                     .accessManagementType(AccessType.ROLE_BASED)
@@ -198,18 +212,22 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         List<FilteredResourceEnvelope> expectedResult = ImmutableList.of(
             FilteredResourceEnvelope.builder()
-                .resourceId(resourceId)
-                .resourceDefinition(RESOURCE_DEFINITION)
-                .data(null)
+                .resource(Resource.builder()
+                    .id(resourceId)
+                    .definition(RESOURCE_DEFINITION)
+                    .data(null)
+                    .build())
                 .access(AccessEnvelope.builder()
                     .permissions(createPermissions("", CREATE_PERMISSION))
                     .accessManagementType(AccessType.ROLE_BASED)
                     .build())
                 .build(),
             FilteredResourceEnvelope.builder()
-                .resourceId(resourceId + "2")
-                .resourceDefinition(RESOURCE_DEFINITION)
-                .data(null)
+                .resource(Resource.builder()
+                    .id(resourceId + "2")
+                    .definition(RESOURCE_DEFINITION)
+                    .data(null)
+                    .build())
                 .access(AccessEnvelope.builder()
                     .permissions(createPermissions("", CREATE_PERMISSION))
                     .accessManagementType(AccessType.ROLE_BASED)

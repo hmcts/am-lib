@@ -90,13 +90,13 @@ public final class TestDataFactory {
 
     public static Resource createResource(String resourceId) {
         return Resource.builder()
-            .resourceId(resourceId)
-            .type(ResourceDefinition.builder()
+            .id(resourceId)
+            .definition(ResourceDefinition.builder()
                 .resourceName(RESOURCE_NAME)
                 .resourceType(RESOURCE_TYPE)
                 .serviceName(SERVICE_NAME)
                 .build())
-            .resourceJson(DATA)
+            .data(DATA)
             .build();
     }
 }

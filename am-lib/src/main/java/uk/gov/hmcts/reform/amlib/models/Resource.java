@@ -12,10 +12,10 @@ import javax.validation.constraints.NotNull;
 @Builder
 public final class Resource {
     @NotBlank
-    private final String resourceId;
+    private final String id;
     @NotNull
     @Valid
-    private final ResourceDefinition type;
+    private final ResourceDefinition definition;
     @NotNull
-    private final JsonNode resourceJson;
+    private final JsonNode data;
 }

@@ -68,15 +68,15 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * Creates a new unique role or updates type, security classification and access type if already exists.
+     * Creates a new unique role or updates definition, security classification and access definition if already exists.
      *
      * @param roleName               the name of the role
-     * @param roleType               the type of role
+     * @param roleType               the definition of role
      * @param securityClassification the security classification for the role
-     * @param accessType             the access type for the role
+     * @param accessType             the access definition for the role
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog(value = "added role '{{roleName}}' of type '{{roleType}}/{{accessType}}'", severity = DEBUG)
+    @AuditLog(value = "added role '{{roleName}}' of definition '{{roleType}}/{{accessType}}'", severity = DEBUG)
     public void addRole(@NotBlank String roleName,
                         @NotNull RoleType roleType,
                         @NotNull SecurityClassification securityClassification,
@@ -89,7 +89,7 @@ public class DefaultRoleSetupImportService {
      * Creates a new resource definition or does nothing if already exists.
      *
      * @param serviceName  the name of the service the resource belongs to
-     * @param resourceType the type of resource
+     * @param resourceType the definition of resource
      * @param resourceName the name of the resource
      * @throws PersistenceException if any persistence errors were encountered
      */
@@ -140,12 +140,12 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * Deletes all default permissions within a service for a given resource type.
+     * Deletes all default permissions within a service for a given resource definition.
      *
      * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *
      * @param serviceName  the name of the service to delete default permissions for
-     * @param resourceType the type of resource to delete default permissions for
+     * @param resourceType the definition of resource to delete default permissions for
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
     @AuditLog("default role access revoked by '{{mdc:caller}}' for service "
@@ -159,12 +159,12 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * Deletes all default permissions within a service for a specific resource name and resource type.
+     * Deletes all default permissions within a service for a specific resource name and resource definition.
      *
      * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *
      * @param serviceName  the name of the service to delete default permissions for
-     * @param resourceType the type of resource to delete default permissions for
+     * @param resourceType the definition of resource to delete default permissions for
      * @param resourceName the name of the resource to delete default permissions for
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
@@ -184,7 +184,7 @@ public class DefaultRoleSetupImportService {
      * Deletes a resource definition.
      *
      * @param serviceName  the name of the service the resource attribute belongs to
-     * @param resourceType the type of resource
+     * @param resourceType the definition of resource
      * @param resourceName the name of the resource
      * @throws PersistenceException if any persistence errors were encountered
      */

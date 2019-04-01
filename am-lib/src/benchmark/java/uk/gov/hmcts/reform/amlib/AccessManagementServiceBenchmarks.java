@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static java.lang.System.getenv;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
@@ -53,11 +54,11 @@ public class AccessManagementServiceBenchmarks {
 
         PGPoolingDataSource dataSource = new PGPoolingDataSource();
         {
-            dataSource.setServerName("localhost");
-            dataSource.setPortNumber(5433);
-            dataSource.setUser("amuser");
-            dataSource.setPassword("ampass");
-            dataSource.setDatabaseName("am");
+            dataSource.setServerName(getenv("DATABASE_HOST"));
+            dataSource.setPortNumber(Integer.parseInt(getenv("DATABASE_PORT")));
+            dataSource.setUser(getenv("DATABASE_USERNAME"));
+            dataSource.setPassword(getenv("DATABASE_PASSWORD"));
+            dataSource.setDatabaseName(getenv("DATABASE_NAME"));
             dataSource.setMaxConnections(64);
         }
 

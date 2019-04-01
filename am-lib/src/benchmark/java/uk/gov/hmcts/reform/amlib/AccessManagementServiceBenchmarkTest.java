@@ -15,8 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
 class AccessManagementServiceBenchmarkTest {
-
-    private static final double REFERENCE_SCORE = 50.000;
+    private static final double REFERENCE_SCORE = 50;
 
     @Test
     void benchmarkRunner() throws RunnerException {
@@ -33,6 +32,6 @@ class AccessManagementServiceBenchmarkTest {
 
         Collection<RunResult> results = new Runner(opt).run();
 
-        results.forEach(result -> assertTrue(result.getPrimaryResult().getScore() > REFERENCE_SCORE));
+        assertTrue(results.stream().allMatch(result -> result.getPrimaryResult().getScore() > REFERENCE_SCORE));
     }
 }

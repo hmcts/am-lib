@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.amapi.functional;
+package uk.gov.hmcts.reform.amlib;
 
 import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.profile.StackProfiler;
@@ -8,7 +8,6 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import uk.gov.hmcts.reform.amapi.AccessManagementServiceBenchmarks;
 
 import java.util.Collection;
 
@@ -23,7 +22,7 @@ class AccessManagementServiceBenchmarkTest {
     void benchmarkRunner() throws RunnerException {
         Options opt = new OptionsBuilder()
             .include(AccessManagementServiceBenchmarks.class.getSimpleName())
-            .warmupIterations(5)
+            .warmupIterations(2)
             .measurementIterations(5)
             .forks(0)
             .resultFormat(ResultFormatType.JSON)

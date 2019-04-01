@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.amapi;
+package uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,8 +11,7 @@ import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.springframework.boot.jdbc.DataSourceBuilder;
-import uk.gov.hmcts.reform.amlib.AccessManagementService;
+import org.postgresql.ds.PGPoolingDataSource;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -46,21 +45,24 @@ public class AccessManagementServiceBenchmarks {
 
         {
             try {
-                inputJson = MAPPER.readTree(ClassLoader.getSystemResource("mock_case_data.json"));
+                inputJson = MAPPER.readTree(ClassLoader.getSystemResource("data.json"));
             } catch (IOException e) {
                 //NO-OP
             }
         }
 
+        PGPoolingDataSource dataSource = new PGPoolingDataSource();
+        {
+            dataSource.setServerName("localhost");
+            dataSource.setPortNumber(5433);
+            dataSource.setUser("amuser");
+            dataSource.setPassword("ampass");
+            dataSource.setDatabaseName("am");
+            dataSource.setMaxConnections(64);
+        }
+
         //initialise service with datasource. Uses springboot DataSourceBuilder.
-        AccessManagementService service =
-            new AccessManagementService(DataSourceBuilder
-                .create()
-                .username("amuser@am-lib-test-aat")
-                .password("PASSWORD")
-                .url("jdbc:postgresql://am-lib-test-aat.postgres.database.azure.com:5432/am?user=amuser@am-lib-test-aat&password=PASSWORD&sslmode=require")
-                .build()
-            );
+        AccessManagementService service = new AccessManagementService(dataSource);
 
         //need to define role constant and add to AAT (for role based)
 
@@ -105,11 +107,6 @@ public class AccessManagementServiceBenchmarks {
                 .build()
             );
         }
-    }
-
-    @Benchmark
-    public void baseline() {
-        //NO-OP
     }
 
     @Benchmark

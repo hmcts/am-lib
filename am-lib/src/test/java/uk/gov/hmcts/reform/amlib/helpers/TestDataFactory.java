@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_TYPE;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
@@ -59,7 +59,7 @@ public final class TestDataFactory {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(ImmutableSet.of(accessorId))
-            .accessType(ACCESS_TYPE)
+            .accessType(ACCESSOR_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
@@ -75,7 +75,7 @@ public final class TestDataFactory {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(accessorId)
-            .accessType(ACCESS_TYPE)
+            .accessType(ACCESSOR_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
@@ -98,7 +98,7 @@ public final class TestDataFactory {
         return ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
             .accessorId(ACCESSOR_ID)
-            .accessType(ACCESS_TYPE)
+            .accessType(ACCESSOR_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)

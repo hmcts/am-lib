@@ -21,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_IDS;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_MANAGEMENT_TYPE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
@@ -88,7 +88,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         ExplicitAccessGrant nonExistingRole = ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(ACCESSOR_IDS)
-            .accessType(ACCESS_TYPE)
+            .accessType(ACCESSOR_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)

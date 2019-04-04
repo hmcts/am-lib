@@ -12,4 +12,7 @@ ADD CONSTRAINT relationship_fkey FOREIGN KEY (relationship)
     ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 ALTER TABLE access_management
+  ALTER COLUMN access_type TYPE ACCESS_TYPE USING access_type::ACCESS_TYPE;
+
+ALTER TABLE access_management
   ADD CONSTRAINT access_management_unique UNIQUE (resource_id, accessor_id, access_type, attribute, resource_type, service_name, resource_name, relationship);

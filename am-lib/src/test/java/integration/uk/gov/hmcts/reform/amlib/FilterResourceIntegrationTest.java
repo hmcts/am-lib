@@ -1,6 +1,7 @@
 package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -38,6 +39,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWh
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
 
+@SuppressWarnings("PMD")
 class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
@@ -186,40 +188,38 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenGrantingExplicitAccessWithDifferentRelationshipSameAttributeAndDiffPermissionsShouldMergePermissions() {
         importerService.addRole("Defendant", ROLE_TYPE, SECURITY_CLASSIFICATION, ACCESS_MANAGEMENT_TYPE);
 
-        service.grantExplicitResourceAccess(
-            createGrant(resourceId, ACCESSOR_ID, RELATIONSHIP,
-                createPermissions("/Parent", READ_PERMISSION)));
-        service.grantExplicitResourceAccess(
-            createGrant(resourceId, ACCESSOR_ID, "Defendant",
-                createPermissions("/Parent", CREATE_PERMISSION)));
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, RELATIONSHIP,
+            createPermissions("/Parent", READ_PERMISSION)));
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, "Defendant",
+            createPermissions("/Parent", CREATE_PERMISSION)));
 
         FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
-            .relationships(ImmutableSet.of(RELATIONSHIP,"Defendant"))
-            .data(DATA)
-            .permissions(ImmutableMap.of(JsonPointer.valueOf("/Parent"), ImmutableSet.of(CREATE,READ)))
+            .relationships(ImmutableSet.of("Defendant", RELATIONSHIP))
+            .data(JsonNodeFactory.instance.objectNode())
+            .permissions(ImmutableMap.of(
+                JsonPointer.valueOf("/Parent"), ImmutableSet.of(CREATE, READ)))
             .build());
     }
 
     @Test
     void whenGrantExplicitAccessWithSameRelationshipParentChildAttributeWithDiffPermissionsShouldNotMergePermissions() {
-        service.grantExplicitResourceAccess(
-            createGrant(resourceId, ACCESSOR_ID, RELATIONSHIP,
-                createPermissions("/Parent", READ_PERMISSION)));
-        service.grantExplicitResourceAccess(
-            createGrant(resourceId, ACCESSOR_ID, RELATIONSHIP,
-                createPermissions("/Parent/Child", CREATE_PERMISSION)));
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, RELATIONSHIP,
+            createPermissions("/Parent", READ_PERMISSION)));
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, RELATIONSHIP,
+            createPermissions("/Parent/Child", CREATE_PERMISSION)));
 
         FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
             .relationships(ImmutableSet.of(RELATIONSHIP))
-            .data(DATA)
-            .permissions(ImmutableMap.of(JsonPointer.valueOf("/Parent"), ImmutableSet.of(READ),
-                JsonPointer.valueOf("/Parent/Child"), ImmutableSet.of(CREATE,READ)))
+            .data(JsonNodeFactory.instance.objectNode())
+            .permissions(ImmutableMap.of(
+                JsonPointer.valueOf("/Parent/Child"), ImmutableSet.of(CREATE),
+                JsonPointer.valueOf("/Parent"), ImmutableSet.of(READ)))
             .build());
     }
 
@@ -227,21 +227,20 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenGrantExplicitAccessWithDifferentRelationshipParentChildAttributeDiffPermissionsShouldMergePermissions() {
         importerService.addRole("Defendant", ROLE_TYPE, SECURITY_CLASSIFICATION, ACCESS_MANAGEMENT_TYPE);
 
-        service.grantExplicitResourceAccess(
-            createGrant(resourceId, ACCESSOR_ID, RELATIONSHIP,
-                createPermissions("/Parent", READ_PERMISSION)));
-        service.grantExplicitResourceAccess(
-            createGrant(resourceId, ACCESSOR_ID, "Defendant",
-                createPermissions("/Parent/Child", CREATE_PERMISSION)));
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, RELATIONSHIP,
+            createPermissions("/Parent", READ_PERMISSION)));
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, "Defendant",
+            createPermissions("/Parent/Child", CREATE_PERMISSION)));
 
         FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
         assertThat(result).isEqualTo(FilterResourceResponse.builder()
             .resourceId(resourceId)
-            .relationships(ImmutableSet.of(RELATIONSHIP, "Defendant"))
-            .data(DATA)
-            .permissions(ImmutableMap.of(JsonPointer.valueOf("/Parent"), ImmutableSet.of(READ),
-                JsonPointer.valueOf("/Parent/Child"), ImmutableSet.of(CREATE,READ)))
+            .relationships(ImmutableSet.of("Defendant", RELATIONSHIP))
+            .data(JsonNodeFactory.instance.objectNode())
+            .permissions(ImmutableMap.of(
+                JsonPointer.valueOf("/Parent/Child"), ImmutableSet.of(CREATE, READ),
+                JsonPointer.valueOf("/Parent"), ImmutableSet.of(READ)))
             .build());
     }
 }

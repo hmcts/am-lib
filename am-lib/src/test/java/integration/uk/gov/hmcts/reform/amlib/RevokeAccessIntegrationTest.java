@@ -16,8 +16,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_MANAGEMENT_TYPE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
@@ -33,13 +33,13 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermission
 // AvoidDuplicateLiterals: multiple occurrences of same string literal needed for testing purposes.
 class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
-    private static DefaultRoleSetupImportService importerService  = initService(DefaultRoleSetupImportService.class);
+    private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private String resourceId;
 
     @BeforeEach
     void setUp() {
         resourceId = UUID.randomUUID().toString();
-        importerService.addRole(ROLE_NAME,ROLE_TYPE,SECURITY_CLASSIFICATION,ACCESS_MANAGEMENT_TYPE);
+        importerService.addRole(ROLE_NAME, ROLE_TYPE, SECURITY_CLASSIFICATION, ACCESS_MANAGEMENT_TYPE);
         MDC.put("caller", "Administrator");
     }
 
@@ -127,7 +127,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         service.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(ImmutableSet.of(ACCESSOR_ID))
-            .accessType(ACCESS_TYPE)
+            .accessType(ACCESSOR_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
@@ -141,7 +141,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         service.revokeResourceAccess(ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
             .accessorId(ACCESSOR_ID)
-            .accessType(ACCESS_TYPE)
+            .accessType(ACCESSOR_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)

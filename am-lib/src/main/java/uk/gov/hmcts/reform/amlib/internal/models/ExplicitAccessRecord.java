@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.utils.Permissions;
@@ -17,7 +18,7 @@ import java.util.Set;
 public final class ExplicitAccessRecord implements AttributeAccessDefinition {
     private final String resourceId;
     private final String accessorId;
-    private final String accessType;
+    private final AccessType accessType;
     private final String serviceName;
     private final String resourceType;
     private final String resourceName;

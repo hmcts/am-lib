@@ -30,9 +30,9 @@ class DefaultRoleSetupImportServiceValidationTest {
     void addRoleMethodShouldRejectInvalidArguments(String roleName,
                                                    RoleType roleType,
                                                    SecurityClassification securityClassification,
-                                                   AccessManagementType accessManagementType) {
+                                                   AccessManagementType accessType) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.addRole(roleName, roleType, securityClassification, accessManagementType))
+            .isThrownBy(() -> service.addRole(roleName, roleType, securityClassification, accessType))
             .withMessageMatching(expectedValidationMessagesRegex(
                 "roleName - must not be blank",
                 "roleType - must not be null",

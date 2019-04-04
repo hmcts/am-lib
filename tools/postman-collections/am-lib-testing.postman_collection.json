@@ -32,7 +32,7 @@
           "raw": "{\n\t\"userId\": \"UNIQUE-USER-ID\",\n\t\"userRoles\": [\"\"],\n\t\"resource\": {\n\t\t\"resourceId\": \"my-super-resource-id\",\n\t\t\"type\": {\n\t\t\t\"serviceName\": \"cmc\",\n\t\t\t\"resourceType\": \"case\",\n\t\t\t\"resourceName\": \"claim\"\n\t\t},\n\t\t\"resourceJson\": {\n\t\t\t\"test\": \"test\"\n\t\t}\n\t}\n}"
         },
         "url": {
-          "raw": "http://localhost:3703/lib/filter-resource",
+          "raw": "http://localhost:3703/lib/filter-resource?",
           "protocol": "http",
           "host": [
             "localhost"
@@ -69,7 +69,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessType\": \"user\",\n    \"serviceName\": \"cmc\",\n    \"resourceType\": \"case\",\n    \"resourceName\": \"claim\",\n    \"attributePermissions\": {\n    \t\"/test2\": [\"CREATE\", \"READ\"]\n    },\n    \"securityClassification\": \"PUBLIC\"\n}"
+          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessType\": \"USER\",\n    \"serviceName\": \"cmc\",\n    \"resourceType\": \"case\",\n    \"resourceName\": \"claim\",\n    \"attributePermissions\": {\n    \t\"/test2\": [\"CREATE\", \"READ\"]\n    },\n    \"relationship\": \"Defendant\",\n    \"securityClassification\": \"PUBLIC\"\n}"
         },
         "url": {
           "raw": "localhost:3703/lib/create-resource-access",
@@ -101,7 +101,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessType\": \"user\",\n    \"serviceName\": \"cmc\",\n    \"resourceType\": \"case\",\n    \"resourceName\": \"claim\",\n    \"attributePermissions\": {\n    \t\"/test\": [\"CREATE\"],\n    \t\"/test2\": [\"CREATE\", \"READ\"],\n    \t\"/test3\": [\"CREATE\", \"UPDATE\"]\n    },\n    \"securityClassification\": \"PUBLIC\"\n}"
+          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessType\": \"USER\",\n    \"serviceName\": \"cmc\",\n    \"resourceType\": \"case\",\n    \"resourceName\": \"claim\",\n    \"attributePermissions\": {\n    \t\"/test\": [\"CREATE\"],\n    \t\"/test2\": [\"CREATE\", \"READ\"],\n    \t\"/test3\": [\"CREATE\", \"UPDATE\"]\n    },\n    \"relationship\" :\"Solicitor\",\n    \"securityClassification\": \"PUBLIC\"\n}"
         },
         "url": {
           "raw": "localhost:3703/lib/create-resource-access",
@@ -133,7 +133,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorId\": \"UNIQUE-USER-ID\",\n    \"accessType\": \"user\",\n    \"serviceName\": \"cmc\",\n    \"resourceType\": \"case\",\n    \"resourceName\": \"claim\",\n    \"attribute\": \"\",\n    \"securityClassification\": \"PUBLIC\"\n}"
+          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorId\": \"UNIQUE-USER-ID\",\n    \"accessType\": \"USER\",\n    \"serviceName\": \"cmc\",\n    \"resourceType\": \"case\",\n    \"resourceName\": \"claim\",\n    \"attribute\": \"\",\n    \"relationship\": \"\",\n    \"securityClassification\": \"PUBLIC\"\n}"
         },
         "url": {
           "raw": "localhost:3703/lib/revoke-resource-access",

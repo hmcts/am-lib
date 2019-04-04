@@ -32,6 +32,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 public class AccessManagementService {
@@ -158,11 +159,14 @@ public class AccessManagementService {
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resource.getResourceId()));
 
-        // need to create a List<Map<JsonPointer, Set<Permission>>> where:
-        // each entry in the list is all attribute permissions for a single relationship.
-        // should be able to stream explicit access and do some cool collecting stuff.
 
-        System.out.println("explicitAccess = " + explicitAccess);
+        List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccess
+            .stream()
+            .collect(Collectors.collectingAndThen(groupingBy(ExplicitAccessRecord::getRelationship), Map::values))
+            .stream()
+            .map(explicitAccessRecords -> explicitAccessRecords.stream()
+                .collect(getMapCollector()))
+            .collect(Collectors.toList());
 
         Map<JsonPointer, Set<Permission>> attributePermissions;
 
@@ -185,7 +189,7 @@ public class AccessManagementService {
             attributePermissions = roleBasedAccess.stream().collect(getMapCollector());
 
         } else {
-            attributePermissions = explicitAccess.stream().collect(getMapCollector());
+            attributePermissions = permissionsService.merge(permissionsForRelationships);
         }
 
         JsonNode filteredJson = filterService.filterJson(resource.getResourceJson(), attributePermissions);

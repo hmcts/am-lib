@@ -23,15 +23,14 @@ import java.util.Set;
 public interface AccessManagementRepository {
 
     @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, access_type, service_name, resource_type, resource_name, attribute, security_classification, relationship) "
-        + "values (:resourceId, :accessorId, :permissionsAsInt, :accessType, :serviceName, :resourceType, :resourceName, :attributeAsString, :securityClassification, :relationship)"
-        + "on conflict on constraint access_management_unique do update set permissions = :permissionsAsInt"
-    )
+        + "values (:resourceId, :accessorId, :permissionsAsInt, cast(:accessType as access_type), :serviceName, :resourceType, :resourceName, :attributeAsString, :securityClassification, :relationship)"
+        + "on conflict on constraint access_management_unique do update set permissions = :permissionsAsInt")
     void createAccessManagementRecord(@BindBean ExplicitAccessRecord explicitAccessRecord);
 
     @SqlUpdate("delete from access_management where "
         + "access_management.resource_id = :resourceId "
         + "and access_management.accessor_id = :accessorId "
-        + "and access_management.access_type = :accessType "
+        + "and access_management.access_type = cast(:accessType as access_type) "
         + "and access_management.service_name = :serviceName "
         + "and access_management.resource_type = :resourceType "
         + "and access_management.resource_name = :resourceName "

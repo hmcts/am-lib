@@ -7,13 +7,23 @@ def product = "am"
 def component = "lib-test"
 
 withPipeline(type, product, component) {
-    setVaultName('am')
-    enableDockerBuild()
-    installCharts()
-    enableDbMigration()
+  setVaultName('am')
+  enableDockerBuild()
+  installCharts()
+  enableDbMigration()
 
-    before('buildinfra:prod') {
-        currentBuild.description = "Success!"
-        error 'Access management project should not be built on prod environment yet.'
-    }
+  onMaster {
+    enableSlackNotifications('#am-master-builds')
+  }
+
+  onPR {
+    // channel won't be used instead the user channel configured here is used:
+    // https://github.com/hmcts/github-slack-user-mappings
+    enableSlackNotifications('#am-pr-builds')
+  }
+
+  before('buildinfra:prod') {
+    echo "Disabling prod build"
+    sh "rm -rf infrastructure/"
+  }
 }

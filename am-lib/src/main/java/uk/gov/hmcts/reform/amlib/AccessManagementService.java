@@ -144,7 +144,7 @@ public class AccessManagementService {
      *     to resource is configured, otherwise null
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @SuppressWarnings("PMD") // AvoidLiteralsInIfCondition: magic number used until multiple roles are supported
+    @SuppressWarnings("PMD.AvoidLiteralsInIfCondition") // Magic number used until multiple roles are supported
     @AuditLog("filtered access to resource '{{resource.resourceId}}' "
         + "defined as '{{resource.type.serviceName}}|{{resource.type.resourceType}}|{{resource.type.resourceName}}' "
         + "for accessor '{{userId}}' in roles '{{userRoles}}': {{result.permissions}}")

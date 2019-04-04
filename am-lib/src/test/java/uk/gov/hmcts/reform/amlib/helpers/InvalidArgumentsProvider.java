@@ -25,10 +25,11 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-@SuppressWarnings("PMD")
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.AvoidThrowingRawExceptionTypes"})
 public class InvalidArgumentsProvider implements ArgumentsProvider {
 
     @Override
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
         List<Arguments> combinations = new ArrayList<>();
 
@@ -52,6 +53,7 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
         return combinations.stream();
     }
 
+    @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
     private Object[] generateInvalidValues(Type parameterType) {
         if (parameterType instanceof Class) {
             return generateInvalidValues((Class<?>) parameterType);

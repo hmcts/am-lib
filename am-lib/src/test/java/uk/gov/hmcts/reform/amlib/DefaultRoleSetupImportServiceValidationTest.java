@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.ValidationMessageRegexFactory.expectedValidationMessagesRegex;
 
-@SuppressWarnings({"PMD"})
+@SuppressWarnings({"PMD.LinguisticNaming", "PMD.AvoidDuplicateLiterals"})
 class DefaultRoleSetupImportServiceValidationTest {
     private final DefaultRoleSetupImportService service = new DefaultRoleSetupImportService("", "", "");
 

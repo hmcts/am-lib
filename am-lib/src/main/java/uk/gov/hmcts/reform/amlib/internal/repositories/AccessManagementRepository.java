@@ -42,7 +42,7 @@ public interface AccessManagementRepository {
     @RegisterConstructorMapper(ExplicitAccessRecord.class)
     List<ExplicitAccessRecord> getExplicitAccess(String accessorId, String resourceId);
 
-    @SuppressWarnings("PMD") // UseObjectForClearerAPI: more than 3 parameters makes sense for now, subject to change
+    @SuppressWarnings("PMD.UseObjectForClearerAPI") // More than 3 parameters makes sense for now, subject to change
     @SqlQuery("select * from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType and resource_name = :resourceName and role_name = :roleName")
     @RegisterConstructorMapper(RoleBasedAccessRecord.class)
     List<RoleBasedAccessRecord> getRolePermissions(String serviceName, String resourceType, String resourceName, String roleName);

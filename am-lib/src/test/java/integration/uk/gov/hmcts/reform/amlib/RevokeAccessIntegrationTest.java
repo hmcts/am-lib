@@ -29,8 +29,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWh
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createMetadata;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 
-@SuppressWarnings("PMD")
-// AvoidDuplicateLiterals: multiple occurrences of same string literal needed for testing purposes.
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals"})
 class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);

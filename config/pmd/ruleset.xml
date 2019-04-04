@@ -47,6 +47,8 @@
         <exclude name="MethodArgumentCouldBeFinal"/>
         <exclude name="OnlyOneReturn"/>
         <exclude name="TooManyStaticImports"/>
+        <exclude name="DefaultPackage" />
+        <exclude name="CommentDefaultAccessModifier" />
     </rule>
     <rule ref="category/java/codestyle.xml/ClassNamingConventions">
         <properties>

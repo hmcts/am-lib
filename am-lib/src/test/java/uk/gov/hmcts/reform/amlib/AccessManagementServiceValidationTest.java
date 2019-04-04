@@ -12,7 +12,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.ValidationMessageRegexFactory.expectedValidationMessagesRegex;
 
-@SuppressWarnings({"PMD"})
+@SuppressWarnings("PMD.LinguisticNaming")
 class AccessManagementServiceValidationTest {
     private final AccessManagementService service = new AccessManagementService("", "", "");
 

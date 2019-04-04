@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -139,9 +140,10 @@ public class AccessManagementService {
      * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions if
      *     access to resource is configured, otherwise null.
+     * @throws PersistenceException if any persistence errors were encountered
      */
     @AuditLog("filtered access to resource '{{resource.id}} defined as '{{resource.definition.serviceName}}|"
-        + "{{resource.definition.resourceType}}|{{resource.definition.resourceType}} for accessor '{{userId}}' "
+        + "{{resource.definition.resourceType}}|{{resource.definition.resourceName}}' for accessor '{{userId}}' "
         + "in roles '{{userRoles}}': {{result.access.permissions}}")
     public FilteredResourceEnvelope filterResource(@NotBlank String userId,
                                                    @NotEmpty Set<@NotBlank String> userRoles,
@@ -153,11 +155,9 @@ public class AccessManagementService {
         AccessType accessType;
 
         if (explicitAccess.isEmpty()) {
-            Set<String> filteredRoles = userRoles.stream()
-                .filter(this::roleBasedAccessType)
-                .collect(Collectors.toSet());
+            Set<String> filteredRoles = filterRolesWithExplicitAccessType(userRoles);
 
-            if (filteredRoles.isEmpty()) {
+            if (Objects.requireNonNull(filteredRoles).isEmpty()) {
                 return null;
             }
 
@@ -189,18 +189,20 @@ public class AccessManagementService {
             .build();
     }
 
-    private boolean roleBasedAccessType(String userRole) {
-        AccessType accessType = jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getRoleAccessType(userRole));
+    private Set<String> filterRolesWithExplicitAccessType(Set<String> userRoles) {
+        if (userRoles.isEmpty()) {
+            return null;
+        }
 
-        return accessType != null && accessType.equals(AccessType.ROLE_BASED);
+        return jdbi.withExtension(AccessManagementRepository.class,
+            dao -> dao.getRoles(userRoles, AccessType.ROLE_BASED));
     }
 
     /**
      * Retrieves a list of {@link RoleBasedAccessRecord } and returns attribute and permissions values.
      *
-     * @param resourceDefinition {@link ResourceDefinition} a unique service name, resource definition and resource name
-     * @param userRoles          A set of user roles
+     * @param resourceDefinition {@link ResourceDefinition} a unique service name, resource type and resource name
+     * @param userRoles           set of user roles
      * @return a map of attributes and their corresponding permissions or null
      * @throws PersistenceException if any persistence errors were encountered
      */

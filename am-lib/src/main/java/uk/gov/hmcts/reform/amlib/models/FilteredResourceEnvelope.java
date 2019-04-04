@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public final class FilteredResourceEnvelope {
-    private Resource resource;
-    private AccessEnvelope access;
+    private final Resource resource;
+    private final AccessEnvelope access;
 }

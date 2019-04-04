@@ -12,6 +12,6 @@ import java.util.Set;
 @Data
 @Builder
 public final class AccessEnvelope {
-    private Map<JsonPointer, Set<Permission>> permissions;
-    private AccessType accessManagementType;
+    private final Map<JsonPointer, Set<Permission>> permissions;
+    private final AccessType accessManagementType;
 }

@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
-@SuppressWarnings("PMD")
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.UnusedPrivateMethod", "PMD.ArrayIsStoredDirectly"})
 class PermissionsTest {
 
     @Test

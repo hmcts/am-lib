@@ -41,7 +41,7 @@ sonarqube {
         property "sonar.projectKey", "uk.gov.hmcts.reform:am-lib"
         property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
         property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
-        property "sonar.coverage.exclusions", "**/models/**"
+        property "sonar.coverage.exclusions", "**/models/**,**/repositories/mappers/**,**/AspectsSuite.java"
     }
 }
 

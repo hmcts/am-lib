@@ -166,7 +166,7 @@ public class AccessManagementService {
             .stream()
             .map(explicitAccessRecords -> explicitAccessRecords.stream()
                 .collect(getMapCollector()))
-            .collect(Collectors.toList());
+            .collect(toList());
 
         Map<JsonPointer, Set<Permission>> attributePermissions;
 

@@ -32,6 +32,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
@@ -159,10 +160,8 @@ public class AccessManagementService {
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resource.getResourceId()));
 
-
-        List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccess
-            .stream()
-            .collect(Collectors.collectingAndThen(groupingBy(ExplicitAccessRecord::getRelationship), Map::values))
+        List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccess.stream()
+            .collect(collectingAndThen(groupingBy(ExplicitAccessRecord::getRelationship), Map::values))
             .stream()
             .map(explicitAccessRecords -> explicitAccessRecords.stream()
                 .collect(getMapCollector()))

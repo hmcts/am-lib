@@ -32,7 +32,7 @@
           "raw": "{\n\t\"userId\": \"UNIQUE-USER-ID\",\n\t\"userRoles\": [\"\"],\n\t\"resource\": {\n\t\t\"resourceId\": \"my-super-resource-id\",\n\t\t\"type\": {\n\t\t\t\"serviceName\": \"cmc\",\n\t\t\t\"resourceType\": \"case\",\n\t\t\t\"resourceName\": \"claim\"\n\t\t},\n\t\t\"resourceJson\": {\n\t\t\t\"test\": \"test\"\n\t\t}\n\t}\n}"
         },
         "url": {
-          "raw": "http://localhost:3703/lib/filter-resource?",
+          "raw": "http://localhost:3703/lib/filter-resource",
           "protocol": "http",
           "host": [
             "localhost"

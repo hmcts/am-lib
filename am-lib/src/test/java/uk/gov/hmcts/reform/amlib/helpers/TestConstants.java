@@ -30,8 +30,6 @@ public final class TestConstants {
     public static final String PARENT_ATTRIBUTE = "/Parent";
     public static final String CHILD_ATTRIBUTE = "/Parent/child";
     public static final String ACCESSOR_ID = "a";
-    public static final String RELATIONSHIP = "Solicitor";
-    public static final String OTHER_RELATIONSHIP = "Defendant";
     public static final Set<String> ROLE_NAMES = ImmutableSet.of("Solicitor");
     public static final Set<String> ACCESSOR_IDS = ImmutableSet.of("y", "z");
     public static final String ROLE_NAME = "Solicitor";

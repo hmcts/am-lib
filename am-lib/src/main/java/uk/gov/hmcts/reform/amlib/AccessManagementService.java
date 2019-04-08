@@ -142,7 +142,7 @@ public class AccessManagementService {
      *     access to resource is configured, otherwise null.
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog("filtered access to resource '{{resource.id}} defined as '{{resource.definition.serviceName}}|"
+    @AuditLog("filtered access to resource '{{resource.id}}' defined as '{{resource.definition.serviceName}}|"
         + "{{resource.definition.resourceType}}|{{resource.definition.resourceName}}' for accessor '{{userId}}' "
         + "in roles '{{userRoles}}': {{result.access.permissions}}")
     public FilteredResourceEnvelope filterResource(@NotBlank String userId,
@@ -161,7 +161,7 @@ public class AccessManagementService {
                 return null;
             }
 
-            attributePermissions = getRolePermissions(resource.getDefinition(), filteredRoles);
+            attributePermissions = getPermissionsToResourceForRoles(resource.getDefinition(), filteredRoles);
 
             if (attributePermissions == null) {
                 return null;
@@ -211,6 +211,13 @@ public class AccessManagementService {
         + "{{result}}")
     public Map<JsonPointer, Set<Permission>> getRolePermissions(@NotNull @Valid ResourceDefinition resourceDefinition,
                                                                 @NotEmpty Set<@NotBlank String> userRoles) {
+        // Delegation to shared private method from public service methods resolves auditing problem where
+        // two audit logs would have been produced otherwise
+        return getPermissionsToResourceForRoles(resourceDefinition, userRoles);
+    }
+
+    private Map<JsonPointer, Set<Permission>> getPermissionsToResourceForRoles(ResourceDefinition resourceDefinition,
+                                                                               Set<String> userRoles) {
         List<Map<JsonPointer, Set<Permission>>> permissionsForRoles =
             jdbi.withExtension(AccessManagementRepository.class, dao -> userRoles.stream()
                 .map(role -> dao.getRolePermissions(resourceDefinition, role))

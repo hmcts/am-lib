@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.amlib.helpers;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -14,12 +15,10 @@ import java.util.Map;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 public final class TestDataFactory {
@@ -59,12 +58,12 @@ public final class TestDataFactory {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(ImmutableSet.of(accessorId))
-            .accessType(ACCESSOR_TYPE)
+            .accessType(AccessType.USER)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attributePermissions(attributePermissions)
-            .securityClassification(SECURITY_CLASSIFICATION)
+            .securityClassification(SecurityClassification.PUBLIC)
             .relationship(relationship)
             .build();
     }
@@ -75,12 +74,12 @@ public final class TestDataFactory {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(accessorId)
-            .accessType(ACCESSOR_TYPE)
+            .accessType(AccessType.USER)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attributePermissions(attributePermissions)
-            .securityClassification(SECURITY_CLASSIFICATION)
+            .securityClassification(SecurityClassification.PUBLIC)
             .relationship(ROLE_NAME)
             .build();
     }
@@ -98,7 +97,7 @@ public final class TestDataFactory {
         return ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
             .accessorId(ACCESSOR_ID)
-            .accessType(ACCESSOR_TYPE)
+            .accessType(AccessType.USER)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)

@@ -8,6 +8,10 @@ import org.slf4j.MDC;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.enums.AccessManagementType;
+import uk.gov.hmcts.reform.amlib.enums.AccessType;
+import uk.gov.hmcts.reform.amlib.enums.RoleType;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
@@ -16,14 +20,10 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_TYPE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_MANAGEMENT_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_TYPE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createMetadata;
@@ -38,7 +38,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @BeforeEach
     void setUp() {
         resourceId = UUID.randomUUID().toString();
-        importerService.addRole(ROLE_NAME, ROLE_TYPE, SECURITY_CLASSIFICATION, ACCESS_MANAGEMENT_TYPE);
+        importerService.addRole(ROLE_NAME, RoleType.IDAM, SecurityClassification.PUBLIC, AccessManagementType.EXPLICIT);
         MDC.put("caller", "Administrator");
     }
 
@@ -126,12 +126,12 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         service.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(ImmutableSet.of(ACCESSOR_ID))
-            .accessType(ACCESSOR_TYPE)
+            .accessType(AccessType.USER)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attributePermissions(createPermissions(attribute, READ_PERMISSION))
-            .securityClassification(SECURITY_CLASSIFICATION)
+            .securityClassification(SecurityClassification.PUBLIC)
             .relationship(ROLE_NAME)
             .build());
     }
@@ -140,12 +140,12 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         service.revokeResourceAccess(ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
             .accessorId(ACCESSOR_ID)
-            .accessType(ACCESSOR_TYPE)
+            .accessType(AccessType.USER)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attribute(JsonPointer.valueOf(attribute))
-            .securityClassification(SECURITY_CLASSIFICATION)
+            .securityClassification(SecurityClassification.PUBLIC)
             .relationship(ROLE_NAME)
             .build());
     }

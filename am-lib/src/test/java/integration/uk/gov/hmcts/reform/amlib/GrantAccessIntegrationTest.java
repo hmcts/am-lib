@@ -8,7 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.enums.AccessManagementType;
+import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.enums.RoleType;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -21,15 +25,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_IDS;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_TYPE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_MANAGEMENT_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_TYPE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
@@ -42,7 +42,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @BeforeEach
     void setUp() {
         resourceId = UUID.randomUUID().toString();
-        importerService.addRole(ROLE_NAME, ROLE_TYPE, SECURITY_CLASSIFICATION, ACCESS_MANAGEMENT_TYPE);
+        importerService.addRole(ROLE_NAME, RoleType.IDAM, SecurityClassification.PUBLIC, AccessManagementType.EXPLICIT);
         MDC.put("caller", "Administrator");
     }
 
@@ -88,12 +88,12 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         ExplicitAccessGrant nonExistingRole = ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(ACCESSOR_IDS)
-            .accessType(ACCESSOR_TYPE)
+            .accessType(AccessType.USER)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attributePermissions(multipleAttributePermissions)
-            .securityClassification(SECURITY_CLASSIFICATION)
+            .securityClassification(SecurityClassification.PUBLIC)
             .relationship("NonExistingRoleName")
             .build();
 

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.get;
 
-@SuppressWarnings("PMD")
 class HelloWorldTest extends RestAssuredTest {
 
     @Test

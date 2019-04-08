@@ -8,7 +8,10 @@ import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 
-@SuppressWarnings({"LineLength", "PMD"})
+@SuppressWarnings({
+    "LineLength",
+    "PMD.TooManyMethods" // Repository class is specific and it makes sense to have all these methods here
+})
 public interface DefaultRoleSetupRepository {
     @SqlUpdate("insert into services (service_name, service_description) values (:serviceName, :serviceDescription)"
         + " on conflict on constraint services_pkey do update set service_description = :serviceDescription")

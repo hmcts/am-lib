@@ -4,13 +4,13 @@
     "Role 1"
   ],
   "resource": {
-    "resourceId": "${resourceId}",
-    "type": {
+    "id": "${resourceId}",
+    "definition": {
       "serviceName": "cmc",
       "resourceType": "case",
       "resourceName": "claim"
     },
-    "resourceJson": {
+    "data": {
       "json": "resource"
     }
   }

@@ -43,13 +43,13 @@ public interface AccessManagementRepository {
     @RegisterConstructorMapper(ExplicitAccessRecord.class)
     List<ExplicitAccessRecord> getExplicitAccess(String accessorId, String resourceId);
 
-    @SuppressWarnings("PMD") // UseObjectForClearerAPI: more than 3 parameters makes sense for now, subject to change
+    @SuppressWarnings("PMD.UseObjectForClearerAPI") // More than 3 parameters makes sense for now, subject to change
     @SqlQuery("select * from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType and resource_name = :resourceName and role_name = :roleName")
     @RegisterConstructorMapper(RoleBasedAccessRecord.class)
-    List<RoleBasedAccessRecord> getRolePermissions(String serviceName, String resourceType, String resourceName, String roleName);
+    List<RoleBasedAccessRecord> getRolePermissions(@BindBean ResourceDefinition resourceDefinition, String roleName);
 
-    @SqlQuery("select access_management_type from roles where role_name = :roleName")
-    AccessType getRoleAccessType(String roleName);
+    @SqlQuery("select role_name from roles where role_name in (<userRoles>) and access_management_type = cast(:accessType as access_type)")
+    Set<String> getRoles(@BindList("userRoles") Set<String> userRoles, AccessType accessType);
 
     @SqlQuery("select distinct service_name, resource_type, resource_name from default_permissions_for_roles where role_name in (<userRoles>) and permissions & 1 = 1 and attribute = ''")
     @RegisterConstructorMapper(ResourceDefinition.class)

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.amlib.internal;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
@@ -114,7 +114,7 @@ public class PermissionsService {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    @Data
+    @EqualsAndHashCode
     @ToString
     private class Merge {
         private final Map<Integer, Set<Permission>> permissions = new ConcurrentHashMap<>();

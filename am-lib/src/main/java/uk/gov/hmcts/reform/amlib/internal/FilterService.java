@@ -81,8 +81,7 @@ public class FilterService {
             .collect(Collectors.toList());
     }
 
-    @SuppressWarnings("PMD")
-    // UseConcurrentHashMap: ConcurrentHashMap cannot be used as sorted map is needed. Instance is local as well.
+    @SuppressWarnings("PMD.UseConcurrentHashMap") // Sorted map is needed; instance is local as well
     private void retainFieldsWithReadPermission(JsonNode resource, List<JsonPointer> uniqueNodesWithRead) {
 
         Collection<Map<JsonPointer, Set<String>>> pointersByDepth = decomposePointersByDepth(uniqueNodesWithRead).values();
@@ -127,7 +126,7 @@ public class FilterService {
      * }
      * </pre>
      */
-    @SuppressWarnings("PMD") // AvoidInstantiatingObjectsInLoops: objects cannot be created outside the loop
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops") // Objects cannot be created outside the loop
     private Map<Integer, Map<JsonPointer, Set<String>>> decomposePointersByDepth(List<JsonPointer> nodes) {
         return nodes.stream()
             .reduce(new TreeMap<>(Collections.reverseOrder()),

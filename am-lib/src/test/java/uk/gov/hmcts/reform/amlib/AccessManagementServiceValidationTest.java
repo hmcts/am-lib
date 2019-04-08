@@ -6,13 +6,14 @@ import uk.gov.hmcts.reform.amlib.helpers.InvalidArgumentsProvider;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.ValidationMessageRegexFactory.expectedValidationMessagesRegex;
 
-@SuppressWarnings({"PMD"})
+@SuppressWarnings("PMD.LinguisticNaming")
 class AccessManagementServiceValidationTest {
     private final AccessManagementService service = new AccessManagementService("", "", "");
 
@@ -62,27 +63,26 @@ class AccessManagementServiceValidationTest {
                 "userRoles - must not be empty",
                 "userRoles\\[\\].<iterable element> - must not be blank",
                 "resource - must not be null",
-                "resource.resourceId - must not be blank",
-                "resource.type - must not be null",
-                "resource.type.serviceName - must not be blank",
-                "resource.type.resourceType - must not be blank",
-                "resource.type.resourceName - must not be blank",
-                "resource.resourceJson - must not be null"
+                "resource.id - must not be blank",
+                "resource.definition - must not be null",
+                "resource.definition.serviceName - must not be blank",
+                "resource.definition.resourceType - must not be blank",
+                "resource.definition.resourceName - must not be blank",
+                "resource.data - must not be null"
             ));
     }
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
-    void getRolePermissionsMethodShouldRejectInvalidArguments(String serviceName,
-                                                              String resourceType,
-                                                              String resourceName,
+    void getRolePermissionsMethodShouldRejectInvalidArguments(ResourceDefinition resourceDefinition,
                                                               Set<String> roleNames) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.getRolePermissions(serviceName, resourceType, resourceName, roleNames))
+            .isThrownBy(() -> service.getRolePermissions(resourceDefinition, roleNames))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "serviceName - must not be blank",
-                "resourceType - must not be blank",
-                "resourceName - must not be blank",
+                "resourceDefinition - must not be null",
+                "resourceDefinition.serviceName - must not be blank",
+                "resourceDefinition.resourceType - must not be blank",
+                "resourceDefinition.resourceName - must not be blank",
                 "userRoles - must not be empty",
                 "userRoles\\[\\].<iterable element> - must not be blank"
             ));

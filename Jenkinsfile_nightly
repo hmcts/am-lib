@@ -4,8 +4,8 @@ properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
   pipelineTriggers([cron('H 05 * * *')]),
   parameters([
-          string(name: 'ENVIRONMENT', defaultValue: 'aat', description: 'Environment to test'),
-          string(name: 'URL_TO_TEST', defaultValue: 'https://am-lib-test-aat.service.core-compute-aat.internal', description: 'The URL you want to run these tests against')
+    string(name: 'ENVIRONMENT', defaultValue: 'aat', description: 'Environment to test'),
+    string(name: 'URL_TO_TEST', defaultValue: 'https://am-lib-test-aat.service.core-compute-aat.internal', description: 'The URL you want to run these tests against')
   ])
 ])
 
@@ -16,11 +16,11 @@ def product = "am"
 def component = "lib-test"
 
 withNightlyPipeline(type, product, component) {
-    env.TEST_URL = params.URL_TO_TEST
+  env.TEST_URL = params.URL_TO_TEST
 
-//    enableMutationTest()
-    enablePerformanceTest()
-    enableSlackNotifications('#am-master-builds')
+  // enableMutationTest()
+  enablePerformanceTest()
+  enableSlackNotifications('#am-master-builds')
 
   before('PerformanceTest') {
     sh "echo 'Benchmark is about to start'"

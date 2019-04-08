@@ -11,7 +11,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.lang.reflect.Constructor;
 
-@SuppressWarnings("PMD")
+@SuppressWarnings({
+    "PMD.AbstractClassWithoutAbstractMethod",
+    "PMD.FieldNamingConventions",
+    "PMD.AvoidThrowingRawExceptionTypes"
+})
 public abstract class IntegrationBaseTest {
 
     protected static final DatabaseHelperRepository databaseHelper;

@@ -18,7 +18,16 @@ def component = "lib-test"
 withNightlyPipeline(type, product, component) {
     env.TEST_URL = params.URL_TO_TEST
 
-    enableMutationTest()
+//    enableMutationTest()
     enablePerformanceTest()
     enableSlackNotifications('#am-master-builds')
+
+  before('PerformanceTest') {
+    sh "echo 'Benchmark is about to start'"
+    sh "./gradlew benchmark --info --rerun-tasks"
+  }
+
+  after('PerformanceTest') {
+    archiveArtifacts allowEmptyArchive: true, artifacts: '**/performance.json'
+  }
 }

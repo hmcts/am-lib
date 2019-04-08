@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
-import uk.gov.hmcts.reform.amlib.enums.AccessManagementType;
+import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
@@ -44,7 +44,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void shouldAddNewEntryIntoDatabaseWhenUniqueEntry() {
-        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessManagementType.ROLE_BASED);
+        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
         service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
 
         assertThat(databaseHelper.countDefaultPermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
@@ -56,7 +56,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void shouldOverwriteExistingRecordWhenEntryIsAddedASecondTime() {
-        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessManagementType.ROLE_BASED);
+        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
         service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
         service.grantDefaultPermission(createDefaultPermissionGrant(CREATE_PERMISSION));
 
@@ -69,7 +69,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void shouldRemoveAllEntriesFromTablesWhenValuesExist() {
-        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessManagementType.ROLE_BASED);
+        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME + "2");
 
@@ -93,7 +93,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void shouldRemoveEntriesWithResourceNameFromTablesWhenEntriesExist() {
-        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessManagementType.ROLE_BASED);
+        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
         service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
         service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import uk.gov.hmcts.reform.amlib.enums.AccessManagementType;
+import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.FilterService;
@@ -157,7 +157,7 @@ public class AccessManagementService {
             dao -> dao.getExplicitAccess(userId, resource.getId()));
 
         Map<JsonPointer, Set<Permission>> attributePermissions;
-        AccessManagementType accessType;
+        AccessType accessType;
 
         if (explicitAccess.isEmpty()) {
             Set<String> filteredRoles = filterRolesWithExplicitAccessType(userRoles);
@@ -172,7 +172,7 @@ public class AccessManagementService {
                 return null;
             }
 
-            accessType = AccessManagementType.ROLE_BASED;
+            accessType = AccessType.ROLE_BASED;
 
         } else {
             List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccess.stream()
@@ -183,7 +183,7 @@ public class AccessManagementService {
                 .collect(toList());
 
             attributePermissions = permissionsService.merge(permissionsForRelationships);
-            accessType = AccessManagementType.EXPLICIT;
+            accessType = AccessType.EXPLICIT;
         }
 
         JsonNode filteredJson = filterService.filterJson(resource.getData(), attributePermissions);
@@ -200,7 +200,7 @@ public class AccessManagementService {
                 .build())
             .access(AccessEnvelope.builder()
                 .permissions(attributePermissions)
-                .accessManagementType(accessType)
+                .accessType(accessType)
                 .build())
             .relationships(relationships)
             .build();
@@ -212,7 +212,7 @@ public class AccessManagementService {
         }
 
         return jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getRoles(userRoles, AccessManagementType.ROLE_BASED));
+            dao -> dao.getRoles(userRoles, AccessType.ROLE_BASED));
     }
 
     /**

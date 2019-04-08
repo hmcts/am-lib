@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.ImmutableSet;
-import uk.gov.hmcts.reform.amlib.enums.AccessManagementType;
+import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 public final class TestConstants {
 
     public static final AccessorType ACCESSOR_TYPE = AccessorType.USER;
-    public static final AccessManagementType ACCESS_MANAGEMENT_TYPE = AccessManagementType.EXPLICIT;
+    public static final AccessType ACCESS_MANAGEMENT_TYPE = AccessType.EXPLICIT;
     public static final String SERVICE_NAME = "Service";
     public static final String RESOURCE_TYPE = "Resource Type";
     public static final String RESOURCE_NAME = "resource";

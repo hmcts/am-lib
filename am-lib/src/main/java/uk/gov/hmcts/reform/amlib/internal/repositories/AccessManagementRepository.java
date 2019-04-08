@@ -6,7 +6,7 @@ import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import uk.gov.hmcts.reform.amlib.enums.AccessManagementType;
+import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.JsonPointerMapper;
@@ -47,11 +47,8 @@ public interface AccessManagementRepository {
     @RegisterConstructorMapper(RoleBasedAccessRecord.class)
     List<RoleBasedAccessRecord> getRolePermissions(@BindBean ResourceDefinition resourceDefinition, String roleName);
 
-    @SqlQuery("select access_management_type from roles where role_name = :roleName")
-    AccessManagementType getRoleAccessType(String roleName);
-
-    @SqlQuery("select role_name from roles where role_name in (<userRoles>) and access_management_type = cast(:accessManagementType as access_management_type)")
-    Set<String> getRoles(@BindList("userRoles") Set<String> userRoles, AccessManagementType accessManagementType);
+    @SqlQuery("select role_name from roles where role_name in (<userRoles>) and access_type = cast(:accessType as access_type)")
+    Set<String> getRoles(@BindList("userRoles") Set<String> userRoles, AccessType accessType);
 
     @SqlQuery("select distinct service_name, resource_type, resource_name from default_permissions_for_roles where role_name in (<userRoles>) and permissions & 1 = 1 and attribute = ''")
     @RegisterConstructorMapper(ResourceDefinition.class)

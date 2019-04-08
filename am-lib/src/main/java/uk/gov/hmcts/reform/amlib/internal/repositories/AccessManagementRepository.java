@@ -22,15 +22,15 @@ import java.util.Set;
 @RegisterColumnMapper(PermissionSetMapper.class)
 public interface AccessManagementRepository {
 
-    @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, access_type, service_name, resource_type, resource_name, attribute, security_classification, relationship) "
-        + "values (:resourceId, :accessorId, :permissionsAsInt, cast(:accessType as access_type), :serviceName, :resourceType, :resourceName, :attributeAsString, :securityClassification, :relationship)"
+    @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, accessor_type, service_name, resource_type, resource_name, attribute, security_classification, relationship) "
+        + "values (:resourceId, :accessorId, :permissionsAsInt, cast(:accessorType as accessor_type), :serviceName, :resourceType, :resourceName, :attributeAsString, :securityClassification, :relationship)"
         + "on conflict on constraint access_management_unique do update set permissions = :permissionsAsInt")
     void createAccessManagementRecord(@BindBean ExplicitAccessRecord explicitAccessRecord);
 
     @SqlUpdate("delete from access_management where "
         + "access_management.resource_id = :resourceId "
         + "and access_management.accessor_id = :accessorId "
-        + "and access_management.access_type = cast(:accessType as access_type) "
+        + "and access_management.accessor_type = cast(:accessorType as accessor_type) "
         + "and access_management.service_name = :serviceName "
         + "and access_management.resource_type = :resourceType "
         + "and access_management.resource_name = :resourceName "
@@ -45,10 +45,13 @@ public interface AccessManagementRepository {
     @SuppressWarnings("PMD.UseObjectForClearerAPI") // More than 3 parameters makes sense for now, subject to change
     @SqlQuery("select * from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType and resource_name = :resourceName and role_name = :roleName")
     @RegisterConstructorMapper(RoleBasedAccessRecord.class)
-    List<RoleBasedAccessRecord> getRolePermissions(String serviceName, String resourceType, String resourceName, String roleName);
+    List<RoleBasedAccessRecord> getRolePermissions(@BindBean ResourceDefinition resourceDefinition, String roleName);
 
     @SqlQuery("select access_management_type from roles where role_name = :roleName")
     AccessManagementType getRoleAccessType(String roleName);
+
+    @SqlQuery("select role_name from roles where role_name in (<userRoles>) and access_management_type = cast(:accessManagementType as access_management_type)")
+    Set<String> getRoles(@BindList("userRoles") Set<String> userRoles, AccessManagementType accessManagementType);
 
     @SqlQuery("select distinct service_name, resource_type, resource_name from default_permissions_for_roles where role_name in (<userRoles>) and permissions & 1 = 1 and attribute = ''")
     @RegisterConstructorMapper(ResourceDefinition.class)

@@ -14,12 +14,11 @@ import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.Pair;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
@@ -89,8 +88,8 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @Test
     void returnListOfPermissionsForRoleName() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
-            RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAMES);
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(buildResource(SERVICE_NAME,
+            RESOURCE_TYPE, RESOURCE_NAME), ROLE_NAMES);
 
         assertThat(accessRecord)
             .hasSize(3)
@@ -101,32 +100,32 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @Test
     void shouldReturnNullWhenServiceNameDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions("Unknown Service",
-            RESOURCE_TYPE, RESOURCE_NAME, ROLE_NAMES);
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
+            buildResource("Unknown Service", RESOURCE_TYPE, RESOURCE_NAME), ROLE_NAMES);
 
         assertThat(accessRecord).isNull();
     }
 
     @Test
     void shouldReturnNullWhenResourceTypeDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
-            "Unknown Resource Type", RESOURCE_NAME, ROLE_NAMES);
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
+            buildResource(SERVICE_NAME, "Unknown Resource Type", RESOURCE_NAME), ROLE_NAMES);
 
         assertThat(accessRecord).isNull();
     }
 
     @Test
     void shouldReturnNullWhenResourceNameDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
-            RESOURCE_TYPE, "Unknown Resource Name", ROLE_NAMES);
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
+            buildResource(SERVICE_NAME, RESOURCE_TYPE, "Unknown Resource Name"), ROLE_NAMES);
 
         assertThat(accessRecord).isNull();
     }
 
     @Test
     void shouldReturnNullWhenDefaultRoleNameDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
-            RESOURCE_TYPE, RESOURCE_NAME, Stream.of("Unknown Role").collect(toSet()));
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
+            buildResource(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME), ImmutableSet.of("Unknown Role"));
 
         assertThat(accessRecord).isNull();
     }
@@ -135,8 +134,8 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     void shouldMergeDataAsExpectedWhenRetrievingPermissionsForMultipleRoles() {
         Set<String> userRoles = ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME);
 
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(SERVICE_NAME,
-            RESOURCE_TYPE, RESOURCE_NAME, userRoles);
+        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
+            buildResource(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME), userRoles);
 
         assertThat(accessRecord)
             .hasSize(5)
@@ -145,5 +144,13 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
             .containsEntry(JsonPointer.valueOf("/address/street/line1"), ImmutableSet.of(CREATE))
             .containsEntry(JsonPointer.valueOf("/child"), ImmutableSet.of(READ, UPDATE))
             .containsEntry(JsonPointer.valueOf("/parent/age"), ImmutableSet.of(CREATE, UPDATE));
+    }
+
+    private ResourceDefinition buildResource(String serviceName, String resourceType, String resourceName) {
+        return ResourceDefinition.builder()
+            .resourceName(resourceName)
+            .resourceType(resourceType)
+            .serviceName(serviceName)
+            .build();
     }
 }

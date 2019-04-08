@@ -59,7 +59,7 @@ public final class TestDataFactory {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(ImmutableSet.of(accessorId))
-            .accessType(ACCESSOR_TYPE)
+            .accessorType(ACCESSOR_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
@@ -75,7 +75,7 @@ public final class TestDataFactory {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(accessorId)
-            .accessType(ACCESSOR_TYPE)
+            .accessorType(ACCESSOR_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
@@ -98,7 +98,7 @@ public final class TestDataFactory {
         return ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
             .accessorId(ACCESSOR_ID)
-            .accessType(ACCESSOR_TYPE)
+            .accessorType(ACCESSOR_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
@@ -110,13 +110,13 @@ public final class TestDataFactory {
 
     public static Resource createResource(String resourceId) {
         return Resource.builder()
-            .resourceId(resourceId)
-            .type(ResourceDefinition.builder()
+            .id(resourceId)
+            .definition(ResourceDefinition.builder()
                 .resourceName(RESOURCE_NAME)
                 .resourceType(RESOURCE_TYPE)
                 .serviceName(SERVICE_NAME)
                 .build())
-            .resourceJson(DATA)
+            .data(DATA)
             .build();
     }
 }

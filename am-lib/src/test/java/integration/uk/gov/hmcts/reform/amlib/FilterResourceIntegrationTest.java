@@ -24,11 +24,11 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CHILD_ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.PARENT_ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
@@ -187,9 +187,9 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             OTHER_ROLE_NAME, RoleType.IDAM, SecurityClassification.PUBLIC, AccessManagementType.EXPLICIT);
 
         service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, ROLE_NAME,
-            createPermissions(PARENT_ATTRIBUTE, READ_PERMISSION)));
+            createPermissions(ATTRIBUTE, READ_PERMISSION)));
         service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, OTHER_ROLE_NAME,
-            createPermissions(PARENT_ATTRIBUTE, CREATE_PERMISSION)));
+            createPermissions(ATTRIBUTE, CREATE_PERMISSION)));
 
         FilterResourceResponse result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
@@ -198,14 +198,14 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .relationships(ImmutableSet.of(OTHER_ROLE_NAME, ROLE_NAME))
             .data(JsonNodeFactory.instance.objectNode())
             .permissions(ImmutableMap.of(
-                JsonPointer.valueOf(PARENT_ATTRIBUTE), ImmutableSet.of(CREATE, READ)))
+                JsonPointer.valueOf(ATTRIBUTE), ImmutableSet.of(CREATE, READ)))
             .build());
     }
 
     @Test
     void whenExplicitAccessWithSameRelationshipParentChildAttributesWithDiffPermissionsShouldNotMergePermissions() {
         service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, ROLE_NAME,
-            createPermissions(PARENT_ATTRIBUTE, READ_PERMISSION)));
+            createPermissions(ATTRIBUTE, READ_PERMISSION)));
         service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, ROLE_NAME,
             createPermissions(CHILD_ATTRIBUTE, CREATE_PERMISSION)));
 
@@ -217,7 +217,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .data(JsonNodeFactory.instance.objectNode())
             .permissions(ImmutableMap.of(
                 JsonPointer.valueOf(CHILD_ATTRIBUTE), ImmutableSet.of(CREATE),
-                JsonPointer.valueOf(PARENT_ATTRIBUTE), ImmutableSet.of(READ)))
+                JsonPointer.valueOf(ATTRIBUTE), ImmutableSet.of(READ)))
             .build());
     }
 
@@ -227,7 +227,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             OTHER_ROLE_NAME, RoleType.IDAM, SecurityClassification.PUBLIC, AccessManagementType.EXPLICIT);
 
         service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, ROLE_NAME,
-            createPermissions(PARENT_ATTRIBUTE, READ_PERMISSION)));
+            createPermissions(ATTRIBUTE, READ_PERMISSION)));
         service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, OTHER_ROLE_NAME,
             createPermissions(CHILD_ATTRIBUTE, CREATE_PERMISSION)));
 
@@ -239,7 +239,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .data(JsonNodeFactory.instance.objectNode())
             .permissions(ImmutableMap.of(
                 JsonPointer.valueOf(CHILD_ATTRIBUTE), ImmutableSet.of(CREATE, READ),
-                JsonPointer.valueOf(PARENT_ATTRIBUTE), ImmutableSet.of(READ)))
+                JsonPointer.valueOf(ATTRIBUTE), ImmutableSet.of(READ)))
             .build());
     }
 }

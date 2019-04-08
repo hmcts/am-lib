@@ -77,7 +77,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, ACCESSOR_IDS, READ_PERMISSION));
 
         assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(2)
-            .extracting(ExplicitAccessRecord::getAccessorId).containsOnly("y", "z");
+            .extracting(ExplicitAccessRecord::getAccessorId).containsOnly(ACCESSOR_IDS.toArray(new String[0]));
     }
 
     @Test

@@ -15,16 +15,35 @@ def type = "java"
 def product = "am"
 def component = "lib-test"
 
-withNightlyPipeline(type, product, component) {
-  env.TEST_URL = params.URL_TO_TEST
+List<Map<String, Object>> secrets = [
+  secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
+  secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
+  secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
+  secret('am-lib-test-POSTGRES-USER', 'DATABASE_USERNAME'),
+  secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASSWORD')
+]
 
-  // enableMutationTest()
+static Map<String, Object> secret(String secretName, String envVariable) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    envVariable: envVariable
+  ]
+}
+
+withNightlyPipeline(type, product, component) {
+  setVaultName('am')
+  loadVaultSecrets(secrets)
+
+  enableMutationTest()
   enablePerformanceTest()
   enableSlackNotifications('#am-master-builds')
 
+  env.TEST_URL = params.URL_TO_TEST
+
   before('PerformanceTest') {
     sh "echo 'Benchmark is about to start'"
-    sh "./gradlew benchmark --info --rerun-tasks"
+    sh " ./gradlew benchmark --info --rerun-tasks"
   }
 
   after('PerformanceTest') {

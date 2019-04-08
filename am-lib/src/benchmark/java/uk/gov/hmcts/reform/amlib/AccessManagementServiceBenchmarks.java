@@ -12,6 +12,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.postgresql.ds.PGPoolingDataSource;
+import uk.gov.hmcts.reform.amlib.config.DatabaseProperties;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -52,13 +53,15 @@ public class AccessManagementServiceBenchmarks {
             }
         }
 
+
         PGPoolingDataSource dataSource = new PGPoolingDataSource();
         {
-            dataSource.setServerName(getenv("DATABASE_HOST"));
-            dataSource.setPortNumber(Integer.parseInt(getenv("DATABASE_PORT")));
-            dataSource.setUser(getenv("DATABASE_USERNAME"));
-            dataSource.setPassword(getenv("DATABASE_PASSWORD"));
-            dataSource.setDatabaseName(getenv("DATABASE_NAME"));
+            DatabaseProperties databaseProperties = DatabaseProperties.createFromEnvironmentProperties();
+            dataSource.setServerName(databaseProperties.getServer().getHost());
+            dataSource.setPortNumber(databaseProperties.getServer().getPort());
+            dataSource.setDatabaseName(databaseProperties.getDatabase());
+            dataSource.setUser(databaseProperties.getCredentials().getUsername());
+            dataSource.setPassword(databaseProperties.getCredentials().getPassword());
             dataSource.setMaxConnections(64);
         }
 
@@ -69,13 +72,13 @@ public class AccessManagementServiceBenchmarks {
 
         //define resource constant
         Resource resource = Resource.builder()
-            .resourceId(resourceId)
-            .type(ResourceDefinition.builder()
+            .id(resourceId)
+            .definition(ResourceDefinition.builder()
                 .serviceName("Service 1")
                 .resourceType("Resource Type 1")
                 .resourceName("resource")
                 .build())
-            .resourceJson(inputJson)
+            .data(inputJson)
             .build();
 
         @Setup

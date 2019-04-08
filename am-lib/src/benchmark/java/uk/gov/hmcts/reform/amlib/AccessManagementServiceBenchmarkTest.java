@@ -5,10 +5,12 @@ import org.openjdk.jmh.profile.StackProfiler;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
-import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 
 import static java.lang.Math.max;
@@ -20,7 +22,12 @@ class AccessManagementServiceBenchmarkTest {
     private static final double REFERENCE_SCORE = 50;
 
     @Test
-    void benchmarkRunner() throws RunnerException {
+    void benchmarkRunner() throws Exception {
+        Path reportsDirectory = Paths.get("build/reports/jmh");
+        if (Files.notExists(reportsDirectory)) {
+            Files.createDirectory(reportsDirectory);
+        }
+
         Options opt = new OptionsBuilder()
             .include(AccessManagementServiceBenchmarks.class.getSimpleName())
             .warmupIterations(0)
@@ -29,7 +36,7 @@ class AccessManagementServiceBenchmarkTest {
             .forks(0)
             .shouldFailOnError(true)
             .resultFormat(ResultFormatType.JSON)
-            .result("performance.json")
+            .result(reportsDirectory + "/result.json")
             .addProfiler(StackProfiler.class)
             .jvmArgs("-prof")
             .build();

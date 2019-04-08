@@ -43,10 +43,18 @@ withNightlyPipeline(type, product, component) {
 
   before('PerformanceTest') {
     sh "echo 'Benchmark is about to start'"
-    sh " ./gradlew benchmark --info --rerun-tasks"
+    sh "./gradlew benchmark --info --rerun-tasks && ./gradlew jmhReport --info --rerun-tasks"
   }
 
   after('PerformanceTest') {
-    archiveArtifacts allowEmptyArchive: true, artifacts: '**/performance.json'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'am-lib/build/reports/jmh/result.json'
+    publishHTML([
+      reportDir: 'am-lib/build/reports/jmh',
+      reportFiles: 'index.html',
+      reportName: 'JMH Benchmark',
+      allowMissing: true,
+      alwaysLinkToLastBuild: true,
+      keepAll: true
+    ])
   }
 }

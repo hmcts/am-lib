@@ -42,6 +42,3 @@ classes/
 /src/gatling/bin/
 /src/gatling/lib/
 /src/gatling/target/
-
-# JMH Benchmark files
-performance.json

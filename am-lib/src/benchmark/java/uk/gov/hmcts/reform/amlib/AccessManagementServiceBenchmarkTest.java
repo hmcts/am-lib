@@ -11,6 +11,8 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.Collection;
 
+import static java.lang.Math.max;
+import static java.lang.Runtime.getRuntime;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
@@ -21,9 +23,11 @@ class AccessManagementServiceBenchmarkTest {
     void benchmarkRunner() throws RunnerException {
         Options opt = new OptionsBuilder()
             .include(AccessManagementServiceBenchmarks.class.getSimpleName())
-            .warmupIterations(2)
-            .measurementIterations(4)
+            .warmupIterations(0)
+            .measurementIterations(1)
+            .threads(max(getRuntime().availableProcessors() / 2, 1))
             .forks(0)
+            .shouldFailOnError(true)
             .resultFormat(ResultFormatType.JSON)
             .result("performance.json")
             .addProfiler(StackProfiler.class)

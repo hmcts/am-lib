@@ -41,6 +41,10 @@ withNightlyPipeline(type, product, component) {
 
   env.TEST_URL = params.URL_TO_TEST
 
+  after('checkout') {
+    sh "git lfs install"
+  }
+
   before('PerformanceTest') {
     sh "echo 'Benchmark is about to start'"
     sh "./gradlew benchmark --info --rerun-tasks && ./gradlew jmhReport --info --rerun-tasks"

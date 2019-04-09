@@ -50,14 +50,12 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private String resourceId;
-    private static final String PARENT_ATTRIBUTE = "/Parent";
-    private static final String CHILD_ATTRIBUTE = "/Parent/child";
+    private static final String PARENT_ATTRIBUTE = "/parent";
+    private static final String CHILD_ATTRIBUTE = "/parent/child";
 
     @BeforeEach
     void setUp() {
         resourceId = UUID.randomUUID().toString();
-        importerService.addRole(
-            ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
     }
 
     @Test

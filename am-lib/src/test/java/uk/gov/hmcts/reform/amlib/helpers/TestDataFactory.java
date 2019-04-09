@@ -36,29 +36,35 @@ public final class TestDataFactory {
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
                                                                   String accessorId,
                                                                   Set<Permission> permissions) {
-        return createGrant(resourceId, ImmutableSet.of(accessorId),
-            createPermissionsForWholeDocument(permissions));
+        return createGrant(resourceId, accessorId, createPermissionsForWholeDocument(permissions));
     }
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
                                                                   Set<String> accessorId,
                                                                   Set<Permission> permissions) {
-        return createGrant(resourceId, accessorId, createPermissionsForWholeDocument(permissions));
+        return createGrant(resourceId, accessorId, ROLE_NAME, createPermissionsForWholeDocument(permissions));
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
                                                   String accessorId,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
-        return createGrant(resourceId, ImmutableSet.of(accessorId), attributePermissions);
+        return createGrant(resourceId, ImmutableSet.of(accessorId), ROLE_NAME, attributePermissions);
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
                                                   String accessorId,
                                                   String relationship,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
+        return createGrant(resourceId, ImmutableSet.of(accessorId), relationship, attributePermissions);
+    }
+
+    public static ExplicitAccessGrant createGrant(String resourceId,
+                                                  Set<String> accessorIds,
+                                                  String relationship,
+                                                  Map<JsonPointer, Set<Permission>> attributePermissions) {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
-            .accessorIds(ImmutableSet.of(accessorId))
+            .accessorIds(accessorIds)
             .accessorType(ACCESSOR_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
@@ -66,22 +72,6 @@ public final class TestDataFactory {
             .attributePermissions(attributePermissions)
             .securityClassification(SECURITY_CLASSIFICATION)
             .relationship(relationship)
-            .build();
-    }
-
-    public static ExplicitAccessGrant createGrant(String resourceId,
-                                                  Set<String> accessorId,
-                                                  Map<JsonPointer, Set<Permission>> attributePermissions) {
-        return ExplicitAccessGrant.builder()
-            .resourceId(resourceId)
-            .accessorIds(accessorId)
-            .accessorType(ACCESSOR_TYPE)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .attributePermissions(attributePermissions)
-            .securityClassification(SECURITY_CLASSIFICATION)
-            .relationship(ROLE_NAME)
             .build();
     }
 

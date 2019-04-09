@@ -8,5 +8,6 @@
   "attributePermissions": {
     "": ["CREATE", "READ", "UPDATE"]
   },
+  "relationship": "Solicitor",
   "securityClassification": "PUBLIC"
 }

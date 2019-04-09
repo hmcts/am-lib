@@ -39,8 +39,6 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     @BeforeEach
     void setUp() {
         importerService.addRole(
-            ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        importerService.addRole(
             OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
 
         Map.Entry<Set<Permission>, SecurityClassification> readPermission =

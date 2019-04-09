@@ -9,6 +9,6 @@ import java.util.Set;
 @Builder
 public final class FilteredResourceEnvelope {
     private final Resource resource;
-    private Set<String> relationships;
     private final AccessEnvelope access;
+    private final Set<String> relationships;
 }

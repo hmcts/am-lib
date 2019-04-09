@@ -22,15 +22,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_IDS;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_MANAGEMENT_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissionsForWholeDocument;
@@ -83,17 +79,8 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenCreatingResourceWithInvalidRelationshipShouldThrowPersistenceException() {
-        ExplicitAccessGrant nonExistingRole = ExplicitAccessGrant.builder()
-            .resourceId(resourceId)
-            .accessorIds(ACCESSOR_IDS)
-            .accessorType(ACCESSOR_TYPE)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .attributePermissions(createPermissionsForWholeDocument(EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS))
-            .securityClassification(SECURITY_CLASSIFICATION)
-            .relationship("NonExistingRoleName")
-            .build();
+        ExplicitAccessGrant nonExistingRole = createGrant(resourceId, ACCESSOR_IDS, "NonExistingRoleName",
+            createPermissionsForWholeDocument(EXPLICIT_READ_CREATE_UPDATE_PERMISSIONS));
 
         assertThatExceptionOfType(PersistenceException.class)
             .isThrownBy(() -> service.grantExplicitResourceAccess(nonExistingRole))

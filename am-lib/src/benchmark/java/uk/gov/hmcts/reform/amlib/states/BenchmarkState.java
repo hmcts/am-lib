@@ -6,13 +6,13 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.amlib.utils.DataSourceFactory.createDataSource;
@@ -27,25 +27,44 @@ public class BenchmarkState {
     }
 
     @Setup
-    public void populateDatabase() throws IOException, SQLException {
+    public void populateDatabase() throws Throwable {
         runScript(Paths.get("src/benchmark/resources/populate-database.sql"));
     }
 
     @TearDown
-    public void cleanupDatabase() throws IOException, SQLException {
+    public void cleanupDatabase() throws Throwable {
         runScript(Paths.get("src/benchmark/resources/truncate-database.sql"));
     }
 
-    private void runScript(Path scriptPath) throws IOException, SQLException {
-        List<String> commands = Files.readAllLines(scriptPath);
+    private void runScript(Path scriptPath) throws Throwable {
+        runWithTimeTracking(() -> {
+            List<String> commands = Files.readAllLines(scriptPath);
 
-        try (Connection connection = createDataSource().getConnection()) {
-            try (Statement statement = connection.createStatement()) {
-                for (String command : commands) {
-                    statement.addBatch(command);
+            try (Connection connection = createDataSource().getConnection()) {
+                connection.setAutoCommit(false);
+                try (Statement statement = connection.createStatement()) {
+                    for (String command : commands) {
+                        statement.addBatch(command);
+                    }
+                    statement.executeBatch();
                 }
-                statement.executeBatch();
+                connection.commit();
             }
-        }
+        });
+    }
+
+    private void runWithTimeTracking(Runner runner) throws Throwable {
+        Instant startTime = Instant.now();
+        System.out.println("Script execution started");
+
+        runner.run();
+
+        Instant completeTime = Instant.now();
+        System.out.println("Script execution completed in " + Duration.between(startTime, completeTime));
+    }
+
+    @FunctionalInterface
+    private interface Runner<E extends Throwable> {
+        void run() throws E;
     }
 }

@@ -1,6 +1,6 @@
 {
-  "gateKeeperEmail": "FamilyPublicLaw+gatekeeper@gmail.com",
   "caseLocalAuthority": "example",
+  "caseName": "test",
   "risks": {
     "neglect": "Yes",
     "sexualAbuse": "Yes",
@@ -31,60 +31,19 @@
       "CONTACT_WITH_NAMED_PERSON"
     ]
   },
-  "others": {
-    "firstOther": {
-      "DOB": "1999-02-02",
-      "name": "Jason Lavery",
-      "gender": "They identify in another way",
-      "address": {
-        "County": "Armagh",
-        "Country": "N.Ire",
-        "PostCode": "BT43 343",
-        "PostTown": "Portadown",
-        "AddressLine1": "Flat 13",
-        "AddressLine2": "Portadown street",
-        "AddressLine3": "Portadown road"
-      },
-      "telephone": "07749972245",
-      "birthPlace": "Armagh",
-      "detailsHidden": "No",
-      "childInformation": "Cousin",
-      "litigationIssues": "NO",
-      "genderIdentification": "Unknown"
-    },
-    "additionalOthers": [
-      {
-        "id": "34c97e1a-eed9-499b-9693-e92496a1f54d",
-        "value": {
-          "DOB": "2000-02-02",
-          "name": "Peter Lavery",
-          "gender": "Male",
-          "address": {
-            "County": "Cork",
-            "Country": "Northern Ireland",
-            "PostCode": "BTTT TTT",
-            "PostTown": "Newcastle",
-            "AddressLine1": "Flat 29",
-            "AddressLine2": "Newcastle road",
-            "AddressLine3": "Newcastle street"
-          },
-          "telephone": "07749972241",
-          "birthPlace": "Lisburn",
-          "detailsHidden": "Yes",
-          "childInformation": "Friend of family",
-          "litigationIssues": "YES",
-          "detailsHiddenReason": "Other two hide from parties",
-          "litigationIssuesDetails": "Other two inability to take part in proceedings"
-        }
-      }
-    ]
-  },
   "grounds": {
     "thresholdReason": [
       "noCare",
       "beyondControl"
     ],
     "thresholdDetails": "grounds for application criteria"
+  },
+  "factorsParenting": {
+    "anythingElse": "No",
+    "alcoholDrugAbuse": "Yes",
+    "domesticViolence": "Yes",
+    "alcoholDrugAbuseReason": "history of drug abuse",
+    "domesticViolenceReason": "history of domestic violence"
   },
   "hearing": {
     "type": "Contested interim care order",
@@ -97,197 +56,6 @@
     "reducedNoticeReason": "Baby needs to be discharged from the hospital",
     "withoutNoticeReason": "Notice without hearing needed",
     "respondentsAwareReason": "They seek to care for baby in mother and baby unit"
-  },
-  "caseName": "test",
-  "children": {
-    "firstChild": {
-      "address": {
-        "County": "Omagh",
-        "Country": "Northern Ireland",
-        "PostCode": "SE22 6SB",
-        "PostTown": "BT11 1234",
-        "AddressLine1": "Appartment 21",
-        "AddressLine2": "22 Wesley Drive",
-        "AddressLine3": "Wesley"
-      },
-      "adoption": "Yes",
-      "childDOB": "2018-06-15",
-      "keyDates": "child starting primary school or taking GCSEs",
-      "childName": "Tom Reeves",
-      "childGender": "They identify in another way",
-      "fathersName": "Rob Reeves",
-      "mothersName": "Isbella Reeves",
-      "detailsHidden": "Yes",
-      "situationDate": "2018-11-08",
-      "careAndContact": "Place baby in local authority foster care",
-      "placementCourt": "Central London County Court",
-      "additionalNeeds": "Yes",
-      "livingSituation": "Living with respondents",
-      "socialWorkerTel": "0123456789",
-      "litigationIssues": "NO",
-      "socialWorkerName": "Helen Green",
-      "detailsHiddenReason": "History of domestic violence with relatives",
-      "fathersResponsibility": "Yes",
-      "additionalNeedsDetails": "Autism",
-      "childGenderIdentification": "Boy",
-      "placementOrderApplication": "Yes"
-    },
-    "additionalChildren": [
-      {
-        "id": "3b0b9640-2894-41eb-bef2-a031d18c8453",
-        "value": {
-          "address": {
-            "County": "London",
-            "Country": "BT66 7RR",
-            "PostCode": "MK10 1SA",
-            "PostTown": "MK",
-            "AddressLine1": "Carnegie House",
-            "AddressLine2": "Central Milton Keynes",
-            "AddressLine3": "Milton Keynes"
-          },
-          "adoption": "Yes",
-          "childDOB": "2002-02-02",
-          "keyDates": "test child two key date",
-          "childName": "Sarah Reeves",
-          "childGender": "Girl",
-          "fathersName": "Scott Simpson",
-          "mothersName": "Sarah Simpson",
-          "detailsHidden": "Yes",
-          "situationDate": "2002-02-02",
-          "careAndContact": "test child two care and contact plan",
-          "placementCourt": "test child two court",
-          "additionalNeeds": "Yes",
-          "livingSituation": "Living with respondents",
-          "socialWorkerTel": "07749972242",
-          "litigationIssues": "YES",
-          "socialWorkerName": "Paul Wilsdon",
-          "detailsHiddenReason": "test child two contact details hidden reason",
-          "fathersResponsibility": "Yes",
-          "additionalNeedsDetails": "learning disabilities",
-          "litigationIssuesDetails": "test child two ability to take part in proceedings",
-          "placementOrderApplication": "Yes"
-        }
-      }
-    ]
-  },
-  "applicant": {
-    "name": "London Borough of Southwark",
-    "email": "jane@smith.com",
-    "mobile": "2020202020",
-    "address": {
-      "County": "Galway",
-      "Country": "Ireland",
-      "PostCode": "SE1 2QH",
-      "PostTown": "Limerick",
-      "AddressLine1": "160 Tooley St",
-      "AddressLine2": "Tooley road",
-      "AddressLine3": "Tooley"
-    },
-    "jobTitle": "Legal adviser",
-    "telephone": "02120202020",
-    "personToContact": "Jane Smith"
-  },
-  "solicitor": {
-    "dx": "106 Southwark &",
-    "name": "Brian Banks",
-    "email": "brian@banks.com",
-    "mobile": "7665545327",
-    "reference": "12345",
-    "telephone": "020 2772 5772"
-  },
-  "proceeding": {
-    "ended": "02-02-2006",
-    "judge": "William Peters",
-    "started": "02-02-2002",
-    "children": "children subject to proceedings",
-    "guardian": "Mark Watson",
-    "caseNumber": "12345",
-    "ordersMade": "Supervision order",
-    "proceedingStatus": "Ongoing",
-    "onGoingProceeding": "Yes",
-    "sameGuardianNeeded": "No",
-    "sameGuardianDetails": "Some guardian not needed"
-  },
-  "respondents": {
-    "additional": [
-      {
-        "id": "a5e57424-9b5c-4722-be7e-9d9d9111c2b0",
-        "value": {
-          "dob": "1933-04-02",
-          "name": "James Smith",
-          "gender": "They identify in another way",
-          "address": {
-            "County": "Down",
-            "Country": "United Kingdom",
-            "PostCode": "BT26 6RJ",
-            "PostTown": "Lurgan",
-            "AddressLine1": "Unit 12",
-            "AddressLine2": "Transa Way",
-            "AddressLine3": "Hillsborough"
-          },
-          "telephone": "02892611016",
-          "placeOfBirth": "Newry",
-          "genderIdentify": "Unknown",
-          "litigationIssues": "YES",
-          "relationshipToChild": "Brother",
-          "contactDetailsHidden": "Yes",
-          "litigationIssuesDetails": "respondent two litigation capacity reason",
-          "contactDetailsHiddenReason": "respondent two hidden contact details reason"
-        }
-      },
-      {
-        "id": "0a5d43cc-333a-4c03-adcf-c6e0d5fbb035",
-        "value": {
-          "dob": "1933-04-02",
-          "name": "Another",
-          "gender": "Male",
-          "address": {
-            "County": "Croydon",
-            "Country": "UK",
-            "PostCode": "BT22 2345",
-            "PostTown": "Surrey",
-            "AddressLine1": "Flat 90",
-            "AddressLine2": "Surrey street",
-            "AddressLine3": "Surrey road"
-          },
-          "telephone": "0987654321",
-          "placeOfBirth": "Reading",
-          "litigationIssues": "NO"
-        }
-      }
-    ],
-    "firstRespondent": {
-      "dob": "1944-05-02",
-      "name": "Paul Smith",
-      "gender": "Male",
-      "address": {
-        "County": "Gloucester",
-        "Country": "Isle of man",
-        "PostCode": "BT66 7RR",
-        "PostTown": "Craigavon",
-        "AddressLine1": "The Grange",
-        "AddressLine2": "Clanconnel Gardens",
-        "AddressLine3": "Waringstown"
-      },
-      "telephone": "07712345678",
-      "placeOfBirth": "Crewe",
-      "litigationIssues": "YES",
-      "relationshipToChild": "Uncle",
-      "contactDetailsHidden": "Yes",
-      "litigationIssuesDetails": "respondent one test litigation reason",
-      "contactDetailsHiddenReason": "Hide from all"
-    }
-  },
-  "factorsParenting": {
-    "anythingElse": "No",
-    "alcoholDrugAbuse": "Yes",
-    "domesticViolence": "Yes",
-    "alcoholDrugAbuseReason": "history of drug abuse",
-    "domesticViolenceReason": "history of domestic violence"
-  },
-  "allocationProposal": {
-    "proposal": "Section 9 circuit judge",
-    "proposalReason": "allocation proposal reason"
   },
   "hearingPreferences": {
     "welsh": "Yes",
@@ -302,6 +70,237 @@
     "extraSecurityMeasures": "Yes",
     "learningDisabilityDetails": "learning disability",
     "extraSecurityMeasuresDetails": "security needed"
+  },
+  "allocationProposal": {
+    "proposal": "Section 9 circuit judge",
+    "proposalReason": "allocation proposal reason"
+  },
+  "proceeding": {
+    "ended": "02-02-2006",
+    "judge": "William Fake",
+    "started": "02-02-2002",
+    "children": "children subject to proceedings",
+    "guardian": "Mark Fake",
+    "caseNumber": "12345",
+    "ordersMade": "Supervision order",
+    "proceedingStatus": "Ongoing",
+    "onGoingProceeding": "Yes",
+    "sameGuardianNeeded": "No",
+    "sameGuardianDetails": "Some guardian not needed"
+  },
+  "applicant": {
+    "name": "Jane Fake",
+    "email": "jane@example.com",
+    "mobile": "07000000000",
+    "address": {
+      "County": "Galway",
+      "Country": "Ireland",
+      "PostCode": "SE0 000",
+      "PostTown": "Limerick",
+      "AddressLine1": "160 Tooley St",
+      "AddressLine2": "Tooley road",
+      "AddressLine3": "Tooley"
+    },
+    "jobTitle": "Legal adviser",
+    "telephone": "07000000000",
+    "personToContact": "Jane Fake"
+  },
+  "children": {
+    "firstChild": {
+      "address": {
+        "County": "Omagh",
+        "Country": "Northern Ireland",
+        "PostCode": "BT00 000",
+        "PostTown": "Belfast",
+        "AddressLine1": "Apartment 1",
+        "AddressLine2": "22 Wesley Drive",
+        "AddressLine3": "Wesley"
+      },
+      "adoption": "Yes",
+      "childDOB": "2018-06-15",
+      "keyDates": "child starting primary school or taking GCSEs",
+      "childName": "Tom Fake",
+      "childGender": "They identify in another way",
+      "fathersName": "Rob Fake",
+      "mothersName": "Isabella Fake",
+      "detailsHidden": "Yes",
+      "situationDate": "2018-11-08",
+      "careAndContact": "Place baby in local authority foster care",
+      "placementCourt": "Central London County Court",
+      "additionalNeeds": "Yes",
+      "livingSituation": "Living with respondents",
+      "socialWorkerTel": "0123456789",
+      "litigationIssues": "NO",
+      "socialWorkerName": "Helen Fake",
+      "detailsHiddenReason": "History of domestic violence with relatives",
+      "fathersResponsibility": "Yes",
+      "additionalNeedsDetails": "Autism",
+      "childGenderIdentification": "Boy",
+      "placementOrderApplication": "Yes"
+    },
+    "additionalChildren": [
+      {
+        "id": "3b0b9640-2894-41eb-bef2-a031d18c8453",
+        "value": {
+          "address": {
+            "County": "London",
+            "Country": "BT00 000",
+            "PostCode": "MK10 1SA",
+            "PostTown": "MK",
+            "AddressLine1": "Carnegie House",
+            "AddressLine2": "Central Milton Keynes",
+            "AddressLine3": "Milton Keynes"
+          },
+          "adoption": "Yes",
+          "childDOB": "2002-02-02",
+          "keyDates": "test child two key date",
+          "childName": "Sarah Fake",
+          "childGender": "Girl",
+          "fathersName": "Scott Fake",
+          "mothersName": "Sarah Fake",
+          "detailsHidden": "Yes",
+          "situationDate": "2002-02-02",
+          "careAndContact": "test child two care and contact plan",
+          "placementCourt": "test child two court",
+          "additionalNeeds": "Yes",
+          "livingSituation": "Living with respondents",
+          "socialWorkerTel": "07000000000",
+          "litigationIssues": "YES",
+          "socialWorkerName": "Paul Fake",
+          "detailsHiddenReason": "test child two contact details hidden reason",
+          "fathersResponsibility": "Yes",
+          "additionalNeedsDetails": "learning disabilities",
+          "litigationIssuesDetails": "test child two ability to take part in proceedings",
+          "placementOrderApplication": "Yes"
+        }
+      }
+    ]
+  },
+  "respondents": {
+    "firstRespondent": {
+      "dob": "1944-05-02",
+      "name": "Paul Fake",
+      "gender": "Male",
+      "address": {
+        "County": "Gloucester",
+        "Country": "Isle of man",
+        "PostCode": "BT00 000",
+        "PostTown": "Craigavon",
+        "AddressLine1": "The Grange",
+        "AddressLine2": "Clanconnel Gardens",
+        "AddressLine3": "Waringstown"
+      },
+      "telephone": "07000000000",
+      "placeOfBirth": "Crewe",
+      "litigationIssues": "YES",
+      "relationshipToChild": "Uncle",
+      "contactDetailsHidden": "Yes",
+      "litigationIssuesDetails": "respondent one test litigation reason",
+      "contactDetailsHiddenReason": "Hide from all"
+    },
+    "additional": [
+      {
+        "id": "a5e57424-9b5c-4722-be7e-9d9d9111c2b0",
+        "value": {
+          "dob": "1933-04-02",
+          "name": "James Fake",
+          "gender": "They identify in another way",
+          "address": {
+            "County": "Down",
+            "Country": "United Kingdom",
+            "PostCode": "BT00 000",
+            "PostTown": "Lurgan",
+            "AddressLine1": "Unit 12",
+            "AddressLine2": "Transa Way",
+            "AddressLine3": "Hillsborough"
+          },
+          "telephone": "07000000000",
+          "placeOfBirth": "Newry",
+          "genderIdentify": "Unknown",
+          "litigationIssues": "YES",
+          "relationshipToChild": "Brother",
+          "contactDetailsHidden": "Yes",
+          "litigationIssuesDetails": "respondent two litigation capacity reason",
+          "contactDetailsHiddenReason": "respondent two hidden contact details reason"
+        }
+      },
+      {
+        "id": "0a5d43cc-333a-4c03-adcf-c6e0d5fbb035",
+        "value": {
+          "dob": "1933-04-02",
+          "name": "Another Fake",
+          "gender": "Male",
+          "address": {
+            "County": "Croydon",
+            "Country": "UK",
+            "PostCode": "BT22 2345",
+            "PostTown": "Surrey",
+            "AddressLine1": "Flat 90",
+            "AddressLine2": "Surrey street",
+            "AddressLine3": "Surrey road"
+          },
+          "telephone": "07000000000",
+          "placeOfBirth": "Reading",
+          "litigationIssues": "NO"
+        }
+      }
+    ]
+  },
+  "solicitor": {
+    "dx": "106 Southwark &",
+    "name": "Brian Fake",
+    "email": "brian@example.com",
+    "mobile": "07000000000",
+    "reference": "12345",
+    "telephone": "07000000000"
+  },
+  "others": {
+    "firstOther": {
+      "DOB": "1999-02-02",
+      "name": "Jason Fake",
+      "gender": "They identify in another way",
+      "address": {
+        "County": "Armagh",
+        "Country": "UK",
+        "PostCode": "BT00 000",
+        "PostTown": "Portadown",
+        "AddressLine1": "Flat 1",
+        "AddressLine2": "Portadown street",
+        "AddressLine3": "Portadown road"
+      },
+      "telephone": "07000000000",
+      "birthPlace": "Armagh",
+      "detailsHidden": "No",
+      "childInformation": "Cousin",
+      "litigationIssues": "NO",
+      "genderIdentification": "Unknown"
+    },
+    "additionalOthers": [
+      {
+        "id": "34c97e1a-eed9-499b-9693-e92496a1f54d",
+        "value": {
+          "DOB": "2000-02-02",
+          "name": "Peter Fake",
+          "gender": "Male",
+          "address": {
+            "County": "Cork",
+            "Country": "UK",
+            "PostCode": "BT00 000",
+            "PostTown": "Newcastle",
+            "AddressLine1": "Flat 1",
+            "AddressLine2": "Newcastle road",
+            "AddressLine3": "Newcastle street"
+          },
+          "telephone": "07000000000",
+          "birthPlace": "Lisburn",
+          "detailsHidden": "Yes",
+          "childInformation": "Friend of family",
+          "litigationIssues": "YES",
+          "detailsHiddenReason": "Other two hide from parties",
+          "litigationIssuesDetails": "Other two inability to take part in proceedings"
+        }
+      }
+    ]
   },
   "internationalElement": {
     "issues": "Yes",

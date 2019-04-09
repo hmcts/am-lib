@@ -314,7 +314,6 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenExplicitAccessWithDifferentRelationshipParentChildAttributeDiffPermissionsShouldMergePermissions() {
         importerService.addRole(OTHER_ROLE_NAME, RoleType.IDAM, SECURITY_CLASSIFICATION, ACCESS_MANAGEMENT_TYPE);
-
         service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, ROLE_NAME,
             createPermissions(PARENT_ATTRIBUTE, READ_PERMISSION)));
         service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, OTHER_ROLE_NAME,

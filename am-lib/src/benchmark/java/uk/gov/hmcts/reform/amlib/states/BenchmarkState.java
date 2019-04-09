@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSet;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 import org.postgresql.ds.PGPoolingDataSource;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.config.DatabaseProperties;
@@ -16,12 +17,18 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import javax.sql.DataSource;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static uk.gov.hmcts.reform.amlib.enums.Permission.*;
 
 @State(Scope.Benchmark)
 public class BenchmarkState {
     public AccessManagementService service;
+
+    @Setup
+    public void initiateService() {
+        service = new AccessManagementService(createDataSource());
+    }
 
     @Setup
     public void populateDatabase(DataState state) {
@@ -39,28 +46,31 @@ public class BenchmarkState {
                 .put(JsonPointer.valueOf("/solicitor"), ImmutableSet.of(UPDATE, DELETE, CREATE))
                 .build();
 
-        service.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
-            .resourceId(state.resource.getId())
-            .accessorIds(ImmutableSet.of(state.accessorId))
-            .accessType("EXPLICIT")
-            .serviceName("Service 1")
-            .resourceType("Resource Type 1")
-            .resourceName("resource")
-            .attributePermissions(attributePermissions)
-            .securityClassification(SecurityClassification.PUBLIC)
-            .build()
-        );
+        for (int i = 0; i < 50000; i++) {
+            service.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
+                .resourceId(UUID.randomUUID().toString())
+                .accessorIds(ImmutableSet.of(state.accessorId))
+                .accessType("EXPLICIT")
+                .serviceName("Service 1")
+                .resourceType("Resource Type 1")
+                .resourceName("resource")
+                .attributePermissions(attributePermissions)
+                .securityClassification(SecurityClassification.PUBLIC)
+                .build()
+            );
+        }
     }
 
-    @Setup
-    public void initiateService() {
-        service = new AccessManagementService(createDataSource());
+    @TearDown
+    public void cleanupDatabase() {
+        
     }
 
     @SuppressWarnings({"deprecation"})
     private DataSource createDataSource() {
-        PGPoolingDataSource dataSource = new PGPoolingDataSource();
         DatabaseProperties databaseProperties = DatabaseProperties.createFromEnvironmentProperties();
+
+        PGPoolingDataSource dataSource = new PGPoolingDataSource();
         dataSource.setServerName(databaseProperties.getServer().getHost());
         dataSource.setPortNumber(databaseProperties.getServer().getPort());
         dataSource.setDatabaseName(databaseProperties.getDatabase());

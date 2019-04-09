@@ -32,14 +32,14 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
+@SuppressWarnings("PMD.LineLength")
 class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
 
     @BeforeEach
     void setUp() {
-        importerService.addRole(
-            OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        importerService.addRole(OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
 
         Map.Entry<Set<Permission>, SecurityClassification> readPermission =
             new Pair<>(READ_PERMISSION, SecurityClassification.PUBLIC);
@@ -72,9 +72,6 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
                 JsonPointer.valueOf("/address"), createPermission
             );
 
-        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC,
-            AccessType.ROLE_BASED);
-
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(OTHER_ROLE_NAME)
             .serviceName(SERVICE_NAME)
@@ -86,8 +83,8 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @Test
     void returnListOfPermissionsForRoleName() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(buildResource(SERVICE_NAME,
-            RESOURCE_TYPE, RESOURCE_NAME), ROLE_NAMES);
+        Map<JsonPointer, Set<Permission>> accessRecord =
+            service.getRolePermissions(buildResource(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME), ROLE_NAMES);
 
         assertThat(accessRecord)
             .hasSize(3)

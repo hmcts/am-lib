@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 import static uk.gov.hmcts.reform.amlib.utils.DataSourceFactory.createDataSource;
+import static uk.gov.hmcts.reform.amlib.utils.EnvironmentVariableUtils.getValueOrDefault;
 
 @State(Scope.Benchmark)
 public class BenchmarkState {
@@ -26,15 +27,17 @@ public class BenchmarkState {
 
     @Setup
     public void populateDatabase() throws Throwable {
-        runScripts(
-            Paths.get(databaseScriptsLocation + "/truncate.sql"),
-            Paths.get(databaseScriptsLocation + "/populate/services.sql"),
-            Paths.get(databaseScriptsLocation + "/populate/resources.sql"),
-            Paths.get(databaseScriptsLocation + "/populate/roles.sql"),
-            Paths.get(databaseScriptsLocation + "/populate/resource_attributes.sql"),
-            Paths.get(databaseScriptsLocation + "/populate/default_permissions_for_roles.sql"),
-            Paths.get(databaseScriptsLocation + "/populate/access_management.copy.sql")
-        );
+        if (getValueOrDefault("BENCHMARK_POPULATE_DATABASE", "true").toLowerCase().equals("true")) {
+            runScripts(
+                Paths.get(databaseScriptsLocation + "/truncate.sql"),
+                Paths.get(databaseScriptsLocation + "/populate/services.sql"),
+                Paths.get(databaseScriptsLocation + "/populate/resources.sql"),
+                Paths.get(databaseScriptsLocation + "/populate/roles.sql"),
+                Paths.get(databaseScriptsLocation + "/populate/resource_attributes.sql"),
+                Paths.get(databaseScriptsLocation + "/populate/default_permissions_for_roles.sql"),
+                Paths.get(databaseScriptsLocation + "/populate/access_management.copy.sql")
+            );
+        }
     }
 
     @Setup

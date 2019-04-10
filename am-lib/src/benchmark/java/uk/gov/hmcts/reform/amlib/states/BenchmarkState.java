@@ -26,16 +26,16 @@ public class BenchmarkState {
     @Setup
     public void populateDatabase() throws Throwable {
         if (getValueOrDefault("BENCHMARK_POPULATE_DATABASE", "true").toLowerCase().equals("true")) {
-            String databaseScriptsLocation = "src/benchmark/resources/database-scripts";
+            Path databaseScriptsLocation = Paths.get("src/benchmark/resources/database-scripts");
             runScripts(
-                Paths.get(databaseScriptsLocation + "/truncate.sql"),
-                Paths.get(databaseScriptsLocation + "/populate/services.sql"),
-                Paths.get(databaseScriptsLocation + "/populate/resources.sql"),
-                Paths.get(databaseScriptsLocation + "/populate/roles.sql"),
-                Paths.get(databaseScriptsLocation + "/populate/resource_attributes.sql"),
-                Paths.get(databaseScriptsLocation + "/populate/default_permissions_for_roles.sql"),
-                Paths.get(databaseScriptsLocation + "/populate/access_management.copy.sql"),
-                Paths.get(databaseScriptsLocation + "/populate/access_management.sql")
+                databaseScriptsLocation.resolve("truncate.sql"),
+                databaseScriptsLocation.resolve("populate/services.sql"),
+                databaseScriptsLocation.resolve("populate/resources.sql"),
+                databaseScriptsLocation.resolve("populate/roles.sql"),
+                databaseScriptsLocation.resolve("populate/resource_attributes.sql"),
+                databaseScriptsLocation.resolve("populate/default_permissions_for_roles.sql"),
+                databaseScriptsLocation.resolve("populate/access_management.copy.sql"),
+                databaseScriptsLocation.resolve("populate/access_management.sql")
             );
         }
     }

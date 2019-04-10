@@ -25,7 +25,7 @@ public class AccessManagementServiceBenchmarks {
         benchmark.service.filterResource(accessorId, ImmutableSet.of(accessorRole), Resource.builder()
             .id(resourceId)
             .definition(resourceDefinition)
-            .data(data.data)
+            .data(data.resourceDataFor(resourceDefinition.getServiceName()))
             .build());
     }
 }

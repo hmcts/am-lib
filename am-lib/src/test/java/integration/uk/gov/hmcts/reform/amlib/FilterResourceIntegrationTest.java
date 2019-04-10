@@ -131,10 +131,9 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenNoExplicitAccessAndRoleHasExplicitAccessTypeShouldReturnNull() {
-        importerService.addRole("Defendant", RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.EXPLICIT);
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
+        importerService.addRole(OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.EXPLICIT);
 
-        FilteredResourceEnvelope result = service.filterResource(ACCESSOR_ID, ImmutableSet.of("Defendant"),
+        FilteredResourceEnvelope result = service.filterResource(ACCESSOR_ID, ImmutableSet.of(OTHER_ROLE_NAME),
             createResource(resourceId));
 
         assertThat(result).isNull();
@@ -142,8 +141,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenNoExplicitAccessAndMultipleRolesWhereOneHasExplicitAccessTypeShouldReturnOnlyRoleBasedPermissions() {
-        importerService.addRole(
-            OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.EXPLICIT);
+        importerService.addRole(OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.EXPLICIT);
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(OTHER_ROLE_NAME)
@@ -319,7 +317,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         FilteredResourceEnvelope result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
 
-        assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
+        assertThat(result).isEqualToComparingFieldByField(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resourceId)
                 .definition(RESOURCE_DEFINITION)
@@ -327,8 +325,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .build())
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(
-                    JsonPointer.valueOf(CHILD_ATTRIBUTE), ImmutableSet.of(CREATE, READ),
-                    JsonPointer.valueOf(PARENT_ATTRIBUTE), ImmutableSet.of(READ)))
+                    JsonPointer.valueOf(PARENT_ATTRIBUTE), ImmutableSet.of(READ),
+                    JsonPointer.valueOf(CHILD_ATTRIBUTE), ImmutableSet.of(CREATE, READ)))
                 .accessType(AccessType.EXPLICIT)
                 .build())
             .relationships(ImmutableSet.of(OTHER_ROLE_NAME, ROLE_NAME))

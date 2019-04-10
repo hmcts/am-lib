@@ -6,11 +6,14 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.FilterService;
 import uk.gov.hmcts.reform.amlib.internal.PermissionsService;
 import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
+import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
 import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
@@ -23,6 +26,7 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collector;
@@ -33,6 +37,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 public class AccessManagementService {
 
@@ -128,7 +135,7 @@ public class AccessManagementService {
                                                          @NotNull List<@NotNull @Valid Resource> resources) {
         return resources.stream()
             .map(resource -> filterResource(userId, userRoles, resource))
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 
     /**
@@ -195,7 +202,9 @@ public class AccessManagementService {
         }
 
         return jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getRoles(userRoles, AccessType.ROLE_BASED));
+            dao -> dao.getRoles(userRoles, AccessType.ROLE_BASED).stream()
+                .map(Role::getRoleName)
+                .collect(toSet()));
     }
 
     /**
@@ -223,7 +232,7 @@ public class AccessManagementService {
                 .map(role -> dao.getRolePermissions(resourceDefinition, role))
                 .map(roleBasedAccessRecords -> roleBasedAccessRecords.stream()
                     .collect(getMapCollector()))
-                .collect(Collectors.toList()));
+                .collect(toList()));
 
         if (permissionsForRoles.stream().allMatch(Map::isEmpty)) {
             return null;
@@ -241,8 +250,37 @@ public class AccessManagementService {
     @SuppressWarnings("LineLength")
     @AuditLog("returned resources that user with roles '{{userRoles}}' has create permission to: {{result}}")
     public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@NotEmpty Set<@NotBlank String> userRoles) {
-        return jdbi.withExtension(AccessManagementRepository.class, dao ->
+
+        // resource definitions with create root perm for a role.
+        Set<ResourceDefinition> resourceDefinitions = jdbi.withExtension(AccessManagementRepository.class, dao ->
             dao.getResourceDefinitionsWithRootCreatePermission(userRoles));
+
+        // get resource attributes with resource definition above
+
+        Set<ResourceAttribute> resourceAttributes = jdbi.withExtension(AccessManagementRepository.class, dao ->
+            dao.getResourceAttributes(resourceDefinitions));
+
+        System.out.println("resourceAttributes = " + resourceAttributes);
+
+        // get roles with role names
+
+        Integer maxSecurityClassificationForRole = jdbi.withExtension(AccessManagementRepository.class, dao ->
+            dao.getRoles(userRoles, AccessType.ROLE_BASED)
+                .stream()
+                .mapToInt(role -> role.getSecurityClassification().getHierarchy())
+                .max().orElseThrow(NoSuchElementException::new));
+
+        // PUBLIC, PRIVATE OR RESTRICTED.
+
+        SecurityClassification securityClassification = SecurityClassification.fromHierarchy(maxSecurityClassificationForRole);
+
+        System.out.println("secClass = " + securityClassification);
+
+        // comparison of sec classifications.
+
+
+
+        return null;
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

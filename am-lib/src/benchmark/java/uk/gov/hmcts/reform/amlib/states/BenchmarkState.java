@@ -21,13 +21,12 @@ import static uk.gov.hmcts.reform.amlib.utils.EnvironmentVariableUtils.getValueO
 
 @State(Scope.Benchmark)
 public class BenchmarkState {
-    private static String databaseScriptsLocation = "src/benchmark/resources/database-scripts";
-
     public AccessManagementService service;
 
     @Setup
     public void populateDatabase() throws Throwable {
         if (getValueOrDefault("BENCHMARK_POPULATE_DATABASE", "true").toLowerCase().equals("true")) {
+            String databaseScriptsLocation = "src/benchmark/resources/database-scripts";
             runScripts(
                 Paths.get(databaseScriptsLocation + "/truncate.sql"),
                 Paths.get(databaseScriptsLocation + "/populate/services.sql"),

@@ -13,26 +13,19 @@ import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
-import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
-import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
-import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
-import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
-import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
-import uk.gov.hmcts.reform.amlib.models.Resource;
-import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+import uk.gov.hmcts.reform.amlib.models.*;
 
 import javax.sql.DataSource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class AccessManagementService {
 
@@ -144,7 +137,7 @@ public class AccessManagementService {
      */
     @AuditLog("filtered access to resource '{{resource.id}}' defined as '{{resource.definition.serviceName}}|"
         + "{{resource.definition.resourceType}}|{{resource.definition.resourceName}}' for accessor '{{userId}}' "
-        + "in roles '{{userRoles}}': {{result.access.permissions}}")
+        + "in roles '{{userRoles}}': {{result.access.accessManagementType}} access with {{result.access.permissions}}")
     public FilteredResourceEnvelope filterResource(@NotBlank String userId,
                                                    @NotEmpty Set<@NotBlank String> userRoles,
                                                    @NotNull @Valid Resource resource) {

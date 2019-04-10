@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.Pair;
 
-import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,14 +21,22 @@ import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.sql.DataSource;
 
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
-import static uk.gov.hmcts.reform.amlib.enums.Permission.*;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.utils.DataSourceFactory.createDataSource;
 
 public class SetupGenerator {
+    private SetupGenerator() {
+        throw new UnsupportedOperationException("Constructing utility class is not supported");
+    }
+
     private static final List<CaseDefinition> definitions = ImmutableList.of(
         new CaseDefinition(
             "fpl",
@@ -109,7 +116,7 @@ public class SetupGenerator {
         }
     }
 
-    @SuppressWarnings("LineLenght")
+    @SuppressWarnings("LineLength")
     private static Collector<Entry<JsonPointer, Set<Permission>>, ?, Map<JsonPointer, Entry<Set<Permission>, SecurityClassification>>> toDefaultAttributePermissions() {
         return Collectors.toMap(
             Entry::getKey,
@@ -122,7 +129,9 @@ public class SetupGenerator {
         private String resourceName;
         private Map<JsonPointer, Set<Permission>> attributePermissions;
 
-        private CaseDefinition(String serviceName, String resourceName, Map<JsonPointer, Set<Permission>> attributePermissions) {
+        private CaseDefinition(String serviceName,
+                               String resourceName,
+                               Map<JsonPointer, Set<Permission>> attributePermissions) {
             this.serviceName = serviceName;
             this.resourceName = resourceName;
             this.attributePermissions = attributePermissions;

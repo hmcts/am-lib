@@ -3,6 +3,10 @@ package uk.gov.hmcts.reform.amlib.utils;
 import static java.lang.System.getenv;
 
 public class EnvironmentVariableUtils {
+    private EnvironmentVariableUtils() {
+        throw new UnsupportedOperationException("Constructing utility class is not supported");
+    }
+
     public static String getValueOrDefault(String name, String defaultValue) {
         String value = getenv(name);
         return value != null ? value : defaultValue;

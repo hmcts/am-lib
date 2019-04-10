@@ -6,6 +6,10 @@ import uk.gov.hmcts.reform.amlib.config.DatabaseProperties;
 import javax.sql.DataSource;
 
 public class DataSourceFactory {
+    private DataSourceFactory() {
+        throw new UnsupportedOperationException("Constructing utility class is not supported");
+    }
+
     @SuppressWarnings({"deprecation"})
     public static DataSource createDataSource() {
         DatabaseProperties databaseProperties = DatabaseProperties.createFromEnvironmentProperties();

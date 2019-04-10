@@ -35,7 +35,8 @@ public class BenchmarkState {
                 Paths.get(databaseScriptsLocation + "/populate/roles.sql"),
                 Paths.get(databaseScriptsLocation + "/populate/resource_attributes.sql"),
                 Paths.get(databaseScriptsLocation + "/populate/default_permissions_for_roles.sql"),
-                Paths.get(databaseScriptsLocation + "/populate/access_management.copy.sql")
+                Paths.get(databaseScriptsLocation + "/populate/access_management.copy.sql"),
+                Paths.get(databaseScriptsLocation + "/populate/access_management.sql")
             );
         }
     }

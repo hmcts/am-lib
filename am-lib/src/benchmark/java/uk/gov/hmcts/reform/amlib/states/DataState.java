@@ -13,6 +13,18 @@ import java.util.Random;
 @State(Scope.Benchmark)
 public class DataState {
     private static Random random = new Random();
+    private static ResourceDefinition[] definitions = new ResourceDefinition[]{
+        ResourceDefinition.builder()
+            .serviceName("fpl")
+            .resourceType("case")
+            .resourceName("application")
+            .build(),
+        ResourceDefinition.builder()
+            .serviceName("cmc")
+            .resourceType("case")
+            .resourceName("case")
+            .build()
+    };
 
     public JsonNode data;
 
@@ -26,11 +38,7 @@ public class DataState {
         return random.nextInt(50000) + 1;
     }
 
-    public ResourceDefinition resourceDefinition() {
-        return ResourceDefinition.builder()
-            .serviceName("fpl")
-            .resourceType("case")
-            .resourceName("application")
-            .build();
+    public ResourceDefinition randomResourceDefinition() {
+        return definitions[random.nextInt(2)];
     }
 }

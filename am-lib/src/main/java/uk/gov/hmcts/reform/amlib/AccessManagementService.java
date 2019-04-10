@@ -6,7 +6,6 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.FilterService;
 import uk.gov.hmcts.reform.amlib.internal.PermissionsService;
@@ -41,6 +40,7 @@ import javax.validation.constraints.NotNull;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
+@SuppressWarnings("PMD.ExcessiveImports")
 public class AccessManagementService {
 
     private final FilterService filterService = new FilterService();
@@ -211,7 +211,7 @@ public class AccessManagementService {
      * Retrieves a list of {@link RoleBasedAccessRecord } and returns attribute and permissions values.
      *
      * @param resourceDefinition {@link ResourceDefinition} a unique service name, resource type and resource name
-     * @param userRoles           set of user roles
+     * @param userRoles          set of user roles
      * @return a map of attributes and their corresponding permissions or null
      * @throws PersistenceException if any persistence errors were encountered
      */
@@ -250,19 +250,15 @@ public class AccessManagementService {
     @SuppressWarnings("LineLength")
     @AuditLog("returned resources that user with roles '{{userRoles}}' has create permission to: {{result}}")
     public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@NotEmpty Set<@NotBlank String> userRoles) {
-
-        // resource definitions with create root perm for a role.
         Set<ResourceDefinition> resourceDefinitions = jdbi.withExtension(AccessManagementRepository.class, dao ->
             dao.getResourceDefinitionsWithRootCreatePermission(userRoles));
 
-        // get resource attributes with resource definition above
+        if (resourceDefinitions.isEmpty()) {
+            return resourceDefinitions;
+        }
 
         Set<ResourceAttribute> resourceAttributes = jdbi.withExtension(AccessManagementRepository.class, dao ->
             dao.getResourceAttributes(resourceDefinitions));
-
-        System.out.println("resourceAttributes = " + resourceAttributes);
-
-        // get roles with role names
 
         Integer maxSecurityClassificationForRole = jdbi.withExtension(AccessManagementRepository.class, dao ->
             dao.getRoles(userRoles, AccessType.ROLE_BASED)
@@ -270,18 +266,15 @@ public class AccessManagementService {
                 .mapToInt(role -> role.getSecurityClassification().getHierarchy())
                 .max().orElseThrow(NoSuchElementException::new));
 
-        // PUBLIC, PRIVATE OR RESTRICTED.
+        Set<ResourceAttribute> filteredResourceAttributes = resourceAttributes.stream().filter(resourceAttribute ->
+            resourceAttribute.getDefaultSecurityClassification().getHierarchy() <= maxSecurityClassificationForRole)
+            .collect(toSet());
 
-        SecurityClassification securityClassification = SecurityClassification.fromHierarchy(maxSecurityClassificationForRole);
-
-        System.out.println("secClass = " + securityClassification);
-
-        // comparison of sec classifications.
-
-
-
-        return null;
+        return filteredResourceAttributes.stream()
+            .map(e -> new ResourceDefinition(e.getServiceName(), e.getResourceType(), e.getResourceName()))
+            .collect(toSet());
     }
+
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {
         return Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions);

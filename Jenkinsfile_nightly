@@ -43,7 +43,7 @@ withNightlyPipeline(type, product, component) {
 
   after('checkout') {
     sh 'curl -L https://github.com/git-lfs/git-lfs/releases/download/v2.7.1/git-lfs-linux-amd64-v2.7.1.tar.gz | tar xz -C ./bin git-lfs'
-    sh 'PATH=$PATH:./bin git lfs pull'
+    sh 'PATH=$PATH:./bin git lfs install && PATH=$PATH:./bin git lfs pull'
   }
 
   before('PerformanceTest') {

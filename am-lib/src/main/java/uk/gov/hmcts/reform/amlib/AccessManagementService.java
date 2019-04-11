@@ -272,11 +272,7 @@ public class AccessManagementService {
                 resourceAttribute.getResourceName()))
             .collect(toSet());
 
-        if (filteredResourceDefinitions.isEmpty()) {
-            return null;
-        }
-
-        return filteredResourceDefinitions;
+        return filteredResourceDefinitions.isEmpty() ? null : filteredResourceDefinitions;
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

@@ -29,7 +29,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n\t\"userId\": \"UNIQUE-USER-ID\",\n\t\"userRoles\": [\"Solicitor\"],\n\t\"resource\": {\n\t\t\"id\": \"my-super-resource-id\",\n\t\t\"definition\": {\n\t\t\t\"serviceName\": \"cmc\",\n\t\t\t\"resourceType\": \"case\",\n\t\t\t\"resourceName\": \"claim\"\n\t\t},\n\t\t\"data\": {\n\t\t\t\"test\": \"test\"\n\t\t},\n\t\"relationship\": \"Solicitor\"\n\t}\n}"
+          "raw": "{\n\t\"userId\": \"UNIQUE-USER-ID\",\n\t\"userRoles\": [\"\"],\n\t\"resource\": {\n\t\t\"id\": \"my-super-resource-id\",\n\t\t\"definition\": {\n\t\t\t\"serviceName\": \"cmc\",\n\t\t\t\"resourceType\": \"case\",\n\t\t\t\"resourceName\": \"claim\"\n\t\t},\n\t\t\"data\": {\n\t\t\t\"test\": \"test\"\n\t\t}\n\t}\n}"
         },
         "url": {
           "raw": "http://localhost:3703/lib/filter-resource",

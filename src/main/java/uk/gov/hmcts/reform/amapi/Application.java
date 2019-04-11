@@ -24,7 +24,6 @@ public class Application implements CommandLineRunner {
     public void run(String... args) {
         importerService.addService("cmc");
         importerService.addResourceDefinition("cmc", "case", "claim");
-        importerService.addRole(
-            "Solicitor", RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        importerService.addRole("caseworker", RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
     }
 }

@@ -6,6 +6,6 @@
   "resourceType": "case",
   "resourceName": "claim",
   "attribute": "",
-  "relationship": "Solicitor",
+  "relationship": "caseworker",
   "securityClassification": "PUBLIC"
 }

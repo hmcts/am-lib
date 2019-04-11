@@ -85,7 +85,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     }
 
     @Test
-    void shouldReturnEmptyListWhenRecordExistsButNoCreatePermission() {
+    void shouldReturnNullWhenRecordExistsButNoCreatePermission() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
             "", READ_PERMISSION, resource, ROLE_NAME));
 
@@ -96,7 +96,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     }
 
     @Test
-    void shouldReturnEmptyListWhenNoRecords() {
+    void shouldReturnNullWhenNoRecords() {
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(Collections.singleton(ROLE_NAME));
 
@@ -168,7 +168,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     }
 
     @Test
-    void whenRoleDoesNotHaveHighEnoughSecurityClassificationShouldReturnEmptySetResourceDefinitions() {
+    void whenRoleDoesNotHaveHighEnoughSecurityClassificationShouldReturnNull() {
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
             .serviceName(resource.getServiceName())

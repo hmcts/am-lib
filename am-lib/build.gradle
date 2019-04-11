@@ -8,13 +8,21 @@ plugins {
     id 'com.jfrog.bintray' version '1.8.4'
     id 'com.github.johnrengelman.shadow' version '4.0.4'
     id "io.freefair.aspectj.post-compile-weaving" version "3.1.4"
+    id "io.morethan.jmhreport" version "0.9.0"
 }
 
 group 'uk.gov.hmcts.reform'
 version "${version}"
 
-configurations {
-    testOutput.extendsFrom(testCompile)
+sourceSets {
+  benchmark {
+    java {
+      compileClasspath += main.output
+      runtimeClasspath += main.output
+      srcDir file('src/benchmark/java')
+    }
+    resources.srcDir file('src/benchmark/resources')
+  }
 }
 
 test {
@@ -88,6 +96,14 @@ dependencies {
     testCompile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: '5.0.1'
+
+    benchmarkAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.21'
+
+    benchmarkImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.1'
+    benchmarkCompile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
+    benchmarkCompile sourceSets.main.runtimeClasspath
+    benchmarkCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'
+    benchmarkCompile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
 }
 
 task codeCoverageReport(type: JacocoReport, dependsOn: test) {
@@ -115,10 +131,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
-task jarTest(type: Jar, dependsOn: testClasses) {
-    from sourceSets.test.output
-}
-
 shadowJar {
     from('src/main/java') {
         include '**/*.sql'
@@ -140,7 +152,6 @@ shadowJar {
 artifacts {
     archives shadowJar
     archives javadocJar
-    testOutput jarTest
 }
 
 publishing {
@@ -171,4 +182,18 @@ bintray {
             name = project.version
         }
     }
+}
+
+task benchmark(type: Test, description: 'Runs benchmarks', group: 'Verification') {
+  testClassesDirs = sourceSets.benchmark.output.classesDirs
+  classpath = sourceSets.benchmark.runtimeClasspath
+}
+
+benchmark {
+  useJUnitPlatform()
+}
+
+jmhReport {
+  jmhResultPath = project.file('build/reports/jmh/result.json')
+  jmhReportOutput = project.file('build/reports/jmh')
 }

@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -250,15 +251,12 @@ public class AccessManagementService {
     @SuppressWarnings("LineLength")
     @AuditLog("returned resources that user with roles '{{userRoles}}' has create permission to: {{result}}")
     public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@NotEmpty Set<@NotBlank String> userRoles) {
-        Set<ResourceDefinition> resourceDefinitions = jdbi.withExtension(AccessManagementRepository.class, dao ->
-            dao.getResourceDefinitionsWithRootCreatePermission(userRoles));
-
-        if (resourceDefinitions.isEmpty()) {
-            return resourceDefinitions;
-        }
-
         Set<ResourceAttribute> resourceAttributes = jdbi.withExtension(AccessManagementRepository.class, dao ->
-            dao.getResourceAttributes(resourceDefinitions));
+            dao.getResourceAttributesWithRootCreatePermission(userRoles));
+
+        if (resourceAttributes.isEmpty()) {
+            return Collections.emptySet();
+        }
 
         Integer maxSecurityClassificationForRole = jdbi.withExtension(AccessManagementRepository.class, dao ->
             dao.getRoles(userRoles, AccessType.ROLE_BASED)
@@ -266,15 +264,15 @@ public class AccessManagementService {
                 .mapToInt(role -> role.getSecurityClassification().getHierarchy())
                 .max().orElseThrow(NoSuchElementException::new));
 
-        Set<ResourceAttribute> filteredResourceAttributes = resourceAttributes.stream().filter(resourceAttribute ->
-            resourceAttribute.getDefaultSecurityClassification().getHierarchy() <= maxSecurityClassificationForRole)
-            .collect(toSet());
-
-        return filteredResourceAttributes.stream()
-            .map(e -> new ResourceDefinition(e.getServiceName(), e.getResourceType(), e.getResourceName()))
+        return resourceAttributes.stream()
+            .filter(resourceAttribute ->
+                resourceAttribute.getDefaultSecurityClassification().getHierarchy() <= maxSecurityClassificationForRole)
+            .map(resourceAttribute -> new ResourceDefinition(
+                resourceAttribute.getServiceName(),
+                resourceAttribute.getResourceType(),
+                resourceAttribute.getResourceName()))
             .collect(toSet());
     }
-
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {
         return Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions);

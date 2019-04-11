@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.amlib.internal.repositories;
 import org.jdbi.v3.sqlobject.config.RegisterColumnMapper;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
-import org.jdbi.v3.sqlobject.customizer.BindBeanList;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -55,11 +54,9 @@ public interface AccessManagementRepository {
     @RegisterConstructorMapper(Role.class)
     Set<Role> getRoles(@BindList("userRoles") Set<String> userRoles, AccessType accessType);
 
-    @SqlQuery("select distinct service_name, resource_type, resource_name from default_permissions_for_roles where role_name in (<userRoles>) and permissions & 1 = 1 and attribute = ''")
-    @RegisterConstructorMapper(ResourceDefinition.class)
-    Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@BindList("userRoles") Set<String> userRoles);
-
-    @SqlQuery("select * from resource_attributes where (service_name, resource_type, resource_name) in (<resourceDefinitions>)")
+    @SqlQuery("select distinct default_perms.service_name, default_perms.resource_type, default_perms.resource_name, default_perms.attribute, resource.default_security_classification from default_permissions_for_roles default_perms"
+        + " join resource_attributes as resource on default_perms.service_name = resource.service_name and default_perms.resource_type = resource.resource_type and default_perms.resource_name = resource.resource_name"
+        + " where default_perms.role_name in (<userRoles>) and default_perms.permissions & 1 = 1 and default_perms.attribute = ''")
     @RegisterConstructorMapper(ResourceAttribute.class)
-    Set<ResourceAttribute> getResourceAttributes(@BindBeanList(value = "resourceDefinitions", propertyNames = {"serviceName", "resourceType", "resourceName"}) Set<ResourceDefinition> resourceDefinitions);
+    Set<ResourceAttribute> getResourceAttributesWithRootCreatePermission(@BindList("userRoles") Set<String> userRoles);
 }

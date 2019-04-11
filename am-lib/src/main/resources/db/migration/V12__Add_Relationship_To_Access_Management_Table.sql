@@ -1,7 +1,7 @@
 CREATE TYPE ACCESSOR_TYPE AS enum ('USER', 'ROLE');
 
 ALTER TABLE access_management
-DROP CONSTRAINT access_management_unique;
+  DROP CONSTRAINT access_management_unique;
 
 UPDATE access_management SET access_type = UPPER(access_type);
 
@@ -12,7 +12,7 @@ ALTER TABLE access_management
   ADD COLUMN relationship VARCHAR(100) NOT NULL;
 
 ALTER TABLE access_management
-ADD CONSTRAINT relationship_fkey FOREIGN KEY (relationship)
+  ADD CONSTRAINT relationship_fkey FOREIGN KEY (relationship)
     REFERENCES roles (role_name)
     ON UPDATE NO ACTION ON DELETE NO ACTION;
 

@@ -34,28 +34,28 @@ public final class TestDataFactory {
     }
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
-                                                                  String accessorId,
+                                                                  String accessorIds,
                                                                   Set<Permission> permissions) {
-        return createGrant(resourceId, accessorId, createPermissionsForWholeDocument(permissions));
+        return createGrant(resourceId, accessorIds, createPermissionsForWholeDocument(permissions));
     }
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
-                                                                  Set<String> accessorId,
+                                                                  Set<String> accessorIds,
                                                                   Set<Permission> permissions) {
-        return createGrant(resourceId, accessorId, ROLE_NAME, createPermissionsForWholeDocument(permissions));
+        return createGrant(resourceId, accessorIds, ROLE_NAME, createPermissionsForWholeDocument(permissions));
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
-                                                  String accessorId,
+                                                  String accessorIds,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
-        return createGrant(resourceId, ImmutableSet.of(accessorId), ROLE_NAME, attributePermissions);
+        return createGrant(resourceId, ImmutableSet.of(accessorIds), ROLE_NAME, attributePermissions);
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
-                                                  String accessorId,
+                                                  String accessorIds,
                                                   String relationship,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
-        return createGrant(resourceId, ImmutableSet.of(accessorId), relationship, attributePermissions);
+        return createGrant(resourceId, ImmutableSet.of(accessorIds), relationship, attributePermissions);
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,

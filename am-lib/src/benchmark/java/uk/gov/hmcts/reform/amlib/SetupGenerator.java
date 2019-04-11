@@ -106,7 +106,7 @@ public class SetupGenerator {
                     .serviceName(definition.serviceName)
                     .resourceType(resourceType)
                     .resourceName(definition.resourceName)
-                    .resourceId("resource-" + number)
+                    .resourceId(definition.serviceName + "-resource-" + number)
                     .accessorIds(ImmutableSet.of("user-" + number))
                     .accessType("USER")
                     .attributePermissions(definition.attributePermissions)

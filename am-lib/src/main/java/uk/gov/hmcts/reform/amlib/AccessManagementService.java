@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -255,7 +254,7 @@ public class AccessManagementService {
             dao.getResourceAttributesWithRootCreatePermission(userRoles));
 
         if (resourceAttributes.isEmpty()) {
-            return Collections.emptySet();
+            return null;
         }
 
         Integer maxSecurityClassificationForRole = jdbi.withExtension(AccessManagementRepository.class, dao ->
@@ -264,7 +263,7 @@ public class AccessManagementService {
                 .mapToInt(role -> role.getSecurityClassification().getHierarchy())
                 .max().orElseThrow(NoSuchElementException::new));
 
-        return resourceAttributes.stream()
+        Set<ResourceDefinition> filteredResourceDefinitions = resourceAttributes.stream()
             .filter(resourceAttribute ->
                 resourceAttribute.getDefaultSecurityClassification().getHierarchy() <= maxSecurityClassificationForRole)
             .map(resourceAttribute -> new ResourceDefinition(
@@ -272,6 +271,12 @@ public class AccessManagementService {
                 resourceAttribute.getResourceType(),
                 resourceAttribute.getResourceName()))
             .collect(toSet());
+
+        if (filteredResourceDefinitions.isEmpty()) {
+            return null;
+        }
+
+        return filteredResourceDefinitions;
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

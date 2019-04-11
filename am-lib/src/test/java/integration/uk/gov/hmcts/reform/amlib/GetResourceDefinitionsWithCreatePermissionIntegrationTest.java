@@ -81,7 +81,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
 
-        assertThat(result).isEmpty();
+        assertThat(result).isNull();
     }
 
     @Test
@@ -92,7 +92,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
 
-        assertThat(result).isEmpty();
+        assertThat(result).isNull();
     }
 
     @Test
@@ -100,7 +100,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(Collections.singleton(ROLE_NAME));
 
-        assertThat(result).isEmpty();
+        assertThat(result).isNull();
     }
 
     @Test
@@ -165,6 +165,21 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         Set<ResourceDefinition> result = service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
 
         assertThat(result).containsExactly(resource);
+    }
+
+    @Test
+    void whenRoleDoesNotHaveHighEnoughSecurityClassificationShouldReturnEmptySetResourceDefinitions() {
+        importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
+            .roleName(ROLE_NAME)
+            .serviceName(resource.getServiceName())
+            .resourceType(resource.getResourceType())
+            .resourceName(resource.getResourceName())
+            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, CREATE_PERMISSION, SecurityClassification.RESTRICTED))
+            .build());
+
+        Set<ResourceDefinition> result = service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
+
+        assertThat(result).isNull();
     }
 
     @Test

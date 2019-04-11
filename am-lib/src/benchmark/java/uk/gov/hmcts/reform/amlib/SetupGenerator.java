@@ -33,10 +33,6 @@ import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.utils.DataSourceFactory.createDataSource;
 
 public class SetupGenerator {
-    private SetupGenerator() {
-        throw new UnsupportedOperationException("Constructing utility class is not supported");
-    }
-
     private static final List<CaseDefinition> definitions = ImmutableList.of(
         new CaseDefinition(
             "fpl",
@@ -71,6 +67,10 @@ public class SetupGenerator {
                 .build()
         )
     );
+
+    private SetupGenerator() {
+        throw new UnsupportedOperationException("Constructing utility class is not supported");
+    }
 
     public static void main(String[] args) {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();

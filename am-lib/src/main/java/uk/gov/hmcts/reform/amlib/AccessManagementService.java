@@ -78,7 +78,8 @@ public class AccessManagementService {
      */
     @AuditLog("explicit access granted by '{{mdc:caller}}' to resource '{{accessGrant.resourceId}}' "
         + "defined as '{{accessGrant.serviceName}}|{{accessGrant.resourceType}}|{{accessGrant.resourceName}}' "
-        + "for accessors '{{accessGrant.accessorIds}}': {{accessGrant.attributePermissions}}")
+        + "for accessors '{{accessGrant.accessorIds}}' in relationship '{{accessGrant.relationship}}': "
+        + "{{accessGrant.attributePermissions}}")
     public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant accessGrant) {
         jdbi.useTransaction(handle -> {
             AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
@@ -111,7 +112,8 @@ public class AccessManagementService {
      */
     @AuditLog("explicit access revoked by '{{mdc:caller}}' to resource '{{accessMetadata.resourceId}}' "
         + "defined as '{{accessMetadata.serviceName}}|{{accessMetadata.resourceType}}|{{accessMetadata.resourceName}}' "
-        + "from accessor '{{accessMetadata.accessorId}}': {{accessMetadata.attribute}}")
+        + "from accessor '{{accessMetadata.accessorId}}' in relationship '{{accessMetadata.relationship}}': "
+        + "{{accessMetadata.attribute}}")
     public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata accessMetadata) {
         jdbi.useExtension(AccessManagementRepository.class,
             dao -> dao.removeAccessManagementRecord(accessMetadata));

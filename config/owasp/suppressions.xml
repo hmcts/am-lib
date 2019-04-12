@@ -6,18 +6,18 @@
     <cpe>cpe:/a:google:guava</cpe>
   </suppress>
   <suppress>
-    <notes><![CDATA[file name: groovy-xml-2.5.5.jar]]></notes>
-    <sha1>9de098bd721e65d54b11fbf44b28f47016a133fc</sha1>
+    <notes><![CDATA[file name: groovy-xml-2.5.6.jar]]></notes>
+    <sha1>f0bcdf0705ac84ba6209de9fea9608150d28a194</sha1>
     <cpe>cpe:/a:apache:groovy</cpe>
   </suppress>
   <suppress>
-    <notes><![CDATA[file name: groovy-json-2.5.5.jar]]></notes>
-    <sha1>03274bb68861c1ba9cf027ef54a592497555f365</sha1>
+    <notes><![CDATA[file name: groovy-json-2.5.6.jar]]></notes>
+    <sha1>c342f6a4f72765085819f949a300c616f33d75c2</sha1>
     <cpe>cpe:/a:apache:groovy</cpe>
   </suppress>
   <suppress>
-    <notes><![CDATA[file name: groovy-2.5.5.jar]]></notes>
-    <sha1>2388f952b369f6b11cde8e15ec872e9ca3e0ff3e</sha1>
+    <notes><![CDATA[file name: groovy-2.5.6.jar]]></notes>
+    <sha1>6936e700f0fb1b50bac0698ada4347a769d40199</sha1>
     <cpe>cpe:/a:apache:groovy</cpe>
   </suppress>
   <suppress>

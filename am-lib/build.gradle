@@ -6,8 +6,8 @@ plugins {
     id 'jacoco'
     id 'org.sonarqube' version '2.7'
     id 'com.jfrog.bintray' version '1.8.4'
-    id 'com.github.johnrengelman.shadow' version '4.0.4'
-    id "io.freefair.aspectj.post-compile-weaving" version "3.1.4"
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
+    id "io.freefair.aspectj.post-compile-weaving" version "3.2.0"
     id "io.morethan.jmhreport" version "0.9.0"
 }
 
@@ -30,13 +30,13 @@ test {
 }
 
 checkstyle {
-    toolVersion = '8.18'
+    toolVersion = '8.19'
     maxWarnings = 0
     configDir = new File("config/checkstyle")
 }
 
 pmd {
-    toolVersion = "6.12.0"
+    toolVersion = "6.13.0"
     sourceSets = [sourceSets.main, sourceSets.test]
     reportsDir = file("$buildDir/reports/pmd/$project.name")
     ruleSetFiles = files("$projectDir/config/pmd/ruleset.xml")
@@ -99,7 +99,7 @@ dependencies {
 
     benchmarkAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.21'
 
-    benchmarkImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.1'
+    benchmarkImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.2'
     benchmarkCompile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
     benchmarkCompile sourceSets.main.runtimeClasspath
     benchmarkCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'

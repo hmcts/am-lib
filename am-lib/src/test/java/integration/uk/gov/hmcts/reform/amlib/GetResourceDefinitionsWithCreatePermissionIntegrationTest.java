@@ -6,10 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
-import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
-import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
@@ -17,6 +15,11 @@ import java.util.Collections;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
+import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PRIVATE;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.RESTRICTED;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createPermissionsForAttribute;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
@@ -28,7 +31,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
-@SuppressWarnings({"LineLength", "PMD.TooManyMethods"})
+@SuppressWarnings("PMD.TooManyMethods")
 class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
@@ -38,9 +41,12 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @BeforeEach
     void setUp() {
-        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        importerService.addRole(OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        importerService.addResourceDefinition(otherResource.getServiceName(), otherResource.getResourceType(), otherResource.getResourceName());
+        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, PUBLIC, ROLE_BASED);
+        importerService.addRole(OTHER_ROLE_NAME, RoleType.RESOURCE, PUBLIC, ROLE_BASED);
+        importerService.addResourceDefinition(
+            otherResource.getServiceName(),
+            otherResource.getResourceType(),
+            otherResource.getResourceName());
     }
 
     @Test
@@ -146,55 +152,70 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @Test
     void whenMultipleRoleBasedAccessRecordsShouldOnlyReturnDefinitionsAllowedByRoleSecurityClassification() {
+        String rolePublic = "RoleWithOnlyPublic";
+
+        importerService.addRole(rolePublic, IDAM, PUBLIC, ROLE_BASED);
+
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
-            .roleName(ROLE_NAME)
+            .roleName(rolePublic)
             .serviceName(resource.getServiceName())
             .resourceType(resource.getResourceType())
             .resourceName(resource.getResourceName())
-            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, CREATE_PERMISSION, SecurityClassification.PUBLIC))
+            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, CREATE_PERMISSION, PUBLIC))
             .build());
 
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
-            .roleName(ROLE_NAME)
+            .roleName(rolePublic)
             .serviceName(otherResource.getServiceName())
             .resourceType(otherResource.getResourceType())
             .resourceName(otherResource.getResourceName())
-            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, CREATE_PERMISSION, SecurityClassification.PRIVATE))
+            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, CREATE_PERMISSION, PRIVATE))
             .build());
 
-        Set<ResourceDefinition> result = service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
+        Set<ResourceDefinition> result =
+            service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(rolePublic));
 
         assertThat(result).containsExactly(resource);
     }
 
     @Test
     void whenRoleDoesNotHaveHighEnoughSecurityClassificationShouldReturnNull() {
+        String rolePublic = "RoleWithOnlyPublic";
+
+        importerService.addRole(rolePublic, IDAM, PUBLIC, ROLE_BASED);
+
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
-            .roleName(ROLE_NAME)
+            .roleName(rolePublic)
             .serviceName(resource.getServiceName())
             .resourceType(resource.getResourceType())
             .resourceName(resource.getResourceName())
-            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, CREATE_PERMISSION, SecurityClassification.RESTRICTED))
+            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, CREATE_PERMISSION, RESTRICTED))
             .build());
 
-        Set<ResourceDefinition> result = service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
+        Set<ResourceDefinition> result =
+            service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(rolePublic));
 
         assertThat(result).isNull();
     }
 
     @Test
     void whenTwoRolesWithDifferentSecurityClassificationShouldUseTheHighestSecurityClassificationToFilter() {
-        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.RESTRICTED, AccessType.ROLE_BASED);
+        String rolePublic = "RoleWithOnlyPublic";
+        String rolePrivate = "RoleWithPrivate";
+
+        importerService.addRole(rolePublic, IDAM, PUBLIC, ROLE_BASED);
+        importerService.addRole(rolePrivate, IDAM, PRIVATE, ROLE_BASED);
 
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
-            .roleName(ROLE_NAME)
+            .roleName(rolePublic)
             .serviceName(resource.getServiceName())
             .resourceType(resource.getResourceType())
             .resourceName(resource.getResourceName())
-            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, CREATE_PERMISSION, SecurityClassification.PRIVATE))
+            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, CREATE_PERMISSION, PRIVATE))
             .build());
 
-        Set<ResourceDefinition> result = service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
+        Set<ResourceDefinition> result =
+            service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(rolePublic, rolePrivate));
 
         assertThat(result).containsExactly(resource);
     }

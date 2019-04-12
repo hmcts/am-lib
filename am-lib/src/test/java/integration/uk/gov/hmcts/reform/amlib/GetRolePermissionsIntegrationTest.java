@@ -36,11 +36,10 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
 
+    @SuppressWarnings("LineLength")
     @BeforeEach
     void setUp() {
-        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-        importerService.addRole(
-            OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        importerService.addRole(OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
 
         Map.Entry<Set<Permission>, SecurityClassification> readPermission =
             new Pair<>(READ_PERMISSION, SecurityClassification.PUBLIC);
@@ -84,8 +83,8 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @Test
     void returnListOfPermissionsForRoleName() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(buildResource(SERVICE_NAME,
-            RESOURCE_TYPE, RESOURCE_NAME), ROLE_NAMES);
+        Map<JsonPointer, Set<Permission>> accessRecord =
+            service.getRolePermissions(buildResource(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME), ROLE_NAMES);
 
         assertThat(accessRecord)
             .hasSize(3)

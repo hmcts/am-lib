@@ -14,5 +14,5 @@ public final class Role {
     private final String roleName;
     private final RoleType roleType;
     private final SecurityClassification securityClassification;
-    private final AccessType accessManagementType;
+    private final AccessType accessType;
 }

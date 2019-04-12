@@ -24,6 +24,7 @@ import java.util.stream.IntStream;
 import javax.sql.DataSource;
 
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
@@ -108,9 +109,10 @@ public class SetupGenerator {
                     .resourceName(definition.resourceName)
                     .resourceId(definition.serviceName + "-resource-" + number)
                     .accessorIds(ImmutableSet.of("user-" + number))
-                    .accessType("USER")
+                    .accessorType(USER)
                     .attributePermissions(definition.attributePermissions)
                     .securityClassification(PUBLIC)
+                    .relationship("caseworker")
                     .build()
             ));
         }

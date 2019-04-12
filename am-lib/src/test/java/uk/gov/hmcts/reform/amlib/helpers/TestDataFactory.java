@@ -14,10 +14,11 @@ import java.util.Map;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_TYPE;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
@@ -33,36 +34,44 @@ public final class TestDataFactory {
     }
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
-                                                                  String accessorId,
+                                                                  String accessorIds,
                                                                   Set<Permission> permissions) {
-        return createGrant(resourceId, ImmutableSet.of(accessorId),
-            createPermissionsForWholeDocument(permissions));
+        return createGrant(resourceId, accessorIds, createPermissionsForWholeDocument(permissions));
     }
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
-                                                                  Set<String> accessorId,
+                                                                  Set<String> accessorIds,
                                                                   Set<Permission> permissions) {
-        return createGrant(resourceId, accessorId, createPermissionsForWholeDocument(permissions));
+        return createGrant(resourceId, accessorIds, ROLE_NAME, createPermissionsForWholeDocument(permissions));
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
-                                                  String accessorId,
+                                                  String accessorIds,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
-        return createGrant(resourceId, ImmutableSet.of(accessorId), attributePermissions);
+        return createGrant(resourceId, ImmutableSet.of(accessorIds), ROLE_NAME, attributePermissions);
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
-                                                  Set<String> accessorId,
+                                                  String accessorIds,
+                                                  String relationship,
+                                                  Map<JsonPointer, Set<Permission>> attributePermissions) {
+        return createGrant(resourceId, ImmutableSet.of(accessorIds), relationship, attributePermissions);
+    }
+
+    public static ExplicitAccessGrant createGrant(String resourceId,
+                                                  Set<String> accessorIds,
+                                                  String relationship,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
-            .accessorIds(accessorId)
-            .accessType(ACCESS_TYPE)
+            .accessorIds(accessorIds)
+            .accessorType(ACCESSOR_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attributePermissions(attributePermissions)
             .securityClassification(SECURITY_CLASSIFICATION)
+            .relationship(relationship)
             .build();
     }
 
@@ -79,7 +88,7 @@ public final class TestDataFactory {
         return ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
             .accessorId(ACCESSOR_ID)
-            .accessType(ACCESS_TYPE)
+            .accessorType(ACCESSOR_TYPE)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)

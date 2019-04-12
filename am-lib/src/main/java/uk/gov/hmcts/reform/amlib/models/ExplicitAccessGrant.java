@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.amlib.models;
 import com.fasterxml.jackson.core.JsonPointer;
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
@@ -19,8 +20,8 @@ public final class ExplicitAccessGrant {
     private final String resourceId;
     @NotEmpty
     private final Set<@NotBlank String> accessorIds;
-    @NotBlank
-    private final String accessType;
+    @NotNull
+    private final AccessorType accessorType;
     @NotBlank
     private final String serviceName;
     @NotBlank
@@ -31,4 +32,6 @@ public final class ExplicitAccessGrant {
     private final Map<@NotNull JsonPointer, @NotEmpty Set<@NotNull Permission>> attributePermissions;
     @NotNull
     private final SecurityClassification securityClassification;
+    @NotBlank
+    private final String relationship;
 }

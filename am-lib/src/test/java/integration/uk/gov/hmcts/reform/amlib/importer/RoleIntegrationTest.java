@@ -30,7 +30,7 @@ class RoleIntegrationTest extends IntegrationBaseTest {
         assertThat(role).isNotNull();
         assertThat(role.getRoleType()).isEqualTo(RoleType.RESOURCE);
         assertThat(role.getSecurityClassification()).isEqualTo(SecurityClassification.PRIVATE);
-        assertThat(role.getAccessManagementType()).isEqualTo(AccessType.EXPLICIT);
+        assertThat(role.getAccessType()).isEqualTo(AccessType.EXPLICIT);
     }
 
     @Test

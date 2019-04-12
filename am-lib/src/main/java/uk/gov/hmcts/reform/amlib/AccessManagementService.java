@@ -34,6 +34,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+
 public class AccessManagementService {
 
     private final FilterService filterService = new FilterService();
@@ -74,7 +78,8 @@ public class AccessManagementService {
      */
     @AuditLog("explicit access granted by '{{mdc:caller}}' to resource '{{accessGrant.resourceId}}' "
         + "defined as '{{accessGrant.serviceName}}|{{accessGrant.resourceType}}|{{accessGrant.resourceName}}' "
-        + "for accessors '{{accessGrant.accessorIds}}': {{accessGrant.attributePermissions}}")
+        + "for accessors '{{accessGrant.accessorIds}}' with relationship '{{accessGrant.relationship}}': "
+        + "{{accessGrant.attributePermissions}}")
     public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant accessGrant) {
         jdbi.useTransaction(handle -> {
             AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
@@ -84,12 +89,13 @@ public class AccessManagementService {
                         .resourceId(accessGrant.getResourceId())
                         .accessorId(accessorIds)
                         .permissions(attributePermission.getValue())
-                        .accessType(accessGrant.getAccessType())
+                        .accessorType(accessGrant.getAccessorType())
                         .serviceName(accessGrant.getServiceName())
                         .resourceType(accessGrant.getResourceType())
                         .resourceName(accessGrant.getResourceName())
                         .attribute(attributePermission.getKey())
                         .securityClassification(accessGrant.getSecurityClassification())
+                        .relationship(accessGrant.getRelationship())
                         .build())
                     .forEach(dao::createAccessManagementRecord));
         });
@@ -128,7 +134,7 @@ public class AccessManagementService {
                                                          @NotNull List<@NotNull @Valid Resource> resources) {
         return resources.stream()
             .map(resource -> filterResource(userId, userRoles, resource))
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 
     /**
@@ -144,7 +150,8 @@ public class AccessManagementService {
      */
     @AuditLog("filtered access to resource '{{resource.id}}' defined as '{{resource.definition.serviceName}}|"
         + "{{resource.definition.resourceType}}|{{resource.definition.resourceName}}' for accessor '{{userId}}' "
-        + "in roles '{{userRoles}}': {{result.access.accessManagementType}} access with {{result.access.permissions}}")
+        + "in roles '{{userRoles}}': {{result.access.accessType}} access with relationships {{result.relationships}} "
+        + "and permissions {{result.access.permissions}}")
     public FilteredResourceEnvelope filterResource(@NotBlank String userId,
                                                    @NotEmpty Set<@NotBlank String> userRoles,
                                                    @NotNull @Valid Resource resource) {
@@ -170,11 +177,22 @@ public class AccessManagementService {
             accessType = AccessType.ROLE_BASED;
 
         } else {
-            attributePermissions = explicitAccess.stream().collect(getMapCollector());
+            List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccess.stream()
+                .collect(collectingAndThen(groupingBy(ExplicitAccessRecord::getRelationship), Map::values))
+                .stream()
+                .map(explicitAccessRecords -> explicitAccessRecords.stream()
+                    .collect(getMapCollector()))
+                .collect(toList());
+
+            attributePermissions = permissionsService.merge(permissionsForRelationships);
             accessType = AccessType.EXPLICIT;
         }
 
         JsonNode filteredJson = filterService.filterJson(resource.getData(), attributePermissions);
+
+        Set<String> relationships = explicitAccess.stream()
+            .map(ExplicitAccessRecord::getRelationship)
+            .collect(Collectors.toSet());
 
         return FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
@@ -184,8 +202,9 @@ public class AccessManagementService {
                 .build())
             .access(AccessEnvelope.builder()
                 .permissions(attributePermissions)
-                .accessManagementType(accessType)
+                .accessType(accessType)
                 .build())
+            .relationships(relationships)
             .build();
     }
 
@@ -202,7 +221,7 @@ public class AccessManagementService {
      * Retrieves a list of {@link RoleBasedAccessRecord } and returns attribute and permissions values.
      *
      * @param resourceDefinition {@link ResourceDefinition} a unique service name, resource type and resource name
-     * @param userRoles           set of user roles
+     * @param userRoles          set of user roles
      * @return a map of attributes and their corresponding permissions or null
      * @throws PersistenceException if any persistence errors were encountered
      */
@@ -223,7 +242,7 @@ public class AccessManagementService {
                 .map(role -> dao.getRolePermissions(resourceDefinition, role))
                 .map(roleBasedAccessRecords -> roleBasedAccessRecords.stream()
                     .collect(getMapCollector()))
-                .collect(Collectors.toList()));
+                .collect(toList()));
 
         if (permissionsForRoles.stream().allMatch(Map::isEmpty)) {
             return null;

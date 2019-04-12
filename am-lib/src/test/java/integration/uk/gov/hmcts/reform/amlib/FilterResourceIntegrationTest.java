@@ -1,6 +1,7 @@
 package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -21,9 +22,12 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createPermissionsForAttribute;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_MANAGEMENT_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
@@ -34,21 +38,24 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
 
-@SuppressWarnings("PMD.ExcessiveImports")
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private String resourceId;
+    private static final String PARENT_ATTRIBUTE = "/parent";
+    private static final String CHILD_ATTRIBUTE = "/parent/child";
 
     @BeforeEach
     void setUp() {
         resourceId = UUID.randomUUID().toString();
-        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
     }
 
     @Test
@@ -65,8 +72,9 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .build())
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(JsonPointer.valueOf(""), READ_PERMISSION))
-                .accessManagementType(AccessType.EXPLICIT)
+                .accessType(AccessType.EXPLICIT)
                 .build())
+            .relationships(ROLE_NAMES)
             .build());
     }
 
@@ -84,8 +92,9 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .build())
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(JsonPointer.valueOf(""), CREATE_PERMISSION))
-                .accessManagementType(AccessType.EXPLICIT)
+                .accessType(AccessType.EXPLICIT)
                 .build())
+            .relationships(ROLE_NAMES)
             .build());
     }
 
@@ -114,17 +123,18 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .build())
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(ROOT_ATTRIBUTE, READ_PERMISSION))
-                .accessManagementType(AccessType.ROLE_BASED)
+                .accessType(AccessType.ROLE_BASED)
                 .build())
+            .relationships(ImmutableSet.of())
             .build());
     }
 
     @Test
     void whenNoExplicitAccessAndRoleHasExplicitAccessTypeShouldReturnNull() {
-        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.EXPLICIT);
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
+        importerService.addRole(OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.EXPLICIT);
 
-        FilteredResourceEnvelope result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
+        FilteredResourceEnvelope result = service.filterResource(ACCESSOR_ID, ImmutableSet.of(OTHER_ROLE_NAME),
+            createResource(resourceId));
 
         assertThat(result).isNull();
     }
@@ -152,13 +162,14 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .build())
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(ROOT_ATTRIBUTE, READ_PERMISSION))
-                .accessManagementType(AccessType.ROLE_BASED)
+                .accessType(AccessType.ROLE_BASED)
                 .build())
+            .relationships(ImmutableSet.of())
             .build());
     }
 
     @Test
-    void whenListOfResourcesShouldReturnListFilterResourceResponse() {
+    void whenListOfResourcesShouldReturnListFilteredResourceEnvelope() {
         importerService.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
 
@@ -177,8 +188,9 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                     .build())
                 .access(AccessEnvelope.builder()
                     .permissions(createPermissions("", READ_PERMISSION))
-                    .accessManagementType(AccessType.ROLE_BASED)
+                    .accessType(AccessType.ROLE_BASED)
                     .build())
+                .relationships(ImmutableSet.of())
                 .build(),
             FilteredResourceEnvelope.builder()
                 .resource(Resource.builder()
@@ -188,11 +200,11 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                     .build())
                 .access(AccessEnvelope.builder()
                     .permissions(createPermissions("", READ_PERMISSION))
-                    .accessManagementType(AccessType.ROLE_BASED)
+                    .accessType(AccessType.ROLE_BASED)
                     .build())
+                .relationships(ImmutableSet.of())
                 .build()
         );
-
         assertThat(result).isEqualTo(expectedResult);
     }
 
@@ -215,8 +227,9 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                     .build())
                 .access(AccessEnvelope.builder()
                     .permissions(createPermissions("", CREATE_PERMISSION))
-                    .accessManagementType(AccessType.ROLE_BASED)
+                    .accessType(AccessType.ROLE_BASED)
                     .build())
+                .relationships(ImmutableSet.of())
                 .build(),
             FilteredResourceEnvelope.builder()
                 .resource(Resource.builder()
@@ -226,11 +239,11 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                     .build())
                 .access(AccessEnvelope.builder()
                     .permissions(createPermissions("", CREATE_PERMISSION))
-                    .accessManagementType(AccessType.ROLE_BASED)
+                    .accessType(AccessType.ROLE_BASED)
                     .build())
+                .relationships(ImmutableSet.of())
                 .build()
         );
-
         assertThat(result).isEqualTo(expectedResult);
     }
 
@@ -241,5 +254,82 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         List<FilteredResourceEnvelope> result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, resources);
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void whenExplicitAccessWithDifferentRelationshipSameAttributeAndDifferentPermissionsShouldMergePermissions() {
+        importerService.addRole(OTHER_ROLE_NAME, RoleType.IDAM, SECURITY_CLASSIFICATION, ACCESS_MANAGEMENT_TYPE);
+
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, ROLE_NAME,
+            createPermissions(PARENT_ATTRIBUTE, READ_PERMISSION)));
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, OTHER_ROLE_NAME,
+            createPermissions(PARENT_ATTRIBUTE, CREATE_PERMISSION)));
+
+        FilteredResourceEnvelope result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
+
+        assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(RESOURCE_DEFINITION)
+                .data(JsonNodeFactory.instance.objectNode())
+                .build())
+            .access(AccessEnvelope.builder()
+                .permissions(ImmutableMap.of(
+                    JsonPointer.valueOf(PARENT_ATTRIBUTE), ImmutableSet.of(CREATE, READ)))
+                .accessType(AccessType.EXPLICIT)
+                .build())
+            .relationships(ImmutableSet.of(OTHER_ROLE_NAME, ROLE_NAME))
+            .build());
+    }
+
+    @Test
+    void whenExplicitAccessWithSameRelationshipParentChildAttributesWithDiffPermissionsShouldNotMergePermissions() {
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, ROLE_NAME,
+            createPermissions(PARENT_ATTRIBUTE, READ_PERMISSION)));
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, ROLE_NAME,
+            createPermissions(CHILD_ATTRIBUTE, CREATE_PERMISSION)));
+
+        FilteredResourceEnvelope result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
+
+        assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(RESOURCE_DEFINITION)
+                .data(JsonNodeFactory.instance.objectNode())
+                .build())
+            .access(AccessEnvelope.builder()
+                .permissions(ImmutableMap.of(
+                    JsonPointer.valueOf(PARENT_ATTRIBUTE), ImmutableSet.of(READ),
+                    JsonPointer.valueOf(CHILD_ATTRIBUTE), ImmutableSet.of(CREATE)))
+                .accessType(AccessType.EXPLICIT)
+                .build())
+            .relationships(ImmutableSet.of(ROLE_NAME))
+            .build());
+    }
+
+    @Test
+    void whenExplicitAccessWithDifferentRelationshipParentChildAttributeDiffPermissionsShouldMergePermissions() {
+        importerService.addRole(OTHER_ROLE_NAME, RoleType.IDAM, SECURITY_CLASSIFICATION, ACCESS_MANAGEMENT_TYPE);
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, ROLE_NAME,
+            createPermissions(PARENT_ATTRIBUTE, READ_PERMISSION)));
+        service.grantExplicitResourceAccess(createGrant(resourceId, ACCESSOR_ID, OTHER_ROLE_NAME,
+            createPermissions(CHILD_ATTRIBUTE, CREATE_PERMISSION)));
+
+        FilteredResourceEnvelope result = service.filterResource(ACCESSOR_ID, ROLE_NAMES, createResource(resourceId));
+
+        assertThat(result).isEqualToComparingFieldByField(FilteredResourceEnvelope.builder()
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(RESOURCE_DEFINITION)
+                .data(JsonNodeFactory.instance.objectNode())
+                .build())
+            .access(AccessEnvelope.builder()
+                .permissions(ImmutableMap.of(
+                    JsonPointer.valueOf(PARENT_ATTRIBUTE), ImmutableSet.of(READ),
+                    JsonPointer.valueOf(CHILD_ATTRIBUTE), ImmutableSet.of(CREATE, READ)))
+                .accessType(AccessType.EXPLICIT)
+                .build())
+            .relationships(ImmutableSet.of(OTHER_ROLE_NAME, ROLE_NAME))
+            .build());
     }
 }

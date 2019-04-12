@@ -78,7 +78,7 @@ public class AccessManagementService {
      */
     @AuditLog("explicit access granted by '{{mdc:caller}}' to resource '{{accessGrant.resourceId}}' "
         + "defined as '{{accessGrant.serviceName}}|{{accessGrant.resourceType}}|{{accessGrant.resourceName}}' "
-        + "for accessors '{{accessGrant.accessorIds}}' in relationship '{{accessGrant.relationship}}': "
+        + "for accessors '{{accessGrant.accessorIds}}' with relationship '{{accessGrant.relationship}}': "
         + "{{accessGrant.attributePermissions}}")
     public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant accessGrant) {
         jdbi.useTransaction(handle -> {

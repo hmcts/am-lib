@@ -146,7 +146,6 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .resourceName(RESOURCE_NAME)
             .attribute(JsonPointer.valueOf(attribute))
             .securityClassification(SECURITY_CLASSIFICATION)
-            .relationship(ROLE_NAME)
             .build());
     }
 }

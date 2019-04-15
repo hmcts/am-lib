@@ -69,7 +69,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessType\": \"user\",\n    \"serviceName\": \"cmc\",\n    \"resourceType\": \"case\",\n    \"resourceName\": \"claim\",\n    \"attributePermissions\": {\n    \t\"/test2\": [\"CREATE\", \"READ\"]\n    },\n    \"securityClassification\": \"PUBLIC\"\n}"
+          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessorType\": \"USER\",\n    \"serviceName\": \"cmc\",\n    \"resourceType\": \"case\",\n    \"resourceName\": \"claim\",\n    \"attributePermissions\": {\n    \t\"/test2\": [\"CREATE\", \"READ\"]\n    },\n    \"relationship\": \"caseworker\",\n    \"securityClassification\": \"PUBLIC\"\n}"
         },
         "url": {
           "raw": "localhost:3703/lib/create-resource-access",
@@ -101,7 +101,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessType\": \"user\",\n    \"serviceName\": \"cmc\",\n    \"resourceType\": \"case\",\n    \"resourceName\": \"claim\",\n    \"attributePermissions\": {\n    \t\"/test\": [\"CREATE\"],\n    \t\"/test2\": [\"CREATE\", \"READ\"],\n    \t\"/test3\": [\"CREATE\", \"UPDATE\"]\n    },\n    \"securityClassification\": \"PUBLIC\"\n}"
+          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessorType\": \"USER\",\n    \"serviceName\": \"cmc\",\n    \"resourceType\": \"case\",\n    \"resourceName\": \"claim\",\n    \"attributePermissions\": {\n    \t\"/test\": [\"CREATE\"],\n    \t\"/test2\": [\"CREATE\", \"READ\"],\n    \t\"/test3\": [\"CREATE\", \"UPDATE\"]\n    },\n    \"relationship\" : \"caseworker\",\n    \"securityClassification\": \"PUBLIC\"\n}"
         },
         "url": {
           "raw": "localhost:3703/lib/create-resource-access",
@@ -133,7 +133,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorId\": \"UNIQUE-USER-ID\",\n    \"accessType\": \"user\",\n    \"serviceName\": \"cmc\",\n    \"resourceType\": \"case\",\n    \"resourceName\": \"claim\",\n    \"attribute\": \"\",\n    \"securityClassification\": \"PUBLIC\"\n}"
+          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorId\": \"UNIQUE-USER-ID\",\n    \"accessorType\": \"USER\",\n    \"serviceName\": \"cmc\",\n    \"resourceType\": \"case\",\n    \"resourceName\": \"claim\",\n    \"attribute\": \"\",\n    \"relationship\": \"caseworker\",\n    \"securityClassification\": \"PUBLIC\"\n}"
         },
         "url": {
           "raw": "localhost:3703/lib/revoke-resource-access",

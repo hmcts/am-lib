@@ -4,6 +4,8 @@ services:
   am-lib-testing-service-db:
     container_name: am-lib-testing-service-db
     build: ./docker/am-lib-testing-service-db
+    tmpfs:
+      - /var/lib/postgresql/data
     networks:
       - am-lib-testing-service-network
     ports:

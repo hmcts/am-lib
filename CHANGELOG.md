@@ -1,3 +1,15 @@
+# [0.5.0](https://github.com/hmcts/am-lib/compare/0.4.0...0.5.0) (2019-04-12)
+
+
+### Features
+
+* allow resource filtering for users with more than one role (AM-168) ([#102](https://github.com/hmcts/am-lib/issues/102)) ([2273ee6](https://github.com/hmcts/am-lib/commit/2273ee6))
+* remove method that retrives list of accessors ([#114](https://github.com/hmcts/am-lib/issues/114)) ([d04d107](https://github.com/hmcts/am-lib/commit/d04d107))
+* merge permissions in method that gets permissions for user roles (AM-60) ([#91](https://github.com/hmcts/am-lib/issues/91)) ([c4ae5d8](https://github.com/hmcts/am-lib/commit/c4ae5d8))
+* add auditing of caller to grant / revoke methods (AM-213) ([#109](https://github.com/hmcts/am-lib/issues/109)) ([16556e8](https://github.com/hmcts/am-lib/commit/16556e8))
+
+
+
 # [0.4.0](https://github.com/hmcts/am-lib/compare/0.3.0...0.4.0) (2019-03-26)
 
 

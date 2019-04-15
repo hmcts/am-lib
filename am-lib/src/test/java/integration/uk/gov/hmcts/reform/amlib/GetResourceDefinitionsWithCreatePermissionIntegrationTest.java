@@ -7,7 +7,6 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
@@ -16,6 +15,8 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
@@ -41,8 +42,6 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @BeforeEach
     void setUp() {
-        importerService.addRole(ROLE_NAME, RoleType.RESOURCE, PUBLIC, ROLE_BASED);
-        importerService.addRole(OTHER_ROLE_NAME, RoleType.RESOURCE, PUBLIC, ROLE_BASED);
         importerService.addResourceDefinition(
             otherResource.getServiceName(),
             otherResource.getResourceType(),
@@ -65,7 +64,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @Test
     void shouldRetrieveResourceDefinitionWhenRecordExistsWithMultiplePermissions() {
-        Set<Permission> permissions = ImmutableSet.of(Permission.READ, Permission.CREATE);
+        Set<Permission> permissions = ImmutableSet.of(READ, CREATE);
 
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, permissions));
 
@@ -119,7 +118,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
 
-        assertThat(result).containsExactly(otherResource, resource);
+        assertThat(result).containsExactly(resource, otherResource);
     }
 
     @Test
@@ -133,7 +132,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
         Set<ResourceDefinition> result = service.getResourceDefinitionsWithRootCreatePermission(userRoles);
 
-        assertThat(result).containsExactly(otherResource, resource);
+        assertThat(result).containsExactly(resource, otherResource);
     }
 
     @Test

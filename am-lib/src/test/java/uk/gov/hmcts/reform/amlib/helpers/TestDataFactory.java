@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
@@ -13,12 +12,12 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import java.util.Map;
 import java.util.Set;
 
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_TYPE;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 public final class TestDataFactory {
@@ -28,41 +27,44 @@ public final class TestDataFactory {
     }
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
+                                                                  String accessorIds,
                                                                   Set<Permission> permissions) {
-        return createGrantForWholeDocument(resourceId, ACCESSOR_ID, permissions);
+        return createGrant(resourceId, accessorIds, createPermissionsForWholeDocument(permissions));
     }
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
-                                                                  String accessorId,
+                                                                  Set<String> accessorIds,
                                                                   Set<Permission> permissions) {
-        return createGrant(resourceId, ImmutableSet.of(accessorId),
-            createPermissionsForWholeDocument(permissions));
-    }
-
-    public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
-                                                                  Set<String> accessorId,
-                                                                  Set<Permission> permissions) {
-        return createGrant(resourceId, accessorId, createPermissionsForWholeDocument(permissions));
+        return createGrant(resourceId, accessorIds, ROLE_NAME, createPermissionsForWholeDocument(permissions));
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
-                                                  String accessorId,
+                                                  String accessorIds,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
-        return createGrant(resourceId, ImmutableSet.of(accessorId), attributePermissions);
+        return createGrant(resourceId, ImmutableSet.of(accessorIds), ROLE_NAME, attributePermissions);
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
-                                                  Set<String> accessorId,
+                                                  String accessorIds,
+                                                  String relationship,
+                                                  Map<JsonPointer, Set<Permission>> attributePermissions) {
+        return createGrant(resourceId, ImmutableSet.of(accessorIds), relationship, attributePermissions);
+    }
+
+    public static ExplicitAccessGrant createGrant(String resourceId,
+                                                  Set<String> accessorIds,
+                                                  String relationship,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
-            .accessorIds(accessorId)
-            .accessType(ACCESS_TYPE)
+            .accessorIds(accessorIds)
+            .accessorType(USER)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attributePermissions(attributePermissions)
-            .securityClassification(SECURITY_CLASSIFICATION)
+            .securityClassification(PUBLIC)
+            .relationship(relationship)
             .build();
     }
 
@@ -75,16 +77,16 @@ public final class TestDataFactory {
         return ImmutableMap.of(JsonPointer.valueOf(attribute), permissions);
     }
 
-    public static ExplicitAccessMetadata createMetadata(String resourceId) {
+    public static ExplicitAccessMetadata createMetadata(String resourceId, String accessorId) {
         return ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
-            .accessorId(ACCESSOR_ID)
-            .accessType(ACCESS_TYPE)
+            .accessorId(accessorId)
+            .accessorType(USER)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attribute(JsonPointer.valueOf(""))
-            .securityClassification(SecurityClassification.PUBLIC)
+            .securityClassification(PUBLIC)
             .build();
     }
 

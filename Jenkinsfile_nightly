@@ -15,10 +15,51 @@ def type = "java"
 def product = "am"
 def component = "lib-test"
 
+List<Map<String, Object>> secrets = [
+  secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
+  secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
+  secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
+  secret('am-lib-test-POSTGRES-USER', 'DATABASE_USERNAME'),
+  secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASSWORD')
+]
+
+static Map<String, Object> secret(String secretName, String envVariable) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    envVariable: envVariable
+  ]
+}
+
 withNightlyPipeline(type, product, component) {
-  env.TEST_URL = params.URL_TO_TEST
+  setVaultName('am-lib-test')
+  loadVaultSecrets(secrets)
 
   enableMutationTest()
   enablePerformanceTest()
   enableSlackNotifications('#am-master-builds')
+
+  env.TEST_URL = params.URL_TO_TEST
+
+  after('checkout') {
+    sh 'curl -L https://github.com/git-lfs/git-lfs/releases/download/v2.7.1/git-lfs-linux-amd64-v2.7.1.tar.gz | tar xz -C ./bin git-lfs'
+    sh 'PATH=$PATH:./bin git lfs install && PATH=$PATH:./bin git lfs pull'
+  }
+
+  before('PerformanceTest') {
+    sh "echo 'Benchmark is about to start'"
+    sh "./gradlew benchmark --info --rerun-tasks && ./gradlew jmhReport --info --rerun-tasks"
+  }
+
+  after('PerformanceTest') {
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'am-lib/build/reports/jmh/result.json'
+    publishHTML([
+      reportDir: 'am-lib/build/reports/jmh',
+      reportFiles: 'index.html',
+      reportName: 'JMH Benchmark',
+      allowMissing: true,
+      alwaysLinkToLastBuild: true,
+      keepAll: true
+    ])
+  }
 }

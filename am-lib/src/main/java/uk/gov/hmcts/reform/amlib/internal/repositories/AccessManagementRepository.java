@@ -7,6 +7,7 @@ import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
 import uk.gov.hmcts.reform.amlib.internal.models.Role;
@@ -51,11 +52,11 @@ public interface AccessManagementRepository {
 
     @SqlQuery("select * from roles where role_name in (<userRoles>) and access_type = cast(:accessType as access_type)")
     @RegisterConstructorMapper(Role.class)
-    Set<Role> getRoles(@BindList("userRoles") Set<String> userRoles, AccessType accessType);
+    Set<Role> getRoles(@BindList Set<String> userRoles, AccessType accessType);
 
     @SqlQuery("select distinct default_perms.service_name, default_perms.resource_type, default_perms.resource_name, default_perms.attribute, resource.default_security_classification from default_permissions_for_roles default_perms"
         + " join resource_attributes as resource on default_perms.service_name = resource.service_name and default_perms.resource_type = resource.resource_type and default_perms.resource_name = resource.resource_name"
-        + " where default_perms.role_name in (<userRoles>) and default_perms.permissions & 1 = 1 and default_perms.attribute = ''")
+        + " where default_perms.role_name in (<userRoles>) and default_perms.permissions & 1 = 1 and default_perms.attribute = '' and cast(resource.default_security_classification as text) in (<securityClassifications>)")
     @RegisterConstructorMapper(ResourceAttribute.class)
-    Set<ResourceAttribute> getResourceAttributesWithRootCreatePermission(@BindList("userRoles") Set<String> userRoles);
+    Set<ResourceAttribute> getResourceAttributesWithRootCreatePermission(@BindList Set<String> userRoles, @BindList Set<SecurityClassification> securityClassifications);
 }

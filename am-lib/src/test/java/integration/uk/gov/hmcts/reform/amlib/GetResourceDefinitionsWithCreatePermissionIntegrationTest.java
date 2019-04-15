@@ -86,7 +86,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
 
-        assertThat(result).isNull();
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -96,7 +96,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
 
-        assertThat(result).isNull();
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -104,7 +104,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(Collections.singleton(ROLE_NAME));
 
-        assertThat(result).isNull();
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -168,7 +168,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(rolePublic));
 
-        assertThat(result).isNull();
+        assertThat(result).isEmpty();
     }
 
     @Test

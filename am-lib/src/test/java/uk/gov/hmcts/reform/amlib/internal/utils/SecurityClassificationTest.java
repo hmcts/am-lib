@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.RESTRICTED;
 
+@SuppressWarnings("PMD.UnusedPrivateMethod")
 class SecurityClassificationTest {
 
     @ParameterizedTest

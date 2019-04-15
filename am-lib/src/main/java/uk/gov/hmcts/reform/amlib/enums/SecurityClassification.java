@@ -15,4 +15,8 @@ public enum SecurityClassification {
     public int getHierarchy() {
         return hierarchy;
     }
+
+    public boolean isVisible(int maxHierarchy) {
+        return maxHierarchy >= this.getHierarchy();
+    }
 }

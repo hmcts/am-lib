@@ -7,6 +7,7 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
@@ -25,7 +26,6 @@ import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.crea
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createPermissionsForAttribute;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
@@ -91,8 +91,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @Test
     void shouldReturnNullWhenRecordExistsButNoCreatePermission() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            "", READ_PERMISSION, resource, ROLE_NAME));
+        grantRootPermission(ROLE_NAME, resource, READ, PUBLIC);
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
@@ -110,10 +109,8 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @Test
     void shouldRetrieveMultipleResourceDefinitionsWhenMultipleRecordExistsForTheSameRole() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            "", CREATE_PERMISSION, resource, ROLE_NAME));
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            "", CREATE_PERMISSION, otherResource, ROLE_NAME));
+        grantRootPermission(ROLE_NAME, resource, CREATE, PUBLIC);
+        grantRootPermission(ROLE_NAME, otherResource, CREATE, PUBLIC);
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
@@ -123,10 +120,8 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @Test
     void shouldRetrieveMultipleResourceDefinitionsWhenDefaultPermissionsExistForDifferentRoles() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            "", CREATE_PERMISSION, resource, ROLE_NAME));
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            "", CREATE_PERMISSION, otherResource, OTHER_ROLE_NAME));
+        grantRootPermission(ROLE_NAME, resource, CREATE, PUBLIC);
+        grantRootPermission(OTHER_ROLE_NAME, otherResource, CREATE, PUBLIC);
 
         Set<String> userRoles = ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME);
 
@@ -137,10 +132,8 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @Test
     void shouldRetrieveOnlyOneResourceDefinitionWhenUserHasAccessWithTwoRoles() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            "", CREATE_PERMISSION, resource, ROLE_NAME));
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            "", CREATE_PERMISSION, resource, OTHER_ROLE_NAME));
+        grantRootPermission(ROLE_NAME, resource, CREATE, PUBLIC);
+        grantRootPermission(OTHER_ROLE_NAME, resource, CREATE, PUBLIC);
 
         Set<String> userRoles = ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME);
 
@@ -155,21 +148,8 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
         importerService.addRole(rolePublic, IDAM, PUBLIC, ROLE_BASED);
 
-        importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
-            .roleName(rolePublic)
-            .serviceName(resource.getServiceName())
-            .resourceType(resource.getResourceType())
-            .resourceName(resource.getResourceName())
-            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, CREATE_PERMISSION, PUBLIC))
-            .build());
-
-        importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
-            .roleName(rolePublic)
-            .serviceName(otherResource.getServiceName())
-            .resourceType(otherResource.getResourceType())
-            .resourceName(otherResource.getResourceName())
-            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, CREATE_PERMISSION, PRIVATE))
-            .build());
+        grantRootPermission(rolePublic, resource, CREATE, PUBLIC);
+        grantRootPermission(rolePublic, otherResource, CREATE, PRIVATE);
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(rolePublic));
@@ -183,13 +163,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
         importerService.addRole(rolePublic, IDAM, PUBLIC, ROLE_BASED);
 
-        importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
-            .roleName(rolePublic)
-            .serviceName(resource.getServiceName())
-            .resourceType(resource.getResourceType())
-            .resourceName(resource.getResourceName())
-            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, CREATE_PERMISSION, RESTRICTED))
-            .build());
+        grantRootPermission(rolePublic, resource, CREATE, RESTRICTED);
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(rolePublic));
@@ -205,13 +179,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         importerService.addRole(rolePublic, IDAM, PUBLIC, ROLE_BASED);
         importerService.addRole(rolePrivate, IDAM, PRIVATE, ROLE_BASED);
 
-        importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
-            .roleName(rolePublic)
-            .serviceName(resource.getServiceName())
-            .resourceType(resource.getResourceType())
-            .resourceName(resource.getResourceName())
-            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, CREATE_PERMISSION, PRIVATE))
-            .build());
+        grantRootPermission(rolePublic, resource, CREATE, PRIVATE);
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(rolePublic, rolePrivate));
@@ -225,5 +193,16 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
             .resourceType(RESOURCE_TYPE)
             .resourceName(resourceName)
             .build();
+    }
+
+    @SuppressWarnings("LineLength")
+    private void grantRootPermission(String roleName, ResourceDefinition resourceDefinition, Permission permission, SecurityClassification securityClassification) {
+        importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
+            .roleName(roleName)
+            .serviceName(resourceDefinition.getServiceName())
+            .resourceType(resourceDefinition.getResourceType())
+            .resourceName(resourceDefinition.getResourceName())
+            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, ImmutableSet.of(permission), securityClassification))
+            .build());
     }
 }

@@ -15,7 +15,6 @@ import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 @SuppressWarnings("LineLength")
@@ -32,23 +31,11 @@ public final class DefaultRoleSetupDataFactory {
     }
 
     public static DefaultPermissionGrant createDefaultPermissionGrant(Set<Permission> permissions) {
-        return DefaultPermissionGrant.builder()
-            .roleName(ROLE_NAME)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, permissions, PUBLIC))
-            .build();
+        return createDefaultPermissionGrant(JsonPointer.valueOf(""), permissions, PUBLIC);
     }
 
     public static DefaultPermissionGrant createDefaultPermissionGrant(JsonPointer attribute, Set<Permission> permissions) {
-        return DefaultPermissionGrant.builder()
-            .roleName(ROLE_NAME)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .attributePermissions(createPermissionsForAttribute(attribute, permissions, PUBLIC))
-            .build();
+        return createDefaultPermissionGrant(attribute, permissions, PUBLIC);
     }
 
     public static DefaultPermissionGrant createDefaultPermissionGrant(JsonPointer attribute, Set<Permission> permissions, SecurityClassification securityClassification) {

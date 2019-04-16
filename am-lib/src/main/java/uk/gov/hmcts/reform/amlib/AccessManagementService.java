@@ -281,13 +281,7 @@ public class AccessManagementService {
             .collect(toSet());
 
         return jdbi.withExtension(AccessManagementRepository.class, dao ->
-            dao.getResourceAttributesWithRootCreatePermission(userRoles, securityClassifications)
-                .stream()
-                .map(resourceAttribute -> new ResourceDefinition(
-                    resourceAttribute.getServiceName(),
-                    resourceAttribute.getResourceType(),
-                    resourceAttribute.getResourceName()))
-                .collect(toSet()));
+            dao.getResourceAttributesWithRootCreatePermission(userRoles, securityClassifications));
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

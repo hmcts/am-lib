@@ -1,7 +1,7 @@
 {
   "resourceId": "${resourceId}",
   "accessorIds": ["${accessorId}"],
-  "accessType": "user",
+  "accessorType": "USER",
   "serviceName": "cmc",
   "resourceType": "case",
   "resourceName": "claim",

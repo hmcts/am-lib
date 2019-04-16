@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import uk.gov.hmcts.reform.amlib.models.Pair;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -25,6 +26,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import javax.validation.Constraint;
 
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.AvoidThrowingRawExceptionTypes"})
 public class InvalidArgumentsProvider implements ArgumentsProvider {
@@ -74,6 +76,7 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
         throw new IllegalArgumentException("Unsupported type: " + parameterType);
     }
 
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     private Object[] generateInvalidValues(Class<?> parameterType) {
         if (parameterType.equals(String.class)) {
             return new Object[]{null, "", " "};
@@ -90,8 +93,8 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
                     if (!setterMethod.getReturnType().equals(builderInstance.getClass())) {
                         continue;
                     }
-                    Field field = parameterType.getDeclaredField(setterMethod.getName());
-                    if (field.getAnnotations().length == 0) {
+                    Field beanField = parameterType.getDeclaredField(setterMethod.getName());
+                    if (Arrays.stream(beanField.getDeclaredAnnotations()).noneMatch(this::isValidationConstraint)) {
                         continue;
                     }
                     Object invalidValue = generateComplexValue(parameterType, setterMethod.getName());
@@ -194,5 +197,9 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
         } catch (Exception e) {
             throw new RuntimeException("Unexpected error occurred while processing type: " + parameterType, e);
         }
+    }
+
+    private boolean isValidationConstraint(Annotation annotation) {
+        return annotation.annotationType().getDeclaredAnnotation(Constraint.class) != null;
     }
 }

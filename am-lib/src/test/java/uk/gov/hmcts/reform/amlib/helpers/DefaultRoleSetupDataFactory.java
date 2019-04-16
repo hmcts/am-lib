@@ -26,9 +26,7 @@ public final class DefaultRoleSetupDataFactory {
     }
 
     public static Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> createPermissionsForAttribute(JsonPointer attribute, Set<Permission> permissions, SecurityClassification securityClassification) {
-
-        Map.Entry<Set<Permission>, SecurityClassification> pair =
-            new Pair<>(permissions, securityClassification);
+        Map.Entry<Set<Permission>, SecurityClassification> pair = new Pair<>(permissions, securityClassification);
 
         return ImmutableMap.of(attribute, pair);
     }

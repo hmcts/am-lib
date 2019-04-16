@@ -57,5 +57,5 @@ public interface AccessManagementRepository {
         + " join resource_attributes as resource on default_perms.service_name = resource.service_name and default_perms.resource_type = resource.resource_type and default_perms.resource_name = resource.resource_name"
         + " where default_perms.role_name in (<userRoles>) and default_perms.permissions & 1 = 1 and default_perms.attribute = '' and cast(resource.default_security_classification as text) in (<securityClassifications>)")
     @RegisterConstructorMapper(ResourceDefinition.class)
-    Set<ResourceDefinition> getResourceAttributesWithRootCreatePermission(@BindList Set<String> userRoles, @BindList Set<SecurityClassification> securityClassifications);
+    Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@BindList Set<String> userRoles, @BindList Set<SecurityClassification> securityClassifications);
 }

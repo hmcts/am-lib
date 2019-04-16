@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
@@ -13,24 +12,18 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import java.util.Map;
 import java.util.Set;
 
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_ID;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESSOR_TYPE;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 public final class TestDataFactory {
 
     private TestDataFactory() {
         //NO-OP
-    }
-
-    public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
-                                                                  Set<Permission> permissions) {
-        return createGrantForWholeDocument(resourceId, ACCESSOR_ID, permissions);
     }
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
@@ -65,12 +58,12 @@ public final class TestDataFactory {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(accessorIds)
-            .accessorType(ACCESSOR_TYPE)
+            .accessorType(USER)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attributePermissions(attributePermissions)
-            .securityClassification(SECURITY_CLASSIFICATION)
+            .securityClassification(PUBLIC)
             .relationship(relationship)
             .build();
     }
@@ -84,16 +77,16 @@ public final class TestDataFactory {
         return ImmutableMap.of(JsonPointer.valueOf(attribute), permissions);
     }
 
-    public static ExplicitAccessMetadata createMetadata(String resourceId) {
+    public static ExplicitAccessMetadata createMetadata(String resourceId, String accessorId) {
         return ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
-            .accessorId(ACCESSOR_ID)
-            .accessorType(ACCESSOR_TYPE)
+            .accessorId(accessorId)
+            .accessorType(USER)
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attribute(JsonPointer.valueOf(""))
-            .securityClassification(SecurityClassification.PUBLIC)
+            .securityClassification(PUBLIC)
             .relationship(ROLE_NAME)
             .build();
     }

@@ -8,9 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
-import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.Pair;
@@ -23,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
@@ -36,19 +35,12 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
 
-    @SuppressWarnings("LineLength")
     @BeforeEach
     void setUp() {
-        importerService.addRole(OTHER_ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
-
-        Map.Entry<Set<Permission>, SecurityClassification> readPermission =
-            new Pair<>(READ_PERMISSION, SecurityClassification.PUBLIC);
-
-        Map.Entry<Set<Permission>, SecurityClassification> createPermission =
-            new Pair<>(CREATE_PERMISSION, SecurityClassification.PUBLIC);
-
+        Map.Entry<Set<Permission>, SecurityClassification> readPermission = new Pair<>(READ_PERMISSION, PUBLIC);
+        Map.Entry<Set<Permission>, SecurityClassification> createPermission = new Pair<>(CREATE_PERMISSION, PUBLIC);
         Map.Entry<Set<Permission>, SecurityClassification> updatePermission =
-            new Pair<>(ImmutableSet.of(UPDATE), SecurityClassification.PUBLIC);
+            new Pair<>(ImmutableSet.of(UPDATE), PUBLIC);
 
         Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermissionsForRole =
             ImmutableMap.of(

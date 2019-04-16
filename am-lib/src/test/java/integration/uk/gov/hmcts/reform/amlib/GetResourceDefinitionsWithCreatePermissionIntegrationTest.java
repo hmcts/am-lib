@@ -7,15 +7,15 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Collections;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ACCESS_MANAGEMENT_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
@@ -23,7 +23,6 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends PreconfiguredIntegrationBaseTest {
@@ -35,9 +34,10 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @BeforeEach
     void setUp() {
-        importerService.addRole(OTHER_ROLE_NAME, RoleType.IDAM, SECURITY_CLASSIFICATION, ACCESS_MANAGEMENT_TYPE);
         importerService.addResourceDefinition(
-            otherResource.getServiceName(), otherResource.getResourceType(), otherResource.getResourceName());
+            otherResource.getServiceName(),
+            otherResource.getResourceType(),
+            otherResource.getResourceName());
     }
 
     @Test
@@ -56,7 +56,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @Test
     void shouldRetrieveResourceDefinitionWhenRecordExistsWithMultiplePermissions() {
-        Set<Permission> permissions = ImmutableSet.of(Permission.READ, Permission.CREATE);
+        Set<Permission> permissions = ImmutableSet.of(READ, CREATE);
 
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, permissions));
 
@@ -110,7 +110,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
 
-        assertThat(result).containsExactly(otherResource, resource);
+        assertThat(result).containsExactly(resource, otherResource);
     }
 
     @Test
@@ -124,7 +124,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
         Set<ResourceDefinition> result = service.getResourceDefinitionsWithRootCreatePermission(userRoles);
 
-        assertThat(result).containsExactly(otherResource, resource);
+        assertThat(result).containsExactly(resource, otherResource);
     }
 
     @Test

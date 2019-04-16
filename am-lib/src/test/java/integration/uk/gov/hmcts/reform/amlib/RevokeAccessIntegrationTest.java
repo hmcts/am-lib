@@ -135,7 +135,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .build());
 
         assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(1)
-            .extracting(ExplicitAccessRecord::getRelationship).contains(ROLE_NAME);
+            .extracting(ExplicitAccessRecord::getResourceId).contains(resourceId);
     }
 
     @Test

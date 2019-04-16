@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
@@ -122,6 +123,64 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
 
+    @Test
+    void whenRevokingResourceWithNonExistentRelationshipShouldNotRemoveAnyRecordFromDatabase() {
+        grantExplicitResourceAccess(resourceId, "");
+
+        service.revokeResourceAccess(ExplicitAccessMetadata.builder()
+            .resourceId(resourceId)
+            .accessorId(ACCESSOR_ID)
+            .accessorType(ACCESSOR_TYPE)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attribute(ROOT_ATTRIBUTE)
+            .securityClassification(SECURITY_CLASSIFICATION)
+            .relationship("NonExistentRelationship")
+            .build());
+
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
+    }
+
+    @Test
+    void whenRevokingResourceWithNullRelationshipShouldRemoveAnyRecordFromDatabase() {
+        grantExplicitResourceAccess(resourceId, "");
+
+        service.revokeResourceAccess(ExplicitAccessMetadata.builder()
+            .resourceId(resourceId)
+            .accessorId(ACCESSOR_ID)
+            .accessorType(ACCESSOR_TYPE)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attribute(JsonPointer.valueOf(""))
+            .securityClassification(SECURITY_CLASSIFICATION)
+            .relationship(null)
+            .build());
+
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
+    }
+
+    @Test
+    void whenRevokingResourceWithRelationshipAndParentShouldRemoveParentAndChildrenFromDatabase() {
+        grantExplicitResourceAccess(resourceId, "/parent");
+        grantExplicitResourceAccess(resourceId, "/parent/child");
+
+        service.revokeResourceAccess(ExplicitAccessMetadata.builder()
+            .resourceId(resourceId)
+            .accessorId(ACCESSOR_ID)
+            .accessorType(ACCESSOR_TYPE)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attribute(JsonPointer.valueOf("/parent"))
+            .securityClassification(SECURITY_CLASSIFICATION)
+            .relationship("Solicitor")
+            .build());
+
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
+    }
+
     private void grantExplicitResourceAccess(String resourceId, String attribute) {
         service.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
             .resourceId(resourceId)
@@ -146,6 +205,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .resourceName(RESOURCE_NAME)
             .attribute(JsonPointer.valueOf(attribute))
             .securityClassification(SECURITY_CLASSIFICATION)
+            .relationship(ROLE_NAME)
             .build());
     }
 }

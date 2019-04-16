@@ -51,7 +51,7 @@ class AccessManagementServiceValidationTest {
                 "accessMetadata.resourceName - must not be blank",
                 "accessMetadata.attribute - must not be null",
                 "accessMetadata.securityClassification - must not be null",
-                "accessMetadata.relationship - must not be blank"
+                "accessMetadata.relationship - must not be null"
             ));
     }
 

@@ -112,7 +112,8 @@ public class AccessManagementService {
      */
     @AuditLog("explicit access revoked by '{{mdc:caller}}' to resource '{{accessMetadata.resourceId}}' "
         + "defined as '{{accessMetadata.serviceName}}|{{accessMetadata.resourceType}}|{{accessMetadata.resourceName}}' "
-        + "from accessor '{{accessMetadata.accessorId}}': {{accessMetadata.attribute}}")
+        + "from accessor '{{accessMetadata.accessorId}}': {{accessMetadata.attribute}} "
+        + "with relationship {{accessMetadata.relationship}}")
     public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata accessMetadata) {
         jdbi.useExtension(AccessManagementRepository.class,
             dao -> dao.removeAccessManagementRecord(accessMetadata));

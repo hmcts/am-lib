@@ -278,7 +278,7 @@ public class AccessManagementService {
         Set<SecurityClassification> visibleSecurityClassifications = EnumSet.allOf(SecurityClassification.class)
             .stream()
             .filter(securityClassification ->
-                securityClassification.getHierarchy() <= maxSecurityClassificationForRole)
+                securityClassification.isVisible(maxSecurityClassificationForRole))
             .collect(toSet());
 
         return jdbi.withExtension(AccessManagementRepository.class, dao ->

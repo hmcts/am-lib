@@ -20,7 +20,6 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createMetadata;
@@ -130,12 +129,13 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .serviceName(SERVICE_NAME)
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
-            .attribute(ROOT_ATTRIBUTE)
+            .attribute(JsonPointer.valueOf(""))
             .securityClassification(PUBLIC)
             .relationship("NonExistentRelationship")
             .build());
 
-        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
+        assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(1)
+            .extracting(ExplicitAccessRecord::getRelationship).contains(ROLE_NAME);
     }
 
     @Test
@@ -152,26 +152,6 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .attribute(JsonPointer.valueOf(""))
             .securityClassification(PUBLIC)
             .relationship(null)
-            .build());
-
-        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
-    }
-
-    @Test
-    void whenRevokingResourceWithRelationshipAndParentShouldRemoveParentAndChildrenFromDatabase() {
-        grantExplicitResourceAccess(resourceId, "/parent");
-        grantExplicitResourceAccess(resourceId, "/parent/child");
-
-        service.revokeResourceAccess(ExplicitAccessMetadata.builder()
-            .resourceId(resourceId)
-            .accessorId(accessorId)
-            .accessorType(USER)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .attribute(JsonPointer.valueOf("/parent"))
-            .securityClassification(PUBLIC)
-            .relationship("Solicitor")
             .build());
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);

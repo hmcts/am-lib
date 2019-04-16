@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import uk.gov.hmcts.reform.amlib.models.Pair;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -87,6 +88,10 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
                 Method[] setterMethods = builderInstance.getClass().getDeclaredMethods();
                 for (Method setterMethod : setterMethods) {
                     if (!setterMethod.getReturnType().equals(builderInstance.getClass())) {
+                        continue;
+                    }
+                    Field field = parameterType.getDeclaredField(setterMethod.getName());
+                    if (field.getAnnotations().length == 0) {
                         continue;
                     }
                     Object invalidValue = generateComplexValue(parameterType, setterMethod.getName());

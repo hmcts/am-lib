@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eE -u
 
 # Release script does:
 #   - calculate next version by looking at Git history
@@ -99,9 +99,16 @@ function create_github_release() {
   conventional-github-releaser --preset ${preset}
 }
 
+function handle_unexpected {
+  echo 'Release process failed! There is no automatic recovery - please start manual process with check of Git history' >&2
+  exit 1
+}
+
 ##############
 ### Script ###
 ##############
+
+trap handle_unexpected ERR
 
 validate_dependencies && validate_environment_variables
 
@@ -122,6 +129,6 @@ case ${choice} in
     ;;
   *)
     echo 'Unrecognised option, try again...'
-    ./$0
+    ./$0 && exit 0
     ;;
 esac

@@ -272,16 +272,17 @@ public class AccessManagementService {
             dao.getRoles(userRoles, AccessType.ROLE_BASED)
                 .stream()
                 .mapToInt(role -> role.getSecurityClassification().getHierarchy())
-                .max().orElseThrow(NoSuchElementException::new));
+                .max()
+                .orElseThrow(NoSuchElementException::new));
 
-        Set<SecurityClassification> securityClassifications = EnumSet.allOf(SecurityClassification.class)
+        Set<SecurityClassification> visibleSecurityClassifications = EnumSet.allOf(SecurityClassification.class)
             .stream()
             .filter(securityClassification ->
                 securityClassification.getHierarchy() <= maxSecurityClassificationForRole)
             .collect(toSet());
 
         return jdbi.withExtension(AccessManagementRepository.class, dao ->
-            dao.getResourceAttributesWithRootCreatePermission(userRoles, securityClassifications));
+            dao.getResourceAttributesWithRootCreatePermission(userRoles, visibleSecurityClassifications));
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

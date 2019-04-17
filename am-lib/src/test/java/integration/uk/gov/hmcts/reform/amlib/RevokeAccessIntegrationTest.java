@@ -199,7 +199,8 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .build());
 
         assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(2)
-            .extracting(ExplicitAccessRecord::getAttribute).contains(JsonPointer.valueOf("/test"), JsonPointer.valueOf("/test/nested"));
+            .extracting(ExplicitAccessRecord::getAttribute).contains(JsonPointer.valueOf("/test"),
+            JsonPointer.valueOf("/test/nested"));
 
     }
 

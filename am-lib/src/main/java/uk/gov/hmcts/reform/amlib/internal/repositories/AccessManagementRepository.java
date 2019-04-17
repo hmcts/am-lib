@@ -31,9 +31,9 @@ public interface AccessManagementRepository {
         + "access_management.resource_id = :resourceId "
         + "and access_management.accessor_id = :accessorId "
         + "and access_management.accessor_type = cast(:accessorType as accessor_type) "
-        + "and access_management.service_name = :serviceName "
-        + "and access_management.resource_type = :resourceType "
-        + "and access_management.resource_name = :resourceName "
+        + "and access_management.service_name = :definition.serviceName "
+        + "and access_management.resource_type = :definition.resourceType "
+        + "and access_management.resource_name = :definition.resourceName "
         + "and access_management.attribute = :attributeAsString "
         + "or access_management.attribute like concat(:attributeAsString, '/', '%')")
     void removeAccessManagementRecord(@BindBean ExplicitAccessMetadata explicitAccessMetadata);

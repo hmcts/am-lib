@@ -17,12 +17,8 @@ import javax.validation.constraints.NotNull;
 @Builder
 @SuppressWarnings("LineLength")
 public final class DefaultPermissionGrant {
-    @NotBlank
-    private final String serviceName;
-    @NotBlank
-    private final String resourceType;
-    @NotBlank
-    private final String resourceName;
+    @NotNull
+    private final ResourceDefinition definition;
     @NotBlank
     private final String roleName;
     @NotEmpty

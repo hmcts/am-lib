@@ -18,12 +18,8 @@ public final class ExplicitAccessMetadata {
     private final String accessorId;
     @NotNull
     private final AccessorType accessorType;
-    @NotBlank
-    private final String serviceName;
-    @NotBlank
-    private final String resourceType;
-    @NotBlank
-    private final String resourceName;
+    @NotNull
+    private final ResourceDefinition definition;
     @NotNull
     private final JsonPointer attribute;
     @NotNull

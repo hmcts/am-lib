@@ -62,9 +62,10 @@ class DefaultRoleSetupImportServiceValidationTest {
             .isThrownBy(() -> service.grantDefaultPermission(accessGrant))
             .withMessageMatching(expectedValidationMessagesRegex(
                 "accessGrant - must not be null",
-                "accessGrant.serviceName - must not be blank",
-                "accessGrant.resourceType - must not be blank",
-                "accessGrant.resourceName - must not be blank",
+                "accessGrant.definition - must not be null",
+                "accessGrant.definition.serviceName - must not be blank",
+                "accessGrant.definition.resourceType - must not be blank",
+                "accessGrant.definition.resourceName - must not be blank",
                 "accessGrant.roleName - must not be blank",
                 "accessGrant.attributePermissions - must not be empty"
             ));

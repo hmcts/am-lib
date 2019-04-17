@@ -111,16 +111,17 @@ public class DefaultRoleSetupImportService {
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
     @AuditLog("default role access granted by '{{mdc:caller}}' to resource "
-        + "defined as '{{accessGrant.serviceName}}|{{accessGrant.resourceType}}|{{accessGrant.resourceName}}' "
-        + "for role '{{accessGrant.roleName}}': {{accessGrant.attributePermissions}}")
+        + "defined as '{{accessGrant.definition.serviceName}}|{{accessGrant.definition.resourceType}}|"
+        + "{{accessGrant.definition.resourceName}}' for role '{{accessGrant.roleName}}': "
+        + "{{accessGrant.attributePermissions}}")
     public void grantDefaultPermission(@NotNull @Valid DefaultPermissionGrant accessGrant) {
         jdbi.useTransaction(handle -> {
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
             accessGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
                 dao.createResourceAttribute(ResourceAttribute.builder()
-                    .serviceName(accessGrant.getServiceName())
-                    .resourceName(accessGrant.getResourceName())
-                    .resourceType(accessGrant.getResourceType())
+                    .serviceName(accessGrant.getDefinition().getServiceName())
+                    .resourceName(accessGrant.getDefinition().getResourceName())
+                    .resourceType(accessGrant.getDefinition().getResourceType())
                     .attribute(attribute)
                     .defaultSecurityClassification(permissionAndClassification.getValue())
                     .build()
@@ -128,9 +129,9 @@ public class DefaultRoleSetupImportService {
 
                 dao.grantDefaultPermission(
                     RoleBasedAccessRecord.builder()
-                        .serviceName(accessGrant.getServiceName())
-                        .resourceType(accessGrant.getResourceType())
-                        .resourceName(accessGrant.getResourceName())
+                        .serviceName(accessGrant.getDefinition().getServiceName())
+                        .resourceType(accessGrant.getDefinition().getResourceType())
+                        .resourceName(accessGrant.getDefinition().getResourceName())
                         .attribute(attribute)
                         .roleName(accessGrant.getRoleName())
                         .permissions(permissionAndClassification.getKey())

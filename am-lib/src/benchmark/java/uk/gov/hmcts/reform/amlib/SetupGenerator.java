@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.amlib.internal.aspects.AuditingAspect;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.Pair;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 import javax.sql.DataSource;
 
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
@@ -92,9 +94,11 @@ public class SetupGenerator {
             // Role based permissions
             importerService.grantDefaultPermission(
                 DefaultPermissionGrant.builder()
-                    .serviceName(definition.serviceName)
-                    .resourceType(resourceType)
-                    .resourceName(definition.resourceName)
+                    .definition(ResourceDefinition.builder()
+                        .serviceName(definition.serviceName)
+                        .resourceType(resourceType)
+                        .resourceName(definition.resourceName)
+                        .build())
                     .roleName("caseworker")
                     .attributePermissions(definition.attributePermissions.entrySet().stream()
                         .collect(toDefaultAttributePermissions()))
@@ -104,9 +108,11 @@ public class SetupGenerator {
             // Explicit permissions
             IntStream.range(1, 25001).forEach(number -> service.grantExplicitResourceAccess(
                 ExplicitAccessGrant.builder()
-                    .serviceName(definition.serviceName)
-                    .resourceType(resourceType)
-                    .resourceName(definition.resourceName)
+                    .definition(ResourceDefinition.builder()
+                        .serviceName(definition.serviceName)
+                        .resourceType(resourceType)
+                        .resourceName(definition.resourceName)
+                        .build())
                     .resourceId(definition.serviceName + "-resource-" + number)
                     .accessorIds(ImmutableSet.of("user-" + number))
                     .accessorType(USER)

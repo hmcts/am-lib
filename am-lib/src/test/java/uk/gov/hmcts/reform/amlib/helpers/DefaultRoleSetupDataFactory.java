@@ -35,9 +35,11 @@ public final class DefaultRoleSetupDataFactory {
     public static DefaultPermissionGrant createDefaultPermissionGrant(Set<Permission> permissions) {
         return DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
+            .definition(ResourceDefinition.builder()
+                .serviceName(SERVICE_NAME)
+                .resourceType(RESOURCE_TYPE)
+                .resourceName(RESOURCE_NAME)
+                .build())
             .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, permissions))
             .build();
     }
@@ -46,9 +48,11 @@ public final class DefaultRoleSetupDataFactory {
         JsonPointer attribute, Set<Permission> permissions) {
         return DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
+            .definition(ResourceDefinition.builder()
+                .serviceName(SERVICE_NAME)
+                .resourceType(RESOURCE_TYPE)
+                .resourceName(RESOURCE_NAME)
+                .build())
             .attributePermissions(createPermissionsForAttribute(attribute, permissions))
             .build();
     }
@@ -59,9 +63,11 @@ public final class DefaultRoleSetupDataFactory {
                                                                       String roleName) {
         return DefaultPermissionGrant.builder()
             .roleName(roleName)
-            .serviceName(resource.getServiceName())
-            .resourceType(resource.getResourceType())
-            .resourceName(resource.getResourceName())
+            .definition(ResourceDefinition.builder()
+                .serviceName(resource.getServiceName())
+                .resourceType(resource.getResourceType())
+                .resourceName(resource.getResourceName())
+                .build())
             .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf(attribute), permissions))
             .build();
     }

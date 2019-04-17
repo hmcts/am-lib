@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.utils.Permissions;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -75,9 +76,11 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
         service.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME + "2")
+            .definition(ResourceDefinition.builder()
+                .serviceName(SERVICE_NAME)
+                .resourceType(RESOURCE_TYPE)
+                .resourceName(RESOURCE_NAME + "2")
+                .build())
             .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, READ_PERMISSION))
             .build());
 

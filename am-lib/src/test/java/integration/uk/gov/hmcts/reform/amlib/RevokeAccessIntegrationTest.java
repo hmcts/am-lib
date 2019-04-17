@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.UUID;
 
@@ -123,9 +124,11 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .resourceId(resourceId)
             .accessorIds(ImmutableSet.of(accessorId))
             .accessorType(USER)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
+            .definition(ResourceDefinition.builder()
+                .serviceName(SERVICE_NAME)
+                .resourceType(RESOURCE_TYPE)
+                .resourceName(RESOURCE_NAME)
+                .build())
             .attributePermissions(createPermissions(attribute, READ_PERMISSION))
             .securityClassification(PUBLIC)
             .relationship(ROLE_NAME)
@@ -137,9 +140,11 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .resourceId(resourceId)
             .accessorId(accessorId)
             .accessorType(USER)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
+            .definition(ResourceDefinition.builder()
+                .serviceName(SERVICE_NAME)
+                .resourceType(RESOURCE_TYPE)
+                .resourceName(RESOURCE_NAME)
+                .build())
             .attribute(JsonPointer.valueOf(attribute))
             .securityClassification(PUBLIC)
             .build());

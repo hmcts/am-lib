@@ -151,9 +151,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, READ_PERMISSION));
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(OTHER_ROLE_NAME)
-            .resourceName(RESOURCE_NAME)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
+            .definition(RESOURCE_DEFINITION)
             .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf("/child"), READ_PERMISSION))
             .build());
 

@@ -21,6 +21,16 @@
     <cpe>cpe:/a:apache:groovy</cpe>
   </suppress>
   <suppress>
+    <notes><![CDATA[file name: tomcat-embed-core-9.0.17.jar - triggered by Gradle upgrade]]></notes>
+    <sha1>aacb92c34eb2e88f38a060c9fcaaae329a79c9ca</sha1>
+    <cpe>cpe:/a:apache:tomcat</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[file name: tomcat-embed-websocket-9.0.17.jar - triggered by Gradle upgrade]]></notes>
+    <sha1>a786505cc2697f7f2d8693c0c318270cc8addd92</sha1>
+    <cpe>cpe:/a:apache:tomcat</cpe>
+  </suppress>
+  <suppress>
     <notes><![CDATA[file name: applicationinsights-core-2.3.1.jar (shaded: io.netty:netty-tcnative-boringssl-static:2.0.17.Final)]]></notes>
     <gav regex="true">^io\.netty:netty-tcnative-boringssl-static:.*$</gav>
     <cpe>cpe:/a:netty_project:netty</cpe>

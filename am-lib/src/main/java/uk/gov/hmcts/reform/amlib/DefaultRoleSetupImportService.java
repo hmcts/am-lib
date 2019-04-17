@@ -177,7 +177,7 @@ public class DefaultRoleSetupImportService {
     /**
      * Deletes a resource definition.
      *
-     * @param definition {@link ResourceDefinition} the name of the resource to delete default permissions for
+     * @param definition {@link ResourceDefinition} the definition of resource to delete
      * @throws PersistenceException if any persistence errors were encountered
      */
     @SuppressWarnings("LineLength")

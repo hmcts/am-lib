@@ -53,7 +53,10 @@ withNightlyPipeline(type, product, component) {
         cat git-lfs-v2.7.1.tar.gz | tar xz git-lfs
       '''
 
-      sh 'PATH=$PATH:./ git lfs install && PATH=$PATH:./ git lfs pull'
+      sh '''
+        export PATH=$PATH:./
+        git lfs install && git lfs pull
+      '''
     }
   }
 

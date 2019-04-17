@@ -32,7 +32,6 @@ class AccessManagementServiceValidationTest {
                 "accessGrant.resourceDefinition.resourceType - must not be blank",
                 "accessGrant.resourceDefinition.resourceName - must not be blank",
                 "accessGrant.attributePermissions - must not be empty",
-                "accessGrant.securityClassification - must not be null",
                 "accessGrant.relationship - must not be blank"
             ));
     }
@@ -52,7 +51,6 @@ class AccessManagementServiceValidationTest {
                 "accessMetadata.resourceDefinition.resourceType - must not be blank",
                 "accessMetadata.resourceDefinition.resourceName - must not be blank",
                 "accessMetadata.attribute - must not be null",
-                "accessMetadata.securityClassification - must not be null",
                 "accessMetadata.relationship - must not be blank"
             ));
     }

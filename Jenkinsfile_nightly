@@ -50,7 +50,7 @@ withNightlyPipeline(type, product, component) {
         curl -L https://github.com/git-lfs/git-lfs/releases/download/v2.7.1/git-lfs-linux-amd64-v2.7.1.tar.gz > git-lfs-v2.7.1.tar.gz
         sha256sum -c git-lfs-v2.7.1.checksum.txt
         
-        cat git-lfs-v2.7.1.tar.gz | tar xz -C ./bin git-lfs'
+        cat git-lfs-v2.7.1.tar.gz | xz -C ./bin git-lfs
       '''
 
       sh ''' 

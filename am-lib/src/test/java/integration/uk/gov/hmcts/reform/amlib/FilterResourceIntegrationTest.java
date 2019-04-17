@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
+import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.buildResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createPermissionsForAttribute;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
@@ -52,11 +53,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private String accessorId;
     private static final String PARENT_ATTRIBUTE = "/parent";
     private static final String CHILD_ATTRIBUTE = "/parent/child";
-    private static final ResourceDefinition RESOURCE_DEFINITION = ResourceDefinition.builder()
-        .serviceName(SERVICE_NAME)
-        .resourceType(RESOURCE_TYPE)
-        .resourceName(RESOURCE_NAME)
-        .build();
+    private static final ResourceDefinition RESOURCE_DEFINITION =
+        buildResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
 
     @BeforeEach
     void setUp() {

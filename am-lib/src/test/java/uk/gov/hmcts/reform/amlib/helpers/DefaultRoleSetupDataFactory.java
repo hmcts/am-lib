@@ -71,4 +71,14 @@ public final class DefaultRoleSetupDataFactory {
             .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf(attribute), permissions))
             .build();
     }
+
+    public static ResourceDefinition buildResourceDefinition(String serviceName,
+                                                             String resourceType,
+                                                             String resourceName) {
+        return ResourceDefinition.builder()
+            .serviceName(serviceName)
+            .resourceType(resourceType)
+            .resourceName(resourceName)
+            .build();
+    }
 }

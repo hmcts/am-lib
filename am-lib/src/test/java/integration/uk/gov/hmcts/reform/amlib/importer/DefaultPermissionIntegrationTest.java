@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.RESOURCE;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
+import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.buildResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createPermissionsForAttribute;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
@@ -31,7 +32,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     @BeforeEach
     void setUp() {
         service.addService(SERVICE_NAME);
-        service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
+        service.addResourceDefinition(buildResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME));
         MDC.put("caller", "Administrator");
     }
 
@@ -70,8 +71,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     @Test
     void shouldRemoveAllEntriesFromTablesWhenValuesExist() {
         service.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);
-        service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
-        service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME + "2");
+        service.addResourceDefinition(buildResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME));
+        service.addResourceDefinition(buildResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME + "2"));
 
         service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
         service.grantDefaultPermission(DefaultPermissionGrant.builder()
@@ -96,11 +97,11 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     @Test
     void shouldRemoveEntriesWithResourceNameFromTablesWhenEntriesExist() {
         service.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);
-        service.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
+        service.addResourceDefinition(buildResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME));
         service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
 
         service.truncateDefaultPermissionsByResourceDefinition(
-            SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
+            buildResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME));
 
         assertThat(databaseHelper.countDefaultPermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
             ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(READ_PERMISSION))).isEqualTo(0);

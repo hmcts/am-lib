@@ -6,6 +6,7 @@ import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -18,7 +19,7 @@ public final class ExplicitAccessMetadata {
     private final String accessorId;
     @NotNull
     private final AccessorType accessorType;
-    @NotNull
+    @NotNull @Valid
     private final ResourceDefinition definition;
     @NotNull
     private final JsonPointer attribute;

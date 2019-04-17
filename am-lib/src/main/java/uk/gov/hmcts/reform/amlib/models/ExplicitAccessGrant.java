@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
 import java.util.Map;
 import java.util.Set;
+
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -22,7 +24,7 @@ public final class ExplicitAccessGrant {
     private final Set<@NotBlank String> accessorIds;
     @NotNull
     private final AccessorType accessorType;
-    @NotNull
+    @NotNull @Valid
     private final ResourceDefinition definition;
     @NotEmpty
     private final Map<@NotNull JsonPointer, @NotEmpty Set<@NotNull Permission>> attributePermissions;

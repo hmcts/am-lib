@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -17,7 +19,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @SuppressWarnings("LineLength")
 public final class DefaultPermissionGrant {
-    @NotNull
+    @NotNull @Valid
     private final ResourceDefinition definition;
     @NotBlank
     private final String roleName;

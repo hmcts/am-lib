@@ -88,7 +88,11 @@ public class SetupGenerator {
 
             // Lookup tables
             importerService.addService(definition.serviceName);
-            importerService.addResourceDefinition(definition.serviceName, resourceType, definition.resourceName);
+            importerService.addResourceDefinition(ResourceDefinition.builder()
+                .serviceName(definition.serviceName)
+                .resourceType(resourceType)
+                .resourceName(definition.resourceName)
+                .build());
             importerService.addRole("caseworker", IDAM, PUBLIC, ROLE_BASED);
 
             // Role based permissions

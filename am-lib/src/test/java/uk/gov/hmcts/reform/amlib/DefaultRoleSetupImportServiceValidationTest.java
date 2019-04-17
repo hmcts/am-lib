@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.helpers.InvalidArgumentsProvider;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.ValidationMessageRegexFactory.expectedValidationMessagesRegex;
@@ -43,15 +44,14 @@ class DefaultRoleSetupImportServiceValidationTest {
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
-    void addResourceDefinitionMethodShouldRejectInvalidArguments(String serviceName,
-                                                                 String resourceType,
-                                                                 String resourceName) {
+    void addResourceDefinitionMethodShouldRejectInvalidArguments(ResourceDefinition definition) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.addResourceDefinition(serviceName, resourceType, resourceName))
+            .isThrownBy(() -> service.addResourceDefinition(definition))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "serviceName - must not be blank",
-                "resourceType - must not be blank",
-                "resourceName - must not be blank"
+                "definition - must not be null",
+                "definition.serviceName - must not be blank",
+                "definition.resourceType - must not be blank",
+                "definition.resourceName - must not be blank"
             ));
     }
 
@@ -86,29 +86,27 @@ class DefaultRoleSetupImportServiceValidationTest {
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
     @SuppressWarnings("LineLength")
-    void truncateDefaultPermissionsByResourceDefinitionMethodShouldRejectInvalidArguments(String serviceName,
-                                                                                          String resourceType,
-                                                                                          String resourceName) {
+    void truncateDefaultPermissionsByResourceDefinitionMethodShouldRejectInvalidArguments(ResourceDefinition definition) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.truncateDefaultPermissionsByResourceDefinition(serviceName, resourceType, resourceName))
+            .isThrownBy(() -> service.truncateDefaultPermissionsByResourceDefinition(definition))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "serviceName - must not be blank",
-                "resourceType - must not be blank",
-                "resourceName - must not be blank"
+                "definition - must not be null",
+                "definition.serviceName - must not be blank",
+                "definition.resourceType - must not be blank",
+                "definition.resourceName - must not be blank"
             ));
     }
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
-    void deleteResourceDefinitionMethodShouldRejectInvalidArguments(String serviceName,
-                                                                    String resourceType,
-                                                                    String resourceName) {
+    void deleteResourceDefinitionMethodShouldRejectInvalidArguments(ResourceDefinition resourceDefinition) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.deleteResourceDefinition(serviceName, resourceType, resourceName))
+            .isThrownBy(() -> service.deleteResourceDefinition(resourceDefinition))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "serviceName - must not be blank",
-                "resourceType - must not be blank",
-                "resourceName - must not be blank"
+                "definition - must not be null",
+                "definition.serviceName - must not be blank",
+                "definition.resourceType - must not be blank",
+                "definition.resourceName - must not be blank"
             ));
     }
 

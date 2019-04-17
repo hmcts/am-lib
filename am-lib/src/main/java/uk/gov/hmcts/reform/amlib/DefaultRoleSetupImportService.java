@@ -87,7 +87,7 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * Creates a new resource resourceDefinition or does nothing if already exists.
+     * Creates a new resource definition or does nothing if already exists.
      *
      * @param resourceDefinition {@link ResourceDefinition} the definition for a resource
      * @throws PersistenceException if any persistence errors were encountered

@@ -24,7 +24,7 @@ public interface DefaultRoleSetupRepository {
 
     @SqlUpdate("insert into resources (service_name, resource_type, resource_name) values (:serviceName, :resourceType, :resourceName)"
         + "on conflict on constraint resources_pkey do nothing")
-    void addResourceDefinition(@BindBean ResourceDefinition definition);
+    void addResourceDefinition(@BindBean ResourceDefinition resourceDefinition);
 
     @SqlUpdate("insert into resource_attributes (service_name, resource_type, resource_name, attribute, default_security_classification)"
         + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, cast(:defaultSecurityClassification as security_classification))"
@@ -40,16 +40,16 @@ public interface DefaultRoleSetupRepository {
     void deleteDefaultPermissionsForRoles(String serviceName, String resourceType);
 
     @SqlUpdate("delete from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType and resource_name = :resourceName")
-    void deleteDefaultPermissionsForRoles(@BindBean ResourceDefinition definition);
+    void deleteDefaultPermissionsForRoles(@BindBean ResourceDefinition resourceDefinition);
 
     @SqlUpdate("delete from resource_attributes where service_name = :serviceName and resource_type = :resourceType")
     void deleteResourceAttributes(String serviceName, String resourceType);
 
     @SqlUpdate("delete from resource_attributes where service_name = :serviceName and resource_type = :resourceType  and resource_name = :resourceName")
-    void deleteResourceAttributes(@BindBean ResourceDefinition definition);
+    void deleteResourceAttributes(@BindBean ResourceDefinition resourceDefinition);
 
     @SqlUpdate("delete from resources where service_name = :serviceName and resource_type = :resourceType  and resource_name = :resourceName")
-    void deleteResourceDefinition(@BindBean ResourceDefinition definition);
+    void deleteResourceDefinition(@BindBean ResourceDefinition resourceDefinition);
 
     @SqlUpdate("delete from roles where role_name = :roleName")
     void deleteRole(String roleName);

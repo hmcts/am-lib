@@ -15,13 +15,13 @@ import javax.validation.constraints.NotNull;
 public final class ExplicitAccessMetadata {
     @NotBlank
     private final String resourceId;
+    @NotNull
+    @Valid
+    private final ResourceDefinition resourceDefinition;
     @NotBlank
     private final String accessorId;
     @NotNull
     private final AccessorType accessorType;
-    @NotNull
-    @Valid
-    private final ResourceDefinition definition;
     @NotNull
     private final JsonPointer attribute;
     @NotNull

@@ -20,13 +20,13 @@ import javax.validation.constraints.NotNull;
 public final class ExplicitAccessGrant {
     @NotBlank
     private final String resourceId;
+    @NotNull
+    @Valid
+    private final ResourceDefinition resourceDefinition;
     @NotEmpty
     private final Set<@NotBlank String> accessorIds;
     @NotNull
     private final AccessorType accessorType;
-    @NotNull
-    @Valid
-    private final ResourceDefinition definition;
     @NotEmpty
     private final Map<@NotNull JsonPointer, @NotEmpty Set<@NotNull Permission>> attributePermissions;
     @NotNull

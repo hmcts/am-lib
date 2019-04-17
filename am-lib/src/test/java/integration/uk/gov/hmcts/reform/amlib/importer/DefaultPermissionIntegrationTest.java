@@ -77,7 +77,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         service.grantDefaultPermission(createDefaultPermissionGrant(READ_PERMISSION));
         service.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
-            .definition(ResourceDefinition.builder()
+            .resourceDefinition(ResourceDefinition.builder()
                 .serviceName(SERVICE_NAME)
                 .resourceType(RESOURCE_TYPE)
                 .resourceName(RESOURCE_NAME + 2)

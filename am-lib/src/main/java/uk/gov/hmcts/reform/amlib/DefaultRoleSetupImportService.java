@@ -87,16 +87,16 @@ public class DefaultRoleSetupImportService {
     }
 
     /**
-     * Creates a new resource definition or does nothing if already exists.
+     * Creates a new resource resourceDefinition or does nothing if already exists.
      *
-     * @param definition {@link ResourceDefinition} the definition for a resource
+     * @param resourceDefinition {@link ResourceDefinition} the definition for a resource
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog(value = "added resource defined as '{{definition.serviceName}}|{{definition.resourceType}}|"
-        + "{{definition.resourceName}}'", severity = DEBUG)
-    public void addResourceDefinition(@NotNull @Valid ResourceDefinition definition) {
+    @AuditLog(value = "added resource defined as '{{resourceDefinition.serviceName}}"
+        + "|{{resourceDefinition.resourceType}}|{{resourceDefinition.resourceName}}'", severity = DEBUG)
+    public void addResourceDefinition(@NotNull @Valid ResourceDefinition resourceDefinition) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao ->
-            dao.addResourceDefinition(definition));
+            dao.addResourceDefinition(resourceDefinition));
     }
 
     /**
@@ -108,17 +108,17 @@ public class DefaultRoleSetupImportService {
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
     @AuditLog("default role access granted by '{{mdc:caller}}' to resource "
-        + "defined as '{{accessGrant.definition.serviceName}}|{{accessGrant.definition.resourceType}}|"
-        + "{{accessGrant.definition.resourceName}}' for role '{{accessGrant.roleName}}': "
+        + "defined as '{{accessGrant.resourceDefinition.serviceName}}|{{accessGrant.resourceDefinition.resourceType}}|"
+        + "{{accessGrant.resourceDefinition.resourceName}}' for role '{{accessGrant.roleName}}': "
         + "{{accessGrant.attributePermissions}}")
     public void grantDefaultPermission(@NotNull @Valid DefaultPermissionGrant accessGrant) {
         jdbi.useTransaction(handle -> {
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
             accessGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
                 dao.createResourceAttribute(ResourceAttribute.builder()
-                    .serviceName(accessGrant.getDefinition().getServiceName())
-                    .resourceName(accessGrant.getDefinition().getResourceName())
-                    .resourceType(accessGrant.getDefinition().getResourceType())
+                    .serviceName(accessGrant.getResourceDefinition().getServiceName())
+                    .resourceName(accessGrant.getResourceDefinition().getResourceName())
+                    .resourceType(accessGrant.getResourceDefinition().getResourceType())
                     .attribute(attribute)
                     .defaultSecurityClassification(permissionAndClassification.getValue())
                     .build()
@@ -126,9 +126,9 @@ public class DefaultRoleSetupImportService {
 
                 dao.grantDefaultPermission(
                     RoleBasedAccessRecord.builder()
-                        .serviceName(accessGrant.getDefinition().getServiceName())
-                        .resourceType(accessGrant.getDefinition().getResourceType())
-                        .resourceName(accessGrant.getDefinition().getResourceName())
+                        .serviceName(accessGrant.getResourceDefinition().getServiceName())
+                        .resourceType(accessGrant.getResourceDefinition().getResourceType())
+                        .resourceName(accessGrant.getResourceDefinition().getResourceName())
                         .attribute(attribute)
                         .roleName(accessGrant.getRoleName())
                         .permissions(permissionAndClassification.getKey())
@@ -161,30 +161,31 @@ public class DefaultRoleSetupImportService {
      *
      * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *
-     * @param definition {@link ResourceDefinition} the definition of resource to delete default permissions for
+     * @param resourceDefinition {@link ResourceDefinition} the definition of resource to delete default permissions for
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
-    @AuditLog("default role access revoked by '{{mdc:caller}}' for resource "
-        + "defined as '{{definition.serviceName}}|{{definition.resourceType}}|{{definition.resourceName}}'")
-    public void truncateDefaultPermissionsByResourceDefinition(@NotNull @Valid ResourceDefinition definition) {
+    @SuppressWarnings("LineLength")
+    @AuditLog("default role access revoked by '{{mdc:caller}}' for resource defined as "
+        + "'{{resourceDefinition.serviceName}}|{{resourceDefinition.resourceType}}|{{resourceDefinition.resourceName}}'")
+    public void truncateDefaultPermissionsByResourceDefinition(@NotNull @Valid ResourceDefinition resourceDefinition) {
         jdbi.useTransaction(handle -> {
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
-            dao.deleteDefaultPermissionsForRoles(definition);
-            dao.deleteResourceAttributes(definition);
+            dao.deleteDefaultPermissionsForRoles(resourceDefinition);
+            dao.deleteResourceAttributes(resourceDefinition);
         });
     }
 
     /**
      * Deletes a resource definition.
      *
-     * @param definition {@link ResourceDefinition} the definition of resource to delete
+     * @param resourceDefinition {@link ResourceDefinition} the definition of resource to delete
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog(value = "deleted resource defined as '{{definition.serviceName}}|{{definition.resourceType}}|"
-        + "{{definition.resourceName}}'", severity = DEBUG)
-    public void deleteResourceDefinition(@NotNull @Valid ResourceDefinition definition) {
+    @AuditLog(value = "deleted resource defined as '{{resourceDefinition.serviceName}}|"
+        + "{{resourceDefinition.resourceType}}|{{resourceDefinition.resourceName}}'", severity = DEBUG)
+    public void deleteResourceDefinition(@NotNull @Valid ResourceDefinition resourceDefinition) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao ->
-            dao.deleteResourceDefinition(definition));
+            dao.deleteResourceDefinition(resourceDefinition));
     }
 
     /**

@@ -98,7 +98,7 @@ public class SetupGenerator {
             // Role based permissions
             importerService.grantDefaultPermission(
                 DefaultPermissionGrant.builder()
-                    .definition(ResourceDefinition.builder()
+                    .resourceDefinition(ResourceDefinition.builder()
                         .serviceName(definition.serviceName)
                         .resourceType(resourceType)
                         .resourceName(definition.resourceName)
@@ -112,7 +112,7 @@ public class SetupGenerator {
             // Explicit permissions
             IntStream.range(1, 25001).forEach(number -> service.grantExplicitResourceAccess(
                 ExplicitAccessGrant.builder()
-                    .definition(ResourceDefinition.builder()
+                    .resourceDefinition(ResourceDefinition.builder()
                         .serviceName(definition.serviceName)
                         .resourceType(resourceType)
                         .resourceName(definition.resourceName)

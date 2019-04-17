@@ -35,7 +35,7 @@ public final class DefaultRoleSetupDataFactory {
     public static DefaultPermissionGrant createDefaultPermissionGrant(Set<Permission> permissions) {
         return DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
-            .definition(ResourceDefinition.builder()
+            .resourceDefinition(ResourceDefinition.builder()
                 .serviceName(SERVICE_NAME)
                 .resourceType(RESOURCE_TYPE)
                 .resourceName(RESOURCE_NAME)
@@ -48,7 +48,7 @@ public final class DefaultRoleSetupDataFactory {
         JsonPointer attribute, Set<Permission> permissions) {
         return DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
-            .definition(ResourceDefinition.builder()
+            .resourceDefinition(ResourceDefinition.builder()
                 .serviceName(SERVICE_NAME)
                 .resourceType(RESOURCE_TYPE)
                 .resourceName(RESOURCE_NAME)
@@ -63,7 +63,7 @@ public final class DefaultRoleSetupDataFactory {
                                                                       String roleName) {
         return DefaultPermissionGrant.builder()
             .roleName(roleName)
-            .definition(ResourceDefinition.builder()
+            .resourceDefinition(ResourceDefinition.builder()
                 .serviceName(resource.getServiceName())
                 .resourceType(resource.getResourceType())
                 .resourceName(resource.getResourceName())

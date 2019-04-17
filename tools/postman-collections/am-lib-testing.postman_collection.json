@@ -69,7 +69,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessorType\": \"USER\",\n    \"definition\": {\n    \t\"serviceName\": \"cmc\",\n    \t\"resourceType\": \"case\",\n    \t\"resourceName\": \"claim\"\n    },\n    \"attributePermissions\": {\n    \t\"/test2\": [\"CREATE\", \"READ\"]\n    },\n    \"relationship\": \"caseworker\",\n    \"securityClassification\": \"PUBLIC\"\n}"
+          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessorType\": \"USER\",\n    \"resourceDefinition\": {\n    \t\"serviceName\": \"cmc\",\n    \t\"resourceType\": \"case\",\n    \t\"resourceName\": \"claim\"\n    },\n    \"attributePermissions\": {\n    \t\"/test2\": [\"CREATE\", \"READ\"]\n    },\n    \"relationship\": \"caseworker\",\n    \"securityClassification\": \"PUBLIC\"\n}"
         },
         "url": {
           "raw": "localhost:3703/lib/create-resource-access",
@@ -101,7 +101,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessorType\": \"USER\",\n    \"definition\": {\n    \t\"serviceName\": \"cmc\",\n    \t\"resourceType\": \"case\",\n    \t\"resourceName\": \"claim\"\n    },\n    \"attributePermissions\": {\n    \t\"/test\": [\"CREATE\"],\n    \t\"/test2\": [\"CREATE\", \"READ\"],\n    \t\"/test3\": [\"CREATE\", \"UPDATE\"]\n    },\n    \"relationship\" : \"caseworker\",\n    \"securityClassification\": \"PUBLIC\"\n}"
+          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessorType\": \"USER\",\n    \"resourceDefinition\": {\n    \t\"serviceName\": \"cmc\",\n    \t\"resourceType\": \"case\",\n    \t\"resourceName\": \"claim\"\n    },\n    \"attributePermissions\": {\n    \t\"/test\": [\"CREATE\"],\n    \t\"/test2\": [\"CREATE\", \"READ\"],\n    \t\"/test3\": [\"CREATE\", \"UPDATE\"]\n    },\n    \"relationship\" : \"caseworker\",\n    \"securityClassification\": \"PUBLIC\"\n}"
         },
         "url": {
           "raw": "localhost:3703/lib/create-resource-access",
@@ -133,7 +133,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorId\": \"UNIQUE-USER-ID\",\n    \"accessorType\": \"USER\",\n    \"definition\": {\n    \t\"serviceName\": \"cmc\",\n    \t\"resourceType\": \"case\",\n    \t\"resourceName\": \"claim\"\n    },\n    \"attribute\": \"\",\n    \"relationship\": \"caseworker\",\n    \"securityClassification\": \"PUBLIC\"\n}"
+          "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorId\": \"UNIQUE-USER-ID\",\n    \"accessorType\": \"USER\",\n    \"resourceDefinition\": {\n    \t\"serviceName\": \"cmc\",\n    \t\"resourceType\": \"case\",\n    \t\"resourceName\": \"claim\"\n    },\n    \"attribute\": \"\",\n    \"relationship\": \"caseworker\",\n    \"securityClassification\": \"PUBLIC\"\n}"
         },
         "url": {
           "raw": "localhost:3703/lib/revoke-resource-access",

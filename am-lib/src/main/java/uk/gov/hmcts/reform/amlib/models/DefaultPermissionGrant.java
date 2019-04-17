@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
 public final class DefaultPermissionGrant {
     @NotNull
     @Valid
-    private final ResourceDefinition definition;
+    private final ResourceDefinition resourceDefinition;
     @NotBlank
     private final String roleName;
     @NotEmpty

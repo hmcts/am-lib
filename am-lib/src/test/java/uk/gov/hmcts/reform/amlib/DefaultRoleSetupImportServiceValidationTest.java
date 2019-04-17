@@ -44,14 +44,14 @@ class DefaultRoleSetupImportServiceValidationTest {
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
-    void addResourceDefinitionMethodShouldRejectInvalidArguments(ResourceDefinition definition) {
+    void addResourceDefinitionMethodShouldRejectInvalidArguments(ResourceDefinition resourceDefinition) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.addResourceDefinition(definition))
+            .isThrownBy(() -> service.addResourceDefinition(resourceDefinition))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "definition - must not be null",
-                "definition.serviceName - must not be blank",
-                "definition.resourceType - must not be blank",
-                "definition.resourceName - must not be blank"
+                "resourceDefinition - must not be null",
+                "resourceDefinition.serviceName - must not be blank",
+                "resourceDefinition.resourceType - must not be blank",
+                "resourceDefinition.resourceName - must not be blank"
             ));
     }
 
@@ -62,10 +62,10 @@ class DefaultRoleSetupImportServiceValidationTest {
             .isThrownBy(() -> service.grantDefaultPermission(accessGrant))
             .withMessageMatching(expectedValidationMessagesRegex(
                 "accessGrant - must not be null",
-                "accessGrant.definition - must not be null",
-                "accessGrant.definition.serviceName - must not be blank",
-                "accessGrant.definition.resourceType - must not be blank",
-                "accessGrant.definition.resourceName - must not be blank",
+                "accessGrant.resourceDefinition - must not be null",
+                "accessGrant.resourceDefinition.serviceName - must not be blank",
+                "accessGrant.resourceDefinition.resourceType - must not be blank",
+                "accessGrant.resourceDefinition.resourceName - must not be blank",
                 "accessGrant.roleName - must not be blank",
                 "accessGrant.attributePermissions - must not be empty"
             ));
@@ -86,14 +86,14 @@ class DefaultRoleSetupImportServiceValidationTest {
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
     @SuppressWarnings("LineLength")
-    void truncateDefaultPermissionsByResourceDefinitionMethodShouldRejectInvalidArguments(ResourceDefinition definition) {
+    void truncateDefaultPermissionsByResourceDefinitionMethodShouldRejectInvalidArguments(ResourceDefinition resourceDefinition) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.truncateDefaultPermissionsByResourceDefinition(definition))
+            .isThrownBy(() -> service.truncateDefaultPermissionsByResourceDefinition(resourceDefinition))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "definition - must not be null",
-                "definition.serviceName - must not be blank",
-                "definition.resourceType - must not be blank",
-                "definition.resourceName - must not be blank"
+                "resourceDefinition - must not be null",
+                "resourceDefinition.serviceName - must not be blank",
+                "resourceDefinition.resourceType - must not be blank",
+                "resourceDefinition.resourceName - must not be blank"
             ));
     }
 
@@ -103,10 +103,10 @@ class DefaultRoleSetupImportServiceValidationTest {
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> service.deleteResourceDefinition(resourceDefinition))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "definition - must not be null",
-                "definition.serviceName - must not be blank",
-                "definition.resourceType - must not be blank",
-                "definition.resourceName - must not be blank"
+                "resourceDefinition - must not be null",
+                "resourceDefinition.serviceName - must not be blank",
+                "resourceDefinition.resourceType - must not be blank",
+                "resourceDefinition.resourceName - must not be blank"
             ));
     }
 

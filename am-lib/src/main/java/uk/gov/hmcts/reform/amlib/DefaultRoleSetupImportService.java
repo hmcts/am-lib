@@ -161,7 +161,7 @@ public class DefaultRoleSetupImportService {
      *
      * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *
-     * @param definition {@link ResourceDefinition} the name of the resource to delete default permissions for
+     * @param definition {@link ResourceDefinition} the definition of resource to delete default permissions for
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
     @AuditLog("default role access revoked by '{{mdc:caller}}' for resource "

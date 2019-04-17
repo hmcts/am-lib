@@ -21,12 +21,14 @@
     <cpe>cpe:/a:apache:groovy</cpe>
   </suppress>
   <suppress>
-    <notes><![CDATA[file name: tomcat-embed-core-9.0.17.jar - triggered by Gradle upgrade]]></notes>
+    <notes><![CDATA[file name: tomcat-embed-core-9.0.17.jar - Spring Boot dependency, not applicable as
+    vulnerability only applies to Windows environments and vulnerable components is disabled by default]]></notes>
     <sha1>aacb92c34eb2e88f38a060c9fcaaae329a79c9ca</sha1>
     <cpe>cpe:/a:apache:tomcat</cpe>
   </suppress>
   <suppress>
-    <notes><![CDATA[file name: tomcat-embed-websocket-9.0.17.jar - triggered by Gradle upgrade]]></notes>
+    <notes><![CDATA[file name: tomcat-embed-websocket-9.0.17.jar - Spring Boot dependency, not applicable as
+    vulnerability only applies to Windows environments and vulnerable components is disabled by default]]></notes>
     <sha1>a786505cc2697f7f2d8693c0c318270cc8addd92</sha1>
     <cpe>cpe:/a:apache:tomcat</cpe>
   </suppress>

@@ -72,9 +72,9 @@ public final class DefaultRoleSetupDataFactory {
             .build();
     }
 
-    public static ResourceDefinition buildResourceDefinition(String serviceName,
-                                                             String resourceType,
-                                                             String resourceName) {
+    public static ResourceDefinition createResourceDefinition(String serviceName,
+                                                              String resourceType,
+                                                              String resourceName) {
         return ResourceDefinition.builder()
             .serviceName(serviceName)
             .resourceType(resourceType)

@@ -15,8 +15,8 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
-import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.buildResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
+import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
@@ -30,9 +30,9 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
 
-    private final ResourceDefinition resource = buildResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
-    private final ResourceDefinition otherResource =
-        buildResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME + "2");
+    private final ResourceDefinition resource = createResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
+    private final ResourceDefinition otherResource = createResourceDefinition(SERVICE_NAME, RESOURCE_TYPE,
+        RESOURCE_NAME + 2);
 
     @BeforeEach
     void setUp() {

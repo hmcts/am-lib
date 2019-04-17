@@ -180,7 +180,6 @@ public class DefaultRoleSetupImportService {
      * @param definition {@link ResourceDefinition} the definition of resource to delete
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @SuppressWarnings("LineLength")
     @AuditLog(value = "deleted resource defined as '{{definition.serviceName}}|{{definition.resourceType}}|"
         + "{{definition.resourceName}}'", severity = DEBUG)
     public void deleteResourceDefinition(@NotNull @Valid ResourceDefinition definition) {

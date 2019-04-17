@@ -24,7 +24,8 @@ public final class ExplicitAccessGrant {
     private final Set<@NotBlank String> accessorIds;
     @NotNull
     private final AccessorType accessorType;
-    @NotNull @Valid
+    @NotNull
+    @Valid
     private final ResourceDefinition definition;
     @NotEmpty
     private final Map<@NotNull JsonPointer, @NotEmpty Set<@NotNull Permission>> attributePermissions;

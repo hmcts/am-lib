@@ -19,7 +19,8 @@ import javax.validation.constraints.NotNull;
 @Builder
 @SuppressWarnings("LineLength")
 public final class DefaultPermissionGrant {
-    @NotNull @Valid
+    @NotNull
+    @Valid
     private final ResourceDefinition definition;
     @NotBlank
     private final String roleName;

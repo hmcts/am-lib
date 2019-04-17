@@ -27,9 +27,9 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
-import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.buildResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createPermissionsForAttribute;
+import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
@@ -47,14 +47,14 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
 
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
+    private static final String PARENT_ATTRIBUTE = "/parent";
+    private static final String CHILD_ATTRIBUTE = "/parent/child";
+    private static final ResourceDefinition RESOURCE_DEFINITION =
+        createResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private String resourceId;
     private String accessorId;
-    private static final String PARENT_ATTRIBUTE = "/parent";
-    private static final String CHILD_ATTRIBUTE = "/parent/child";
-    private static final ResourceDefinition RESOURCE_DEFINITION =
-        buildResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
 
     @BeforeEach
     void setUp() {
@@ -177,7 +177,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         List<Resource> resources = ImmutableList.of(
             createResource(resourceId),
-            createResource(resourceId + "2"));
+            createResource(resourceId + 2));
 
         List<FilteredResourceEnvelope> result = service.filterResource(accessorId, ROLE_NAMES, resources);
 
@@ -196,7 +196,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .build(),
             FilteredResourceEnvelope.builder()
                 .resource(Resource.builder()
-                    .id(resourceId + "2")
+                    .id(resourceId + 2)
                     .definition(RESOURCE_DEFINITION)
                     .data(DATA)
                     .build())
@@ -216,7 +216,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         List<Resource> resources = ImmutableList.of(
             createResource(resourceId),
-            createResource(resourceId + "2"));
+            createResource(resourceId + 2));
 
         List<FilteredResourceEnvelope> result = service.filterResource(accessorId, ROLE_NAMES, resources);
 
@@ -235,7 +235,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .build(),
             FilteredResourceEnvelope.builder()
                 .resource(Resource.builder()
-                    .id(resourceId + "2")
+                    .id(resourceId + 2)
                     .definition(RESOURCE_DEFINITION)
                     .data(null)
                     .build())

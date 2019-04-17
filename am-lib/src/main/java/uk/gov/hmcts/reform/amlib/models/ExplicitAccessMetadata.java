@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
-import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -26,8 +25,6 @@ public final class ExplicitAccessMetadata {
     private final String resourceName;
     @NotNull
     private final JsonPointer attribute;
-    @NotNull
-    private final SecurityClassification securityClassification;
 
     public String getAttributeAsString() {
         return getAttribute().toString();

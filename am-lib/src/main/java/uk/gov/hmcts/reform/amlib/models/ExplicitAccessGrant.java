@@ -5,10 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -30,8 +30,6 @@ public final class ExplicitAccessGrant {
     private final String resourceName;
     @NotEmpty
     private final Map<@NotNull JsonPointer, @NotEmpty Set<@NotNull Permission>> attributePermissions;
-    @NotNull
-    private final SecurityClassification securityClassification;
     @NotBlank
     private final String relationship;
 }

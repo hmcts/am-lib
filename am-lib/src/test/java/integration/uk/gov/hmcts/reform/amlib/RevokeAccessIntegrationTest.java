@@ -16,6 +16,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
@@ -155,6 +156,72 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .build());
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
+    }
+
+    @Test
+    void whenRevokingResourceWithNestedAttributeRelationshipShouldOnlyRemoveThatRelationshipAndAttribute() {
+        grantExplicitResourceAccess(resourceId, "/test");
+        grantExplicitResourceAccess(resourceId, "/test/nested");
+        service.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
+            .resourceId(resourceId)
+            .accessorIds(ImmutableSet.of(accessorId))
+            .accessorType(USER)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attributePermissions(createPermissions("/test", READ_PERMISSION))
+            .securityClassification(PUBLIC)
+            .relationship(OTHER_ROLE_NAME)
+            .build());
+
+        service.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
+            .resourceId(resourceId)
+            .accessorIds(ImmutableSet.of(accessorId))
+            .accessorType(USER)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attributePermissions(createPermissions("/test/nested", READ_PERMISSION))
+            .securityClassification(PUBLIC)
+            .relationship(OTHER_ROLE_NAME)
+            .build());
+
+        service.revokeResourceAccess(ExplicitAccessMetadata.builder()
+            .resourceId(resourceId)
+            .accessorId(accessorId)
+            .accessorType(USER)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attribute(JsonPointer.valueOf("/test"))
+            .securityClassification(PUBLIC)
+            .relationship(ROLE_NAME)
+            .build());
+
+        assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(2)
+            .extracting(ExplicitAccessRecord::getAttribute).contains(JsonPointer.valueOf("/test"), JsonPointer.valueOf("/test/nested"));
+
+    }
+
+    @Test
+    void whenRevokingResourceWithOtherValidRelationshipShouldNotRemoveResourceFromDatabase() {
+        grantExplicitResourceAccess(resourceId, "/test");
+        grantExplicitResourceAccess(resourceId, "/test/nested");
+
+        service.revokeResourceAccess(ExplicitAccessMetadata.builder()
+            .resourceId(resourceId)
+            .accessorId(accessorId)
+            .accessorType(USER)
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .attribute(JsonPointer.valueOf(""))
+            .securityClassification(PUBLIC)
+            .relationship(OTHER_ROLE_NAME)
+            .build());
+
+        assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(2)
+            .extracting(ExplicitAccessRecord::getResourceId).contains(resourceId);
     }
 
     private void grantExplicitResourceAccess(String resourceId, String attribute) {

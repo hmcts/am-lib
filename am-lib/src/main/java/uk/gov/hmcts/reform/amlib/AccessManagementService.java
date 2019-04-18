@@ -6,11 +6,13 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.FilterService;
 import uk.gov.hmcts.reform.amlib.internal.PermissionsService;
 import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
 import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
@@ -21,8 +23,10 @@ import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collector;
@@ -36,7 +40,9 @@ import javax.validation.constraints.NotNull;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
+@SuppressWarnings("PMD.ExcessiveImports")
 public class AccessManagementService {
 
     private final FilterService filterService = new FilterService();
@@ -192,7 +198,7 @@ public class AccessManagementService {
 
         Set<String> relationships = explicitAccess.stream()
             .map(ExplicitAccessRecord::getRelationship)
-            .collect(Collectors.toSet());
+            .collect(toSet());
 
         return FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
@@ -214,7 +220,9 @@ public class AccessManagementService {
         }
 
         return jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getRoles(userRoles, AccessType.ROLE_BASED));
+            dao -> dao.getRoles(userRoles, AccessType.ROLE_BASED).stream()
+                .map(Role::getRoleName)
+                .collect(toSet()));
     }
 
     /**
@@ -260,8 +268,21 @@ public class AccessManagementService {
     @SuppressWarnings("LineLength")
     @AuditLog("returned resources that user with roles '{{userRoles}}' has create permission to: {{result}}")
     public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@NotEmpty Set<@NotBlank String> userRoles) {
+        Integer maxSecurityClassificationForRole = jdbi.withExtension(AccessManagementRepository.class, dao ->
+            dao.getRoles(userRoles, AccessType.ROLE_BASED)
+                .stream()
+                .mapToInt(role -> role.getSecurityClassification().getHierarchy())
+                .max()
+                .orElseThrow(NoSuchElementException::new));
+
+        Set<SecurityClassification> visibleSecurityClassifications = EnumSet.allOf(SecurityClassification.class)
+            .stream()
+            .filter(securityClassification ->
+                securityClassification.isVisible(maxSecurityClassificationForRole))
+            .collect(toSet());
+
         return jdbi.withExtension(AccessManagementRepository.class, dao ->
-            dao.getResourceDefinitionsWithRootCreatePermission(userRoles));
+            dao.getResourceDefinitionsWithRootCreatePermission(userRoles, visibleSecurityClassifications));
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

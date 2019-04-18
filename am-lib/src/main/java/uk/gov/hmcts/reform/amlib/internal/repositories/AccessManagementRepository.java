@@ -7,7 +7,9 @@ import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.JsonPointerMapper;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.PermissionSetMapper;
@@ -48,10 +50,13 @@ public interface AccessManagementRepository {
     @RegisterConstructorMapper(RoleBasedAccessRecord.class)
     List<RoleBasedAccessRecord> getRolePermissions(@BindBean ResourceDefinition resourceDefinition, String roleName);
 
-    @SqlQuery("select role_name from roles where role_name in (<userRoles>) and access_type = cast(:accessType as access_type)")
-    Set<String> getRoles(@BindList("userRoles") Set<String> userRoles, AccessType accessType);
+    @SqlQuery("select * from roles where role_name in (<userRoles>) and access_type = cast(:accessType as access_type)")
+    @RegisterConstructorMapper(Role.class)
+    Set<Role> getRoles(@BindList Set<String> userRoles, AccessType accessType);
 
-    @SqlQuery("select distinct service_name, resource_type, resource_name from default_permissions_for_roles where role_name in (<userRoles>) and permissions & 1 = 1 and attribute = ''")
+    @SqlQuery("select distinct default_perms.service_name, default_perms.resource_type, default_perms.resource_name from default_permissions_for_roles default_perms"
+        + " join resource_attributes as resource on default_perms.service_name = resource.service_name and default_perms.resource_type = resource.resource_type and default_perms.resource_name = resource.resource_name"
+        + " where default_perms.role_name in (<userRoles>) and default_perms.permissions & 1 = 1 and default_perms.attribute = '' and cast(resource.default_security_classification as text) in (<securityClassifications>)")
     @RegisterConstructorMapper(ResourceDefinition.class)
-    Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@BindList("userRoles") Set<String> userRoles);
+    Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@BindList Set<String> userRoles, @BindList Set<SecurityClassification> securityClassifications);
 }

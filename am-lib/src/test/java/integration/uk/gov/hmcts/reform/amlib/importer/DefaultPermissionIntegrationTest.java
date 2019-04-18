@@ -82,7 +82,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
                 .resourceType(RESOURCE_TYPE)
                 .resourceName(RESOURCE_NAME + 2)
                 .build())
-            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, READ_PERMISSION))
+            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, READ_PERMISSION, PUBLIC))
             .build());
 
         service.truncateDefaultPermissionsForService(SERVICE_NAME, RESOURCE_TYPE);

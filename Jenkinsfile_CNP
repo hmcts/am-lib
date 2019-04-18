@@ -35,6 +35,10 @@ withPipeline(type, product, component) {
     after('build') {
       sh '''
         cp -r am-lib/build/docs/javadoc .
+
+        git config user.email "jenkins@local"
+        git config user.name "Jenkins"
+
         git checkout --orphan gh-pages
         git add javadoc/
         git commit -m 'docs: add latest version of Javadoc' javadoc/

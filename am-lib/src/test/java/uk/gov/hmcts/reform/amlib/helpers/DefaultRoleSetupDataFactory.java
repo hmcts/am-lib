@@ -11,28 +11,35 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import java.util.Map;
 import java.util.Set;
 
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
+@SuppressWarnings("LineLength")
 public final class DefaultRoleSetupDataFactory {
 
     private DefaultRoleSetupDataFactory() {
         throw new UnsupportedOperationException("Constructing utility class is not supported");
     }
 
-    public static Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> createPermissionsForAttribute(
-        JsonPointer attribute, Set<Permission> permissions) {
-
-        Map.Entry<Set<Permission>, SecurityClassification> pair =
-            new Pair<>(permissions, SecurityClassification.PUBLIC);
+    public static Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> createPermissionsForAttribute(JsonPointer attribute, Set<Permission> permissions, SecurityClassification securityClassification) {
+        Map.Entry<Set<Permission>, SecurityClassification> pair = new Pair<>(permissions, securityClassification);
 
         return ImmutableMap.of(attribute, pair);
     }
 
     public static DefaultPermissionGrant createDefaultPermissionGrant(Set<Permission> permissions) {
+        return createDefaultPermissionGrant(JsonPointer.valueOf(""), permissions, PUBLIC);
+    }
+
+    public static DefaultPermissionGrant createDefaultPermissionGrant(JsonPointer attribute, Set<Permission> permissions) {
+        return createDefaultPermissionGrant(attribute, permissions, PUBLIC);
+
+    }
+
+    public static DefaultPermissionGrant createDefaultPermissionGrant(JsonPointer attribute, Set<Permission> permissions, SecurityClassification securityClassification) {
         return DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
             .resourceDefinition(ResourceDefinition.builder()
@@ -40,27 +47,11 @@ public final class DefaultRoleSetupDataFactory {
                 .resourceType(RESOURCE_TYPE)
                 .resourceName(RESOURCE_NAME)
                 .build())
-            .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, permissions))
+            .attributePermissions(createPermissionsForAttribute(attribute, permissions, securityClassification))
             .build();
     }
 
-    public static DefaultPermissionGrant createDefaultPermissionGrant(
-        JsonPointer attribute, Set<Permission> permissions) {
-        return DefaultPermissionGrant.builder()
-            .roleName(ROLE_NAME)
-            .resourceDefinition(ResourceDefinition.builder()
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .build())
-            .attributePermissions(createPermissionsForAttribute(attribute, permissions))
-            .build();
-    }
-
-    public static DefaultPermissionGrant createDefaultPermissionGrant(String attribute,
-                                                                      Set<Permission> permissions,
-                                                                      ResourceDefinition resource,
-                                                                      String roleName) {
+    public static DefaultPermissionGrant createDefaultPermissionGrant(String attribute, Set<Permission> permissions, ResourceDefinition resource, String roleName) {
         return DefaultPermissionGrant.builder()
             .roleName(roleName)
             .resourceDefinition(ResourceDefinition.builder()
@@ -68,7 +59,7 @@ public final class DefaultRoleSetupDataFactory {
                 .resourceType(resource.getResourceType())
                 .resourceName(resource.getResourceName())
                 .build())
-            .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf(attribute), permissions))
+            .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf(attribute), permissions, PUBLIC))
             .build();
     }
 

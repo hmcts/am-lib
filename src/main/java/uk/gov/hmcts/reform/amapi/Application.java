@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 @SpringBootApplication
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
@@ -23,7 +24,11 @@ public class Application implements CommandLineRunner {
     @Override
     public void run(String... args) {
         importerService.addService("cmc");
-        importerService.addResourceDefinition("cmc", "case", "claim");
+        importerService.addResourceDefinition(ResourceDefinition.builder()
+            .serviceName("cmc")
+            .resourceType("case")
+            .resourceName("claim")
+            .build());
         importerService.addRole("caseworker", RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
     }
 }

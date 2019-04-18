@@ -31,7 +31,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
 import javax.sql.DataSource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -83,9 +82,9 @@ public class AccessManagementService {
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
     @AuditLog("explicit access granted by '{{mdc:caller}}' to resource '{{accessGrant.resourceId}}' "
-        + "defined as '{{accessGrant.serviceName}}|{{accessGrant.resourceType}}|{{accessGrant.resourceName}}' "
-        + "for accessors '{{accessGrant.accessorIds}}' with relationship '{{accessGrant.relationship}}': "
-        + "{{accessGrant.attributePermissions}}")
+        + "defined as '{{accessGrant.resourceDefinition.serviceName}}|{{accessGrant.resourceDefinition.resourceType}}|"
+        + "{{accessGrant.resourceDefinition.resourceName}}' for accessors '{{accessGrant.accessorIds}}' "
+        + "with relationship '{{accessGrant.relationship}}': {{accessGrant.attributePermissions}}")
     public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant accessGrant) {
         jdbi.useTransaction(handle -> {
             AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
@@ -96,9 +95,9 @@ public class AccessManagementService {
                         .accessorId(accessorIds)
                         .permissions(attributePermission.getValue())
                         .accessorType(accessGrant.getAccessorType())
-                        .serviceName(accessGrant.getServiceName())
-                        .resourceType(accessGrant.getResourceType())
-                        .resourceName(accessGrant.getResourceName())
+                        .serviceName(accessGrant.getResourceDefinition().getServiceName())
+                        .resourceType(accessGrant.getResourceDefinition().getResourceType())
+                        .resourceName(accessGrant.getResourceDefinition().getResourceName())
                         .attribute(attributePermission.getKey())
                         .securityClassification(accessGrant.getSecurityClassification())
                         .relationship(accessGrant.getRelationship())
@@ -116,9 +115,10 @@ public class AccessManagementService {
      * @param accessMetadata an object to remove a specific explicit access record
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog("explicit access revoked by '{{mdc:caller}}' to resource '{{accessMetadata.resourceId}}' "
-        + "defined as '{{accessMetadata.serviceName}}|{{accessMetadata.resourceType}}|{{accessMetadata.resourceName}}' "
-        + "from accessor '{{accessMetadata.accessorId}}': {{accessMetadata.attribute}}")
+    @AuditLog("explicit access revoked by '{{mdc:caller}}' to resource '{{accessMetadata.resourceId}}' defined as "
+        + "'{{accessMetadata.resourceDefinition.serviceName}}|{{accessMetadata.resourceDefinition.resourceType}}|"
+        + "{{accessMetadata.resourceDefinition.resourceName}}' from accessor '{{accessMetadata.accessorId}}': "
+        + "{{accessMetadata.attribute}}")
     public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata accessMetadata) {
         jdbi.useExtension(AccessManagementRepository.class,
             dao -> dao.removeAccessManagementRecord(accessMetadata));

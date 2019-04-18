@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.RESTRICTED;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createPermissionsForAttribute;
+import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
@@ -37,15 +38,13 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
 
-    private final ResourceDefinition resource = buildResource(RESOURCE_NAME);
-    private final ResourceDefinition otherResource = buildResource(RESOURCE_NAME + "2");
+    private final ResourceDefinition resource = createResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
+    private final ResourceDefinition otherResource = createResourceDefinition(SERVICE_NAME, RESOURCE_TYPE,
+        RESOURCE_NAME + 2);
 
     @BeforeEach
     void setUp() {
-        importerService.addResourceDefinition(
-            otherResource.getServiceName(),
-            otherResource.getResourceType(),
-            otherResource.getResourceName());
+        importerService.addResourceDefinition(otherResource);
     }
 
     @Test
@@ -187,21 +186,15 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         assertThat(result).containsExactly(resource);
     }
 
-    private ResourceDefinition buildResource(String resourceName) {
-        return ResourceDefinition.builder()
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(resourceName)
-            .build();
-    }
-
     @SuppressWarnings("LineLength")
     private void grantRootPermission(String roleName, ResourceDefinition resourceDefinition, Permission permission, SecurityClassification securityClassification) {
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(roleName)
-            .serviceName(resourceDefinition.getServiceName())
-            .resourceType(resourceDefinition.getResourceType())
-            .resourceName(resourceDefinition.getResourceName())
+            .resourceDefinition(ResourceDefinition.builder()
+                .serviceName(resourceDefinition.getServiceName())
+                .resourceType(resourceDefinition.getResourceType())
+                .resourceName(resourceDefinition.getResourceName())
+                .build())
             .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, ImmutableSet.of(permission), securityClassification))
             .build());
     }

@@ -36,14 +36,17 @@ public final class DefaultRoleSetupDataFactory {
 
     public static DefaultPermissionGrant createDefaultPermissionGrant(JsonPointer attribute, Set<Permission> permissions) {
         return createDefaultPermissionGrant(attribute, permissions, PUBLIC);
+
     }
 
     public static DefaultPermissionGrant createDefaultPermissionGrant(JsonPointer attribute, Set<Permission> permissions, SecurityClassification securityClassification) {
         return DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
+            .resourceDefinition(ResourceDefinition.builder()
+                .serviceName(SERVICE_NAME)
+                .resourceType(RESOURCE_TYPE)
+                .resourceName(RESOURCE_NAME)
+                .build())
             .attributePermissions(createPermissionsForAttribute(attribute, permissions, securityClassification))
             .build();
     }
@@ -51,10 +54,22 @@ public final class DefaultRoleSetupDataFactory {
     public static DefaultPermissionGrant createDefaultPermissionGrant(String attribute, Set<Permission> permissions, ResourceDefinition resource, String roleName) {
         return DefaultPermissionGrant.builder()
             .roleName(roleName)
-            .serviceName(resource.getServiceName())
-            .resourceType(resource.getResourceType())
-            .resourceName(resource.getResourceName())
+            .resourceDefinition(ResourceDefinition.builder()
+                .serviceName(resource.getServiceName())
+                .resourceType(resource.getResourceType())
+                .resourceName(resource.getResourceName())
+                .build())
             .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf(attribute), permissions, PUBLIC))
+            .build();
+    }
+
+    public static ResourceDefinition createResourceDefinition(String serviceName,
+                                                              String resourceType,
+                                                              String resourceName) {
+        return ResourceDefinition.builder()
+            .serviceName(serviceName)
+            .resourceType(resourceType)
+            .resourceName(resourceName)
             .build();
     }
 }

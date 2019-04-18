@@ -38,10 +38,6 @@ withPipeline(type, product, component) {
 
         git config user.email "jenkins@local"
         git config user.name "Jenkins"
-
-        git checkout --orphan gh-pages
-        git add javadoc/
-        git commit -m 'docs: add latest version of Javadoc' javadoc/
       '''
     }
   }

@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
@@ -126,6 +127,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attributePermissions(createPermissions(attribute, READ_PERMISSION))
+            .securityClassification(PUBLIC)
             .relationship(ROLE_NAME)
             .build());
     }
@@ -139,6 +141,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .resourceType(RESOURCE_TYPE)
             .resourceName(RESOURCE_NAME)
             .attribute(JsonPointer.valueOf(attribute))
+            .securityClassification(PUBLIC)
             .build());
     }
 }

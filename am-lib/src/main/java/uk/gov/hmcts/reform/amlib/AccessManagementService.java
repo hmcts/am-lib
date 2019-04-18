@@ -100,6 +100,7 @@ public class AccessManagementService {
                         .resourceType(accessGrant.getResourceType())
                         .resourceName(accessGrant.getResourceName())
                         .attribute(attributePermission.getKey())
+                        .securityClassification(accessGrant.getSecurityClassification())
                         .relationship(accessGrant.getRelationship())
                         .build())
                     .forEach(dao::createAccessManagementRecord));

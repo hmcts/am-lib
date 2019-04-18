@@ -49,9 +49,9 @@ public interface AccessManagementRepository {
     @RegisterConstructorMapper(RoleBasedAccessRecord.class)
     List<RoleBasedAccessRecord> getRolePermissions(@BindBean ResourceDefinition resourceDefinition, String roleName);
 
-    @SqlQuery("select * from roles where role_name in (<userRoles>) and access_type = cast(:accessType as access_type)")
+    @SqlQuery("select * from roles where role_name in (<userRoles>) and cast(access_type as text) in (<accessTypes>)")
     @RegisterConstructorMapper(Role.class)
-    Set<Role> getRoles(@BindList Set<String> userRoles, AccessType accessType);
+    Set<Role> getRoles(@BindList Set<String> userRoles, @BindList Set<AccessType> accessTypes);
 
     @SqlQuery("select distinct default_perms.service_name, default_perms.resource_type, default_perms.resource_name from default_permissions_for_roles default_perms"
         + " join resource_attributes as resource on default_perms.service_name = resource.service_name and default_perms.resource_type = resource.resource_type and default_perms.resource_name = resource.resource_name"

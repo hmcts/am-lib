@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class AccessManagementService {
@@ -180,7 +182,7 @@ public class AccessManagementService {
                 return null;
             }
 
-            accessType = AccessType.ROLE_BASED;
+            accessType = ROLE_BASED;
 
         } else {
             List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccess.stream()
@@ -220,7 +222,7 @@ public class AccessManagementService {
         }
 
         return jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getRoles(userRoles, AccessType.ROLE_BASED).stream()
+            dao -> dao.getRoles(userRoles, Collections.singleton(ROLE_BASED)).stream()
                 .map(Role::getRoleName)
                 .collect(toSet()));
     }
@@ -269,7 +271,7 @@ public class AccessManagementService {
     @AuditLog("returned resources that user with roles '{{userRoles}}' has create permission to: {{result}}")
     public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@NotEmpty Set<@NotBlank String> userRoles) {
         Integer maxSecurityClassificationForRole = jdbi.withExtension(AccessManagementRepository.class, dao ->
-            dao.getRoles(userRoles, AccessType.ROLE_BASED)
+            dao.getRoles(userRoles, Collections.singleton(ROLE_BASED))
                 .stream()
                 .mapToInt(role -> role.getSecurityClassification().getHierarchy())
                 .max()

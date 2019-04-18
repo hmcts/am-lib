@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
-import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
@@ -65,7 +64,6 @@ public final class TestDataFactory {
                 .resourceName(RESOURCE_NAME)
                 .build())
             .attributePermissions(attributePermissions)
-            .securityClassification(PUBLIC)
             .relationship(relationship)
             .build();
     }
@@ -90,7 +88,6 @@ public final class TestDataFactory {
                 .resourceName(RESOURCE_NAME)
                 .build())
             .attribute(JsonPointer.valueOf(""))
-            .securityClassification(PUBLIC)
             .build();
     }
 

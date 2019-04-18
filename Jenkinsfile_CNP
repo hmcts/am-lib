@@ -14,16 +14,31 @@ withPipeline(type, product, component) {
 
   onMaster {
     enableSlackNotifications('#am-master-builds')
+
+    after('build') {
+      sh '''
+        
+      '''
+    }
+
+    after('smoketest:aat') {
+      echo "Disabling prod build"
+      sh "rm -rf infrastructure/"
+    }
   }
 
   onPR {
     // channel won't be used instead the user channel configured here is used:
     // https://github.com/hmcts/github-slack-user-mappings
     enableSlackNotifications('#am-pr-builds')
-  }
 
-  after('smoketest:aat') {
-    echo "Disabling prod build"
-    sh "rm -rf infrastructure/"
+    after('build') {
+      sh '''
+        cp -r am-lib/build/docs/javadoc .
+        git checkout --orphan gh-pages
+        git add javadoc/
+        git commit -m 'docs: add latest version of Javadoc' javadoc/
+      '''
+    }
   }
 }

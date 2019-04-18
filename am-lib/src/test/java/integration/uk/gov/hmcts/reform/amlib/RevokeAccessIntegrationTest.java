@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createMetadata;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
@@ -167,33 +168,10 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenRevokingResourceWithNestedAttributeRelationshipShouldOnlyRemoveThatRelationshipAndAttribute() {
         grantExplicitResourceAccess(resourceId, "/test");
         grantExplicitResourceAccess(resourceId, "/test/nested");
-        service.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
-            .resourceId(resourceId)
-            .accessorIds(ImmutableSet.of(accessorId))
-            .accessorType(USER)
-            .resourceDefinition(ResourceDefinition.builder()
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .build())
-            .attributePermissions(createPermissions("/test", READ_PERMISSION))
-            .securityClassification(PUBLIC)
-            .relationship(OTHER_ROLE_NAME)
-            .build());
-
-        service.grantExplicitResourceAccess(ExplicitAccessGrant.builder()
-            .resourceId(resourceId)
-            .accessorIds(ImmutableSet.of(accessorId))
-            .accessorType(USER)
-            .resourceDefinition(ResourceDefinition.builder()
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .build())
-            .attributePermissions(createPermissions("/test/nested", READ_PERMISSION))
-            .securityClassification(PUBLIC)
-            .relationship(OTHER_ROLE_NAME)
-            .build());
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, OTHER_ROLE_NAME,
+            createPermissions("/test", READ_PERMISSION)));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, OTHER_ROLE_NAME,
+            createPermissions("/test/nested", READ_PERMISSION)));
 
         revokeResourceAccess("/test");
 

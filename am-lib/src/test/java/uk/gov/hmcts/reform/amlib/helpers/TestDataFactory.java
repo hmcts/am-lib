@@ -95,6 +95,23 @@ public final class TestDataFactory {
             .build();
     }
 
+    public static ExplicitAccessMetadata createMetadata(String resourceId, String accessorId,
+                                                        String relationship, JsonPointer attribute) {
+        return ExplicitAccessMetadata.builder()
+            .resourceId(resourceId)
+            .accessorId(accessorId)
+            .accessorType(USER)
+            .resourceDefinition(ResourceDefinition.builder()
+                .serviceName(SERVICE_NAME)
+                .resourceType(RESOURCE_TYPE)
+                .resourceName(RESOURCE_NAME)
+                .build())
+            .attribute(attribute)
+            .securityClassification(PUBLIC)
+            .relationship(relationship)
+            .build();
+    }
+
     public static Resource createResource(String resourceId) {
         return Resource.builder()
             .id(resourceId)

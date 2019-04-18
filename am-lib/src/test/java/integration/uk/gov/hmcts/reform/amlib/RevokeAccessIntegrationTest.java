@@ -125,19 +125,8 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenRevokingResourceWithNonExistentRelationshipShouldNotRemoveAnyRecordFromDatabase() {
         grantExplicitResourceAccess(resourceId, "");
 
-        service.revokeResourceAccess(ExplicitAccessMetadata.builder()
-            .resourceId(resourceId)
-            .accessorId(accessorId)
-            .accessorType(USER)
-            .resourceDefinition(ResourceDefinition.builder()
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .build())
-            .attribute(JsonPointer.valueOf(""))
-            .securityClassification(PUBLIC)
-            .relationship("NonExistentRelationship")
-            .build());
+        service.revokeResourceAccess(createMetadata(resourceId,accessorId,
+            "NonExistentRelationship", JsonPointer.valueOf("")));
 
         assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(1)
             .extracting(ExplicitAccessRecord::getResourceId).contains(resourceId);
@@ -147,27 +136,17 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenRevokingResourceWithNullRelationshipShouldRemoveAnyRecordFromDatabase() {
         grantExplicitResourceAccess(resourceId, "");
 
-        service.revokeResourceAccess(ExplicitAccessMetadata.builder()
-            .resourceId(resourceId)
-            .accessorId(accessorId)
-            .accessorType(USER)
-            .resourceDefinition(ResourceDefinition.builder()
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .build())
-            .attribute(JsonPointer.valueOf(""))
-            .securityClassification(PUBLIC)
-            .relationship(null)
-            .build());
+        service.revokeResourceAccess(createMetadata(resourceId,accessorId,null, JsonPointer.valueOf("")));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
 
     @Test
     void whenRevokingResourceWithNestedAttributeRelationshipShouldOnlyRemoveThatRelationshipAndAttribute() {
-        grantExplicitResourceAccess(resourceId, "/test");
-        grantExplicitResourceAccess(resourceId, "/test/nested");
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, ROLE_NAME,
+            createPermissions("/test", READ_PERMISSION)));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, ROLE_NAME,
+            createPermissions("/test/nested", READ_PERMISSION)));
         service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, OTHER_ROLE_NAME,
             createPermissions("/test", READ_PERMISSION)));
         service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, OTHER_ROLE_NAME,
@@ -178,7 +157,6 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(2)
             .extracting(ExplicitAccessRecord::getAttribute).contains(JsonPointer.valueOf("/test"),
             JsonPointer.valueOf("/test/nested"));
-
     }
 
     @Test
@@ -186,19 +164,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         grantExplicitResourceAccess(resourceId, "/test");
         grantExplicitResourceAccess(resourceId, "/test/nested");
 
-        service.revokeResourceAccess(ExplicitAccessMetadata.builder()
-            .resourceId(resourceId)
-            .accessorId(accessorId)
-            .accessorType(USER)
-            .resourceDefinition(ResourceDefinition.builder()
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .build())
-            .attribute(JsonPointer.valueOf(""))
-            .securityClassification(PUBLIC)
-            .relationship(OTHER_ROLE_NAME)
-            .build());
+        service.revokeResourceAccess(createMetadata(resourceId,accessorId,OTHER_ROLE_NAME, JsonPointer.valueOf("")));
 
         assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(2)
             .extracting(ExplicitAccessRecord::getResourceId).contains(resourceId);

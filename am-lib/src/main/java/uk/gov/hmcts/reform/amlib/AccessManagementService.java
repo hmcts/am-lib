@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import javax.sql.DataSource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -41,6 +44,8 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class AccessManagementService {
@@ -99,7 +104,6 @@ public class AccessManagementService {
                         .resourceType(accessGrant.getResourceDefinition().getResourceType())
                         .resourceName(accessGrant.getResourceDefinition().getResourceName())
                         .attribute(attributePermission.getKey())
-                        .securityClassification(accessGrant.getSecurityClassification())
                         .relationship(accessGrant.getRelationship())
                         .build())
                     .forEach(dao::createAccessManagementRecord));
@@ -180,7 +184,7 @@ public class AccessManagementService {
                 return null;
             }
 
-            accessType = AccessType.ROLE_BASED;
+            accessType = ROLE_BASED;
 
         } else {
             List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccess.stream()
@@ -191,7 +195,7 @@ public class AccessManagementService {
                 .collect(toList());
 
             attributePermissions = permissionsService.merge(permissionsForRelationships);
-            accessType = AccessType.EXPLICIT;
+            accessType = EXPLICIT;
         }
 
         JsonNode filteredJson = filterService.filterJson(resource.getData(), attributePermissions);
@@ -220,7 +224,7 @@ public class AccessManagementService {
         }
 
         return jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getRoles(userRoles, AccessType.ROLE_BASED).stream()
+            dao -> dao.getRoles(userRoles, Collections.singleton(ROLE_BASED)).stream()
                 .map(Role::getRoleName)
                 .collect(toSet()));
     }
@@ -269,7 +273,7 @@ public class AccessManagementService {
     @AuditLog("returned resources that user with roles '{{userRoles}}' has create permission to: {{result}}")
     public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@NotEmpty Set<@NotBlank String> userRoles) {
         Integer maxSecurityClassificationForRole = jdbi.withExtension(AccessManagementRepository.class, dao ->
-            dao.getRoles(userRoles, AccessType.ROLE_BASED)
+            dao.getRoles(userRoles, Stream.of(EXPLICIT, ROLE_BASED).collect(toSet()))
                 .stream()
                 .mapToInt(role -> role.getSecurityClassification().getHierarchy())
                 .max()

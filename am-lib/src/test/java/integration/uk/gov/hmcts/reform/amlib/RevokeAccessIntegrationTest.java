@@ -181,7 +181,6 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .resourceName(RESOURCE_NAME)
                 .build())
             .attributePermissions(createPermissions(attribute, READ_PERMISSION))
-            .securityClassification(PUBLIC)
             .relationship(ROLE_NAME)
             .build());
     }

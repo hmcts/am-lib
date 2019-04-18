@@ -8,6 +8,5 @@
   "accessorId": "${accessorId}",
   "accessorType": "USER",
   "attribute": "",
-  "relationship": "caseworker",
-  "securityClassification": "PUBLIC"
+  "relationship": "caseworker"
 }

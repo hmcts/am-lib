@@ -121,7 +121,6 @@ public class SetupGenerator {
                     .accessorIds(ImmutableSet.of("user-" + number))
                     .accessorType(USER)
                     .attributePermissions(definition.attributePermissions)
-                    .securityClassification(PUBLIC)
                     .relationship("caseworker")
                     .build()
             ));

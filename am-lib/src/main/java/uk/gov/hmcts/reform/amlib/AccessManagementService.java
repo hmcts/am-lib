@@ -32,6 +32,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import javax.sql.DataSource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -42,6 +44,7 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 
 @SuppressWarnings("PMD.ExcessiveImports")
@@ -193,7 +196,7 @@ public class AccessManagementService {
                 .collect(toList());
 
             attributePermissions = permissionsService.merge(permissionsForRelationships);
-            accessType = AccessType.EXPLICIT;
+            accessType = EXPLICIT;
         }
 
         JsonNode filteredJson = filterService.filterJson(resource.getData(), attributePermissions);
@@ -271,7 +274,7 @@ public class AccessManagementService {
     @AuditLog("returned resources that user with roles '{{userRoles}}' has create permission to: {{result}}")
     public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@NotEmpty Set<@NotBlank String> userRoles) {
         Integer maxSecurityClassificationForRole = jdbi.withExtension(AccessManagementRepository.class, dao ->
-            dao.getRoles(userRoles, Collections.singleton(ROLE_BASED))
+            dao.getRoles(userRoles, Stream.of(EXPLICIT, ROLE_BASED).collect(toSet()))
                 .stream()
                 .mapToInt(role -> role.getSecurityClassification().getHierarchy())
                 .max()

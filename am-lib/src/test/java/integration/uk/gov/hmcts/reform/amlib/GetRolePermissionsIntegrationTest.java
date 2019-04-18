@@ -52,9 +52,11 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         importerService.grantDefaultPermission(
             DefaultPermissionGrant.builder()
                 .roleName(ROLE_NAME)
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
+                .resourceDefinition(ResourceDefinition.builder()
+                    .serviceName(SERVICE_NAME)
+                    .resourceType(RESOURCE_TYPE)
+                    .resourceName(RESOURCE_NAME)
+                    .build())
                 .attributePermissions(attributePermissionsForRole)
                 .build());
 
@@ -66,9 +68,11 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(OTHER_ROLE_NAME)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
+            .resourceDefinition(ResourceDefinition.builder()
+                .serviceName(SERVICE_NAME)
+                .resourceType(RESOURCE_TYPE)
+                .resourceName(RESOURCE_NAME)
+                .build())
             .attributePermissions(attributePermissionsForOtherRole)
             .build());
     }

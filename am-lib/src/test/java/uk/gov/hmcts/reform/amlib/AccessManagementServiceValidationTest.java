@@ -27,9 +27,10 @@ class AccessManagementServiceValidationTest {
                 "accessGrant.resourceId - must not be blank",
                 "accessGrant.accessorIds - must not be empty",
                 "accessGrant.accessorType - must not be null",
-                "accessGrant.serviceName - must not be blank",
-                "accessGrant.resourceType - must not be blank",
-                "accessGrant.resourceName - must not be blank",
+                "accessGrant.resourceDefinition - must not be null",
+                "accessGrant.resourceDefinition.serviceName - must not be blank",
+                "accessGrant.resourceDefinition.resourceType - must not be blank",
+                "accessGrant.resourceDefinition.resourceName - must not be blank",
                 "accessGrant.attributePermissions - must not be empty",
                 "accessGrant.securityClassification - must not be null",
                 "accessGrant.relationship - must not be blank"
@@ -46,9 +47,10 @@ class AccessManagementServiceValidationTest {
                 "accessMetadata.resourceId - must not be blank",
                 "accessMetadata.accessorId - must not be blank",
                 "accessMetadata.accessorType - must not be null",
-                "accessMetadata.serviceName - must not be blank",
-                "accessMetadata.resourceType - must not be blank",
-                "accessMetadata.resourceName - must not be blank",
+                "accessMetadata.resourceDefinition - must not be null",
+                "accessMetadata.resourceDefinition.serviceName - must not be blank",
+                "accessMetadata.resourceDefinition.resourceType - must not be blank",
+                "accessMetadata.resourceDefinition.resourceName - must not be blank",
                 "accessMetadata.attribute - must not be null",
                 "accessMetadata.securityClassification - must not be null"
             ));

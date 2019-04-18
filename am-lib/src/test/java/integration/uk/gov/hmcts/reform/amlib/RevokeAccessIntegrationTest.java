@@ -186,17 +186,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .relationship(OTHER_ROLE_NAME)
             .build());
 
-        service.revokeResourceAccess(ExplicitAccessMetadata.builder()
-            .resourceId(resourceId)
-            .accessorId(accessorId)
-            .accessorType(USER)
-            .serviceName(SERVICE_NAME)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .attribute(JsonPointer.valueOf("/test"))
-            .securityClassification(PUBLIC)
-            .relationship(ROLE_NAME)
-            .build());
+        revokeResourceAccess("/test");
 
         assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(2)
             .extracting(ExplicitAccessRecord::getAttribute).contains(JsonPointer.valueOf("/test"),

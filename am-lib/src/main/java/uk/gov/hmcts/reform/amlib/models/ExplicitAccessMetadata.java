@@ -23,8 +23,6 @@ public final class ExplicitAccessMetadata {
     private final AccessorType accessorType;
     @NotNull
     private final JsonPointer attribute;
-    @NotNull
-    private final SecurityClassification securityClassification;
     private final String relationship;
 
     public String getAttributeAsString() {

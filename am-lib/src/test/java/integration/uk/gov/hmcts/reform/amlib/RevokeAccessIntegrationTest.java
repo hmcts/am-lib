@@ -16,7 +16,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
-import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
@@ -125,7 +124,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenRevokingResourceWithNonExistentRelationshipShouldNotRemoveAnyRecordFromDatabase() {
         grantExplicitResourceAccess(resourceId, "");
 
-        service.revokeResourceAccess(createMetadata(resourceId,accessorId,
+        service.revokeResourceAccess(createMetadata(resourceId, accessorId,
             "NonExistentRelationship", JsonPointer.valueOf("")));
 
         assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(1)
@@ -136,7 +135,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenRevokingResourceWithNullRelationshipShouldRemoveAnyRecordFromDatabase() {
         grantExplicitResourceAccess(resourceId, "");
 
-        service.revokeResourceAccess(createMetadata(resourceId,accessorId,null, JsonPointer.valueOf("")));
+        service.revokeResourceAccess(createMetadata(resourceId, accessorId, null, JsonPointer.valueOf("")));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
     }
@@ -164,7 +163,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         grantExplicitResourceAccess(resourceId, "/test");
         grantExplicitResourceAccess(resourceId, "/test/nested");
 
-        service.revokeResourceAccess(createMetadata(resourceId,accessorId,OTHER_ROLE_NAME, JsonPointer.valueOf("")));
+        service.revokeResourceAccess(createMetadata(resourceId, accessorId, OTHER_ROLE_NAME, JsonPointer.valueOf("")));
 
         assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(2)
             .extracting(ExplicitAccessRecord::getResourceId).contains(resourceId);
@@ -196,7 +195,6 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .resourceName(RESOURCE_NAME)
                 .build())
             .attribute(JsonPointer.valueOf(attribute))
-            .securityClassification(PUBLIC)
             .relationship(ROLE_NAME)
             .build());
     }

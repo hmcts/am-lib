@@ -37,8 +37,7 @@ public interface AccessManagementRepository {
         + "and access_management.resource_type = :resourceDefinition.resourceType "
         + "and access_management.resource_name = :resourceDefinition.resourceName "
         + "and (:relationship is null or access_management.relationship = :relationship) "
-        + "and (access_management.attribute = :attributeAsString "
-        + "or access_management.attribute like concat(:attributeAsString, '/', '%'))")
+        + "and (access_management.attribute = :attributeAsString or access_management.attribute like concat(:attributeAsString, '/', '%'))")
     void removeAccessManagementRecord(@BindBean ExplicitAccessMetadata explicitAccessMetadata);
 
     @SqlQuery("select * from access_management where accessor_id=? and resource_id=?")

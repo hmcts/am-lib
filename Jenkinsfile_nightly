@@ -58,7 +58,7 @@ withNightlyPipeline(type, product, component) {
         set -e
       
         export PATH=$PATH:./bin
-        git lfs install
+        git lfs install --local
         git lfs pull || (git lfs logs last && false)
       '''
   }

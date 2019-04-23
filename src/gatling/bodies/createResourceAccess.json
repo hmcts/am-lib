@@ -10,6 +10,5 @@
   "attributePermissions": {
     "": ["CREATE", "READ", "UPDATE"]
   },
-  "relationship": "caseworker",
-  "securityClassification": "PUBLIC"
+  "relationship": "caseworker"
 }

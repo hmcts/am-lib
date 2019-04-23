@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.utils.Permissions;
 import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
 
@@ -24,7 +23,6 @@ public final class ExplicitAccessRecord implements AttributeAccessDefinition {
     private final String resourceName;
     private final JsonPointer attribute;
     private final Set<Permission> permissions;
-    private final SecurityClassification securityClassification;
     private final String relationship;
 
     @Override

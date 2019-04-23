@@ -2,6 +2,7 @@ package integration.uk.gov.hmcts.reform.amlib.base;
 
 import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
@@ -25,6 +26,10 @@ public abstract class PreconfiguredIntegrationBaseTest extends IntegrationBaseTe
         importerService.addService(SERVICE_NAME);
         importerService.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);
         importerService.addRole(OTHER_ROLE_NAME, IDAM, PUBLIC, EXPLICIT);
-        importerService.addResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
+        importerService.addResourceDefinition(ResourceDefinition.builder()
+            .serviceName(SERVICE_NAME)
+            .resourceType(RESOURCE_TYPE)
+            .resourceName(RESOURCE_NAME)
+            .build());
     }
 }

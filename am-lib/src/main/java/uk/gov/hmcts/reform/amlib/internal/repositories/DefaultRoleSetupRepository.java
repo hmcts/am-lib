@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 @SuppressWarnings({
     "LineLength",
@@ -23,7 +24,7 @@ public interface DefaultRoleSetupRepository {
 
     @SqlUpdate("insert into resources (service_name, resource_type, resource_name) values (:serviceName, :resourceType, :resourceName)"
         + "on conflict on constraint resources_pkey do nothing")
-    void addResourceDefinition(String serviceName, String resourceType, String resourceName);
+    void addResourceDefinition(@BindBean ResourceDefinition resourceDefinition);
 
     @SqlUpdate("insert into resource_attributes (service_name, resource_type, resource_name, attribute, default_security_classification)"
         + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, cast(:defaultSecurityClassification as security_classification))"
@@ -39,16 +40,16 @@ public interface DefaultRoleSetupRepository {
     void deleteDefaultPermissionsForRoles(String serviceName, String resourceType);
 
     @SqlUpdate("delete from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType and resource_name = :resourceName")
-    void deleteDefaultPermissionsForRoles(String serviceName, String resourceType, String resourceName);
+    void deleteDefaultPermissionsForRoles(@BindBean ResourceDefinition resourceDefinition);
 
     @SqlUpdate("delete from resource_attributes where service_name = :serviceName and resource_type = :resourceType")
     void deleteResourceAttributes(String serviceName, String resourceType);
 
     @SqlUpdate("delete from resource_attributes where service_name = :serviceName and resource_type = :resourceType  and resource_name = :resourceName")
-    void deleteResourceAttributes(String serviceName, String resourceType, String resourceName);
+    void deleteResourceAttributes(@BindBean ResourceDefinition resourceDefinition);
 
     @SqlUpdate("delete from resources where service_name = :serviceName and resource_type = :resourceType  and resource_name = :resourceName")
-    void deleteResourceDefinition(String serviceName, String resourceType, String resourceName);
+    void deleteResourceDefinition(@BindBean ResourceDefinition resourceDefinition);
 
     @SqlUpdate("delete from roles where role_name = :roleName")
     void deleteRole(String roleName);

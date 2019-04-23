@@ -1,11 +1,12 @@
 {
   "resourceId": "${resourceId}",
+  "resourceDefinition": {
+    "serviceName": "cmc",
+    "resourceType": "case",
+    "resourceName": "claim"
+  },
   "accessorId": "${accessorId}",
-  "accessType": "user",
-  "serviceName": "cmc",
-  "resourceType": "case",
-  "resourceName": "claim",
+  "accessorType": "USER",
   "attribute": "",
-  "relationship": "caseworker",
-  "securityClassification": "PUBLIC"
+  "relationship": "caseworker"
 }

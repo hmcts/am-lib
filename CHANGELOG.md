@@ -1,3 +1,12 @@
+# [0.6.0](https://github.com/hmcts/am-lib/compare/0.5.0...0.6.0) (2019-04-15)
+
+
+### Features
+
+* support relationship between user and resource in explicit access grants ([#112](https://github.com/hmcts/am-lib/issues/112)) ([5d87c15](https://github.com/hmcts/am-lib/commit/5d87c15))
+
+
+
 # [0.5.0](https://github.com/hmcts/am-lib/compare/0.4.0...0.5.0) (2019-04-12)
 
 

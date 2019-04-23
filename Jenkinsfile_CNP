@@ -14,16 +14,37 @@ withPipeline(type, product, component) {
 
   onMaster {
     enableSlackNotifications('#am-master-builds')
+
+    before('aat:promotion') {
+      withCredentials([usernamePassword(credentialsId: 'jenkins-github-hmcts-api-token', usernameVariable: 'USERNAME', passwordVariable: 'BEARER_TOKEN')]) {
+        sh '''
+          set -e
+
+          function publish {
+            git config user.email "jenkins@local"
+            git config user.name "Jenkins"
+            git remote set-url origin $(git config remote.origin.url | sed "s/github.com/${BEARER_TOKEN}@github.com/g")
+
+            git checkout --orphan gh-pages
+            git add javadoc/
+            git commit -m "docs: add latest version of Javadoc" javadoc/
+            git push --force origin gh-pages
+          }
+
+          cp -r am-lib/build/docs/javadoc . && publish && rm -rf javadoc/
+        '''
+      }
+    }
+
+    after('smoketest:aat') {
+      echo "Disabling prod build"
+      sh "rm -rf infrastructure/"
+    }
   }
 
   onPR {
     // channel won't be used instead the user channel configured here is used:
     // https://github.com/hmcts/github-slack-user-mappings
     enableSlackNotifications('#am-pr-builds')
-  }
-
-  after('smoketest:aat') {
-    echo "Disabling prod build"
-    sh "rm -rf infrastructure/"
   }
 }

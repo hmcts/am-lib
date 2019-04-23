@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.helpers.InvalidArgumentsProvider;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.ValidationMessageRegexFactory.expectedValidationMessagesRegex;
@@ -43,15 +44,14 @@ class DefaultRoleSetupImportServiceValidationTest {
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
-    void addResourceDefinitionMethodShouldRejectInvalidArguments(String serviceName,
-                                                                 String resourceType,
-                                                                 String resourceName) {
+    void addResourceDefinitionMethodShouldRejectInvalidArguments(ResourceDefinition resourceDefinition) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.addResourceDefinition(serviceName, resourceType, resourceName))
+            .isThrownBy(() -> service.addResourceDefinition(resourceDefinition))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "serviceName - must not be blank",
-                "resourceType - must not be blank",
-                "resourceName - must not be blank"
+                "resourceDefinition - must not be null",
+                "resourceDefinition.serviceName - must not be blank",
+                "resourceDefinition.resourceType - must not be blank",
+                "resourceDefinition.resourceName - must not be blank"
             ));
     }
 
@@ -62,9 +62,10 @@ class DefaultRoleSetupImportServiceValidationTest {
             .isThrownBy(() -> service.grantDefaultPermission(accessGrant))
             .withMessageMatching(expectedValidationMessagesRegex(
                 "accessGrant - must not be null",
-                "accessGrant.serviceName - must not be blank",
-                "accessGrant.resourceType - must not be blank",
-                "accessGrant.resourceName - must not be blank",
+                "accessGrant.resourceDefinition - must not be null",
+                "accessGrant.resourceDefinition.serviceName - must not be blank",
+                "accessGrant.resourceDefinition.resourceType - must not be blank",
+                "accessGrant.resourceDefinition.resourceName - must not be blank",
                 "accessGrant.roleName - must not be blank",
                 "accessGrant.attributePermissions - must not be empty"
             ));
@@ -85,29 +86,27 @@ class DefaultRoleSetupImportServiceValidationTest {
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
     @SuppressWarnings("LineLength")
-    void truncateDefaultPermissionsByResourceDefinitionMethodShouldRejectInvalidArguments(String serviceName,
-                                                                                          String resourceType,
-                                                                                          String resourceName) {
+    void truncateDefaultPermissionsByResourceDefinitionMethodShouldRejectInvalidArguments(ResourceDefinition resourceDefinition) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.truncateDefaultPermissionsByResourceDefinition(serviceName, resourceType, resourceName))
+            .isThrownBy(() -> service.truncateDefaultPermissionsByResourceDefinition(resourceDefinition))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "serviceName - must not be blank",
-                "resourceType - must not be blank",
-                "resourceName - must not be blank"
+                "resourceDefinition - must not be null",
+                "resourceDefinition.serviceName - must not be blank",
+                "resourceDefinition.resourceType - must not be blank",
+                "resourceDefinition.resourceName - must not be blank"
             ));
     }
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
-    void deleteResourceDefinitionMethodShouldRejectInvalidArguments(String serviceName,
-                                                                    String resourceType,
-                                                                    String resourceName) {
+    void deleteResourceDefinitionMethodShouldRejectInvalidArguments(ResourceDefinition resourceDefinition) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.deleteResourceDefinition(serviceName, resourceType, resourceName))
+            .isThrownBy(() -> service.deleteResourceDefinition(resourceDefinition))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "serviceName - must not be blank",
-                "resourceType - must not be blank",
-                "resourceName - must not be blank"
+                "resourceDefinition - must not be null",
+                "resourceDefinition.serviceName - must not be blank",
+                "resourceDefinition.resourceType - must not be blank",
+                "resourceDefinition.resourceName - must not be blank"
             ));
     }
 

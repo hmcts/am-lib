@@ -6,11 +6,13 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.FilterService;
 import uk.gov.hmcts.reform.amlib.internal.PermissionsService;
 import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
 import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
@@ -21,12 +23,16 @@ import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 import javax.validation.Valid;
@@ -37,7 +43,11 @@ import javax.validation.constraints.NotNull;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 
+@SuppressWarnings("PMD.ExcessiveImports")
 public class AccessManagementService {
 
     private final FilterService filterService = new FilterService();
@@ -77,9 +87,9 @@ public class AccessManagementService {
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
     @AuditLog("explicit access granted by '{{mdc:caller}}' to resource '{{accessGrant.resourceId}}' "
-        + "defined as '{{accessGrant.serviceName}}|{{accessGrant.resourceType}}|{{accessGrant.resourceName}}' "
-        + "for accessors '{{accessGrant.accessorIds}}' with relationship '{{accessGrant.relationship}}': "
-        + "{{accessGrant.attributePermissions}}")
+        + "defined as '{{accessGrant.resourceDefinition.serviceName}}|{{accessGrant.resourceDefinition.resourceType}}|"
+        + "{{accessGrant.resourceDefinition.resourceName}}' for accessors '{{accessGrant.accessorIds}}' "
+        + "with relationship '{{accessGrant.relationship}}': {{accessGrant.attributePermissions}}")
     public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant accessGrant) {
         jdbi.useTransaction(handle -> {
             AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
@@ -90,11 +100,10 @@ public class AccessManagementService {
                         .accessorId(accessorIds)
                         .permissions(attributePermission.getValue())
                         .accessorType(accessGrant.getAccessorType())
-                        .serviceName(accessGrant.getServiceName())
-                        .resourceType(accessGrant.getResourceType())
-                        .resourceName(accessGrant.getResourceName())
+                        .serviceName(accessGrant.getResourceDefinition().getServiceName())
+                        .resourceType(accessGrant.getResourceDefinition().getResourceType())
+                        .resourceName(accessGrant.getResourceDefinition().getResourceName())
                         .attribute(attributePermission.getKey())
-                        .securityClassification(accessGrant.getSecurityClassification())
                         .relationship(accessGrant.getRelationship())
                         .build())
                     .forEach(dao::createAccessManagementRecord));
@@ -110,9 +119,10 @@ public class AccessManagementService {
      * @param accessMetadata an object to remove a specific explicit access record
      * @throws PersistenceException if any persistence errors were encountered
      */
-    @AuditLog("explicit access revoked by '{{mdc:caller}}' to resource '{{accessMetadata.resourceId}}' "
-        + "defined as '{{accessMetadata.serviceName}}|{{accessMetadata.resourceType}}|{{accessMetadata.resourceName}}' "
-        + "from accessor '{{accessMetadata.accessorId}}': {{accessMetadata.attribute}}")
+    @AuditLog("explicit access revoked by '{{mdc:caller}}' to resource '{{accessMetadata.resourceId}}' defined as "
+        + "'{{accessMetadata.resourceDefinition.serviceName}}|{{accessMetadata.resourceDefinition.resourceType}}|"
+        + "{{accessMetadata.resourceDefinition.resourceName}}' from accessor '{{accessMetadata.accessorId}}': "
+        + "{{accessMetadata.attribute}}")
     public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata accessMetadata) {
         jdbi.useExtension(AccessManagementRepository.class,
             dao -> dao.removeAccessManagementRecord(accessMetadata));
@@ -174,7 +184,7 @@ public class AccessManagementService {
                 return null;
             }
 
-            accessType = AccessType.ROLE_BASED;
+            accessType = ROLE_BASED;
 
         } else {
             List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccess.stream()
@@ -185,14 +195,14 @@ public class AccessManagementService {
                 .collect(toList());
 
             attributePermissions = permissionsService.merge(permissionsForRelationships);
-            accessType = AccessType.EXPLICIT;
+            accessType = EXPLICIT;
         }
 
         JsonNode filteredJson = filterService.filterJson(resource.getData(), attributePermissions);
 
         Set<String> relationships = explicitAccess.stream()
             .map(ExplicitAccessRecord::getRelationship)
-            .collect(Collectors.toSet());
+            .collect(toSet());
 
         return FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
@@ -214,7 +224,9 @@ public class AccessManagementService {
         }
 
         return jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getRoles(userRoles, AccessType.ROLE_BASED));
+            dao -> dao.getRoles(userRoles, Collections.singleton(ROLE_BASED)).stream()
+                .map(Role::getRoleName)
+                .collect(toSet()));
     }
 
     /**
@@ -260,8 +272,21 @@ public class AccessManagementService {
     @SuppressWarnings("LineLength")
     @AuditLog("returned resources that user with roles '{{userRoles}}' has create permission to: {{result}}")
     public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@NotEmpty Set<@NotBlank String> userRoles) {
+        Integer maxSecurityClassificationForRole = jdbi.withExtension(AccessManagementRepository.class, dao ->
+            dao.getRoles(userRoles, Stream.of(EXPLICIT, ROLE_BASED).collect(toSet()))
+                .stream()
+                .mapToInt(role -> role.getSecurityClassification().getHierarchy())
+                .max()
+                .orElseThrow(NoSuchElementException::new));
+
+        Set<SecurityClassification> visibleSecurityClassifications = EnumSet.allOf(SecurityClassification.class)
+            .stream()
+            .filter(securityClassification ->
+                securityClassification.isVisible(maxSecurityClassificationForRole))
+            .collect(toSet());
+
         return jdbi.withExtension(AccessManagementRepository.class, dao ->
-            dao.getResourceDefinitionsWithRootCreatePermission(userRoles));
+            dao.getResourceDefinitionsWithRootCreatePermission(userRoles, visibleSecurityClassifications));
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {

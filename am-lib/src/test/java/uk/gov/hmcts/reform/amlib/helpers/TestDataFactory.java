@@ -78,18 +78,7 @@ public final class TestDataFactory {
     }
 
     public static ExplicitAccessMetadata createMetadata(String resourceId, String accessorId) {
-        return ExplicitAccessMetadata.builder()
-            .resourceId(resourceId)
-            .accessorId(accessorId)
-            .accessorType(USER)
-            .resourceDefinition(ResourceDefinition.builder()
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .build())
-            .attribute(JsonPointer.valueOf(""))
-            .relationship(ROLE_NAME)
-            .build();
+        return createMetadata(resourceId,accessorId,ROLE_NAME,JsonPointer.valueOf(""));
     }
 
     public static ExplicitAccessMetadata createMetadata(String resourceId, String accessorId,

@@ -60,7 +60,6 @@ withNightlyPipeline(type, product, component) {
         export PATH=$PATH:./bin
         git lfs install
         git lfs pull || (git lfs logs last && false)
-    
       '''
   }
 

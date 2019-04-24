@@ -1,5 +1,13 @@
 # Access Management Library
 
+[![javadoc badge](https://img.shields.io/badge/javadoc-published-brightgreen.svg)](https://hmcts.github.io/am-lib/javadoc/)
+
+## Documentation
+
+### Javadoc
+
+Latest version of Javadoc out of master branch is published automatically and [available online](https://hmcts.github.io/am-lib/javadoc/).
+
 ## Building the library
 
 The project uses [Gradle](https://gradle.org) as a build tool. It already contains

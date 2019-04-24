@@ -9,7 +9,7 @@ properties([
   ])
 ])
 
-@Library("Infrastructure@feature/RPE-1069-add-perf-test-java-detection")
+@Library("Infrastructure")
 
 def type = "java"
 def product = "am"

@@ -15,7 +15,7 @@ Before you can add anything else please make sure you have added any service to 
 
 ```public void addService(@NotBlank String serviceName, String serviceDescription)```
 
-for example:
+For example:
 ```addService("CMC", "Civil Money Case")```
 
 Description is not mandatory. Please keep in mind that name of service is unique primary key and you will overwrite description if you provide name of service that already exists, but it will not throw any exception.
@@ -75,7 +75,7 @@ It will delete all default permissions for all resource names within provided se
 
 2. by `serviceName`, `resourceType` and `resourceName` eg:
 
-```truncateDefaultPermissionsForService("CMC", "CASE", "CivilMonayCase");```
+```truncateDefaultPermissionsForService("CMC", "CASE", "CivilMoneyCase");```
 
 will delete all "CivilMonayCase", but no other cases definitions within CMC. One service may have more than 1 case type.
 
@@ -85,13 +85,13 @@ To clean up database you need to delete rows from database in the correct order.
 2. Delete resource definitions
 ```public void deleteResourceDefinition(@NotBlank String serviceName, @NotBlank String resourceType, @NotBlank String resourceName)```
 
-for example:
+For example:
 ```deleteResourceDefinition("CMC", "CASE", "CivilMoneyCase")```
 
 3. Delete roles
 ```public void deleteRole(@NotBlank String roleName)```
 
-eg:
+For example:
 ```public void deleteRole("citizen")```
 
 This can fail if this role is used as a relationship in `access_management` table.
@@ -99,9 +99,15 @@ This can fail if this role is used as a relationship in `access_management` tabl
 4. Delete services
 ```public void deleteService(@NotBlank String serviceName)```
 
-eg
+For example:
 ```deleteService("CMC")```
 
-## No cascade on delete
+### No cascade on delete
 
 Please mind there is no cascade on delete. In other words, when you try to remove service, but you haven't deleted resource definitions that are using this service (fk constraint) it will cause an error.
+
+### Overwrite by default
+
+Whenever you try to grant persmissions for an attribute that is already defined (there is a row in db that has the same: `resourceType`, `resourceName`, `serviceName`, `attribute`, `roleName` as in your call) this record will be overwritten and you will not get any information about the fact that there used to be record for this attribute before. 
+
+This rule applies to other tables. Please see db documentation on confluence to learn more about all uniques and other constraints.

@@ -115,7 +115,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
 
-        assertThat(result).containsExactly(resourceDefinition, otherResource);
+        assertThat(result).containsExactlyInAnyOrder(resourceDefinition, otherResource);
     }
 
     @Test
@@ -127,7 +127,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
         Set<ResourceDefinition> result = service.getResourceDefinitionsWithRootCreatePermission(userRoles);
 
-        assertThat(result).containsExactly(resourceDefinition, otherResource);
+        assertThat(result).containsExactlyInAnyOrder(resourceDefinition, otherResource);
     }
 
     @Test

@@ -16,7 +16,7 @@ Before you can add anything else please make sure you have added any service to 
 ```public void addService(@NotBlank String serviceName, String serviceDescription)```
 
 for example:
-```public void addService('CMC', 'Civil Money Case')```
+```addService("CMC", "Civil Money Case")```
 
 Description is not mandatory. Please keep in mind that name of service is unique primary key and you will overwrite description if you provide name of service that already exists, but it will not throw any exception.
 
@@ -26,7 +26,7 @@ Roles are more complex as you have 4 values (and all are mandatory).
 ```public void addRole(@NotBlank String roleName, @NotNull RoleType roleType, @NotNull SecurityClassification securityClassification, @NotNull AccessType accessType)```
 
 For example:
-```public void addRole('citizen', RoleType.IDAM, SecurityClassification.PUBLIC, AccessManagementType.EXPLICIT_ACCESS)```
+```addRole("citizen", RoleType.IDAM, SecurityClassification.PUBLIC, AccessManagementType.EXPLICIT_ACCESS)```
 
 Possible options for `RoleType`:
 * IDAM
@@ -51,7 +51,7 @@ By "resource definition" we understand 3 values: service, resource type and reso
 ```public void addResourceDefinition(@NotBlank String serviceName, @NotBlank String resourceType, @NotBlank String resourceName)```
 
 For example:
-```public void addResourceDefinition('CMC', 'CASE', 'CivilMoneyCase')```
+```addResourceDefinition("CMC", "CASE", "CivilMoneyCase")```
 
 Why 'CASE' needs to be provided? At the moment we will support only cases, but in the upcoming releases we are going to support also documents and maybe even other types of resources.
 

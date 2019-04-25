@@ -1,4 +1,4 @@
-package gov.hmcts.reform.amlib.performance.http
+package uk.gov.hmcts.reform.amlib.performance.http
 
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
@@ -9,7 +9,7 @@ object AccessManagement {
   private def postRequest(url: String, body: String): HttpRequestBuilder =
     http(url)
       .post("/lib" + url)
-      .body(ElFileBody(body)).asJSON
+      .body(ElFileBody(body)).asJson
       .check(status.is(200))
 
   def createResourceAssess: HttpRequestBuilder =

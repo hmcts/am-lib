@@ -1,7 +1,7 @@
-package gov.hmcts.reform.amlib.performance.scenarios
+package uk.gov.hmcts.reform.amlib.performance.scenarios
 
-import gov.hmcts.reform.amlib.performance.feed.CreateResourceAccess
-import gov.hmcts.reform.amlib.performance.http.AccessManagement
+import uk.gov.hmcts.reform.amlib.performance.feed.CreateResourceAccess
+import uk.gov.hmcts.reform.amlib.performance.http.AccessManagement
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 

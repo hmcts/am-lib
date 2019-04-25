@@ -1,3 +1,18 @@
+# [0.7.0](https://github.com/hmcts/am-lib/compare/0.6.0...0.7.0) (2019-04-24)
+
+
+### Bug Fixes
+
+* make retrieving resource definitions with root create permissions use EXPLICIT and ROLE_BASED access type ([#136](https://github.com/hmcts/am-lib/issues/136)) ([5ef5c62](https://github.com/hmcts/am-lib/commit/5ef5c62))
+
+
+### Features
+
+* filter resource definitions with create permission using security classification (AM-253) ([#122](https://github.com/hmcts/am-lib/issues/122)) ([a5278c5](https://github.com/hmcts/am-lib/commit/a5278c5))
+* revoke resource access based on relationship (AM-249) ([#130](https://github.com/hmcts/am-lib/issues/130)) ([18cfe13](https://github.com/hmcts/am-lib/commit/18cfe13))
+
+
+
 # [0.6.0](https://github.com/hmcts/am-lib/compare/0.5.0...0.6.0) (2019-04-15)
 
 

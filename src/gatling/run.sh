@@ -2,11 +2,11 @@
 
 dir=$(realpath $(dirname ${0}))
 
-command='gatling.sh -m -sf /gatling/workspace/simulations -bdf /gatling/workspace/bodies -rf /gatling/workspace/results'
+command='gatling.sh --simulations-folder /gatling/workspace/simulations --results-folder /gatling/workspace/results --resources-folder /gatling/workspace/resources'
 
 docker run -it --network=host \
     -v ${dir}/conf:/etc/gatling/conf \
     -v ${dir}:/gatling/workspace:rw,z \
     -w /gatling/workspace \
     -e TEST_URL \
-    hmcts/moj-gatling-image:2.3.1-1.0 ${command}
+    hmcts/gatling:3.1.1-java-8-1.0 ${command}

@@ -58,7 +58,6 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenCreatingResourceAccessResourceAccessAppearsInDatabase() {
         service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, accessorId, resourceDefinition, ImmutableSet.of(READ)));
-
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
     }
 

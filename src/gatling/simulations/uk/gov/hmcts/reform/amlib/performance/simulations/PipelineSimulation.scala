@@ -1,6 +1,6 @@
-package gov.hmcts.reform.amlib.performance.simulations
+package uk.gov.hmcts.reform.amlib.performance.simulations
 
-import gov.hmcts.reform.amlib.performance.scenarios.BasicScenarios
+import uk.gov.hmcts.reform.amlib.performance.scenarios.BasicScenarios
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import uk.gov.hmcts.reform.amlib.performance.utils.Environment
@@ -9,8 +9,8 @@ import scala.concurrent.duration._
 
 class PipelineSimulation extends Simulation {
 
-  private val httpProtocol = http.baseURL(Environment.baseUrl)
-  private val loadProfile = rampUsers(10).over(2.seconds)
+  private val httpProtocol = http.baseUrl(Environment.baseUrl)
+  private val loadProfile = rampUsers(10) during 2.seconds
 
   /* load profile and assertions to be changed once NFRs are defined
       this is just an exemplary simulation */

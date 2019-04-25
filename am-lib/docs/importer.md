@@ -29,17 +29,21 @@ For example:
 ```public void addRole('citizen', RoleType.IDAM, SecurityClassification.PUBLIC, AccessManagementType.EXPLICIT_ACCESS)```
 
 Possible options for `RoleType`:
-- IDAM
+* IDAM
+
 It's a global (IdAM) role, such as 'citizen', 'caseworker', 'solicitor'.
 
-- RESOURCE
+* RESOURCE
+
 It's a role related to a resource (for CCD it's "case role"), eg. 'defendant', 'claimant', 'applicant'.
 
 Possible options for `AccessManagementType`:
-- EXPLICIT_ACCESS
+* EXPLICIT_ACCESS
+
 User who has role of this access management type must be granted explicit access if you want him to have any access to a resource. There must be a link (relationship) between him and a resource.
 
-- ROLE_BASED
+* ROLE_BASED
+
 User who has role with `ROLE_BASED` access doesn't have to be granted explicit access to a case and he may still have access to it if default permissions for his role (with ROLE_BASED access) gives him it.
 
 3. Add resource definitions

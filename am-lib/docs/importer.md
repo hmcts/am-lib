@@ -4,11 +4,10 @@ AM is able to store and retrive default permissions for roles (permissions that 
 
 If you want to import it you need to make sure you do it in proper order as there is quite a lot of db constraints that provided data need to match.
 
-#How to import default permissions for roles? (DefaultRoleSetupImportService)
+## When you start with empty database
 
-##When you start with empty database
-
-Please see documentation about db on confluence first. You can find out how to delete data from db using 
+Please see documentation about db on confluence first. 
+If you want to delete existing data from database please see "How to delete permissions" section below.
 
 1. Add service first
 
@@ -23,7 +22,7 @@ Description is not mandatory. Please keep in mind that name of service is unique
 
 2. Add roles
 
-Roles are a more complex as you have 4 values (and all all are mandatory).
+Roles are more complex as you have 4 values (and all are mandatory).
 ```public void addRole(@NotBlank String roleName, @NotNull RoleType roleType, @NotNull SecurityClassification securityClassification, @NotNull AccessType accessType)```
 
 For example:
@@ -41,7 +40,7 @@ Possible options for `AccessManagementType`:
 User who has role of this access management type must be granted explicit access if you want him to have any access to a resource. There must be a link (relationship) between him and a resource.
 
 - ROLE_BASED
-User who has role with `ROLE_BASED` access doesn't have to be granted explocit access to a case and he may still have access to it if default permissions for his role (with ROLE_BBASED access) gives him it.
+User who has role with `ROLE_BASED` access doesn't have to be granted explicit access to a case and he may still have access to it if default permissions for his role (with ROLE_BASED access) gives him it.
 
 3. Add resource definitions
 By "resource definition" we understand 3 values: service, resource type and resource name (all mandatory, combined unique):
@@ -54,13 +53,13 @@ Why 'CASE' needs to be provided? At the moment we will support only cases, but i
 
 In CCD:
 - serviceName = jurisdiction
-- resourceName = caseType
-- resourceType is always CASE
+- resourceName = case type
+- resourceType is always "CASE"
 
 4. Grant default permissions for a role
 ```public void grantDefaultPermission(@NotNull @Valid DefaultPermissionGrant accessGrant```
 
-##How to delete permissions?
+## How to delete permissions?
 
 You can only truncate all default permissions, in two ways:
 
@@ -99,6 +98,6 @@ This can fail if this role is used as a relationship in `access_management` tabl
 eg
 ```deleteService("CMC")```
 
-No cascade on delete
+## No cascade on delete
 
 Please mind there is no cascade on delete. In other words, when you try to remove service, but you haven't deleted resource definitions that are using this service (fk constraint) it will cause an error.

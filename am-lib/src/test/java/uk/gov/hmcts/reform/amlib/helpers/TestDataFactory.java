@@ -14,10 +14,7 @@ import java.util.Set;
 
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 public final class TestDataFactory {
 
@@ -27,42 +24,47 @@ public final class TestDataFactory {
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
                                                                   String accessorIds,
+                                                                  ResourceDefinition resourceDefinition,
                                                                   Set<Permission> permissions) {
-        return createGrant(resourceId, accessorIds, createPermissionsForWholeDocument(permissions));
+        return createGrant(
+            resourceId, accessorIds, resourceDefinition, createPermissionsForWholeDocument(permissions));
     }
 
     public static ExplicitAccessGrant createGrantForWholeDocument(String resourceId,
                                                                   Set<String> accessorIds,
+                                                                  ResourceDefinition resourceDefinition,
                                                                   Set<Permission> permissions) {
-        return createGrant(resourceId, accessorIds, ROLE_NAME, createPermissionsForWholeDocument(permissions));
+        return createGrant(
+            resourceId, accessorIds, ROLE_NAME, resourceDefinition, createPermissionsForWholeDocument(permissions));
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
                                                   String accessorIds,
+                                                  ResourceDefinition resourceDefinition,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
-        return createGrant(resourceId, ImmutableSet.of(accessorIds), ROLE_NAME, attributePermissions);
+        return createGrant(
+            resourceId, ImmutableSet.of(accessorIds), ROLE_NAME, resourceDefinition, attributePermissions);
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
                                                   String accessorIds,
                                                   String relationship,
+                                                  ResourceDefinition resourceDefinition,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
-        return createGrant(resourceId, ImmutableSet.of(accessorIds), relationship, attributePermissions);
+        return createGrant(
+            resourceId, ImmutableSet.of(accessorIds), relationship, resourceDefinition, attributePermissions);
     }
 
     public static ExplicitAccessGrant createGrant(String resourceId,
                                                   Set<String> accessorIds,
                                                   String relationship,
+                                                  ResourceDefinition resourceDefinition,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(accessorIds)
             .accessorType(USER)
-            .resourceDefinition(ResourceDefinition.builder()
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .build())
+            .resourceDefinition(resourceDefinition)
             .attributePermissions(attributePermissions)
             .relationship(relationship)
             .build();
@@ -77,34 +79,28 @@ public final class TestDataFactory {
         return ImmutableMap.of(JsonPointer.valueOf(attribute), permissions);
     }
 
-    public static ExplicitAccessMetadata createMetadata(String resourceId, String accessorId) {
-        return createMetadata(resourceId, accessorId, ROLE_NAME, JsonPointer.valueOf(""));
+    public static ExplicitAccessMetadata createMetadata(String resourceId, String accessorId,
+                                                        ResourceDefinition resourceDefinition) {
+        return createMetadata(resourceId, accessorId, ROLE_NAME, resourceDefinition, JsonPointer.valueOf(""));
     }
 
     public static ExplicitAccessMetadata createMetadata(String resourceId, String accessorId,
-                                                        String relationship, JsonPointer attribute) {
+                                                        String relationship, ResourceDefinition resourceDefinition,
+                                                        JsonPointer attribute) {
         return ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
             .accessorId(accessorId)
             .accessorType(USER)
-            .resourceDefinition(ResourceDefinition.builder()
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .build())
+            .resourceDefinition(resourceDefinition)
             .attribute(attribute)
             .relationship(relationship)
             .build();
     }
 
-    public static Resource createResource(String resourceId) {
+    public static Resource createResource(String resourceId, ResourceDefinition resourceDefinition) {
         return Resource.builder()
             .id(resourceId)
-            .definition(ResourceDefinition.builder()
-                .resourceName(RESOURCE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .serviceName(SERVICE_NAME)
-                .build())
+            .definition(resourceDefinition)
             .data(DATA)
             .build();
     }

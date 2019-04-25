@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import lombok.Builder;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals"})
@@ -34,7 +35,7 @@ class FilterServiceTest {
     void itShouldBePossibleToSHowEverything() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, createPermissions("", READ_PERMISSION));
+        JsonNode returnedJson = fs.filterJson(inputJson, createPermissions("", ImmutableSet.of(READ)));
 
         assertThat(returnedJson).isEqualTo(inputJson);
     }
@@ -44,8 +45,8 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf(""), READ_PERMISSION,
-            JsonPointer.valueOf("/amount"), CREATE_PERMISSION);
+            JsonPointer.valueOf(""), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/amount"), ImmutableSet.of(CREATE));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -77,8 +78,8 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf(""), READ_PERMISSION,
-            JsonPointer.valueOf("/claimant"), CREATE_PERMISSION);
+            JsonPointer.valueOf(""), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -102,8 +103,8 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf(""), READ_PERMISSION,
-            JsonPointer.valueOf("/claimant/age"), CREATE_PERMISSION);
+            JsonPointer.valueOf(""), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/claimant/age"), ImmutableSet.of(CREATE));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -135,8 +136,8 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf(""), READ_PERMISSION,
-            JsonPointer.valueOf("/claimant/address"), CREATE_PERMISSION);
+            JsonPointer.valueOf(""), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(CREATE));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -165,7 +166,7 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf("/amount"), READ_PERMISSION);
+            JsonPointer.valueOf("/amount"), ImmutableSet.of(READ));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -182,7 +183,7 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf("/claimant"), READ_PERMISSION);
+            JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -206,7 +207,7 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf("/claimant/age"), READ_PERMISSION);
+            JsonPointer.valueOf("/claimant/age"), ImmutableSet.of(READ));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -226,7 +227,7 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf("/claimant/address"), READ_PERMISSION);
+            JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(READ));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -249,8 +250,8 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf("/claimant"), READ_PERMISSION,
-            JsonPointer.valueOf("/defendant"), READ_PERMISSION);
+            JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/defendant"), ImmutableSet.of(READ));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -283,8 +284,8 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf("/claimant/name"), READ_PERMISSION,
-            JsonPointer.valueOf("/claimant/address"), READ_PERMISSION);
+            JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(READ));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -308,8 +309,8 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf("/claimant/address"), READ_PERMISSION,
-            JsonPointer.valueOf("/defendant/address"), READ_PERMISSION);
+            JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/defendant/address"), ImmutableSet.of(READ));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -339,9 +340,9 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf(""), READ_PERMISSION,
-            JsonPointer.valueOf("/claimant"), CREATE_PERMISSION,
-            JsonPointer.valueOf("/claimant/address/city"), READ_PERMISSION);
+            JsonPointer.valueOf(""), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
+            JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(READ));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -372,9 +373,9 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf(""), READ_PERMISSION,
-            JsonPointer.valueOf("/claimant/address"), CREATE_PERMISSION,
-            JsonPointer.valueOf("/claimant/address/city"), READ_PERMISSION);
+            JsonPointer.valueOf(""), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(CREATE),
+            JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(READ));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -406,7 +407,7 @@ class FilterServiceTest {
     void itShouldBePossibleToHideEverything() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, createPermissions("/name", CREATE_PERMISSION));
+        JsonNode returnedJson = fs.filterJson(inputJson, createPermissions("/name", ImmutableSet.of(CREATE)));
 
         assertThat(returnedJson).isNull();
     }
@@ -416,18 +417,18 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.<JsonPointer, Set<Permission>>builder()
-            .put(JsonPointer.valueOf("/claimant"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant/name"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant/age"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant/address"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant/address/city"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/claimant/address/postcode"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/defendant"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/defendant/name"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/defendant/address"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/defendant/address/city"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/defendant/address/postcode"), CREATE_PERMISSION)
-            .put(JsonPointer.valueOf("/amount"), CREATE_PERMISSION)
+            .put(JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE))
+            .put(JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(CREATE))
+            .put(JsonPointer.valueOf("/claimant/age"), ImmutableSet.of(CREATE))
+            .put(JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(CREATE))
+            .put(JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(CREATE))
+            .put(JsonPointer.valueOf("/claimant/address/postcode"), ImmutableSet.of(CREATE))
+            .put(JsonPointer.valueOf("/defendant"), ImmutableSet.of(CREATE))
+            .put(JsonPointer.valueOf("/defendant/name"), ImmutableSet.of(CREATE))
+            .put(JsonPointer.valueOf("/defendant/address"), ImmutableSet.of(CREATE))
+            .put(JsonPointer.valueOf("/defendant/address/city"), ImmutableSet.of(CREATE))
+            .put(JsonPointer.valueOf("/defendant/address/postcode"), ImmutableSet.of(CREATE))
+            .put(JsonPointer.valueOf("/amount"), ImmutableSet.of(CREATE))
             .build();
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
@@ -440,8 +441,8 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf("/claimant"), CREATE_PERMISSION,
-            JsonPointer.valueOf("/claimant/name"), READ_PERMISSION);
+            JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
+            JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(READ));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -461,8 +462,8 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf("/claimant/name"), READ_PERMISSION,
-            JsonPointer.valueOf("/claimant/age"), CREATE_PERMISSION);
+            JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/claimant/age"), ImmutableSet.of(CREATE));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -482,10 +483,10 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf("/version"), READ_PERMISSION,
-            JsonPointer.valueOf("/claimant/id"), READ_PERMISSION,
-            JsonPointer.valueOf("/defendant/mobile"), CREATE_PERMISSION,
-            JsonPointer.valueOf("/updated"), CREATE_PERMISSION);
+            JsonPointer.valueOf("/version"), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/claimant/id"), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/defendant/mobile"), ImmutableSet.of(CREATE),
+            JsonPointer.valueOf("/updated"), ImmutableSet.of(CREATE));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 
@@ -497,9 +498,9 @@ class FilterServiceTest {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
-            JsonPointer.valueOf(""), READ_PERMISSION,
-            JsonPointer.valueOf("/amountInPounds"), READ_PERMISSION,
-            JsonPointer.valueOf("/amount"), CREATE_PERMISSION);
+            JsonPointer.valueOf(""), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/amountInPounds"), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/amount"), ImmutableSet.of(CREATE));
 
         JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
 

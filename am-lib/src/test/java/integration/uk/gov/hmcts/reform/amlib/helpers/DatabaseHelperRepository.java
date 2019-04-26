@@ -2,16 +2,17 @@ package integration.uk.gov.hmcts.reform.amlib.helpers;
 
 import org.jdbi.v3.sqlobject.config.RegisterColumnMapper;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
+import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
-import uk.gov.hmcts.reform.amlib.internal.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.Service;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.JsonPointerMapper;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.PermissionSetMapper;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.List;
 
@@ -52,7 +53,7 @@ public interface DatabaseHelperRepository {
         + "and attribute = :attribute "
         + "and default_security_classification = cast(:securityClassification as security_classification)")
     @RegisterConstructorMapper(ResourceAttribute.class)
-    ResourceAttribute getResourceAttribute(String serviceName, String resourceType, String resourceName, String attribute, SecurityClassification securityClassification);
+    ResourceAttribute getResourceAttribute(@BindBean ResourceDefinition resourceDefinition, String attribute, SecurityClassification securityClassification);
 
     @SqlQuery("select count(1) from access_management "
         + "where resource_id = :resourceId")
@@ -70,5 +71,5 @@ public interface DatabaseHelperRepository {
         + "and attribute = :attribute "
         + "and role_name = :roleName "
         + "and permissions = :permissions")
-    int countDefaultPermissions(String serviceName, String resourceType, String resourceName, String attribute, String roleName, int permissions);
+    int countDefaultPermissions(@BindBean ResourceDefinition resourceDefinition, String attribute, String roleName, int permissions);
 }

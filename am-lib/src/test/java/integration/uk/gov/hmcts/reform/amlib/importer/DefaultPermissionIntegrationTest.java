@@ -55,10 +55,10 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         service.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);
         service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ)));
 
-        assertThat(databaseHelper.countDefaultPermissions(serviceName, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.countDefaultPermissions(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(ImmutableSet.of(READ)))).isEqualTo(1);
 
-        assertThat(databaseHelper.getResourceAttribute(serviceName, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.getResourceAttribute(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), PUBLIC)).isNotNull();
     }
 
@@ -68,10 +68,10 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ)));
         service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(CREATE)));
 
-        assertThat(databaseHelper.countDefaultPermissions(serviceName, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.countDefaultPermissions(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(ImmutableSet.of(CREATE)))).isEqualTo(1);
 
-        assertThat(databaseHelper.getResourceAttribute(serviceName, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.getResourceAttribute(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), PUBLIC)).isNotNull();
     }
 
@@ -94,10 +94,10 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
         service.truncateDefaultPermissionsForService(serviceName, RESOURCE_TYPE);
 
-        assertThat(databaseHelper.countDefaultPermissions(serviceName, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.countDefaultPermissions(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(ImmutableSet.of(READ)))).isEqualTo(0);
 
-        assertThat(databaseHelper.getResourceAttribute(serviceName, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.getResourceAttribute(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), PUBLIC)).isNull();
     }
 
@@ -110,10 +110,10 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         service.truncateDefaultPermissionsByResourceDefinition(
             createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
 
-        assertThat(databaseHelper.countDefaultPermissions(serviceName, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.countDefaultPermissions(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(ImmutableSet.of(READ)))).isEqualTo(0);
 
-        assertThat(databaseHelper.getResourceAttribute(serviceName, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.getResourceAttribute(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), PUBLIC)).isNull();
     }
 }

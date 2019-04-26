@@ -31,22 +31,18 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 @SuppressWarnings({"PMD.TooManyMethods", "LineLength"})
 class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
-
     private static ResourceDefinition resourceDefinition;
-    private final ResourceDefinition otherResource = createResourceDefinition(SERVICE_NAME, RESOURCE_TYPE,
-        RESOURCE_NAME + 2);
+    private static ResourceDefinition otherResource;
     String serviceName;
 
     @BeforeEach
     void setUp() {
         String serviceName = UUID.randomUUID().toString();
-        importerService.addResourceDefinition(otherResource);
         importerService.addService(serviceName);
         importerService.addResourceDefinition(ResourceDefinition.builder()
             .serviceName(serviceName)
@@ -54,6 +50,9 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
             .resourceName(RESOURCE_NAME)
             .build());
         resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME);
+        otherResource = createResourceDefinition(serviceName, RESOURCE_TYPE,
+            RESOURCE_NAME + 2);
+        importerService.addResourceDefinition(otherResource);
     }
 
     @Test

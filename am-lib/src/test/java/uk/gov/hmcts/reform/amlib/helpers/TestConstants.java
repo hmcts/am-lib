@@ -8,7 +8,6 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 
 public final class TestConstants {
-    public static final String SERVICE_NAME = "CMC";
     public static final String RESOURCE_TYPE = "Case";
     public static final String RESOURCE_NAME = "Claim";
     public static final JsonPointer ROOT_ATTRIBUTE = JsonPointer.valueOf("");

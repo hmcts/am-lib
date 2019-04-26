@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissionsForWholeDocument;
@@ -41,7 +40,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenCreatingResourceAccessResourceAccessAppearsInDatabase() {
-        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, accessorId, READ_PERMISSION));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, accessorId, ImmutableSet.of(READ)));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
     }
@@ -59,8 +58,8 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenCreatingDuplicateResourceAccessEntryIsOverwritten() {
-        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, accessorId, READ_PERMISSION));
-        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, accessorId, READ_PERMISSION));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, accessorId, ImmutableSet.of(READ)));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, accessorId, ImmutableSet.of(READ)));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
     }
@@ -68,7 +67,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenCreatingResourceForMultipleUsersShouldAppearInDatabase() {
         service.grantExplicitResourceAccess(
-            createGrantForWholeDocument(resourceId, ImmutableSet.of("User1", "User2"), READ_PERMISSION));
+            createGrantForWholeDocument(resourceId, ImmutableSet.of("User1", "User2"), ImmutableSet.of(READ)));
 
         assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(2)
             .extracting(ExplicitAccessRecord::getAccessorId).containsOnly("User1", "User2");

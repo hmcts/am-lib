@@ -33,20 +33,16 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
-    private static ResourceDefinition resourceDefinition;
-    private static String serviceName;
+    private String serviceName;
+    private ResourceDefinition resourceDefinition;
 
 
     @BeforeEach
     void setUp() {
         serviceName = UUID.randomUUID().toString();
         importerService.addService(serviceName);
-        importerService.addResourceDefinition(ResourceDefinition.builder()
-            .serviceName(serviceName)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .build());
-        resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME);
+        importerService.addResourceDefinition(
+            resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
 
         Map.Entry<Set<Permission>, SecurityClassification> readPermission = new Pair<>(ImmutableSet.of(READ), PUBLIC);
         Map.Entry<Set<Permission>, SecurityClassification> createPermission = new Pair<>(

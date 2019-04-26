@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 
 class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
     private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportService.class);
-    private static String serviceName;
+    private String serviceName;
 
     @BeforeEach
     void setUp() {

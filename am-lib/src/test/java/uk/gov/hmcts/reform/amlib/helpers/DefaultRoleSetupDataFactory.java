@@ -28,15 +28,15 @@ public final class DefaultRoleSetupDataFactory {
     }
 
     public static DefaultPermissionGrant createDefaultPermissionGrant(ResourceDefinition resourceDefinition, Set<Permission> permissions) {
-        return createDefaultPermissionGrant(JsonPointer.valueOf(""), permissions, resourceDefinition, PUBLIC);
+        return createDefaultPermissionGrant(resourceDefinition, permissions, JsonPointer.valueOf(""), PUBLIC);
     }
 
     public static DefaultPermissionGrant createDefaultPermissionGrant(JsonPointer attribute, ResourceDefinition resourceDefinition, Set<Permission> permissions) {
-        return createDefaultPermissionGrant(attribute, permissions, resourceDefinition, PUBLIC);
+        return createDefaultPermissionGrant(resourceDefinition, permissions, attribute, PUBLIC);
 
     }
 
-    public static DefaultPermissionGrant createDefaultPermissionGrant(JsonPointer attribute, Set<Permission> permissions, ResourceDefinition resourceDefinition, SecurityClassification securityClassification) {
+    public static DefaultPermissionGrant createDefaultPermissionGrant(ResourceDefinition resourceDefinition, Set<Permission> permissions, JsonPointer attribute, SecurityClassification securityClassification) {
         return DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
             .resourceDefinition(resourceDefinition)

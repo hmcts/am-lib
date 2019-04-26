@@ -31,19 +31,15 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 @SuppressWarnings("LineLength")
 class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportService.class);
-    private static ResourceDefinition resourceDefinition;
     private String serviceName;
+    private ResourceDefinition resourceDefinition;
 
     @BeforeEach
     void setUp() {
         serviceName = UUID.randomUUID().toString();
         service.addService(serviceName);
-        service.addResourceDefinition(ResourceDefinition.builder()
-            .serviceName(serviceName)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .build());
-        resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME);
+        service.addResourceDefinition(
+            resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
         MDC.put("caller", "Administrator");
     }
 

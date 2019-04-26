@@ -42,16 +42,16 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWh
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
 
-@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "LineLength"})
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.SingularField", "PMD.TooManyMethods", "LineLength"})
 class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static final String PARENT_ATTRIBUTE = "/parent";
     private static final String CHILD_ATTRIBUTE = "/parent/child";
-    private static ResourceDefinition resourceDefinition;
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private String resourceId;
     private String accessorId;
-    String serviceName;
+    private String serviceName;
+    private ResourceDefinition resourceDefinition;
 
     @BeforeEach
     void setUp() {
@@ -59,12 +59,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         accessorId = UUID.randomUUID().toString();
         serviceName = UUID.randomUUID().toString();
         importerService.addService(serviceName);
-        importerService.addResourceDefinition(ResourceDefinition.builder()
-            .serviceName(serviceName)
-            .resourceType(RESOURCE_TYPE)
-            .resourceName(RESOURCE_NAME)
-            .build());
-        resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME);
+        importerService.addResourceDefinition(
+            resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
     }
 
     @Test

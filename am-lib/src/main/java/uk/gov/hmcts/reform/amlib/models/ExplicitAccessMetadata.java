@@ -23,6 +23,7 @@ public final class ExplicitAccessMetadata {
     private final AccessorType accessorType;
     @NotNull
     private final JsonPointer attribute;
+    private final String relationship;
 
     public String getAttributeAsString() {
         return getAttribute().toString();

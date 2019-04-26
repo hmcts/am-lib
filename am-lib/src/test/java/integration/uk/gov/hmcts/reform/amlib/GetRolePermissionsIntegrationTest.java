@@ -22,9 +22,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CREATE_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
@@ -37,8 +35,9 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @BeforeEach
     void setUp() {
-        Map.Entry<Set<Permission>, SecurityClassification> readPermission = new Pair<>(READ_PERMISSION, PUBLIC);
-        Map.Entry<Set<Permission>, SecurityClassification> createPermission = new Pair<>(CREATE_PERMISSION, PUBLIC);
+        Map.Entry<Set<Permission>, SecurityClassification> readPermission = new Pair<>(ImmutableSet.of(READ), PUBLIC);
+        Map.Entry<Set<Permission>, SecurityClassification> createPermission =
+            new Pair<>(ImmutableSet.of(CREATE), PUBLIC);
         Map.Entry<Set<Permission>, SecurityClassification> updatePermission =
             new Pair<>(ImmutableSet.of(UPDATE), PUBLIC);
 
@@ -84,9 +83,9 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
         assertThat(accessRecord)
             .hasSize(3)
-            .containsEntry(JsonPointer.valueOf("/child"), READ_PERMISSION)
-            .containsEntry(JsonPointer.valueOf("/parent/age"), CREATE_PERMISSION)
-            .containsEntry(JsonPointer.valueOf("/address/street/line1"), CREATE_PERMISSION);
+            .containsEntry(JsonPointer.valueOf("/child"), ImmutableSet.of(READ))
+            .containsEntry(JsonPointer.valueOf("/parent/age"), ImmutableSet.of(CREATE))
+            .containsEntry(JsonPointer.valueOf("/address/street/line1"), ImmutableSet.of(CREATE));
     }
 
     @Test

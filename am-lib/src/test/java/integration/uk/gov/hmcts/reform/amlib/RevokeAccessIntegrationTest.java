@@ -1,6 +1,7 @@
 package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.google.common.collect.ImmutableSet;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -12,8 +13,8 @@ import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.READ_PERMISSION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createMetadata;
@@ -147,7 +148,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     private void grantExplicitResourceAccess(String resourceId, String relationship, String attribute) {
         service.grantExplicitResourceAccess(
-            createGrant(resourceId, accessorId, relationship, createPermissions(attribute, READ_PERMISSION))
+            createGrant(resourceId, accessorId, relationship, createPermissions(attribute, ImmutableSet.of(READ)))
         );
     }
 

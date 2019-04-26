@@ -8,6 +8,12 @@
 
 Latest version of Javadoc out of master branch is published automatically and [available online](https://hmcts.github.io/am-lib/javadoc/).
 
+### How to guides
+
+Check the following "how to" pages describing some use cases in more details: 
+
+- [how to import default permissions for roles](docs/importer.md)
+
 ## Building the library
 
 The project uses [Gradle](https://gradle.org) as a build tool. It already contains

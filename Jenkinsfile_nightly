@@ -51,10 +51,6 @@ withNightlyPipeline(type, product, component) {
         
         tar xz -C bin/ git-lfs -f git-lfs-v2.7.1.tar.gz
         ls -lash bin/
-      '''
-
-      sh '''
-        set -e
       
         export PATH=$PATH:./bin
         git lfs install --local

@@ -50,7 +50,6 @@ withNightlyPipeline(type, product, component) {
         sha256sum -c git-lfs-v2.7.1.checksum.txt
         
         tar xz -f git-lfs-v2.7.1.tar.gz -C bin/ git-lfs
-        ls -lash bin/
       
         export PATH=$PATH:./bin
         git lfs install --local

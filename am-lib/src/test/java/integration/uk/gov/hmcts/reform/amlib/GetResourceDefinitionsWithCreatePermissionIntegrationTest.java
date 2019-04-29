@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
@@ -27,7 +28,6 @@ import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.crea
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 
@@ -37,13 +37,15 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private ResourceDefinition resourceDefinition;
     private ResourceDefinition otherResource;
+    private String resourceType;
 
     @BeforeEach
     void setUp() {
+        resourceType = UUID.randomUUID().toString();
         importerService.addResourceDefinition(
-            resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
+            resourceDefinition = createResourceDefinition(serviceName, resourceType, RESOURCE_NAME));
         importerService.addResourceDefinition(
-            otherResource = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME + 2));
+            otherResource = createResourceDefinition(serviceName, resourceType, RESOURCE_NAME + 2));
     }
 
     @Test

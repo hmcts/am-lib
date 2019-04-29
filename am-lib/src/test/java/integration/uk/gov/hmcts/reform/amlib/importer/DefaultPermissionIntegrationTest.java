@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.amlib.internal.utils.Permissions;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
@@ -25,89 +27,92 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
+@SuppressWarnings("LineLength")
 class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportService.class);
+    private String serviceName;
+    private ResourceDefinition resourceDefinition;
 
     @BeforeEach
     void setUp() {
-        service.addService(SERVICE_NAME);
-        service.addResourceDefinition(createResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME));
+        serviceName = UUID.randomUUID().toString();
+        service.addService(serviceName);
+        service.addResourceDefinition(
+            resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
         MDC.put("caller", "Administrator");
     }
 
     @Test
     void shouldNotBeAbleToCreateDefaultPermissionWhenRoleDoesNotExist() {
         assertThatExceptionOfType(PersistenceException.class)
-            .isThrownBy(() -> service.grantDefaultPermission(createDefaultPermissionGrant(ImmutableSet.of(READ))))
+            .isThrownBy(() -> service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ))))
             .withMessageContaining("(role_name)=(Solicitor) is not present in table \"roles\"");
     }
 
     @Test
     void shouldAddNewEntryIntoDatabaseWhenUniqueEntry() {
         service.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);
-        service.grantDefaultPermission(createDefaultPermissionGrant(ImmutableSet.of(READ)));
+        service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ)));
 
-        assertThat(databaseHelper.countDefaultPermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.countDefaultPermissions(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(ImmutableSet.of(READ)))).isEqualTo(1);
 
-        assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.getResourceAttribute(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), PUBLIC)).isNotNull();
     }
 
     @Test
     void shouldOverwriteExistingRecordWhenEntryIsAddedASecondTime() {
         service.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);
-        service.grantDefaultPermission(createDefaultPermissionGrant(ImmutableSet.of(READ)));
-        service.grantDefaultPermission(createDefaultPermissionGrant(ImmutableSet.of(CREATE)));
+        service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ)));
+        service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(CREATE)));
 
-        assertThat(databaseHelper.countDefaultPermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.countDefaultPermissions(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(ImmutableSet.of(CREATE)))).isEqualTo(1);
 
-        assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.getResourceAttribute(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), PUBLIC)).isNotNull();
     }
 
     @Test
     void shouldRemoveAllEntriesFromTablesWhenValuesExist() {
         service.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);
-        service.addResourceDefinition(createResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME));
-        service.addResourceDefinition(createResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME + 2));
+        service.addResourceDefinition(resourceDefinition);
+        service.addResourceDefinition(createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME + 2));
 
-        service.grantDefaultPermission(createDefaultPermissionGrant(ImmutableSet.of(READ)));
+        service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ)));
         service.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
             .resourceDefinition(ResourceDefinition.builder()
-                .serviceName(SERVICE_NAME)
+                .serviceName(serviceName)
                 .resourceType(RESOURCE_TYPE)
                 .resourceName(RESOURCE_NAME + 2)
                 .build())
             .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, ImmutableSet.of(READ), PUBLIC))
             .build());
 
-        service.truncateDefaultPermissionsForService(SERVICE_NAME, RESOURCE_TYPE);
+        service.truncateDefaultPermissionsForService(serviceName, RESOURCE_TYPE);
 
-        assertThat(databaseHelper.countDefaultPermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.countDefaultPermissions(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(ImmutableSet.of(READ)))).isEqualTo(0);
 
-        assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.getResourceAttribute(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), PUBLIC)).isNull();
     }
 
     @Test
     void shouldRemoveEntriesWithResourceNameFromTablesWhenEntriesExist() {
         service.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);
-        service.addResourceDefinition(createResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME));
-        service.grantDefaultPermission(createDefaultPermissionGrant(ImmutableSet.of(READ)));
+        service.addResourceDefinition(resourceDefinition);
+        service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ)));
 
-        service.truncateDefaultPermissionsByResourceDefinition(
-            createResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME));
+        service.truncateDefaultPermissionsByResourceDefinition(resourceDefinition);
 
-        assertThat(databaseHelper.countDefaultPermissions(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.countDefaultPermissions(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(ImmutableSet.of(READ)))).isEqualTo(0);
 
-        assertThat(databaseHelper.getResourceAttribute(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME,
+        assertThat(databaseHelper.getResourceAttribute(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), PUBLIC)).isNull();
     }
 }

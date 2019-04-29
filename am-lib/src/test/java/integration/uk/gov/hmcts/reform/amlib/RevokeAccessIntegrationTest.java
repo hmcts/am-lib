@@ -8,32 +8,41 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createMetadata;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals", "LineLength"})
 class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
+    private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
 
     private final String relationship = ROLE_NAME;
     private final String otherRelationship = OTHER_ROLE_NAME;
     private String resourceId;
     private String accessorId;
+    private ResourceDefinition resourceDefinition;
 
     @BeforeEach
     void setUp() {
         resourceId = UUID.randomUUID().toString();
         accessorId = UUID.randomUUID().toString();
         MDC.put("caller", "Administrator");
+        importerService.addResourceDefinition(
+            resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
     }
 
     @Test
@@ -148,13 +157,13 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     private void grantExplicitResourceAccess(String resourceId, String relationship, String attribute) {
         service.grantExplicitResourceAccess(
-            createGrant(resourceId, accessorId, relationship, createPermissions(attribute, ImmutableSet.of(READ)))
+            createGrant(resourceId, accessorId, relationship, resourceDefinition, createPermissions(attribute, ImmutableSet.of(READ)))
         );
     }
 
     private void revokeResourceAccess(String resourceId, String relationship, String attribute) {
         service.revokeResourceAccess(
-            createMetadata(resourceId, accessorId, relationship, JsonPointer.valueOf(attribute))
+            createMetadata(resourceId, accessorId, relationship, resourceDefinition, JsonPointer.valueOf(attribute))
         );
     }
 }

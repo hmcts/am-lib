@@ -37,39 +37,39 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
 
-@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "LineLength"})
 class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static final String PARENT_ATTRIBUTE = "/parent";
     private static final String CHILD_ATTRIBUTE = "/parent/child";
-    private static final ResourceDefinition RESOURCE_DEFINITION =
-        createResourceDefinition(SERVICE_NAME, RESOURCE_TYPE, RESOURCE_NAME);
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private String resourceId;
     private String accessorId;
+    private ResourceDefinition resourceDefinition;
 
     @BeforeEach
     void setUp() {
         resourceId = UUID.randomUUID().toString();
         accessorId = UUID.randomUUID().toString();
+        importerService.addResourceDefinition(
+            resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
     }
 
     @Test
     void whenRowExistsAndHasReadPermissionsShouldReturnEnvelopeWithData() {
-        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, accessorId, ImmutableSet.of(READ)));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, accessorId, resourceDefinition, ImmutableSet.of(READ)));
 
-        FilteredResourceEnvelope result = service.filterResource(accessorId, ROLE_NAMES, createResource(resourceId));
+        FilteredResourceEnvelope result = service.filterResource(accessorId, ROLE_NAMES, createResource(resourceId, resourceDefinition));
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resourceId)
-                .definition(RESOURCE_DEFINITION)
+                .definition(resourceDefinition)
                 .data(DATA)
                 .build())
             .access(AccessEnvelope.builder()
@@ -83,14 +83,14 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenRowExistsAndDoesNotHaveReadPermissionsShouldReturnEnvelopeWithoutData() {
         service.grantExplicitResourceAccess(
-            createGrantForWholeDocument(resourceId, accessorId, ImmutableSet.of(CREATE)));
+            createGrantForWholeDocument(resourceId, accessorId, resourceDefinition, ImmutableSet.of(CREATE)));
 
-        FilteredResourceEnvelope result = service.filterResource(accessorId, ROLE_NAMES, createResource(resourceId));
+        FilteredResourceEnvelope result = service.filterResource(accessorId, ROLE_NAMES, createResource(resourceId, resourceDefinition));
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resourceId)
-                .definition(RESOURCE_DEFINITION)
+                .definition(resourceDefinition)
                 .data(null)
                 .build())
             .access(AccessEnvelope.builder()
@@ -107,21 +107,21 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         String nonExistingResourceId = "lmn";
 
         FilteredResourceEnvelope result = service.filterResource(
-            nonExistingUserId, ROLE_NAMES, createResource(nonExistingResourceId));
+            nonExistingUserId, ROLE_NAMES, createResource(nonExistingResourceId, resourceDefinition));
 
         assertThat(result).isNull();
     }
 
     @Test
     void whenNoExplicitAccessShouldUseRoleBasedAccess() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, ImmutableSet.of(READ)));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ROOT_ATTRIBUTE, ImmutableSet.of(READ)));
 
-        FilteredResourceEnvelope result = service.filterResource(accessorId, ROLE_NAMES, createResource(resourceId));
+        FilteredResourceEnvelope result = service.filterResource(accessorId, ROLE_NAMES, createResource(resourceId, resourceDefinition));
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resourceId)
-                .definition(RESOURCE_DEFINITION)
+                .definition(resourceDefinition)
                 .data(DATA)
                 .build())
             .access(AccessEnvelope.builder()
@@ -137,7 +137,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         importerService.addRole(OTHER_ROLE_NAME, RoleType.RESOURCE, PUBLIC, EXPLICIT);
 
         FilteredResourceEnvelope result = service.filterResource(accessorId, ImmutableSet.of(OTHER_ROLE_NAME),
-            createResource(resourceId));
+            createResource(resourceId, resourceDefinition));
 
         assertThat(result).isNull();
     }
@@ -145,21 +145,21 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenNoExplicitAccessAndMultipleRolesWhereOneHasExplicitAccessTypeShouldReturnOnlyRoleBasedPermissions() {
         importerService.addRole(OTHER_ROLE_NAME, RoleType.RESOURCE, PUBLIC, EXPLICIT);
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, ImmutableSet.of(READ)));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ROOT_ATTRIBUTE, ImmutableSet.of(READ)));
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(OTHER_ROLE_NAME)
-            .resourceDefinition(RESOURCE_DEFINITION)
+            .resourceDefinition(resourceDefinition)
             .attributePermissions(createPermissionsForAttribute(
                 JsonPointer.valueOf("/child"), ImmutableSet.of(READ), PUBLIC))
             .build());
 
         FilteredResourceEnvelope result = service.filterResource(
-            accessorId, ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME), createResource(resourceId));
+            accessorId, ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME), createResource(resourceId, resourceDefinition));
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resourceId)
-                .definition(RESOURCE_DEFINITION)
+                .definition(resourceDefinition)
                 .data(DATA)
                 .build())
             .access(AccessEnvelope.builder()
@@ -173,11 +173,11 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenListOfResourcesShouldReturnListFilteredResourceEnvelope() {
         importerService.addRole(ROLE_NAME, RoleType.RESOURCE, PUBLIC, AccessType.ROLE_BASED);
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, ImmutableSet.of(READ)));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ROOT_ATTRIBUTE, ImmutableSet.of(READ)));
 
         List<Resource> resources = ImmutableList.of(
-            createResource(resourceId),
-            createResource(resourceId + 2));
+            createResource(resourceId, resourceDefinition),
+            createResource(resourceId + 2, resourceDefinition));
 
         List<FilteredResourceEnvelope> result = service.filterResource(accessorId, ROLE_NAMES, resources);
 
@@ -185,7 +185,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             FilteredResourceEnvelope.builder()
                 .resource(Resource.builder()
                     .id(resourceId)
-                    .definition(RESOURCE_DEFINITION)
+                    .definition(resourceDefinition)
                     .data(DATA)
                     .build())
                 .access(AccessEnvelope.builder()
@@ -197,7 +197,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             FilteredResourceEnvelope.builder()
                 .resource(Resource.builder()
                     .id(resourceId + 2)
-                    .definition(RESOURCE_DEFINITION)
+                    .definition(resourceDefinition)
                     .data(DATA)
                     .build())
                 .access(AccessEnvelope.builder()
@@ -212,11 +212,11 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenListOfResourcesButNoReadAccessShouldReturnListOfEnvelopesWithNullDataValues() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, ImmutableSet.of(CREATE)));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ROOT_ATTRIBUTE, ImmutableSet.of(CREATE)));
 
         List<Resource> resources = ImmutableList.of(
-            createResource(resourceId),
-            createResource(resourceId + 2));
+            createResource(resourceId, resourceDefinition),
+            createResource(resourceId + 2, resourceDefinition));
 
         List<FilteredResourceEnvelope> result = service.filterResource(accessorId, ROLE_NAMES, resources);
 
@@ -224,7 +224,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             FilteredResourceEnvelope.builder()
                 .resource(Resource.builder()
                     .id(resourceId)
-                    .definition(RESOURCE_DEFINITION)
+                    .definition(resourceDefinition)
                     .data(null)
                     .build())
                 .access(AccessEnvelope.builder()
@@ -236,7 +236,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             FilteredResourceEnvelope.builder()
                 .resource(Resource.builder()
                     .id(resourceId + 2)
-                    .definition(RESOURCE_DEFINITION)
+                    .definition(resourceDefinition)
                     .data(null)
                     .build())
                 .access(AccessEnvelope.builder()
@@ -262,17 +262,17 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     void whenExplicitAccessWithDifferentRelationshipSameAttributeAndDifferentPermissionsShouldMergePermissions() {
         importerService.addRole(OTHER_ROLE_NAME, IDAM, PUBLIC, EXPLICIT);
 
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, ROLE_NAME,
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, ROLE_NAME, resourceDefinition,
             createPermissions(PARENT_ATTRIBUTE, ImmutableSet.of(READ))));
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, OTHER_ROLE_NAME,
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, OTHER_ROLE_NAME, resourceDefinition,
             createPermissions(PARENT_ATTRIBUTE, ImmutableSet.of(CREATE))));
 
-        FilteredResourceEnvelope result = service.filterResource(accessorId, ROLE_NAMES, createResource(resourceId));
+        FilteredResourceEnvelope result = service.filterResource(accessorId, ROLE_NAMES, createResource(resourceId, resourceDefinition));
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resourceId)
-                .definition(RESOURCE_DEFINITION)
+                .definition(resourceDefinition)
                 .data(JsonNodeFactory.instance.objectNode())
                 .build())
             .access(AccessEnvelope.builder()
@@ -286,17 +286,17 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenExplicitAccessWithSameRelationshipParentChildAttributesWithDiffPermissionsShouldNotMergePermissions() {
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, ROLE_NAME,
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, ROLE_NAME, resourceDefinition,
             createPermissions(PARENT_ATTRIBUTE, ImmutableSet.of(READ))));
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, ROLE_NAME,
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, ROLE_NAME, resourceDefinition,
             createPermissions(CHILD_ATTRIBUTE, ImmutableSet.of(CREATE))));
 
-        FilteredResourceEnvelope result = service.filterResource(accessorId, ROLE_NAMES, createResource(resourceId));
+        FilteredResourceEnvelope result = service.filterResource(accessorId, ROLE_NAMES, createResource(resourceId, resourceDefinition));
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resourceId)
-                .definition(RESOURCE_DEFINITION)
+                .definition(resourceDefinition)
                 .data(JsonNodeFactory.instance.objectNode())
                 .build())
             .access(AccessEnvelope.builder()
@@ -312,17 +312,17 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenExplicitAccessWithDifferentRelationshipParentChildAttributeDiffPermissionsShouldMergePermissions() {
         importerService.addRole(OTHER_ROLE_NAME, IDAM, PUBLIC, EXPLICIT);
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, ROLE_NAME,
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, ROLE_NAME, resourceDefinition,
             createPermissions(PARENT_ATTRIBUTE, ImmutableSet.of(READ))));
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, OTHER_ROLE_NAME,
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, OTHER_ROLE_NAME, resourceDefinition,
             createPermissions(CHILD_ATTRIBUTE, ImmutableSet.of(CREATE))));
 
-        FilteredResourceEnvelope result = service.filterResource(accessorId, ROLE_NAMES, createResource(resourceId));
+        FilteredResourceEnvelope result = service.filterResource(accessorId, ROLE_NAMES, createResource(resourceId, resourceDefinition));
 
         assertThat(result).isEqualToComparingFieldByField(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resourceId)
-                .definition(RESOURCE_DEFINITION)
+                .definition(resourceDefinition)
                 .data(JsonNodeFactory.instance.objectNode())
                 .build())
             .access(AccessEnvelope.builder()

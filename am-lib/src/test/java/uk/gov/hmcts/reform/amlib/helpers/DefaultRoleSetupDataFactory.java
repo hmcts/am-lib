@@ -12,10 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.SERVICE_NAME;
 
 @SuppressWarnings("LineLength")
 public final class DefaultRoleSetupDataFactory {
@@ -30,28 +27,24 @@ public final class DefaultRoleSetupDataFactory {
         return ImmutableMap.of(attribute, pair);
     }
 
-    public static DefaultPermissionGrant createDefaultPermissionGrant(Set<Permission> permissions) {
-        return createDefaultPermissionGrant(JsonPointer.valueOf(""), permissions, PUBLIC);
+    public static DefaultPermissionGrant createDefaultPermissionGrant(ResourceDefinition resourceDefinition, Set<Permission> permissions) {
+        return createDefaultPermissionGrant(resourceDefinition, permissions, JsonPointer.valueOf(""), PUBLIC);
     }
 
-    public static DefaultPermissionGrant createDefaultPermissionGrant(JsonPointer attribute, Set<Permission> permissions) {
-        return createDefaultPermissionGrant(attribute, permissions, PUBLIC);
+    public static DefaultPermissionGrant createDefaultPermissionGrant(ResourceDefinition resourceDefinition, JsonPointer attribute, Set<Permission> permissions) {
+        return createDefaultPermissionGrant(resourceDefinition, permissions, attribute, PUBLIC);
 
     }
 
-    public static DefaultPermissionGrant createDefaultPermissionGrant(JsonPointer attribute, Set<Permission> permissions, SecurityClassification securityClassification) {
+    public static DefaultPermissionGrant createDefaultPermissionGrant(ResourceDefinition resourceDefinition, Set<Permission> permissions, JsonPointer attribute, SecurityClassification securityClassification) {
         return DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
-            .resourceDefinition(ResourceDefinition.builder()
-                .serviceName(SERVICE_NAME)
-                .resourceType(RESOURCE_TYPE)
-                .resourceName(RESOURCE_NAME)
-                .build())
+            .resourceDefinition(resourceDefinition)
             .attributePermissions(createPermissionsForAttribute(attribute, permissions, securityClassification))
             .build();
     }
 
-    public static DefaultPermissionGrant createDefaultPermissionGrant(String attribute, Set<Permission> permissions, ResourceDefinition resource, String roleName) {
+    public static DefaultPermissionGrant createDefaultPermissionGrant(ResourceDefinition resource, Set<Permission> permissions, String attribute, String roleName) {
         return DefaultPermissionGrant.builder()
             .roleName(roleName)
             .resourceDefinition(ResourceDefinition.builder()

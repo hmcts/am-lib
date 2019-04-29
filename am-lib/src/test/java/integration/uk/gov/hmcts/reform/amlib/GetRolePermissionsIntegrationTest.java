@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
@@ -25,7 +26,6 @@ import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 
@@ -33,12 +33,14 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private ResourceDefinition resourceDefinition;
+    private String resourceType;
 
 
     @BeforeEach
     void setUp() {
+        resourceType = UUID.randomUUID().toString();
         importerService.addResourceDefinition(
-            resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
+            resourceDefinition = createResourceDefinition(serviceName, resourceType, RESOURCE_NAME));
 
         Map.Entry<Set<Permission>, SecurityClassification> readPermission = new Pair<>(ImmutableSet.of(READ), PUBLIC);
         Map.Entry<Set<Permission>, SecurityClassification> createPermission = new Pair<>(
@@ -77,7 +79,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     @Test
     void returnListOfPermissionsForRoleName() {
         Map<JsonPointer, Set<Permission>> accessRecord =
-            service.getRolePermissions(buildResource(serviceName, RESOURCE_TYPE, RESOURCE_NAME), ROLE_NAMES);
+            service.getRolePermissions(buildResource(serviceName, resourceType, RESOURCE_NAME), ROLE_NAMES);
 
         assertThat(accessRecord)
             .hasSize(3)
@@ -89,7 +91,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     @Test
     void shouldReturnNullWhenServiceNameDoesNotExist() {
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
-            buildResource("Unknown Service", RESOURCE_TYPE, RESOURCE_NAME), ROLE_NAMES);
+            buildResource("Unknown Service", resourceType, RESOURCE_NAME), ROLE_NAMES);
 
         assertThat(accessRecord).isNull();
     }
@@ -105,7 +107,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     @Test
     void shouldReturnNullWhenResourceNameDoesNotExist() {
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
-            buildResource(serviceName, RESOURCE_TYPE, "Unknown Resource Name"), ROLE_NAMES);
+            buildResource(serviceName, resourceType, "Unknown Resource Name"), ROLE_NAMES);
 
         assertThat(accessRecord).isNull();
     }
@@ -113,7 +115,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     @Test
     void shouldReturnNullWhenDefaultRoleNameDoesNotExist() {
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
-            buildResource(serviceName, RESOURCE_TYPE, RESOURCE_NAME), ImmutableSet.of("Unknown Role"));
+            buildResource(serviceName, resourceType, RESOURCE_NAME), ImmutableSet.of("Unknown Role"));
 
         assertThat(accessRecord).isNull();
     }
@@ -123,7 +125,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         Set<String> userRoles = ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME);
 
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
-            buildResource(serviceName, RESOURCE_TYPE, RESOURCE_NAME), userRoles);
+            buildResource(serviceName, resourceType, RESOURCE_NAME), userRoles);
 
         assertThat(accessRecord)
             .hasSize(5)

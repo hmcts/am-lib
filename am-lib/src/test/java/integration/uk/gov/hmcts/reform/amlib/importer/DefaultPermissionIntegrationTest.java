@@ -24,7 +24,6 @@ import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.crea
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createPermissionsForAttribute;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 
@@ -32,14 +31,16 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportService.class);
     private String serviceName;
+    private String resourceType;
     private ResourceDefinition resourceDefinition;
 
     @BeforeEach
     void setUp() {
         serviceName = UUID.randomUUID().toString();
+        resourceType = UUID.randomUUID().toString();
         service.addService(serviceName);
         service.addResourceDefinition(
-            resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
+            resourceDefinition = createResourceDefinition(serviceName, resourceType, RESOURCE_NAME));
         MDC.put("caller", "Administrator");
     }
 
@@ -79,20 +80,20 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     void shouldRemoveAllEntriesFromTablesWhenValuesExist() {
         service.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);
         service.addResourceDefinition(resourceDefinition);
-        service.addResourceDefinition(createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME + 2));
+        service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, RESOURCE_NAME + 2));
 
         service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ)));
         service.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(ROLE_NAME)
             .resourceDefinition(ResourceDefinition.builder()
                 .serviceName(serviceName)
-                .resourceType(RESOURCE_TYPE)
+                .resourceType(resourceType)
                 .resourceName(RESOURCE_NAME + 2)
                 .build())
             .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, ImmutableSet.of(READ), PUBLIC))
             .build());
 
-        service.truncateDefaultPermissionsForService(serviceName, RESOURCE_TYPE);
+        service.truncateDefaultPermissionsForService(serviceName, resourceType);
 
         assertThat(databaseHelper.countDefaultPermissions(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(ImmutableSet.of(READ)))).isEqualTo(0);

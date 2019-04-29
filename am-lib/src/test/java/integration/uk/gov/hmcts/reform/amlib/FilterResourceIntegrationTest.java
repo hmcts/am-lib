@@ -33,7 +33,6 @@ import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.crea
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
@@ -54,10 +53,11 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @BeforeEach
     void setUp() {
+        String resourceType = UUID.randomUUID().toString();
         resourceId = UUID.randomUUID().toString();
         accessorId = UUID.randomUUID().toString();
         importerService.addResourceDefinition(
-            resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
+            resourceDefinition = createResourceDefinition(serviceName, resourceType, RESOURCE_NAME));
     }
 
     @Test

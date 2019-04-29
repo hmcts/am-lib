@@ -13,7 +13,6 @@ import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 
 /**
@@ -31,6 +30,7 @@ public abstract class PreconfiguredIntegrationBaseTest extends IntegrationBaseTe
         importerService.addService(serviceName);
         importerService.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);
         importerService.addRole(OTHER_ROLE_NAME, IDAM, PUBLIC, EXPLICIT);
-        importerService.addResourceDefinition(createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
+        String resourceType = UUID.randomUUID().toString();
+        importerService.addResourceDefinition(createResourceDefinition(serviceName, resourceType, RESOURCE_NAME));
     }
 }

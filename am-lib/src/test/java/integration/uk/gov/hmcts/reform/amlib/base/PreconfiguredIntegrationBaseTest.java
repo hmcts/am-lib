@@ -21,9 +21,12 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
  */
 public abstract class PreconfiguredIntegrationBaseTest extends IntegrationBaseTest {
 
+    public String serviceName;
+
     @BeforeEach
     void populateDatabaseWithBasicDefinitions() {
-        String serviceName = UUID.randomUUID().toString();
+        this.serviceName = UUID.randomUUID().toString();
+
         DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
         importerService.addService(serviceName);
         importerService.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);

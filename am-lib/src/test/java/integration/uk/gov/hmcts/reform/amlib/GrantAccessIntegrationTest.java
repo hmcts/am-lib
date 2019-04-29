@@ -31,13 +31,12 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissionsForWholeDocument;
 
-@SuppressWarnings({"LineLength", "PMD.SingularField"})
+@SuppressWarnings({"LineLength"})
 class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private String resourceId;
     private String accessorId;
-    private String serviceName;
     private ResourceDefinition resourceDefinition;
 
     @BeforeEach
@@ -45,8 +44,6 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         resourceId = UUID.randomUUID().toString();
         accessorId = UUID.randomUUID().toString();
         MDC.put("caller", "Administrator");
-        serviceName = UUID.randomUUID().toString();
-        importerService.addService(serviceName);
         importerService.addResourceDefinition(
             resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
     }

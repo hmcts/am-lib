@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
@@ -32,18 +31,15 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_TYPE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.SingularField", "LineLength"})
+@SuppressWarnings({"PMD.TooManyMethods", "LineLength"})
 class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private ResourceDefinition resourceDefinition;
     private ResourceDefinition otherResource;
-    private String serviceName;
 
     @BeforeEach
     void setUp() {
-        serviceName = UUID.randomUUID().toString();
-        importerService.addService(serviceName);
         importerService.addResourceDefinition(
             resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
         importerService.addResourceDefinition(
@@ -52,7 +48,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @Test
     void shouldRetrieveResourceDefinitionWhenRecordExists() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, resourceDefinition, ImmutableSet.of(CREATE)));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ROOT_ATTRIBUTE, ImmutableSet.of(CREATE)));
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
@@ -64,7 +60,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     void shouldRetrieveResourceDefinitionWhenRecordExistsWithMultiplePermissions() {
         Set<Permission> permissions = ImmutableSet.of(READ, CREATE);
 
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, resourceDefinition, permissions));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ROOT_ATTRIBUTE, permissions));
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));
@@ -75,7 +71,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldNotRetrieveResourceDefinitionWhenRecordExistsWithoutRootAttribute() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            "/adult", ImmutableSet.of(CREATE), resourceDefinition, ROLE_NAME));
+            resourceDefinition, ImmutableSet.of(CREATE), "/adult", ROLE_NAME));
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(ROLE_NAME));

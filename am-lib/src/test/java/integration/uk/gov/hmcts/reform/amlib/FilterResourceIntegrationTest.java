@@ -42,7 +42,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWh
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
 
-@SuppressWarnings({"PMD.ExcessiveImports", "PMD.SingularField", "PMD.TooManyMethods", "LineLength"})
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "LineLength"})
 class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static final String PARENT_ATTRIBUTE = "/parent";
     private static final String CHILD_ATTRIBUTE = "/parent/child";
@@ -50,15 +50,12 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private String resourceId;
     private String accessorId;
-    private String serviceName;
     private ResourceDefinition resourceDefinition;
 
     @BeforeEach
     void setUp() {
         resourceId = UUID.randomUUID().toString();
         accessorId = UUID.randomUUID().toString();
-        serviceName = UUID.randomUUID().toString();
-        importerService.addService(serviceName);
         importerService.addResourceDefinition(
             resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
     }
@@ -117,7 +114,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenNoExplicitAccessShouldUseRoleBasedAccess() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, resourceDefinition, ImmutableSet.of(READ)));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ROOT_ATTRIBUTE, ImmutableSet.of(READ)));
 
         FilteredResourceEnvelope result = service.filterResource(accessorId, ROLE_NAMES, createResource(resourceId, resourceDefinition));
 
@@ -148,7 +145,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenNoExplicitAccessAndMultipleRolesWhereOneHasExplicitAccessTypeShouldReturnOnlyRoleBasedPermissions() {
         importerService.addRole(OTHER_ROLE_NAME, RoleType.RESOURCE, PUBLIC, EXPLICIT);
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, resourceDefinition, ImmutableSet.of(READ)));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ROOT_ATTRIBUTE, ImmutableSet.of(READ)));
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(OTHER_ROLE_NAME)
             .resourceDefinition(resourceDefinition)
@@ -176,7 +173,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenListOfResourcesShouldReturnListFilteredResourceEnvelope() {
         importerService.addRole(ROLE_NAME, RoleType.RESOURCE, PUBLIC, AccessType.ROLE_BASED);
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, resourceDefinition, ImmutableSet.of(READ)));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ROOT_ATTRIBUTE, ImmutableSet.of(READ)));
 
         List<Resource> resources = ImmutableList.of(
             createResource(resourceId, resourceDefinition),
@@ -215,7 +212,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenListOfResourcesButNoReadAccessShouldReturnListOfEnvelopesWithNullDataValues() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(ROOT_ATTRIBUTE, resourceDefinition, ImmutableSet.of(CREATE)));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ROOT_ATTRIBUTE, ImmutableSet.of(CREATE)));
 
         List<Resource> resources = ImmutableList.of(
             createResource(resourceId, resourceDefinition),

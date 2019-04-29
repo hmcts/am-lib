@@ -78,7 +78,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     @Test
     void shouldRemoveAllEntriesFromTablesWhenValuesExist() {
         service.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);
-        service.addResourceDefinition(createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
+        service.addResourceDefinition(resourceDefinition);
         service.addResourceDefinition(createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME + 2));
 
         service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ)));
@@ -104,11 +104,10 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     @Test
     void shouldRemoveEntriesWithResourceNameFromTablesWhenEntriesExist() {
         service.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);
-        service.addResourceDefinition(createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
+        service.addResourceDefinition(resourceDefinition);
         service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ)));
 
-        service.truncateDefaultPermissionsByResourceDefinition(
-            createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
+        service.truncateDefaultPermissionsByResourceDefinition(resourceDefinition);
 
         assertThat(databaseHelper.countDefaultPermissions(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), ROLE_NAME, Permissions.sumOf(ImmutableSet.of(READ)))).isEqualTo(0);

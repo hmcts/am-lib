@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
@@ -33,14 +32,11 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
-    private String serviceName;
     private ResourceDefinition resourceDefinition;
 
 
     @BeforeEach
     void setUp() {
-        serviceName = UUID.randomUUID().toString();
-        importerService.addService(serviceName);
         importerService.addResourceDefinition(
             resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
 

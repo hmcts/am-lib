@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createMetadata;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.SingularField", "PMD.AvoidDuplicateLiterals", "LineLength"})
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals", "LineLength"})
 class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
@@ -34,7 +34,6 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private final String otherRelationship = OTHER_ROLE_NAME;
     private String resourceId;
     private String accessorId;
-    private String serviceName;
     private ResourceDefinition resourceDefinition;
 
     @BeforeEach
@@ -42,8 +41,6 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         resourceId = UUID.randomUUID().toString();
         accessorId = UUID.randomUUID().toString();
         MDC.put("caller", "Administrator");
-        serviceName = UUID.randomUUID().toString();
-        importerService.addService(serviceName);
         importerService.addResourceDefinition(
             resourceDefinition = createResourceDefinition(serviceName, RESOURCE_TYPE, RESOURCE_NAME));
     }

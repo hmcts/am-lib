@@ -23,7 +23,6 @@ import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createPermissionsForAttribute;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 
@@ -40,7 +39,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         resourceType = UUID.randomUUID().toString();
         service.addService(serviceName);
         service.addResourceDefinition(
-            resourceDefinition = createResourceDefinition(serviceName, resourceType, RESOURCE_NAME));
+            resourceDefinition = createResourceDefinition(serviceName, resourceType, UUID.randomUUID().toString()));
         MDC.put("caller", "Administrator");
     }
 
@@ -78,9 +77,10 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void shouldRemoveAllEntriesFromTablesWhenValuesExist() {
+        String otherResourceName = UUID.randomUUID().toString();
         service.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);
         service.addResourceDefinition(resourceDefinition);
-        service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, RESOURCE_NAME + 2));
+        service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, otherResourceName));
 
         service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ)));
         service.grantDefaultPermission(DefaultPermissionGrant.builder()
@@ -88,7 +88,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
             .resourceDefinition(ResourceDefinition.builder()
                 .serviceName(serviceName)
                 .resourceType(resourceType)
-                .resourceName(RESOURCE_NAME + 2)
+                .resourceName(otherResourceName)
                 .build())
             .attributePermissions(createPermissionsForAttribute(ROOT_ATTRIBUTE, ImmutableSet.of(READ), PUBLIC))
             .build());

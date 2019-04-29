@@ -25,7 +25,6 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.OTHER_ROLE_NAME;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAMES;
 
@@ -34,13 +33,15 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private ResourceDefinition resourceDefinition;
     private String resourceType;
+    private String resourceName;
 
 
     @BeforeEach
     void setUp() {
         resourceType = UUID.randomUUID().toString();
+        resourceName = UUID.randomUUID().toString();
         importerService.addResourceDefinition(
-            resourceDefinition = createResourceDefinition(serviceName, resourceType, RESOURCE_NAME));
+            resourceDefinition = createResourceDefinition(serviceName, resourceType, resourceName));
 
         Map.Entry<Set<Permission>, SecurityClassification> readPermission = new Pair<>(ImmutableSet.of(READ), PUBLIC);
         Map.Entry<Set<Permission>, SecurityClassification> createPermission = new Pair<>(
@@ -91,7 +92,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     @Test
     void shouldReturnNullWhenServiceNameDoesNotExist() {
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
-            buildResource("Unknown Service", resourceType, RESOURCE_NAME), ROLE_NAMES);
+            buildResource("Unknown Service", resourceType, resourceName), ROLE_NAMES);
 
         assertThat(accessRecord).isNull();
     }
@@ -99,7 +100,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     @Test
     void shouldReturnNullWhenResourceTypeDoesNotExist() {
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
-            buildResource(serviceName, "Unknown Resource Type", RESOURCE_NAME), ROLE_NAMES);
+            buildResource(serviceName, "Unknown Resource Type", resourceName), ROLE_NAMES);
 
         assertThat(accessRecord).isNull();
     }

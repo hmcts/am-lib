@@ -25,7 +25,6 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.RESOURCE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissionsForWholeDocument;
@@ -44,7 +43,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         accessorId = UUID.randomUUID().toString();
         MDC.put("caller", "Administrator");
         importerService.addResourceDefinition(
-            resourceDefinition = createResourceDefinition(serviceName, UUID.randomUUID().toString(), RESOURCE_NAME));
+            resourceDefinition = createResourceDefinition(serviceName, UUID.randomUUID().toString(), UUID.randomUUID().toString()));
     }
 
     @Test

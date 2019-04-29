@@ -37,11 +37,10 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private ResourceDefinition resourceDefinition;
     private ResourceDefinition otherResource;
-    private String resourceType;
 
     @BeforeEach
     void setUp() {
-        resourceType = UUID.randomUUID().toString();
+        String resourceType = UUID.randomUUID().toString();
         importerService.addResourceDefinition(
             resourceDefinition = createResourceDefinition(serviceName, resourceType, RESOURCE_NAME));
         importerService.addResourceDefinition(

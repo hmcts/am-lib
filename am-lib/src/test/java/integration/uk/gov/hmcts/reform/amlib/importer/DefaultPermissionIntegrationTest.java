@@ -26,7 +26,6 @@ import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.crea
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 
-@SuppressWarnings("LineLength")
 class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportService.class);
     private String serviceName;
@@ -46,7 +45,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     @Test
     void shouldNotBeAbleToCreateDefaultPermissionWhenRoleDoesNotExist() {
         assertThatExceptionOfType(PersistenceException.class)
-            .isThrownBy(() -> service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ))))
+            .isThrownBy(() ->
+                service.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ))))
             .withMessageContaining("(role_name)=(Solicitor) is not present in table \"roles\"");
     }
 

@@ -79,7 +79,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     @Test
     void returnListOfPermissionsForRoleName() {
         Map<JsonPointer, Set<Permission>> accessRecord =
-            service.getRolePermissions(buildResource(serviceName, resourceType, RESOURCE_NAME), ROLE_NAMES);
+            service.getRolePermissions(resourceDefinition, ROLE_NAMES);
 
         assertThat(accessRecord)
             .hasSize(3)
@@ -115,7 +115,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     @Test
     void shouldReturnNullWhenDefaultRoleNameDoesNotExist() {
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
-            buildResource(serviceName, resourceType, RESOURCE_NAME), ImmutableSet.of("Unknown Role"));
+            resourceDefinition, ImmutableSet.of("Unknown Role"));
 
         assertThat(accessRecord).isNull();
     }
@@ -125,7 +125,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         Set<String> userRoles = ImmutableSet.of(ROLE_NAME, OTHER_ROLE_NAME);
 
         Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
-            buildResource(serviceName, resourceType, RESOURCE_NAME), userRoles);
+            resourceDefinition, userRoles);
 
         assertThat(accessRecord)
             .hasSize(5)

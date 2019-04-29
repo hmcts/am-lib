@@ -40,9 +40,8 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         resourceId = UUID.randomUUID().toString();
         accessorId = UUID.randomUUID().toString();
         MDC.put("caller", "Administrator");
-        String resourceType = UUID.randomUUID().toString();
         importerService.addResourceDefinition(
-            resourceDefinition = createResourceDefinition(serviceName, resourceType, RESOURCE_NAME));
+            resourceDefinition = createResourceDefinition(serviceName, UUID.randomUUID().toString(), RESOURCE_NAME));
     }
 
     @Test

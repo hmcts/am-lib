@@ -53,11 +53,10 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @BeforeEach
     void setUp() {
-        String resourceType = UUID.randomUUID().toString();
         resourceId = UUID.randomUUID().toString();
         accessorId = UUID.randomUUID().toString();
         importerService.addResourceDefinition(
-            resourceDefinition = createResourceDefinition(serviceName, resourceType, RESOURCE_NAME));
+            resourceDefinition = createResourceDefinition(serviceName, UUID.randomUUID().toString(), RESOURCE_NAME));
     }
 
     @Test

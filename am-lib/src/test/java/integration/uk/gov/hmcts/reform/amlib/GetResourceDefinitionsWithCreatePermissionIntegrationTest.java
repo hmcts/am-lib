@@ -40,11 +40,10 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @BeforeEach
     void setUp() {
-        String resourceType = UUID.randomUUID().toString();
         importerService.addResourceDefinition(
-            resourceDefinition = createResourceDefinition(serviceName, resourceType, RESOURCE_NAME));
+            resourceDefinition = createResourceDefinition(serviceName, UUID.randomUUID().toString(), RESOURCE_NAME));
         importerService.addResourceDefinition(
-            otherResource = createResourceDefinition(serviceName, resourceType, RESOURCE_NAME + 2));
+            otherResource = createResourceDefinition(serviceName, UUID.randomUUID().toString(), RESOURCE_NAME + 2));
     }
 
     @Test

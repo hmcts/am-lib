@@ -30,7 +30,7 @@ public abstract class PreconfiguredIntegrationBaseTest extends IntegrationBaseTe
         importerService.addService(serviceName);
         importerService.addRole(ROLE_NAME, RESOURCE, PUBLIC, ROLE_BASED);
         importerService.addRole(OTHER_ROLE_NAME, IDAM, PUBLIC, EXPLICIT);
-        String resourceType = UUID.randomUUID().toString();
-        importerService.addResourceDefinition(createResourceDefinition(serviceName, resourceType, RESOURCE_NAME));
+        importerService.addResourceDefinition(
+            createResourceDefinition(serviceName, UUID.randomUUID().toString(), RESOURCE_NAME));
     }
 }

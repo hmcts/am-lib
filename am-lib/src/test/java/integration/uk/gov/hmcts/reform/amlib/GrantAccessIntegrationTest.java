@@ -21,34 +21,41 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
+import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
-import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissionsForWholeDocument;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 
-@SuppressWarnings({"LineLength"})
 class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private String resourceId;
     private String accessorId;
+    private String relationship;
     private ResourceDefinition resourceDefinition;
 
     @BeforeEach
     void setUp() {
         resourceId = UUID.randomUUID().toString();
         accessorId = UUID.randomUUID().toString();
+
         MDC.put("caller", "Administrator");
-        importerService.addResourceDefinition(
-            resourceDefinition = createResourceDefinition(serviceName, UUID.randomUUID().toString(), UUID.randomUUID().toString()));
+        importerService.addRole(relationship = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
+        importerService.addResourceDefinition(resourceDefinition = createResourceDefinition(
+            serviceName, UUID.randomUUID().toString(), UUID.randomUUID().toString()));
     }
 
     @Test
     void whenCreatingResourceAccessResourceAccessAppearsInDatabase() {
-        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, accessorId, resourceDefinition, ImmutableSet.of(READ)));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, accessorId, relationship, resourceDefinition, ImmutableSet.of(READ)));
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
     }
 
@@ -58,23 +65,26 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             JsonPointer.valueOf(""), ImmutableSet.of(CREATE, READ, UPDATE),
             JsonPointer.valueOf("/name"), ImmutableSet.of(CREATE, READ, UPDATE));
 
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, resourceDefinition, multipleAttributePermissions));
+        service.grantExplicitResourceAccess(createGrant(
+            resourceId, accessorId, relationship, resourceDefinition, multipleAttributePermissions));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(2);
     }
 
     @Test
     void whenCreatingDuplicateResourceAccessEntryIsOverwritten() {
-        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, accessorId, resourceDefinition, ImmutableSet.of(READ)));
-        service.grantExplicitResourceAccess(createGrantForWholeDocument(resourceId, accessorId, resourceDefinition, ImmutableSet.of(READ)));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, accessorId, relationship, resourceDefinition, ImmutableSet.of(READ)));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, accessorId, relationship, resourceDefinition, ImmutableSet.of(READ)));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
     }
 
     @Test
     void whenCreatingResourceForMultipleUsersShouldAppearInDatabase() {
-        service.grantExplicitResourceAccess(
-            createGrantForWholeDocument(resourceId, ImmutableSet.of("User1", "User2"), resourceDefinition, ImmutableSet.of(READ)));
+        service.grantExplicitResourceAccess(createPermissionsForWholeDocumentForMultipleUsers(
+            ImmutableSet.of("User1", "User2"), ImmutableSet.of(READ)));
 
         assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(2)
             .extracting(ExplicitAccessRecord::getAccessorId).containsOnly("User1", "User2");
@@ -82,11 +92,23 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenCreatingResourceWithInvalidRelationshipShouldThrowPersistenceException() {
-        ExplicitAccessGrant nonExistingRole = createGrant(resourceId, ImmutableSet.of(accessorId),
-            "NonExistingRoleName", resourceDefinition, createPermissionsForWholeDocument(ImmutableSet.of(CREATE, READ, UPDATE)));
+        ExplicitAccessGrant nonExistingRole = createGrant(resourceId, accessorId, "NonExistingRoleName",
+            resourceDefinition, createPermissions("", ImmutableSet.of(CREATE, READ, UPDATE)));
 
         assertThatExceptionOfType(PersistenceException.class)
             .isThrownBy(() -> service.grantExplicitResourceAccess(nonExistingRole))
             .withMessageContaining("(relationship)=(NonExistingRoleName) is not present in table \"roles\"");
+    }
+
+    private ExplicitAccessGrant createPermissionsForWholeDocumentForMultipleUsers(Set<String> accessorIds,
+                                                                                  Set<Permission> permissions) {
+        return ExplicitAccessGrant.builder()
+            .resourceId(resourceId)
+            .accessorIds(accessorIds)
+            .accessorType(USER)
+            .resourceDefinition(resourceDefinition)
+            .attributePermissions(createPermissions("", permissions))
+            .relationship(relationship)
+            .build();
     }
 }

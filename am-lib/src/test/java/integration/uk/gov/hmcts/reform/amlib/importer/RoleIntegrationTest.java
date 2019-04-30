@@ -1,6 +1,7 @@
 package integration.uk.gov.hmcts.reform.amlib.importer;
 
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
@@ -8,28 +9,36 @@ import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.models.Role;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
-import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROLE_NAME;
 
 class RoleIntegrationTest extends IntegrationBaseTest {
     private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportService.class);
 
+    private String roleName;
+
+    @BeforeEach
+    void setUp() {
+        roleName = UUID.randomUUID().toString();
+    }
+
     @Test
     void shouldAddNewEntryIntoDatabaseWhenNewRoleIsAdded() {
-        service.addRole(ROLE_NAME, IDAM, PUBLIC, ROLE_BASED);
+        service.addRole(roleName, IDAM, PUBLIC, ROLE_BASED);
 
-        assertThat(databaseHelper.getRole(ROLE_NAME)).isNotNull();
+        assertThat(databaseHelper.getRole(roleName)).isNotNull();
     }
 
     @Test
     void shouldUpdateExistingEntryWhenDuplicateRolesAreAdded() {
-        service.addRole(ROLE_NAME, IDAM, PUBLIC, ROLE_BASED);
-        service.addRole(ROLE_NAME, RoleType.RESOURCE, SecurityClassification.PRIVATE, AccessType.EXPLICIT);
+        service.addRole(roleName, IDAM, PUBLIC, ROLE_BASED);
+        service.addRole(roleName, RoleType.RESOURCE, SecurityClassification.PRIVATE, AccessType.EXPLICIT);
 
-        Role role = databaseHelper.getRole(ROLE_NAME);
+        Role role = databaseHelper.getRole(roleName);
         assertThat(role).isNotNull();
         assertThat(role.getRoleType()).isEqualTo(RoleType.RESOURCE);
         assertThat(role.getSecurityClassification()).isEqualTo(SecurityClassification.PRIVATE);
@@ -38,9 +47,9 @@ class RoleIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void shouldDeleteRoleFromTableWhenItExists() {
-        service.addRole(ROLE_NAME, IDAM, PUBLIC, ROLE_BASED);
-        service.deleteRole(ROLE_NAME);
+        service.addRole(roleName, IDAM, PUBLIC, ROLE_BASED);
+        service.deleteRole(roleName);
 
-        assertThat(databaseHelper.getRole(ROLE_NAME)).isNull();
+        assertThat(databaseHelper.getRole(roleName)).isNull();
     }
 }

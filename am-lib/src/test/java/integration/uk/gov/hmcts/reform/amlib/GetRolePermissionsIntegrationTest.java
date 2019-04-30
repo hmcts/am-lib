@@ -22,6 +22,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
@@ -46,7 +47,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     @Test
     void whenGettingRolePermissionsShouldReturnPermissionsAndSecurityClassificationsForSpecifiedRole() {
 
-        ImmutableSet multiPermission = ImmutableSet.builder().add(READ).add(CREATE).add(UPDATE).build();
+        ImmutableSet multiPermission = ImmutableSet.builder().add(READ).add(CREATE).add(UPDATE).add(DELETE).build();
 
         Map.Entry<Set<Permission>, SecurityClassification> publicReadPermission =
             new Pair<>(ImmutableSet.of(READ), PUBLIC);
@@ -54,14 +55,14 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         Map.Entry<Set<Permission>, SecurityClassification> privateReadPermission =
             new Pair<>(ImmutableSet.of(READ), PRIVATE);
 
-        Map.Entry<Set<Permission>, SecurityClassification> restrictedReadPermission =
+        Map.Entry<Set<Permission>, SecurityClassification> restrictedAllPermission =
             new Pair<>(multiPermission, RESTRICTED);
 
         addRoleWithSecurityClassification(roleName, RESTRICTED);
         grantDefaultPermissionForRole(roleName, ImmutableMap.of(
             JsonPointer.valueOf("/child"), publicReadPermission,
             JsonPointer.valueOf("/parent/age"), privateReadPermission,
-            JsonPointer.valueOf("/parent/address"), restrictedReadPermission
+            JsonPointer.valueOf("/parent/address"), restrictedAllPermission
         ));
 
         RolePermissions rolePermissions =
@@ -120,7 +121,6 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
         assertThat(rolePermissions).isNull();
     }
-
 
     @Test
     void shouldReturnNullWhenServiceNameDoesNotExist() {

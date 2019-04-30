@@ -46,9 +46,6 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @Test
     void whenGettingRolePermissionsShouldReturnPermissionsAndSecurityClassificationsForSpecifiedRole() {
-
-        ImmutableSet multiPermission = ImmutableSet.builder().add(READ).add(CREATE).add(UPDATE).add(DELETE).build();
-
         Map.Entry<Set<Permission>, SecurityClassification> publicReadPermission =
             new Pair<>(ImmutableSet.of(READ), PUBLIC);
 
@@ -56,9 +53,10 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
             new Pair<>(ImmutableSet.of(READ), PRIVATE);
 
         Map.Entry<Set<Permission>, SecurityClassification> restrictedAllPermission =
-            new Pair<>(multiPermission, RESTRICTED);
+            new Pair<>(ImmutableSet.of(CREATE,READ,UPDATE,DELETE), RESTRICTED);
 
         addRoleWithSecurityClassification(roleName, RESTRICTED);
+
         grantDefaultPermissionForRole(roleName, ImmutableMap.of(
             JsonPointer.valueOf("/child"), publicReadPermission,
             JsonPointer.valueOf("/parent/age"), privateReadPermission,
@@ -72,7 +70,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
             .permissions(ImmutableMap.of(
                 JsonPointer.valueOf("/child"), ImmutableSet.of(READ),
                 JsonPointer.valueOf("/parent/age"), ImmutableSet.of(READ),
-                JsonPointer.valueOf("/parent/address"), multiPermission
+                JsonPointer.valueOf("/parent/address"), ImmutableSet.of(CREATE,READ,UPDATE,DELETE)
             ))
             .securityClassifications(ImmutableMap.of(
                 JsonPointer.valueOf("/child"), PUBLIC,

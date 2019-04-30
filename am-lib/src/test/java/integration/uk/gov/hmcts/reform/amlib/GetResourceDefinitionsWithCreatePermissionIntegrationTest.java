@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.crea
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 
-@SuppressWarnings("PMD.TooManyMethods")
+@SuppressWarnings({"PMD.TooManyMethods", "LineLength"})
 class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
@@ -53,7 +53,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldRetrieveResourceDefinitionWhenRecordExists() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            resourceDefinition, ImmutableSet.of(CREATE), "", roleName));
+            roleName, resourceDefinition, ImmutableSet.of(CREATE), ""));
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(roleName));
@@ -64,7 +64,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldRetrieveResourceDefinitionWhenRecordExistsWithMultiplePermissions() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            resourceDefinition, ImmutableSet.of(READ, CREATE), "", roleName));
+            roleName, resourceDefinition, ImmutableSet.of(READ, CREATE), ""));
 
 
         Set<ResourceDefinition> result =
@@ -76,7 +76,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldNotRetrieveResourceDefinitionWhenRecordExistsWithoutRootAttribute() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            resourceDefinition, ImmutableSet.of(CREATE), "/adult", roleName));
+            roleName, resourceDefinition, ImmutableSet.of(CREATE), "/adult"));
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(roleName));

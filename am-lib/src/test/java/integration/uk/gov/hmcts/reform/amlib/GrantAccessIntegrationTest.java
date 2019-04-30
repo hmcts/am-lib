@@ -38,7 +38,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private String resourceId;
     private String accessorId;
-    private String relationship;
+    private String roleName;
     private ResourceDefinition resourceDefinition;
 
     @BeforeEach
@@ -47,7 +47,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         accessorId = UUID.randomUUID().toString();
 
         MDC.put("caller", "Administrator");
-        importerService.addRole(relationship = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
+        importerService.addRole(roleName = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
         importerService.addResourceDefinition(resourceDefinition = createResourceDefinition(
             serviceName, UUID.randomUUID().toString(), UUID.randomUUID().toString()));
     }
@@ -55,7 +55,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenCreatingResourceAccessResourceAccessAppearsInDatabase() {
         service.grantExplicitResourceAccess(createGrantForWholeDocument(
-            resourceId, accessorId, relationship, resourceDefinition, ImmutableSet.of(READ)));
+            resourceId, accessorId, roleName, resourceDefinition, ImmutableSet.of(READ)));
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
     }
 
@@ -66,7 +66,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             JsonPointer.valueOf("/name"), ImmutableSet.of(CREATE, READ, UPDATE));
 
         service.grantExplicitResourceAccess(createGrant(
-            resourceId, accessorId, relationship, resourceDefinition, multipleAttributePermissions));
+            resourceId, accessorId, roleName, resourceDefinition, multipleAttributePermissions));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(2);
     }
@@ -74,17 +74,17 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenCreatingDuplicateResourceAccessEntryIsOverwritten() {
         service.grantExplicitResourceAccess(createGrantForWholeDocument(
-            resourceId, accessorId, relationship, resourceDefinition, ImmutableSet.of(READ)));
+            resourceId, accessorId, roleName, resourceDefinition, ImmutableSet.of(READ)));
         service.grantExplicitResourceAccess(createGrantForWholeDocument(
-            resourceId, accessorId, relationship, resourceDefinition, ImmutableSet.of(READ)));
+            resourceId, accessorId, roleName, resourceDefinition, ImmutableSet.of(READ)));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
     }
 
     @Test
     void whenCreatingResourceForMultipleUsersShouldAppearInDatabase() {
-        service.grantExplicitResourceAccess(createPermissionsForWholeDocumentForMultipleUsers(
-            ImmutableSet.of("User1", "User2"), ImmutableSet.of(READ)));
+        service.grantExplicitResourceAccess(
+            createPermissionsForResourceForMultipleUsers(resourceId, ImmutableSet.of("User1", "User2")));
 
         assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(2)
             .extracting(ExplicitAccessRecord::getAccessorId).containsOnly("User1", "User2");
@@ -100,15 +100,15 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .withMessageContaining("(relationship)=(NonExistingRoleName) is not present in table \"roles\"");
     }
 
-    private ExplicitAccessGrant createPermissionsForWholeDocumentForMultipleUsers(Set<String> accessorIds,
-                                                                                  Set<Permission> permissions) {
+    private ExplicitAccessGrant createPermissionsForResourceForMultipleUsers(String resourceId,
+                                                                             Set<String> accessorIds) {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(accessorIds)
             .accessorType(USER)
             .resourceDefinition(resourceDefinition)
-            .attributePermissions(createPermissions("", permissions))
-            .relationship(relationship)
+            .attributePermissions(createPermissions("", ImmutableSet.of(READ)))
+            .relationship(roleName)
             .build();
     }
 }

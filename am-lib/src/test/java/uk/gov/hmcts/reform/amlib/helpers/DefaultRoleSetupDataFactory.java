@@ -26,10 +26,7 @@ public final class DefaultRoleSetupDataFactory {
         return ImmutableMap.of(attribute, pair);
     }
 
-    public static DefaultPermissionGrant createDefaultPermissionGrant(ResourceDefinition resource,
-                                                                      Set<Permission> permissions,
-                                                                      String attribute,
-                                                                      String roleName) {
+    public static DefaultPermissionGrant createDefaultPermissionGrant(String roleName, ResourceDefinition resource, Set<Permission> permissions, String attribute) {
         return DefaultPermissionGrant.builder()
             .roleName(roleName)
             .resourceDefinition(ResourceDefinition.builder()

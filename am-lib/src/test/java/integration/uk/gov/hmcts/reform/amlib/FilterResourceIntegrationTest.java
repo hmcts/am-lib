@@ -117,7 +117,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenNoExplicitAccessShouldUseRoleBasedAccess() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ)));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(roleName, resourceDefinition, "", ImmutableSet.of(READ)));
 
         FilteredResourceEnvelope result = service.filterResource(
             accessorId, ImmutableSet.of(roleName), createResource(resourceId, resourceDefinition));
@@ -146,7 +146,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenNoExplicitAccessAndMultipleRolesWhereOneHasExplicitAccessTypeShouldReturnOnlyRoleBasedPermissions() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ)));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(roleName, resourceDefinition, "", ImmutableSet.of(READ)));
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(otherRoleName)
             .resourceDefinition(resourceDefinition)
@@ -173,7 +173,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenListOfResourcesShouldReturnListFilteredResourceEnvelope() {
-        importerService.grantDefaultPermission(createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(READ)));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(roleName, resourceDefinition, "", ImmutableSet.of(READ)));
 
         List<Resource> resources = ImmutableList.of(
             createResource(resourceId, resourceDefinition),
@@ -214,7 +214,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenListOfResourcesButNoReadAccessShouldReturnListOfEnvelopesWithNullDataValues() {
         importerService.grantDefaultPermission(
-            createDefaultPermissionGrant(resourceDefinition, ImmutableSet.of(CREATE)));
+            createDefaultPermissionGrant(roleName, resourceDefinition, "", ImmutableSet.of(CREATE)));
 
         List<Resource> resources = ImmutableList.of(
             createResource(resourceId, resourceDefinition),
@@ -339,12 +339,14 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .build());
     }
 
-    private DefaultPermissionGrant createDefaultPermissionGrant(ResourceDefinition resourceDefinition,
+    private DefaultPermissionGrant createDefaultPermissionGrant(String roleName,
+                                                                ResourceDefinition resourceDefinition,
+                                                                String attribute,
                                                                 Set<Permission> permissions) {
         return DefaultPermissionGrant.builder()
             .roleName(roleName)
             .resourceDefinition(resourceDefinition)
-            .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf(""), permissions, PUBLIC))
+            .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf(attribute), permissions, PUBLIC))
             .build();
     }
 }

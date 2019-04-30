@@ -40,10 +40,8 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @BeforeEach
     void setUp() {
-        roleName = UUID.randomUUID().toString();
-        otherRoleName = UUID.randomUUID().toString();
-        importerService.addRole(roleName, IDAM, PUBLIC, EXPLICIT);
-        importerService.addRole(otherRoleName, IDAM, PUBLIC, EXPLICIT);
+        importerService.addRole(roleName = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
+        importerService.addRole(otherRoleName = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
         importerService.addResourceDefinition(resourceDefinition =
             createResourceDefinition(serviceName, UUID.randomUUID().toString(), UUID.randomUUID().toString()));
         importerService.addResourceDefinition(otherResource =
@@ -53,7 +51,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldRetrieveResourceDefinitionWhenRecordExists() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            roleName, resourceDefinition, ImmutableSet.of(CREATE), ""));
+            roleName, resourceDefinition, "", ImmutableSet.of(CREATE)));
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(roleName));
@@ -64,7 +62,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldRetrieveResourceDefinitionWhenRecordExistsWithMultiplePermissions() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            roleName, resourceDefinition, ImmutableSet.of(READ, CREATE), ""));
+            roleName, resourceDefinition, "", ImmutableSet.of(READ, CREATE)));
 
 
         Set<ResourceDefinition> result =
@@ -76,7 +74,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldNotRetrieveResourceDefinitionWhenRecordExistsWithoutRootAttribute() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            roleName, resourceDefinition, ImmutableSet.of(CREATE), "/adult"));
+            roleName, resourceDefinition, "/adult", ImmutableSet.of(CREATE)));
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(roleName));

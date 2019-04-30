@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
@@ -42,7 +43,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         resourceName = UUID.randomUUID().toString();
 
         importerService.addRole(roleName = UUID.randomUUID().toString(), IDAM, PUBLIC, ROLE_BASED);
-        importerService.addRole(otherRoleName = UUID.randomUUID().toString(), IDAM, PUBLIC, ROLE_BASED);
+        importerService.addRole(otherRoleName = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
         importerService.addResourceDefinition(resourceDefinition =
             createResourceDefinition(serviceName, resourceType, resourceName));
 

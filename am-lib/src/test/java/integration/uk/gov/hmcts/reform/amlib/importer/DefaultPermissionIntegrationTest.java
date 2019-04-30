@@ -50,14 +50,15 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     void shouldNotBeAbleToCreateDefaultPermissionWhenRoleDoesNotExist() {
         assertThatExceptionOfType(PersistenceException.class)
             .isThrownBy(() -> service.grantDefaultPermission(createDefaultPermissionGrant(
-                roleName, resourceDefinition, ImmutableSet.of(READ), "")))
+                roleName, resourceDefinition, "", ImmutableSet.of(READ))))
             .withMessageContaining("(role_name)=(" + roleName + ") is not present in table \"roles\"");
     }
 
     @Test
     void shouldAddNewEntryIntoDatabaseWhenUniqueEntry() {
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
-        service.grantDefaultPermission(grantDefaultPermissionForResource(resourceDefinition, ImmutableSet.of(READ)));
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
 
         assertThat(databaseHelper.countDefaultPermissions(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), roleName, Permissions.sumOf(ImmutableSet.of(READ)))).isEqualTo(1);
@@ -69,8 +70,10 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     @Test
     void shouldOverwriteExistingRecordWhenEntryIsAddedASecondTime() {
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
-        service.grantDefaultPermission(grantDefaultPermissionForResource(resourceDefinition, ImmutableSet.of(READ)));
-        service.grantDefaultPermission(grantDefaultPermissionForResource(resourceDefinition, ImmutableSet.of(CREATE)));
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(CREATE)));
 
         assertThat(databaseHelper.countDefaultPermissions(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), roleName, Permissions.sumOf(ImmutableSet.of(CREATE)))).isEqualTo(1);
@@ -86,7 +89,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         service.addResourceDefinition(resourceDefinition);
         service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, otherResourceName));
 
-        service.grantDefaultPermission(grantDefaultPermissionForResource(resourceDefinition, ImmutableSet.of(READ)));
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
         service.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(roleName)
             .resourceDefinition(ResourceDefinition.builder()
@@ -110,7 +114,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     void shouldRemoveEntriesWithResourceNameFromTablesWhenEntriesExist() {
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
         service.addResourceDefinition(resourceDefinition);
-        service.grantDefaultPermission(grantDefaultPermissionForResource(resourceDefinition, ImmutableSet.of(READ)));
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
 
         service.truncateDefaultPermissionsByResourceDefinition(resourceDefinition);
 
@@ -121,7 +126,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
             ROOT_ATTRIBUTE.toString(), PUBLIC)).isNull();
     }
 
-    private DefaultPermissionGrant grantDefaultPermissionForResource(ResourceDefinition resourceDefinition,
+    private DefaultPermissionGrant grantDefaultPermissionForResource(String roleName,
+                                                                     ResourceDefinition resourceDefinition,
                                                                      Set<Permission> permissions) {
         return DefaultPermissionGrant.builder()
             .roleName(roleName)

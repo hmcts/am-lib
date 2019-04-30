@@ -21,7 +21,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
@@ -47,7 +47,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         accessorId = UUID.randomUUID().toString();
 
         MDC.put("caller", "Administrator");
-        importerService.addRole(roleName = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
+        importerService.addRole(roleName = UUID.randomUUID().toString(), IDAM, PUBLIC, ROLE_BASED);
         importerService.addResourceDefinition(resourceDefinition = createResourceDefinition(
             serviceName, UUID.randomUUID().toString(), UUID.randomUUID().toString()));
     }

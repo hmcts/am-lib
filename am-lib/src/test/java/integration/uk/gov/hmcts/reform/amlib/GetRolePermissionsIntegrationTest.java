@@ -53,7 +53,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
             new Pair<>(ImmutableSet.of(READ), PRIVATE);
 
         Map.Entry<Set<Permission>, SecurityClassification> restrictedAllPermission =
-            new Pair<>(ImmutableSet.of(CREATE,READ,UPDATE,DELETE), RESTRICTED);
+            new Pair<>(ImmutableSet.of(CREATE, READ, UPDATE, DELETE), RESTRICTED);
 
         addRoleWithSecurityClassification(roleName, RESTRICTED);
 

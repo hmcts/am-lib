@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
-import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
@@ -24,6 +23,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
@@ -39,8 +39,9 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
 
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "LineLength"})
 class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
-    private static final String PARENT_ATTRIBUTE = "/parent";
-    private static final String CHILD_ATTRIBUTE = "/parent/child";
+    private static final String PARENT_ATTRIBUTE = "/" + UUID.randomUUID().toString();
+    private static final String CHILD_ATTRIBUTE = "/" + UUID.randomUUID().toString();
+    private static final String PARENT_AND_CHILD_ATTRIBUTE = PARENT_ATTRIBUTE + CHILD_ATTRIBUTE;
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
     private String resourceId;
@@ -54,7 +55,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         resourceId = UUID.randomUUID().toString();
         accessorId = UUID.randomUUID().toString();
 
-        importerService.addRole(idamRoleWithRoleBaseAccess = UUID.randomUUID().toString(), IDAM, PUBLIC, AccessType.ROLE_BASED);
+        importerService.addRole(idamRoleWithRoleBaseAccess = UUID.randomUUID().toString(), IDAM, PUBLIC, ROLE_BASED);
         importerService.addRole(idamRoleWithExplicitAccess = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
         importerService.addResourceDefinition(resourceDefinition =
             createResourceDefinition(serviceName, UUID.randomUUID().toString(), UUID.randomUUID().toString()));
@@ -130,7 +131,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .build())
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(ROOT_ATTRIBUTE, ImmutableSet.of(READ)))
-                .accessType(AccessType.ROLE_BASED)
+                .accessType(ROLE_BASED)
                 .build())
             .relationships(ImmutableSet.of())
             .build());
@@ -151,7 +152,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .roleName(idamRoleWithExplicitAccess)
             .resourceDefinition(resourceDefinition)
             .attributePermissions(createPermissionsForAttribute(
-                JsonPointer.valueOf("/child"), ImmutableSet.of(READ), PUBLIC))
+                JsonPointer.valueOf(CHILD_ATTRIBUTE), ImmutableSet.of(READ), PUBLIC))
             .build());
 
         FilteredResourceEnvelope result = service.filterResource(
@@ -165,7 +166,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .build())
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(ROOT_ATTRIBUTE, ImmutableSet.of(READ)))
-                .accessType(AccessType.ROLE_BASED)
+                .accessType(ROLE_BASED)
                 .build())
             .relationships(ImmutableSet.of())
             .build());
@@ -191,7 +192,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                     .build())
                 .access(AccessEnvelope.builder()
                     .permissions(createPermissions("", ImmutableSet.of(READ)))
-                    .accessType(AccessType.ROLE_BASED)
+                    .accessType(ROLE_BASED)
                     .build())
                 .relationships(ImmutableSet.of())
                 .build(),
@@ -203,7 +204,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                     .build())
                 .access(AccessEnvelope.builder()
                     .permissions(createPermissions("", ImmutableSet.of(READ)))
-                    .accessType(AccessType.ROLE_BASED)
+                    .accessType(ROLE_BASED)
                     .build())
                 .relationships(ImmutableSet.of())
                 .build()
@@ -232,7 +233,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                     .build())
                 .access(AccessEnvelope.builder()
                     .permissions(createPermissions("", ImmutableSet.of(CREATE)))
-                    .accessType(AccessType.ROLE_BASED)
+                    .accessType(ROLE_BASED)
                     .build())
                 .relationships(ImmutableSet.of())
                 .build(),
@@ -244,7 +245,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                     .build())
                 .access(AccessEnvelope.builder()
                     .permissions(createPermissions("", ImmutableSet.of(CREATE)))
-                    .accessType(AccessType.ROLE_BASED)
+                    .accessType(ROLE_BASED)
                     .build())
                 .relationships(ImmutableSet.of())
                 .build()
@@ -292,7 +293,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithRoleBaseAccess, resourceDefinition,
             createPermissions(PARENT_ATTRIBUTE, ImmutableSet.of(READ))));
         service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithRoleBaseAccess, resourceDefinition,
-            createPermissions(CHILD_ATTRIBUTE, ImmutableSet.of(CREATE))));
+            createPermissions(PARENT_AND_CHILD_ATTRIBUTE, ImmutableSet.of(CREATE))));
 
         FilteredResourceEnvelope result = service.filterResource(
             accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition));
@@ -306,7 +307,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(
                     JsonPointer.valueOf(PARENT_ATTRIBUTE), ImmutableSet.of(READ),
-                    JsonPointer.valueOf(CHILD_ATTRIBUTE), ImmutableSet.of(CREATE)))
+                    JsonPointer.valueOf(PARENT_AND_CHILD_ATTRIBUTE), ImmutableSet.of(CREATE)))
                 .accessType(EXPLICIT)
                 .build())
             .relationships(ImmutableSet.of(idamRoleWithRoleBaseAccess))
@@ -318,7 +319,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithRoleBaseAccess, resourceDefinition,
             createPermissions(PARENT_ATTRIBUTE, ImmutableSet.of(READ))));
         service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition,
-            createPermissions(CHILD_ATTRIBUTE, ImmutableSet.of(CREATE))));
+            createPermissions(PARENT_AND_CHILD_ATTRIBUTE, ImmutableSet.of(CREATE))));
 
         FilteredResourceEnvelope result = service.filterResource(
             accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition));
@@ -332,7 +333,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(
                     JsonPointer.valueOf(PARENT_ATTRIBUTE), ImmutableSet.of(READ),
-                    JsonPointer.valueOf(CHILD_ATTRIBUTE), ImmutableSet.of(CREATE, READ)))
+                    JsonPointer.valueOf(PARENT_AND_CHILD_ATTRIBUTE), ImmutableSet.of(CREATE, READ)))
                 .accessType(EXPLICIT)
                 .build())
             .relationships(ImmutableSet.of(idamRoleWithExplicitAccess, idamRoleWithRoleBaseAccess))

@@ -80,7 +80,7 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.jdbi', name: 'jdbi3-core', version: '3.8.0'
+    compile group: 'org.jdbi', name: 'jdbi3-core', version: '3.8.1'
     compile group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.8.1'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'

@@ -13,8 +13,9 @@ import uk.gov.hmcts.reform.amlib.internal.PermissionsService;
 import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.Role;
-import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
+import uk.gov.hmcts.reform.amlib.internal.models.query.AttributeData;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
+import uk.gov.hmcts.reform.amlib.internal.utils.SecurityClassifications;
 import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
 import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -22,16 +23,15 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
+import uk.gov.hmcts.reform.amlib.models.RolePermissions;
 
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.sql.DataSource;
@@ -43,6 +43,7 @@ import javax.validation.constraints.NotNull;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
@@ -229,24 +230,6 @@ public class AccessManagementService {
                 .collect(toSet()));
     }
 
-    /**
-     * Retrieves a list of {@link RoleBasedAccessRecord } and returns attribute and permissions values.
-     *
-     * @param resourceDefinition {@link ResourceDefinition} a unique service name, resource type and resource name
-     * @param userRoles          set of user roles
-     * @return a map of attributes and their corresponding permissions or null
-     * @throws PersistenceException if any persistence errors were encountered
-     */
-    @AuditLog("returned role access to resource defined as '{{resourceDefinition.serviceName}}|"
-        + "{{resourceDefinition.resourceType}}|{{resourceDefinition.resourceName}}' for roles '{{userRoles}}': "
-        + "{{result}}")
-    public Map<JsonPointer, Set<Permission>> getRolePermissions(@NotNull @Valid ResourceDefinition resourceDefinition,
-                                                                @NotEmpty Set<@NotBlank String> userRoles) {
-        // Delegation to shared private method from public service methods resolves auditing problem where
-        // two audit logs would have been produced otherwise
-        return getPermissionsToResourceForRoles(resourceDefinition, userRoles);
-    }
-
     private Map<JsonPointer, Set<Permission>> getPermissionsToResourceForRoles(ResourceDefinition resourceDefinition,
                                                                                Set<String> userRoles) {
         List<Map<JsonPointer, Set<Permission>>> permissionsForRoles =
@@ -261,6 +244,49 @@ public class AccessManagementService {
         }
 
         return permissionsService.merge(permissionsForRoles);
+    }
+
+    /**
+     * Retrieves {@link RolePermissions} filtered by role security classification for a specific resource and role.
+     *
+     * @param resourceDefinition {@link ResourceDefinition} a unique service name, resource type and resource name
+     * @param roleName           user role name
+     * @return {@link RolePermissions} a combination of permissions and security classifications for a role name
+     * @throws PersistenceException if any persistence errors were encountered
+     */
+    @AuditLog("returned role access to resource defined as '{{resourceDefinition.serviceName}}|"
+        + "{{resourceDefinition.resourceType}}|{{resourceDefinition.resourceName}}' for role '{{roleName}}': "
+        + "permissions '{{result.permissions}}' from access type '{{result.roleAccessType}}' and "
+        + "security classifications '{{result.securityClassifications}}' due to role security classification "
+        + "'{{result.roleSecurityClassification}}'")
+    public RolePermissions getRolePermissions(@NotNull @Valid ResourceDefinition resourceDefinition,
+                                              @NotBlank String roleName) {
+        Map<AccessType, SecurityClassification> roleData = jdbi.withExtension(AccessManagementRepository.class, dao ->
+            dao.getRoles(Collections.singleton(roleName), Stream.of(EXPLICIT, ROLE_BASED).collect(toSet()))).stream()
+            .collect(toMap(Role::getAccessType, Role::getSecurityClassification));
+
+        if (roleData.isEmpty()) {
+            return null;
+        }
+
+        SecurityClassification roleSecurityClassification = roleData.entrySet().iterator().next().getValue();
+
+        List<AttributeData> attributeData = jdbi.withExtension(AccessManagementRepository.class, dao ->
+            dao.getAttributeDataForResource(resourceDefinition, roleName,
+                SecurityClassifications.getVisibleSecurityClassifications(roleSecurityClassification.getHierarchy())));
+
+        if (attributeData.isEmpty()) {
+            return null;
+        }
+
+        return RolePermissions.builder()
+            .permissions(attributeData.stream()
+                .collect(toMap(AttributeData::getAttribute, AttributeData::getPermissions)))
+            .securityClassifications(attributeData.stream()
+                .collect(toMap(AttributeData::getAttribute, AttributeData::getDefaultSecurityClassification)))
+            .roleSecurityClassification(roleSecurityClassification)
+            .roleAccessType(roleData.entrySet().iterator().next().getKey())
+            .build();
     }
 
     /**
@@ -279,17 +305,12 @@ public class AccessManagementService {
                 .max()
                 .orElseThrow(NoSuchElementException::new));
 
-        Set<SecurityClassification> visibleSecurityClassifications = EnumSet.allOf(SecurityClassification.class)
-            .stream()
-            .filter(securityClassification ->
-                securityClassification.isVisible(maxSecurityClassificationForRole))
-            .collect(toSet());
-
         return jdbi.withExtension(AccessManagementRepository.class, dao ->
-            dao.getResourceDefinitionsWithRootCreatePermission(userRoles, visibleSecurityClassifications));
+            dao.getResourceDefinitionsWithRootCreatePermission(
+                userRoles, SecurityClassifications.getVisibleSecurityClassifications(maxSecurityClassificationForRole)));
     }
 
     private Collector<AttributeAccessDefinition, ?, Map<JsonPointer, Set<Permission>>> getMapCollector() {
-        return Collectors.toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions);
+        return toMap(AttributeAccessDefinition::getAttribute, AttributeAccessDefinition::getPermissions);
     }
 }

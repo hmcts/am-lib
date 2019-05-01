@@ -76,17 +76,15 @@ class AccessManagementServiceValidationTest {
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
-    void getRolePermissionsMethodShouldRejectInvalidArguments(ResourceDefinition resourceDefinition,
-                                                              Set<String> roleNames) {
+    void getRolePermissionsMethodShouldRejectInvalidArguments(ResourceDefinition resourceDefinition, String roleName) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.getRolePermissions(resourceDefinition, roleNames))
+            .isThrownBy(() -> service.getRolePermissions(resourceDefinition, roleName))
             .withMessageMatching(expectedValidationMessagesRegex(
                 "resourceDefinition - must not be null",
                 "resourceDefinition.serviceName - must not be blank",
                 "resourceDefinition.resourceType - must not be blank",
                 "resourceDefinition.resourceName - must not be blank",
-                "userRoles - must not be empty",
-                "userRoles\\[\\].<iterable element> - must not be blank"
+                "roleName - must not be blank"
             ));
     }
 

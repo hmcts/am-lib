@@ -15,11 +15,11 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
 public final class Permissions {
 
-    public static final int MIN_PERMISSIONS_VALUE = Permissions.sumOf(CREATE);
-    public static final int MAX_PERMISSIONS_VALUE = Permissions.sumOf(CREATE, READ, UPDATE, DELETE);
+    static final int MIN_PERMISSIONS_VALUE = Permissions.sumOf(CREATE);
+    static final int MAX_PERMISSIONS_VALUE = Permissions.sumOf(CREATE, READ, UPDATE, DELETE);
 
     private Permissions() {
-        //NO-OP
+        throw new UnsupportedOperationException("Constructing utility class is not supported");
     }
 
     /**

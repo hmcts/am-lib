@@ -20,11 +20,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
-import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
-import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.RESTRICTED;
@@ -38,7 +35,6 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
     private String resourceType;
     private String resourceName;
     private String roleName;
-    private String otherRoleName;
 
     @BeforeEach
     void setUp() {
@@ -116,24 +112,24 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
     @Test
     void shouldReturnNullWhenServiceNameDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
-            buildResource("Unknown Service", resourceType, resourceName), ImmutableSet.of(roleName));
+        RolePermissions rolePermissions = service.getRolePermissions(
+            createResourceDefinition("Unknown Service", resourceType, resourceName), roleName);
 
         assertThat(rolePermissions).isNull();
     }
 
     @Test
     void shouldReturnNullWhenResourceTypeDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
-            buildResource(serviceName, "Unknown Resource Type", resourceName), ImmutableSet.of(roleName));
+        RolePermissions rolePermissions = service.getRolePermissions(
+            createResourceDefinition(serviceName, "Unknown Resource Type", resourceName), roleName);
 
         assertThat(rolePermissions).isNull();
     }
 
     @Test
     void shouldReturnNullWhenResourceNameDoesNotExist() {
-        Map<JsonPointer, Set<Permission>> accessRecord = service.getRolePermissions(
-            buildResource(serviceName, resourceType, "Unknown Resource Name"), ImmutableSet.of(roleName));
+        RolePermissions rolePermissions = service.getRolePermissions(
+            createResourceDefinition(serviceName, resourceType, "Unknown Resource Name"), roleName);
 
         assertThat(rolePermissions).isNull();
     }

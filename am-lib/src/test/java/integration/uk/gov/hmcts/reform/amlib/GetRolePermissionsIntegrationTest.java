@@ -21,8 +21,12 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.RESTRICTED;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
@@ -53,25 +57,35 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         Map.Entry<Set<Permission>, SecurityClassification> publicReadPermission =
             new Pair<>(ImmutableSet.of(READ), PUBLIC);
 
-        addRoleWithSecurityClassification(roleName, PUBLIC);
+        Map.Entry<Set<Permission>, SecurityClassification> privateReadPermission =
+            new Pair<>(ImmutableSet.of(READ), PRIVATE);
+
+        Map.Entry<Set<Permission>, SecurityClassification> restrictedAllPermission =
+            new Pair<>(ImmutableSet.of(CREATE, READ, UPDATE, DELETE), RESTRICTED);
+
+        addRoleWithSecurityClassification(roleName, RESTRICTED);
         grantDefaultPermissionForRole(roleName, ImmutableMap.of(
             JsonPointer.valueOf("/child"), publicReadPermission,
-            JsonPointer.valueOf("/parent/age"), publicReadPermission
+            JsonPointer.valueOf("/parent/age"), privateReadPermission,
+            JsonPointer.valueOf("/parent/address"), restrictedAllPermission
         ));
 
-        RolePermissions rolePermissions = service.getRolePermissions(resourceDefinition, roleName);
+        RolePermissions rolePermissions =
+            service.getRolePermissions(resourceDefinition, roleName);
 
         assertThat(rolePermissions).isEqualTo(RolePermissions.builder()
             .permissions(ImmutableMap.of(
                 JsonPointer.valueOf("/child"), ImmutableSet.of(READ),
-                JsonPointer.valueOf("/parent/age"), ImmutableSet.of(READ)
+                JsonPointer.valueOf("/parent/age"), ImmutableSet.of(READ),
+                JsonPointer.valueOf("/parent/address"), ImmutableSet.of(CREATE, READ, UPDATE, DELETE)
             ))
             .securityClassifications(ImmutableMap.of(
                 JsonPointer.valueOf("/child"), PUBLIC,
-                JsonPointer.valueOf("/parent/age"), PUBLIC
+                JsonPointer.valueOf("/parent/age"), PRIVATE,
+                JsonPointer.valueOf("/parent/address"), RESTRICTED
             ))
             .roleAccessType(ROLE_BASED)
-            .roleSecurityClassification(PUBLIC)
+            .roleSecurityClassification(RESTRICTED)
             .build());
     }
 

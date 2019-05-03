@@ -370,6 +370,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @NotNull
     private Map<JsonPointer, String> createJsonPointerStringMap(String... args) {
         Map<JsonPointer, String> map = new ConcurrentHashMap<>();
+        map.put(JsonPointer.valueOf(""), PUBLIC_ACCESS);
         for (String attribute :
             args) {
             map.put(JsonPointer.valueOf(attribute), PUBLIC_ACCESS);

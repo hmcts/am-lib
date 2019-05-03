@@ -171,6 +171,10 @@ public class AccessManagementService {
                                                    @NotEmpty @Valid Map<JsonPointer, @NotBlank String>
                                                        attributeSecurityClassification) {
 
+        if (attributeSecurityClassification == null || attributeSecurityClassification.isEmpty()
+            || attributeSecurityClassification.get(JsonPointer.valueOf("")) == null) {
+            return null;
+        }
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resource.getId()));
 
@@ -228,7 +232,7 @@ public class AccessManagementService {
 
     private Map<JsonPointer, Set<Permission>> filterAttributePermission(
         Map<JsonPointer, Set<Permission>> attributePermissions, List<JsonPointer> visibleAttributes) {
-        attributePermissions.entrySet().removeIf(entry -> !visibleAttributes.contains((entry.getKey())));
+        attributePermissions.entrySet().removeIf(entry -> !visibleAttributes.contains(entry.getKey()));
         return attributePermissions;
     }
 

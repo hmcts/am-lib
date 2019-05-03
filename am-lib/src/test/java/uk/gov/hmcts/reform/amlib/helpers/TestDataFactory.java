@@ -70,7 +70,8 @@ public final class TestDataFactory {
             .build();
     }
 
-    public static Resource createResourceByData(String resourceId, ResourceDefinition resourceDefinition, JsonNode jsonData) {
+    public static Resource createResourceByData(String resourceId, ResourceDefinition resourceDefinition,
+                                                JsonNode jsonData) {
         return Resource.builder()
             .id(resourceId)
             .definition(resourceDefinition)

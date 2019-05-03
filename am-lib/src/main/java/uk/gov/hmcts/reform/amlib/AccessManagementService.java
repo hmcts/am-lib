@@ -143,7 +143,7 @@ public class AccessManagementService {
     public List<FilteredResourceEnvelope> filterResource(@NotBlank String userId,
                                                          @NotEmpty Set<@NotBlank String> userRoles,
                                                          @NotNull List<@NotNull @Valid Resource> resources,
-                                                         @NotEmpty @Valid Map<JsonPointer, @NotBlank String>
+                                                         @NotEmpty @Valid Map<JsonPointer, SecurityClassification>
                                                              attributeSecurityClassification) {
         return resources.stream()
             .map(resource -> filterResource(userId, userRoles, resource, attributeSecurityClassification))
@@ -168,7 +168,7 @@ public class AccessManagementService {
     public FilteredResourceEnvelope filterResource(@NotBlank String userId,
                                                    @NotEmpty Set<@NotBlank String> userRoles,
                                                    @NotNull @Valid Resource resource,
-                                                   @NotEmpty @Valid Map<JsonPointer, @NotBlank String>
+                                                   @NotEmpty @Valid Map<JsonPointer, SecurityClassification>
                                                        attributeSecurityClassification) {
 
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
@@ -228,12 +228,13 @@ public class AccessManagementService {
 
     private Map<JsonPointer, Set<Permission>> filterAttributePermission(
         Map<JsonPointer, Set<Permission>> attributePermissions, List<JsonPointer> visibleAttributes) {
-        attributePermissions.entrySet().removeIf(entry -> !visibleAttributes.contains((entry.getKey())));
+        attributePermissions.entrySet().removeIf(entry -> !visibleAttributes.contains(entry.getKey()));
         return attributePermissions;
     }
 
+    @SuppressWarnings("LineLength")
     private List<JsonPointer> getFilteredAttributesBySecurityClassification(@NotEmpty Set<@NotBlank String> userRoles,
-                                                                            @NotEmpty @Valid Map<JsonPointer, String>
+                                                                            @NotEmpty @Valid Map<JsonPointer, SecurityClassification>
                                                                                 attributeSecurityClassification) {
 
         final Set<SecurityClassification> securityClassifications =
@@ -242,7 +243,7 @@ public class AccessManagementService {
         return attributeSecurityClassification.entrySet()
             .stream()
             .filter(attributes -> securityClassifications.stream()
-                .anyMatch(classification -> classification.name().equals(attributes.getValue())))
+                .anyMatch(classification -> classification.equals(attributes.getValue())))
             .map(Map.Entry::getKey)
             .collect(toList());
     }

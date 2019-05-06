@@ -15,5 +15,5 @@ public class FilterResource {
     private final String userId;
     private final Set<String> userRoles;
     private final Resource resource;
-    private final Map<JsonPointer, SecurityClassification> attributes;
+    private final Map<JsonPointer, SecurityClassification> attributeSecurityClassification;
 }

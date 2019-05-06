@@ -157,6 +157,7 @@ public class AccessManagementService {
      * @param userId    accessor ID
      * @param userRoles accessor roles
      * @param resource  envelope {@link Resource} and corresponding metadata
+     * @param attributeSecurityClassification input security classification map from CCD
      * @return envelope {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions if
      * access to resource is configured, otherwise null.
      * @throws PersistenceException if any persistence errors were encountered

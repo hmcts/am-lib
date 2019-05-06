@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.amlib.helpers;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.enums.Permission;

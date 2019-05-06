@@ -48,6 +48,6 @@ public class AmLibProxyController {
     @PostMapping("/filter-resource")
     public FilteredResourceEnvelope filterResource(@RequestBody FilterResource request) {
         return am.filterResource(request.getUserId(), request.getUserRoles(),
-            request.getResource(), request.getAttributes());
+            request.getResource(), request.getAttributeSecurityClassification());
     }
 }

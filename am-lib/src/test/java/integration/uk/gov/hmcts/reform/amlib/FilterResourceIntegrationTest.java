@@ -362,7 +362,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenRoleSecurityClassificationIsMoreThanResourceSecurityClassificationShouldFilterResource() {
+    void whenRoleSecurityClassificationIsMoreThanResourceSecurityClassificationShouldReturnAllAttributes() {
         String idamRoleWithRoleBasedPrivateAccess = UUID.randomUUID().toString();
         importerService.addRole(idamRoleWithRoleBasedPrivateAccess, IDAM, PRIVATE, ROLE_BASED);
 
@@ -399,7 +399,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenRoleSecurityClassificationMatchesResourceSecurityClassificationShouldFilterResource() {
+    void whenRoleSecurityClassificationMatchesResourceSecurityClassificationShouldReturnAllAttributes() {
         String idamRoleWithRoleBasedPrivateAccess = UUID.randomUUID().toString();
         importerService.addRole(idamRoleWithRoleBasedPrivateAccess, IDAM, PRIVATE, ROLE_BASED);
 
@@ -507,7 +507,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void whenOneOfMultipleRoleSecurityClassificationsIsMoreThanAttributeSecurityClassificationShouldFilterAttribute() {
+    void whenOneOfMultipleRoleSecurityClassificationsIsMoreThanAttributeSecurityClassificationShouldReturnAllAttributes() {
         //Permissions are looking fine, data needs to be updated.
         String idamRoleWithRoleBasedPrivateAccess = UUID.randomUUID().toString();
         importerService.addRole(idamRoleWithRoleBasedPrivateAccess, IDAM, RESTRICTED, ROLE_BASED);

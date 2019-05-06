@@ -51,7 +51,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldRetrieveResourceDefinitionWhenRecordExists() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            roleName, resourceDefinition, "", ImmutableSet.of(CREATE)));
+            roleName, resourceDefinition, "", ImmutableSet.of(CREATE), PUBLIC));
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(roleName));
@@ -62,8 +62,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldRetrieveResourceDefinitionWhenRecordExistsWithMultiplePermissions() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            roleName, resourceDefinition, "", ImmutableSet.of(READ, CREATE)));
-
+            roleName, resourceDefinition, "", ImmutableSet.of(READ, CREATE), PUBLIC));
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(roleName));
@@ -74,7 +73,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldNotRetrieveResourceDefinitionWhenRecordExistsWithoutRootAttribute() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            roleName, resourceDefinition, "/adult", ImmutableSet.of(CREATE)));
+            roleName, resourceDefinition, "/adult", ImmutableSet.of(CREATE), PUBLIC));
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(roleName));

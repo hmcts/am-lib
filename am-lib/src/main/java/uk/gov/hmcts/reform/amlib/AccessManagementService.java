@@ -136,6 +136,7 @@ public class AccessManagementService {
      * @param userId    accessor ID
      * @param userRoles accessor roles
      * @param resources envelope {@link Resource} and corresponding metadata
+     * @param attributeSecurityClassification input security classification map from CCD
      * @return envelope list of {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions
      * if access to resource is configured, otherwise null
      * @throws PersistenceException if any persistence errors were encountered
@@ -173,7 +174,7 @@ public class AccessManagementService {
                                                        attributeSecurityClassification) {
 
         if (attributeSecurityClassification.get(JsonPointer.valueOf("")) == null) {
-            return null;
+            throw new NoSuchElementException();
         }
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resource.getId()));

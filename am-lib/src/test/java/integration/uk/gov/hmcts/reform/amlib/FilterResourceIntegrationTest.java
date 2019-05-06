@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -544,6 +546,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .build());
     }
 
+    @SuppressWarnings("PMD")
     @Test
     void whenNoRootSecurityClassificationShouldThrowException() {
         //Permissions are looking fine, data needs to be updated.
@@ -559,10 +562,10 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedPrivateAccess,
             resourceDefinition, CITY_ATTRIBUTE, ImmutableSet.of(READ)));
 
-        FilteredResourceEnvelope result = service.filterResource(accessorId, ImmutableSet.of(idamRoleWithRoleBasedPrivateAccess),
-            createResource(resourceId, resourceDefinition), attributePermissions);
-
-        assertThat(result).isEqualTo(null);
+        Assertions.assertThrows(NoSuchElementException.class, () -> {
+            service.filterResource(accessorId, ImmutableSet.of(idamRoleWithRoleBasedPrivateAccess),
+                createResource(resourceId, resourceDefinition), attributePermissions);
+        });
     }
 
     private Map<JsonPointer, SecurityClassification> getJsonPointerStringMap() {

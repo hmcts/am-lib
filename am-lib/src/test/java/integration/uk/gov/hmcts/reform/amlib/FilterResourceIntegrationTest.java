@@ -550,7 +550,6 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         String idamRoleWithRoleBasedPrivateAccess = UUID.randomUUID().toString();
         importerService.addRole(idamRoleWithRoleBasedPrivateAccess, IDAM, RESTRICTED, ROLE_BASED);
 
-
         Map<JsonPointer, SecurityClassification> attributePermissions = new ConcurrentHashMap<>();
         attributePermissions.put(JsonPointer.valueOf("/random"), PRIVATE);
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedPrivateAccess,
@@ -577,8 +576,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private Map<JsonPointer, SecurityClassification> createJsonPointerStringMap(String... args) {
         Map<JsonPointer, SecurityClassification> map = new ConcurrentHashMap<>();
         map.put(JsonPointer.valueOf(""), PUBLIC);
-        for (String attribute :
-            args) {
+        for (String attribute : args) {
             map.put(JsonPointer.valueOf(attribute), PUBLIC);
         }
         return map;

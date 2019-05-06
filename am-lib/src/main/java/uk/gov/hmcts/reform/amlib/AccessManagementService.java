@@ -239,7 +239,6 @@ public class AccessManagementService {
     private List<JsonPointer> getFilteredAttributesBySecurityClassification(@NotEmpty Set<@NotBlank String> userRoles,
                                                                             @NotEmpty @Valid Map<JsonPointer, SecurityClassification>
                                                                                 attributeSecurityClassification) {
-
         final Set<SecurityClassification> securityClassifications =
             SecurityClassifications.getVisibleSecurityClassifications(getMaxSecurityRole(userRoles));
 

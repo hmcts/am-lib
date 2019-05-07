@@ -32,6 +32,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.sql.DataSource;
@@ -232,13 +233,15 @@ public class AccessManagementService {
     }
 
     private Map<JsonPointer, Set<Permission>> filterAttributePermission(
-        Map<JsonPointer, Set<Permission>> attributePermissions, List<JsonPointer> visibleAttributes) {
-        attributePermissions.entrySet().removeIf(entry -> !visibleAttributes.contains(entry.getKey()));
-        return attributePermissions;
+        Map<JsonPointer, Set<Permission>> attributePermissions, Set<JsonPointer> visibleAttributes) {
+
+        return attributePermissions.entrySet().stream()
+            .filter(entry -> visibleAttributes.contains(entry.getKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @SuppressWarnings("LineLength")
-    private List<JsonPointer> getFilteredAttributesBySecurityClassification(@NotEmpty Set<@NotBlank String> userRoles,
+    private Set<JsonPointer> getFilteredAttributesBySecurityClassification(@NotEmpty Set<@NotBlank String> userRoles,
                                                                             @NotEmpty @Valid Map<JsonPointer, SecurityClassification>
                                                                                 attributeSecurityClassification) {
         final Set<SecurityClassification> securityClassifications =
@@ -249,7 +252,7 @@ public class AccessManagementService {
             .filter(attributes -> securityClassifications.stream()
                 .anyMatch(classification -> classification.equals(attributes.getValue())))
             .map(Map.Entry::getKey)
-            .collect(toList());
+            .collect(toSet());
     }
 
     private Integer getMaxSecurityRole(@NotEmpty Set<String> userRoles) {

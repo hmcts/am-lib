@@ -6,7 +6,6 @@ import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.lang.reflect.Constructor;
@@ -29,10 +28,7 @@ public abstract class IntegrationBaseTest {
         databaseHelper = Jdbi.create(db.getJdbcUrl(), db.getUsername(), db.getPassword())
             .installPlugin(new SqlObjectPlugin())
             .onDemand(DatabaseHelperRepository.class);
-    }
 
-    @BeforeAll
-    protected static void cleanupDatabase() {
         databaseHelper.truncateTables();
     }
 

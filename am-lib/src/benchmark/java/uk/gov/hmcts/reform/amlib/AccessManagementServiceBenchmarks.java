@@ -29,7 +29,8 @@ public class AccessManagementServiceBenchmarks {
         String accessorId = "user-" + id;
         String accessorRole = "caseworker";
         String resourceId = resourceDefinition.getServiceName() + "-resource-" + id;
-        Map<JsonPointer, SecurityClassification> securityClassifications = new HashMap<JsonPointer, SecurityClassification>() {
+        Map<JsonPointer, SecurityClassification> securityClassifications =
+            new HashMap<JsonPointer, SecurityClassification>() {
             {
                 put(JsonPointer.valueOf(UUID.randomUUID().toString()), PUBLIC);
             }

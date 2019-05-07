@@ -174,7 +174,7 @@ public class AccessManagementService {
                                                        attributeSecurityClassification) {
 
         if (attributeSecurityClassification.get(JsonPointer.valueOf("")) == null) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Root element not found in input Security Classification");
         }
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resource.getId()));
@@ -246,8 +246,7 @@ public class AccessManagementService {
         final Set<SecurityClassification> securityClassifications =
             SecurityClassifications.getVisibleSecurityClassifications(getMaxSecurityRole(userRoles));
 
-        return attributeSecurityClassification.entrySet()
-            .stream()
+        return attributeSecurityClassification.entrySet().stream()
             .filter(attributes -> securityClassifications.stream()
                 .anyMatch(classification -> classification.equals(attributes.getValue())))
             .map(Map.Entry::getKey)
@@ -256,8 +255,7 @@ public class AccessManagementService {
 
     private Integer getMaxSecurityRole(@NotEmpty Set<String> userRoles) {
         return jdbi.withExtension(AccessManagementRepository.class, dao ->
-            dao.getRoles(userRoles, Stream.of(EXPLICIT, ROLE_BASED).collect(toSet()))
-                .stream()
+            dao.getRoles(userRoles, Stream.of(EXPLICIT, ROLE_BASED).collect(toSet())).stream()
                 .mapToInt(role -> role.getSecurityClassification().getHierarchy())
                 .max()
                 .orElseThrow(NoSuchElementException::new));

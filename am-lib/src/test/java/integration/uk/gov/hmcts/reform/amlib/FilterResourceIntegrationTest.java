@@ -481,7 +481,6 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     //In this case, the filter method should return the attributes for which user is authorized.
     @Test
     void whenRoleSecurityClassificationIsLessThanAttributeSecurityClassificationShouldRemoveAttribute() {
-        //Permissions are looking fine, data needs to be updated.
         String idamRoleWithRoleBasedPrivateAccess = UUID.randomUUID().toString();
         importerService.addRole(idamRoleWithRoleBasedPrivateAccess, IDAM, PRIVATE, ROLE_BASED);
 
@@ -520,7 +519,6 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     //In this case, the filter method should return the attributes for which user is authorized.
     @Test
     void whenOneOfMultipleRoleSecurityClassificationsIsMoreThanAttributeSecurityClassificationShouldReturnAllAttributes() {
-        //Permissions are looking fine, data needs to be updated.
         String idamRoleWithRoleBasedPrivateAccess = UUID.randomUUID().toString();
         importerService.addRole(idamRoleWithRoleBasedPrivateAccess, IDAM, RESTRICTED, ROLE_BASED);
 
@@ -559,7 +557,6 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @SuppressWarnings("PMD")
     @Test
     void whenNoRootSecurityClassificationShouldThrowException() {
-        //Permissions are looking fine, data needs to be updated.
         String idamRoleWithRoleBasedPrivateAccess = UUID.randomUUID().toString();
         importerService.addRole(idamRoleWithRoleBasedPrivateAccess, IDAM, RESTRICTED, ROLE_BASED);
 

@@ -363,6 +363,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .build();
     }
 
+    //This method checks if the User's security role has higher privileges than requested attributes.
+    //In this case, the filter method should return all of the attributes.
     @Test
     void whenRoleSecurityClassificationIsMoreThanResourceSecurityClassificationShouldReturnAllAttributes() {
         String idamRoleWithRoleBasedPrivateAccess = UUID.randomUUID().toString();
@@ -400,15 +402,17 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .build());
     }
 
+    //This method checks if the User's security role has same privileges as of the requested input attributes.
+    //In this case, the filter method should return all of the attributes.
     @Test
     void whenRoleSecurityClassificationMatchesResourceSecurityClassificationShouldReturnAllAttributes() {
         String idamRoleWithRoleBasedPrivateAccess = UUID.randomUUID().toString();
         importerService.addRole(idamRoleWithRoleBasedPrivateAccess, IDAM, PRIVATE, ROLE_BASED);
 
         Map<JsonPointer, SecurityClassification> attributePermissions = new ConcurrentHashMap<>();
-        attributePermissions.put(JsonPointer.valueOf(""), PUBLIC);
+        attributePermissions.put(JsonPointer.valueOf(""), PRIVATE);
         attributePermissions.put(JsonPointer.valueOf(NAME_ATTRIBUTE), PRIVATE);
-        attributePermissions.put(JsonPointer.valueOf(CITY_ATTRIBUTE), PUBLIC);
+        attributePermissions.put(JsonPointer.valueOf(CITY_ATTRIBUTE), PRIVATE);
 
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedPrivateAccess,
             resourceDefinition, "", ImmutableSet.of(READ)));
@@ -437,6 +441,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .build());
     }
 
+    //This method checks if the User's security role has less privileges as of the requested attributes.
+    //In this case, the filter method should return no attribute.
     @Test
     void whenRoleSecurityClassificationIsLessThanResourceSecurityClassificationShouldReturnNull() {
         String idamRoleWithRoleBasedPrivateAccess = UUID.randomUUID().toString();
@@ -471,6 +477,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .build());
     }
 
+    //This method checks if few of the security classification attributes have higher privilege than the user security classification.
+    //In this case, the filter method should return the attributes for which user is authorized.
     @Test
     void whenRoleSecurityClassificationIsLessThanAttributeSecurityClassificationShouldRemoveAttribute() {
         //Permissions are looking fine, data needs to be updated.
@@ -508,6 +516,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .build());
     }
 
+    //If user has multiple roles, get the role which has highest privileges and do the filtering of permissions.
+    //In this case, the filter method should return the attributes for which user is authorized.
     @Test
     void whenOneOfMultipleRoleSecurityClassificationsIsMoreThanAttributeSecurityClassificationShouldReturnAllAttributes() {
         //Permissions are looking fine, data needs to be updated.

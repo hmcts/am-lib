@@ -28,8 +28,6 @@ public abstract class IntegrationBaseTest {
         databaseHelper = Jdbi.create(db.getJdbcUrl(), db.getUsername(), db.getPassword())
             .installPlugin(new SqlObjectPlugin())
             .onDemand(DatabaseHelperRepository.class);
-
-        databaseHelper.truncateTables();
     }
 
     protected static <T> T initService(Class<T> serviceClass) {

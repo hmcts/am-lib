@@ -8,7 +8,7 @@ plugins {
     id 'com.jfrog.bintray' version '1.8.4'
     id 'com.github.johnrengelman.shadow' version '5.0.0'
     id "io.freefair.aspectj.post-compile-weaving" version "3.2.1"
-    id "io.freefair.lombok" version "3.2.1"
+    id "io.freefair.lombok" version "3.4.0"
     id "io.morethan.jmhreport" version "0.9.0"
 }
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.NONE;
 
 @Slf4j
 @SuppressWarnings("LineLength")
@@ -27,29 +29,69 @@ public class FilterService {
 
     private static final JsonPointer WHOLE_RESOURCE_POINTER = JsonPointer.valueOf("");
 
-    public JsonNode filterJson(JsonNode resource, Map<JsonPointer, Set<Permission>> attributePermissions) {
-        List<JsonPointer> nodesWithRead = filterPointersWithReadPermission(attributePermissions);
-        log.debug("> Nodes with READ access: " + nodesWithRead);
+    public JsonNode filterJson(JsonNode resource,
+                               Map<JsonPointer, Set<Permission>> attributePermissions/*,
+                               Map<JsonPointer, SecurityClassification> attributeSecurityClassifications,
+                               Set<SecurityClassification> userSecurityClassifications*/) {
 
-        if (nodesWithRead.isEmpty()) {
+        List<JsonPointer> nodesToKeep = filterPointersWithReadPermission(attributePermissions);
+        log.debug("> Nodes with READ access: " + nodesToKeep);
+
+        if (nodesToKeep.isEmpty()) {
             return null;
         }
 
         JsonNode resourceCopy = resource.deepCopy();
 
-        if (!nodesWithRead.contains(WHOLE_RESOURCE_POINTER)) {
-            List<JsonPointer> uniqueNodesWithRead = reducePointersToUniqueList(nodesWithRead);
+        if (!nodesToKeep.contains(WHOLE_RESOURCE_POINTER)) {
+            List<JsonPointer> uniqueNodesWithRead = reducePointersToUniqueList(nodesToKeep);
             log.debug("> Unique nodes with READ access: " + uniqueNodesWithRead);
 
             retainFieldsWithReadPermission(resourceCopy, uniqueNodesWithRead);
         }
 
-        List<JsonPointer> nodesWithoutRead = filterPointersWithoutReadPermission(attributePermissions);
-        log.debug("> Nodes without READ access: " + nodesWithoutRead);
+        List<JsonPointer> nodesToRemove = filterPointersWithoutReadPermission(attributePermissions);
+        log.debug("> Nodes without READ access: " + nodesToRemove);
 
-        removeFieldsWithoutReadPermission(resourceCopy, nodesWithRead, nodesWithoutRead);
+        /*filterNodesBySecurityClassification(nodesToKeep, nodesToRemove, attributeSecurityClassifications,
+            userSecurityClassifications);*/
+
+        removeFieldsFromData(resourceCopy, nodesToKeep, nodesToRemove);
 
         return resourceCopy;
+    }
+
+    /*private void filterNodesBySecurityClassification(List<JsonPointer> nodesToKeep,
+                                                     List<JsonPointer> nodesToRemove,
+                                                     Map<JsonPointer, SecurityClassification>
+                                                         attributeSecurityClassifications,
+                                                     Set<SecurityClassification> userSecurityClassifications) {
+        nodesToKeep.forEach(node -> {
+            SecurityClassification nodeSecurityClassification = attributeSecurityClassifications.get(node);
+            if (nodeSecurityClassification == null) {
+                nodeSecurityClassification = inheritAttributeSecurityClassification(
+                    node, attributeSecurityClassifications);
+            }
+
+            if (!userSecurityClassifications.contains(nodeSecurityClassification)) {
+                log.debug("> Node without security classification access: " + node);
+                nodesToKeep.remove(node);
+                nodesToRemove.add(node);
+            }
+        });
+    }*/
+
+    private SecurityClassification inheritAttributeSecurityClassification(JsonPointer attribute,
+                                                                          Map<JsonPointer, SecurityClassification>
+                                                                              attributeSecurityClassifications) {
+        JsonPointer parentAttribute = attribute.head();
+        while (attributeSecurityClassifications.get(parentAttribute) == null) {
+            if (parentAttribute.toString().equals("")) {
+                return NONE;
+            }
+            parentAttribute = parentAttribute.head();
+        }
+        return attributeSecurityClassifications.get(parentAttribute);
     }
 
     private List<JsonPointer> filterPointersWithReadPermission(Map<JsonPointer, Set<Permission>> attributePermissions) {
@@ -157,10 +199,10 @@ public class FilterService {
                 }, (firstPointer, secondPointer) -> firstPointer);
     }
 
-    private void removeFieldsWithoutReadPermission(JsonNode resource, List<JsonPointer> nodesWithRead, List<JsonPointer> nodesWithoutRead) {
-        nodesWithoutRead.forEach(pointerCandidateForRemoval -> {
+    private void removeFieldsFromData(JsonNode resource, List<JsonPointer> nodesToKeep, List<JsonPointer> nodesToRemove) {
+        nodesToRemove.forEach(pointerCandidateForRemoval -> {
             log.debug(">> Pointer candidate for removal: " + pointerCandidateForRemoval);
-            List<JsonPointer> childPointersWithRead = nodesWithRead.stream()
+            List<JsonPointer> childPointersWithRead = nodesToKeep.stream()
                 .filter(pointerWithRead -> pointerWithRead.toString().startsWith(pointerCandidateForRemoval.toString() + "/"))
                 .collect(Collectors.toList());
             if (childPointersWithRead.isEmpty()) {

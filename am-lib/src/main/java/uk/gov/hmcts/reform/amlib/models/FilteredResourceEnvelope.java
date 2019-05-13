@@ -11,4 +11,5 @@ public final class FilteredResourceEnvelope {
     private final Resource resource;
     private final AccessEnvelope access;
     private final Set<String> relationships;
+    private final String userSecurityClassification;
 }

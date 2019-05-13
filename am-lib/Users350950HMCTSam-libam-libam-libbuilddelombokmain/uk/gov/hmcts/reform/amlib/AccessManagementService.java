@@ -26,23 +26,20 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.RolePermissions;
 
 import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
+
 import javax.sql.DataSource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
-import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -136,21 +133,18 @@ public class AccessManagementService {
      * Filters a list of {@link JsonNode} to remove fields that user has no access to (no READ permission) and returns
      * an envelope response consisting of id, filtered json and permissions for attributes.
      *
-     * @param userId                          accessor ID
-     * @param userRoles                       accessor roles
-     * @param resources                       envelope {@link Resource} and corresponding metadata
-     * @param attributeSecurityClassification input security classification map from CCD
+     * @param userId    accessor ID
+     * @param userRoles accessor roles
+     * @param resources envelope {@link Resource} and corresponding metadata
      * @return envelope list of {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions
-     * if access to resource is configured, otherwise null
+     *     if access to resource is configured, otherwise null
      * @throws PersistenceException if any persistence errors were encountered
      */
     public List<FilteredResourceEnvelope> filterResource(@NotBlank String userId,
                                                          @NotEmpty Set<@NotBlank String> userRoles,
-                                                         @NotNull List<@NotNull @Valid Resource> resources,
-                                                         @NotEmpty @Valid Map<JsonPointer, SecurityClassification>
-                                                             attributeSecurityClassification) {
+                                                         @NotNull List<@NotNull @Valid Resource> resources) {
         return resources.stream()
-            .map(resource -> filterResource(userId, userRoles, resource, attributeSecurityClassification))
+            .map(resource -> filterResource(userId, userRoles, resource))
             .collect(toList());
     }
 
@@ -158,30 +152,20 @@ public class AccessManagementService {
      * Filters {@link JsonNode} to remove fields that user has no access to (no READ permission). In addition to that
      * method also returns map of all permissions that user has to resource.
      *
-     * @param userId                          accessor ID
-     * @param userRoles                       accessor roles
-     * @param resource                        envelope {@link Resource} and corresponding metadata
-     * @param attributeSecurityClassification input security classification map from CCD
+     * @param userId    accessor ID
+     * @param userRoles accessor roles
+     * @param resource  envelope {@link Resource} and corresponding metadata
      * @return envelope {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions if
-     * access to resource is configured, otherwise null.
+     *     access to resource is configured, otherwise null.
      * @throws PersistenceException if any persistence errors were encountered
      */
     @AuditLog("filtered access to resource '{{resource.id}}' defined as '{{resource.definition.serviceName}}|"
         + "{{resource.definition.resourceType}}|{{resource.definition.resourceName}}' for accessor '{{userId}}' "
-        + "in roles '{{userRoles}}' and SecurityClassification {{attributeSecurityClassification}} : "
-        + "{{result.access.accessType}} access with relationships {{result.relationships}} "
+        + "in roles '{{userRoles}}': {{result.access.accessType}} access with relationships {{result.relationships}} "
         + "and permissions {{result.access.permissions}}")
     public FilteredResourceEnvelope filterResource(@NotBlank String userId,
                                                    @NotEmpty Set<@NotBlank String> userRoles,
-                                                   @NotNull @Valid Resource resource,
-                                                   @NotEmpty @Valid Map<@NotNull JsonPointer, SecurityClassification>
-                                                       attributeSecurityClassification) {
-
-        //Throws NoSuchElementException exception when root is missing
-        if (isNull(attributeSecurityClassification.get(JsonPointer.valueOf("")))) {
-            throw new NoSuchElementException("Root element not found in input Security Classification");
-        }
-
+                                                   @NotNull @Valid Resource resource) {
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getExplicitAccess(userId, resource.getId()));
 
@@ -191,7 +175,7 @@ public class AccessManagementService {
         if (explicitAccess.isEmpty()) {
             Set<String> filteredRoles = filterRolesWithExplicitAccessType(userRoles);
 
-            if (requireNonNull(filteredRoles).isEmpty()) {
+            if (Objects.requireNonNull(filteredRoles).isEmpty()) {
                 return null;
             }
 
@@ -215,85 +199,24 @@ public class AccessManagementService {
             accessType = EXPLICIT;
         }
 
-        //called max security role once to avoided multiple db calls
-        final Integer maxUserRole = getMaxSecurityRole(userRoles);
-
-        //gets user security classification
-        SecurityClassification userSecurityClassification = EnumSet.allOf(SecurityClassification.class)
-            .stream()
-            .filter(securityClassification -> securityClassification.getHierarchy() == maxUserRole)
-            .collect(collectingAndThen(toList(), li -> li.get(0)));
-
-        attributePermissions = filterAttributePermission(attributePermissions,
-            getFilteredAttributesBySecurityClassification(SecurityClassifications
-                    .getVisibleSecurityClassifications(maxUserRole),
-                attributeSecurityClassification));
-
         JsonNode filteredJson = filterService.filterJson(resource.getData(), attributePermissions);
+
         Set<String> relationships = explicitAccess.stream()
             .map(ExplicitAccessRecord::getRelationship)
             .collect(toSet());
 
-        removeEmptyNodeValues(filteredJson);
         return FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resource.getId())
                 .definition(resource.getDefinition())
                 .data(filteredJson)
                 .build())
-            .userSecurityClassification(userSecurityClassification.toString())
             .access(AccessEnvelope.builder()
                 .permissions(attributePermissions)
                 .accessType(accessType)
                 .build())
             .relationships(relationships)
             .build();
-    }
-
-    /**
-     * Removes empty nodes from data.
-     *
-     * @param node JsonNode
-     */
-    private void removeEmptyNodeValues(JsonNode node) {
-        if (nonNull(node)) {
-            Iterator<JsonNode> it = node.iterator();
-            while (it.hasNext()) {
-                JsonNode child = it.next();
-                if (child.isObject() && child.isEmpty(null)) {
-                    it.remove();
-                } else {
-                    removeEmptyNodeValues(child);
-                }
-            }
-        }
-    }
-
-    private Map<JsonPointer, Set<Permission>> filterAttributePermission(
-        Map<JsonPointer, Set<Permission>> attributePermissions, Set<JsonPointer> visibleAttributes) {
-
-        return attributePermissions.entrySet().stream()
-            .filter(entry -> visibleAttributes.contains(entry.getKey()))
-            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    @SuppressWarnings("LineLength")
-    private Set<JsonPointer> getFilteredAttributesBySecurityClassification(final Set<SecurityClassification> securityClassifications,
-                                                                           @NotEmpty @Valid Map<JsonPointer, SecurityClassification>
-                                                                               attributeSecurityClassification) {
-        return attributeSecurityClassification.entrySet().stream()
-            .filter(attributes -> securityClassifications.stream()
-                .anyMatch(classification -> classification.equals(attributes.getValue())))
-            .map(Map.Entry::getKey)
-            .collect(toSet());
-    }
-
-    private Integer getMaxSecurityRole(@NotEmpty Set<String> userRoles) {
-        return jdbi.withExtension(AccessManagementRepository.class, dao ->
-            dao.getRoles(userRoles, Stream.of(EXPLICIT, ROLE_BASED).collect(toSet())).stream()
-                .mapToInt(role -> role.getSecurityClassification().getHierarchy())
-                .max()
-                .orElseThrow(NoSuchElementException::new));
     }
 
     private Set<String> filterRolesWithExplicitAccessType(Set<String> userRoles) {
@@ -375,7 +298,12 @@ public class AccessManagementService {
     @SuppressWarnings("LineLength")
     @AuditLog("returned resources that user with roles '{{userRoles}}' has create permission to: {{result}}")
     public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@NotEmpty Set<@NotBlank String> userRoles) {
-        Integer maxSecurityClassificationForRole = getMaxSecurityRole(userRoles);
+        Integer maxSecurityClassificationForRole = jdbi.withExtension(AccessManagementRepository.class, dao ->
+            dao.getRoles(userRoles, Stream.of(EXPLICIT, ROLE_BASED).collect(toSet()))
+                .stream()
+                .mapToInt(role -> role.getSecurityClassification().getHierarchy())
+                .max()
+                .orElseThrow(NoSuchElementException::new));
 
         return jdbi.withExtension(AccessManagementRepository.class, dao ->
             dao.getResourceDefinitionsWithRootCreatePermission(

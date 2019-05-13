@@ -1,0 +1,100 @@
+---- AspectJ Properties ---
+AspectJ Compiler 1.9.2 built on Wednesday Oct 24, 2018 at 15:43:33 GMT
+---- Dump Properties ---
+Dump file: ajcore.20190510.185335.046.txt
+Dump reason: java.io.FileNotFoundException
+Dump on exception: true
+Dump at exit condition: abort
+---- Exception Information ---
+java.io.FileNotFoundException: C:\Users\350950\HMCTS\am-lib\am-lib\am-lib\build\classes\java\test\uk\gov\hmcts\reform\amlib\helpers\InvalidArgumentsProvider.class (The system cannot find the file specified)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at org.aspectj.weaver.bcel.BcelWeaver.addClassFile(BcelWeaver.java:464)
+	at org.aspectj.ajdt.internal.core.builder.AjBuildManager.initBcelWorld(AjBuildManager.java:908)
+	at org.aspectj.ajdt.internal.core.builder.AjBuildManager.performBuild(AjBuildManager.java:253)
+	at org.aspectj.ajdt.internal.core.builder.AjBuildManager.batchBuild(AjBuildManager.java:189)
+	at org.aspectj.ajdt.ajc.AjdtCommand.doCommand(AjdtCommand.java:114)
+	at org.aspectj.ajdt.ajc.AjdtCommand.runCommand(AjdtCommand.java:60)
+	at org.aspectj.tools.ajc.Main.run(Main.java:371)
+	at org.aspectj.tools.ajc.Main.runMain(Main.java:248)
+	at org.aspectj.tools.ajc.Main.main(Main.java:84)
+---- System Properties ---
+java.runtime.name=Java(TM) SE Runtime Environment
+sun.boot.library.path=C:\Program Files\Java\jdk1.8.0_201\jre\bin
+java.vm.version=25.201-b09
+java.vm.vendor=Oracle Corporation
+java.vendor.url=http://java.oracle.com/
+path.separator=;
+java.vm.name=Java HotSpot(TM) 64-Bit Server VM
+file.encoding.pkg=sun.io
+user.script=
+sun.java.launcher=SUN_STANDARD
+user.country=GB
+sun.os.patch.level=
+java.vm.specification.name=Java Virtual Machine Specification
+user.dir=C:\Users\350950\HMCTS\am-lib\am-lib\am-lib
+java.runtime.version=1.8.0_201-b09
+java.awt.graphicsenv=sun.awt.Win32GraphicsEnvironment
+java.endorsed.dirs=C:\Program Files\Java\jdk1.8.0_201\jre\lib\endorsed
+os.arch=amd64
+java.io.tmpdir=C:\Users\350950\AppData\Local\Temp\
+line.separator=
+
+java.vm.specification.vendor=Oracle Corporation
+user.variant=
+os.name=Windows 10
+sun.jnu.encoding=Cp1252
+java.library.path=C:\Program Files\Java\jdk1.8.0_201\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\Docker\Docker\Resources\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\Java\jdk1.8.0_201;C:\Program Files\Git\bin\git.exe;C:\Program Files\Git\cmd;"C:\Users\350950\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Java\jdk1.8.0_201;C:\Program Files\Git\bin\git.exe;C:\Program Files\Git\cmd";;.
+java.specification.name=Java Platform API Specification
+java.class.version=52.0
+sun.management.compiler=HotSpot 64-Bit Tiered Compilers
+os.version=10.0
+user.home=C:\Users\350950
+user.timezone=Europe/London
+java.awt.printerjob=sun.awt.windows.WPrinterJob
+file.encoding=windows-1252
+java.specification.version=1.8
+java.class.path=C:\Users\350950\.gradle\caches\modules-2\files-2.1\org.aspectj\aspectjtools\1.9.2\5ffa9075e58cc7bc62e6386823387d9543faa6a\aspectjtools-1.9.2.jar
+user.name=350950
+java.vm.specification.version=1.8
+sun.java.command=org.aspectj.tools.ajc.Main -argfile C:\Users\350950\HMCTS\am-lib\am-lib\am-lib\build\tmp\compileTestJava\ajc.options
+java.home=C:\Program Files\Java\jdk1.8.0_201\jre
+sun.arch.data.model=64
+user.language=en
+java.specification.vendor=Oracle Corporation
+awt.toolkit=sun.awt.windows.WToolkit
+java.vm.info=mixed mode
+java.version=1.8.0_201
+java.ext.dirs=C:\Program Files\Java\jdk1.8.0_201\jre\lib\ext;C:\WINDOWS\Sun\Java\lib\ext
+sun.boot.class.path=C:\Program Files\Java\jdk1.8.0_201\jre\lib\resources.jar;C:\Program Files\Java\jdk1.8.0_201\jre\lib\rt.jar;C:\Program Files\Java\jdk1.8.0_201\jre\lib\sunrsasign.jar;C:\Program Files\Java\jdk1.8.0_201\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.8.0_201\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_201\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_201\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_201\jre\classes
+java.vendor=Oracle Corporation
+file.separator=\
+java.vendor.url.bug=http://bugreport.sun.com/bugreport/
+sun.io.unicode.encoding=UnicodeLittle
+sun.cpu.endian=little
+sun.desktop=windows
+sun.cpu.isalist=amd64
+---- Command Line ---
+-argfile
+C:\Users\350950\HMCTS\am-lib\am-lib\am-lib\build\tmp\compileTestJava\ajc.options
+---- Full Classpath ---
+Empty
+---- Compiler Messages ---
+warning bad version number found in C:\Users\350950\.gradle\caches\modules-2\files-2.1\org.aspectj\aspectjrt\1.9.3\c98f37d3c7979f7cf813cf11df53b2dc05805f82\aspectjrt-1.9.3.jar expected 1.9.2 found 1.9.3
+abort ABORT -- (FileNotFoundException) C:\Users\350950\HMCTS\am-lib\am-lib\am-lib\build\classes\java\test\uk\gov\hmcts\reform\amlib\helpers\InvalidArgumentsProvider.class (The system cannot find the file specified)
+C:\Users\350950\HMCTS\am-lib\am-lib\am-lib\build\classes\java\test\uk\gov\hmcts\reform\amlib\helpers\InvalidArgumentsProvider.class (The system cannot find the file specified)
+java.io.FileNotFoundException: C:\Users\350950\HMCTS\am-lib\am-lib\am-lib\build\classes\java\test\uk\gov\hmcts\reform\amlib\helpers\InvalidArgumentsProvider.class (The system cannot find the file specified)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at org.aspectj.weaver.bcel.BcelWeaver.addClassFile(BcelWeaver.java:464)
+	at org.aspectj.ajdt.internal.core.builder.AjBuildManager.initBcelWorld(AjBuildManager.java:908)
+	at org.aspectj.ajdt.internal.core.builder.AjBuildManager.performBuild(AjBuildManager.java:253)
+	at org.aspectj.ajdt.internal.core.builder.AjBuildManager.batchBuild(AjBuildManager.java:189)
+	at org.aspectj.ajdt.ajc.AjdtCommand.doCommand(AjdtCommand.java:114)
+	at org.aspectj.ajdt.ajc.AjdtCommand.runCommand(AjdtCommand.java:60)
+	at org.aspectj.tools.ajc.Main.run(Main.java:371)
+	at org.aspectj.tools.ajc.Main.runMain(Main.java:248)
+	at org.aspectj.tools.ajc.Main.main(Main.java:84)
+

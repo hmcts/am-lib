@@ -64,12 +64,14 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
             ParameterizedType parameterizedType = (ParameterizedType) parameterType;
 
             Class<?> rawType = (Class<?>) parameterizedType.getRawType();
-            if (Collection.class.isAssignableFrom(rawType)) {
+            if (Collection.class.isAssignableFrom(rawType) || Map.class.isAssignableFrom(rawType)) {
                 Class<?> actualElementType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
                 if (List.class.isAssignableFrom(rawType)) {
                     return generateInvalidCollections(actualElementType, ImmutableList.of(), ImmutableList::of);
                 } else if (Set.class.isAssignableFrom(rawType)) {
                     return generateInvalidCollections(actualElementType, ImmutableSet.of(), ImmutableSet::of);
+                } else if (Map.class.isAssignableFrom(rawType)) {
+                    return generateInvalidMap(actualElementType, ImmutableMap.of(),  map -> ImmutableMap.of());
                 }
             }
         }
@@ -81,6 +83,8 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
         if (parameterType.equals(String.class)) {
             return new Object[]{null, "", " "};
         } else if (parameterType.isEnum()) {
+            return new Object[]{null};
+        } else if (parameterType.equals(JsonPointer.class)) {
             return new Object[]{null};
         } else if (isComplexTypeSupported(parameterType)) {
             Object[] invalidValues = new Object[]{null};
@@ -111,6 +115,18 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
     private Object[] generateInvalidCollections(Class<?> invalidValueClass,
                                                 Collection<?> emptyCollection,
                                                 Function<Object, Collection<Object>> collectionCreationFn) {
+        Object[] invalidValues = generateInvalidValues(invalidValueClass);
+
+        return ObjectArrays.concat(
+            new Object[]{null, emptyCollection},
+            Arrays.stream(invalidValues).filter(Objects::nonNull).map(collectionCreationFn).toArray(),
+            Object.class
+        );
+    }
+
+    private Object[] generateInvalidMap(Class<?> invalidValueClass,
+                                                Map<?,?> emptyCollection,
+                                                Function<Object, Map<Object,Object>> collectionCreationFn) {
         Object[] invalidValues = generateInvalidValues(invalidValueClass);
 
         return ObjectArrays.concat(

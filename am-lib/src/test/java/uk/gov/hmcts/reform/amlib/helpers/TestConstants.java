@@ -8,7 +8,8 @@ public final class TestConstants {
     public static final JsonPointer ROOT_ATTRIBUTE = JsonPointer.valueOf("");
     public static final JsonNode DATA = JsonNodeFactory.instance.objectNode()
         .put("name", "John")
-        .put("age", 18);
+        .set("address", JsonNodeFactory.instance.objectNode()
+            .put("city", "London"));
 
     private TestConstants() {
         //NO-OP

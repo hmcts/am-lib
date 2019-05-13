@@ -51,7 +51,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldRetrieveResourceDefinitionWhenRecordExists() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            roleName, resourceDefinition, "", ImmutableSet.of(CREATE)));
+            roleName, resourceDefinition, "", ImmutableSet.of(CREATE), PUBLIC));
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(roleName));
@@ -62,8 +62,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldRetrieveResourceDefinitionWhenRecordExistsWithMultiplePermissions() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            roleName, resourceDefinition, "", ImmutableSet.of(READ, CREATE)));
-
+            roleName, resourceDefinition, "", ImmutableSet.of(READ, CREATE), PUBLIC));
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(roleName));
@@ -74,7 +73,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
     @Test
     void shouldNotRetrieveResourceDefinitionWhenRecordExistsWithoutRootAttribute() {
         importerService.grantDefaultPermission(createDefaultPermissionGrant(
-            roleName, resourceDefinition, "/adult", ImmutableSet.of(CREATE)));
+            roleName, resourceDefinition, "/adult", ImmutableSet.of(CREATE), PUBLIC));
 
         Set<ResourceDefinition> result =
             service.getResourceDefinitionsWithRootCreatePermission(ImmutableSet.of(roleName));
@@ -137,8 +136,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @Test
     void whenMultipleRoleBasedAccessRecordsShouldOnlyReturnDefinitionsAllowedByRoleSecurityClassification() {
-        String rolePublic = "RoleWithOnlyPublic";
-
+        String rolePublic = UUID.randomUUID().toString();
         importerService.addRole(rolePublic, IDAM, PUBLIC, ROLE_BASED);
 
         grantRootPermission(rolePublic, resourceDefinition, CREATE, PUBLIC);
@@ -152,8 +150,7 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @Test
     void whenRoleDoesNotHaveHighEnoughSecurityClassificationShouldReturnEmptyList() {
-        String rolePublic = "RoleWithOnlyPublic";
-
+        String rolePublic = UUID.randomUUID().toString();
         importerService.addRole(rolePublic, IDAM, PUBLIC, ROLE_BASED);
 
         grantRootPermission(rolePublic, resourceDefinition, CREATE, RESTRICTED);
@@ -166,8 +163,8 @@ class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends Preconfi
 
     @Test
     void whenTwoRolesWithDifferentSecurityClassificationShouldUseTheHighestSecurityClassificationToFilter() {
-        String rolePublic = "RoleWithOnlyPublic";
-        String rolePrivate = "RoleWithPrivate";
+        String rolePublic = UUID.randomUUID().toString();
+        String rolePrivate = UUID.randomUUID().toString();
 
         importerService.addRole(rolePublic, IDAM, PUBLIC, ROLE_BASED);
         importerService.addRole(rolePrivate, IDAM, PRIVATE, ROLE_BASED);

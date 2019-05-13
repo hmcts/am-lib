@@ -18,4 +18,6 @@ public final class Resource {
     private final ResourceDefinition definition;
     @NotNull
     private final JsonNode data;
+
+
 }

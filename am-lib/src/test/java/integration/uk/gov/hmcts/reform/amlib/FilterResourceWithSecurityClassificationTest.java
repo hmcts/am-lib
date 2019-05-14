@@ -3,6 +3,7 @@ package integration.uk.gov.hmcts.reform.amlib;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
@@ -349,17 +350,20 @@ public class FilterResourceWithSecurityClassificationTest extends PreconfiguredI
 
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBaseAccess, resourceDefinition,
             rootLevelAttribute, ImmutableSet.of(READ), PUBLIC));
+
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBaseAccess, resourceDefinition,
             rootLevelObject + "/" + nestedAttribute, ImmutableSet.of(CREATE), PUBLIC));
 
         Map<JsonPointer, SecurityClassification> securityClassificationMap = new ConcurrentHashMap<>();
         securityClassificationMap.put(JsonPointer.valueOf(""), PUBLIC);
         securityClassificationMap.put(JsonPointer.valueOf(rootLevelAttribute), PUBLIC);
+        securityClassificationMap.put(JsonPointer.valueOf(rootLevelObject),PUBLIC);
         securityClassificationMap.put(JsonPointer.valueOf(rootLevelObject + "/" + nestedAttribute), PUBLIC);
 
 
         JsonNode data = JsonNodeFactory.instance.objectNode()
             .put(rootLevelAttribute.replace("/",""), rootLevelAttributeValue);
+        ((ObjectNode)data).putObject(rootLevelObject.replace("/",""));//@Todo need to tested with 273
 
         FilteredResourceEnvelope result = service.filterResource(
             accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId,

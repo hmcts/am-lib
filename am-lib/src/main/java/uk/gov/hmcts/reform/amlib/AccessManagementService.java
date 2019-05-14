@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.amlib.models.RolePermissions;
 
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -164,7 +163,8 @@ public class AccessManagementService {
      * @param attributeSecurityClassification input security classification map from CCD
      * @return envelope {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions if
      * access to resource is configured, otherwise null.
-     * @throws PersistenceException if any persistence errors were encountered
+     * @throws PersistenceException if any persistence errors were encountered,
+     * or NoSuchElementException if root element missing
      */
     @AuditLog("filtered access to resource '{{resource.id}}' defined as '{{resource.definition.serviceName}}|"
         + "{{resource.definition.resourceType}}|{{resource.definition.resourceName}}' for accessor '{{userId}}' "
@@ -241,8 +241,7 @@ public class AccessManagementService {
             .map(ExplicitAccessRecord::getRelationship)
             .collect(toSet());
 
-        //filterService.removeFieldsHavingLowerSecurityClassifications(filteredJson,attributePermissions);
-        removeEmptyNodeValues(filteredJson);
+        // filterService.removeFieldsHavingLowerSecurityClassifications(filteredJson,attributePermissions);
         return FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resource.getId())
@@ -269,29 +268,9 @@ public class AccessManagementService {
                                                                 JsonNode filteredJson) {
 
         List<JsonPointer> visibleAttributes = attributePermissions.entrySet().stream()
-            .filter(t -> !t.getKey().equals(""))
             .map(s -> s.getKey()).collect(toList());
         filterService.retainFieldsWithVisibleSecurityClassifications(filteredJson, visibleAttributes);
         return filteredJson;
-    }
-
-    /**
-     * Removes empty nodes from data.
-     *
-     * @param node JsonNode
-     */
-    private void removeEmptyNodeValues(JsonNode node) {
-        if (nonNull(node)) {
-            Iterator<JsonNode> it = node.iterator();
-            while (it.hasNext()) {
-                JsonNode child = it.next();
-                if (child.isObject() && child.isEmpty(null)) {
-                    it.remove();
-                } else {
-                    removeEmptyNodeValues(child);
-                }
-            }
-        }
     }
 
     private Map<JsonPointer, Set<Permission>> filterAttributePermission(

@@ -219,7 +219,7 @@ public class AccessManagementService {
         final Integer maxUserRole = getMaxSecurityRole(userRoles);
 
         //gets user security classification
-        SecurityClassification userSecurityClassification = EnumSet.allOf(SecurityClassification.class)
+        final SecurityClassification userSecurityClassification = EnumSet.allOf(SecurityClassification.class)
             .stream()
             .filter(securityClassification -> securityClassification.getHierarchy() == maxUserRole)
             .collect(collectingAndThen(toList(), li -> li.get(0)));
@@ -229,11 +229,19 @@ public class AccessManagementService {
                     .getVisibleSecurityClassifications(maxUserRole),
                 attributeSecurityClassification));
 
+        //filter attribute permissions
         JsonNode filteredJson = filterService.filterJson(resource.getData(), attributePermissions);
+
+        // filter data with security classification
+        if (nonNull(filteredJson)) {
+            filteredJson = filterDataWithHigherSecurityClassification(attributePermissions, filteredJson.deepCopy());
+        }
+
         Set<String> relationships = explicitAccess.stream()
             .map(ExplicitAccessRecord::getRelationship)
             .collect(toSet());
 
+        //filterService.removeFieldsHavingLowerSecurityClassifications(filteredJson,attributePermissions);
         removeEmptyNodeValues(filteredJson);
         return FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
@@ -241,13 +249,30 @@ public class AccessManagementService {
                 .definition(resource.getDefinition())
                 .data(filteredJson)
                 .build())
-            .userSecurityClassification(userSecurityClassification.toString())
+            .userSecurityClassification(userSecurityClassification)
             .access(AccessEnvelope.builder()
                 .permissions(attributePermissions)
                 .accessType(accessType)
                 .build())
             .relationships(relationships)
             .build();
+    }
+
+    /**
+    * Filter data with higher security classification.
+    *
+    * @param attributePermissions set
+    * @param filteredJson JsonNode
+    * @return JsonNode
+    */
+    private JsonNode filterDataWithHigherSecurityClassification(Map<JsonPointer, Set<Permission>> attributePermissions,
+                                                                JsonNode filteredJson) {
+
+        List<JsonPointer> visibleAttributes = attributePermissions.entrySet().stream()
+            .filter(t -> !t.getKey().equals(""))
+            .map(s -> s.getKey()).collect(toList());
+        filterService.retainFieldsWithVisibleSecurityClassifications(filteredJson, visibleAttributes);
+        return filteredJson;
     }
 
     /**

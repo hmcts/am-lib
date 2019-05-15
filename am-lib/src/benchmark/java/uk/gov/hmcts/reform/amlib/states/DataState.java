@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.amlib.states;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.BenchmarkException;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.io.IOException;
@@ -13,6 +15,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -20,6 +25,10 @@ import static uk.gov.hmcts.reform.amlib.utils.RandomNumberFactory.nextIntegerInR
 
 @State(Scope.Benchmark)
 public class DataState {
+
+    private static final List<SecurityClassification> VALUES =
+        Collections.unmodifiableList(Arrays.asList(SecurityClassification.values()));
+
     private static ResourceDefinition[] definitions = new ResourceDefinition[]{
         ResourceDefinition.builder()
             .serviceName("fpl")
@@ -48,6 +57,26 @@ public class DataState {
             }
         ));
 
+    private static Map<String,Map<JsonPointer, SecurityClassification>> securityClassifications = Arrays
+        .stream(definitions).collect(Collectors.toMap(ResourceDefinition::getServiceName,
+            definition -> {
+                try {
+                    Path resourceDataLocation = Paths.get("src/benchmark/resources/resource-data");
+                    Path resourceSecurityClassificationPath = resourceDataLocation
+                        .resolve(definition.getServiceName() + "-securityclassification" + ".json");
+                    try (Reader dataReader = Files.newBufferedReader(resourceSecurityClassificationPath)) {
+                        Map<JsonPointer, SecurityClassification> securityClassificationMap = new HashMap<>();
+                        new ObjectMapper().readValue(dataReader, HashMap.class)
+                            .forEach((s,t) ->  securityClassificationMap
+                                .put(JsonPointer.valueOf((String)s), SecurityClassification.valueOf((String)t)));
+                        return  securityClassificationMap;
+                    }
+                } catch (IOException ex) {
+                    throw new BenchmarkException(ex);
+                }
+            }
+        ));
+
     public int randomId() {
         return nextIntegerInRange(1, 50000);
     }
@@ -59,4 +88,10 @@ public class DataState {
     public JsonNode resourceDataFor(String serviceName) {
         return resourceDataPerService.get(serviceName);
     }
+
+    public Map<JsonPointer, SecurityClassification> getSecurityClassifications(String serviceName) {
+        return securityClassifications.get(serviceName);
+    }
+
+
 }

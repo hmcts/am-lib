@@ -67,8 +67,8 @@ public class DataState {
                     try (Reader dataReader = Files.newBufferedReader(resourceSecurityClassificationPath)) {
                         Map<JsonPointer, SecurityClassification> securityClassificationMap = new HashMap<>();
                         new ObjectMapper().readValue(dataReader, HashMap.class)
-                            .forEach((s,t) ->  securityClassificationMap
-                                .put(JsonPointer.valueOf((String)s), SecurityClassification.valueOf((String)t)));
+                            .forEach((jsonPointer,securityClassification) ->  securityClassificationMap
+                                .put(JsonPointer.valueOf((String)jsonPointer), SecurityClassification.valueOf((String)securityClassification)));
                         return  securityClassificationMap;
                     }
                 } catch (IOException ex) {

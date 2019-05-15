@@ -204,13 +204,8 @@ dependencies {
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     compile group: 'org.flywaydb', name: 'flyway-core', version: versions.flyway
 
-    compile 'io.rest-assured:json-path:4.0.0'
-    compile 'io.rest-assured:xml-path:4.0.0'
-
-    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '4.0.0'
-    testCompile 'io.rest-assured:json-schema-validator:4.0.0'
-
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.2'
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 
   testCompile (group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot) {
         exclude group: 'junit', module: 'junit'

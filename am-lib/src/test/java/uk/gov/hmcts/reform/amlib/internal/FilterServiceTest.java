@@ -16,12 +16,14 @@ import uk.gov.hmcts.reform.amlib.internal.FilterServiceTest.Resource.Claimant;
 import uk.gov.hmcts.reform.amlib.internal.FilterServiceTest.Resource.Defendant;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals"})
@@ -32,10 +34,11 @@ class FilterServiceTest {
     private final FilterService fs = new FilterService();
 
     @Test
-    void itShouldBePossibleToSHowEverything() throws IOException {
+    void itShouldBePossibleToShowEverything() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, createPermissions("", ImmutableSet.of(READ)));
+        JsonNode returnedJson = fs.filterJson(inputJson, createPermissions("", ImmutableSet.of(READ)),
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(inputJson);
     }
@@ -48,7 +51,8 @@ class FilterServiceTest {
             JsonPointer.valueOf(""), ImmutableSet.of(READ),
             JsonPointer.valueOf("/amount"), ImmutableSet.of(CREATE));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
@@ -81,7 +85,8 @@ class FilterServiceTest {
             JsonPointer.valueOf(""), ImmutableSet.of(READ),
             JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
@@ -106,7 +111,8 @@ class FilterServiceTest {
             JsonPointer.valueOf(""), ImmutableSet.of(READ),
             JsonPointer.valueOf("/claimant/age"), ImmutableSet.of(CREATE));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
@@ -139,7 +145,8 @@ class FilterServiceTest {
             JsonPointer.valueOf(""), ImmutableSet.of(READ),
             JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(CREATE));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
@@ -168,7 +175,8 @@ class FilterServiceTest {
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
             JsonPointer.valueOf("/amount"), ImmutableSet.of(READ));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
@@ -185,7 +193,8 @@ class FilterServiceTest {
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
             JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
@@ -209,7 +218,8 @@ class FilterServiceTest {
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
             JsonPointer.valueOf("/claimant/age"), ImmutableSet.of(READ));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
@@ -229,7 +239,8 @@ class FilterServiceTest {
         Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
             JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(READ));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
@@ -253,7 +264,8 @@ class FilterServiceTest {
             JsonPointer.valueOf("/claimant"), ImmutableSet.of(READ),
             JsonPointer.valueOf("/defendant"), ImmutableSet.of(READ));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
@@ -287,7 +299,8 @@ class FilterServiceTest {
             JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(READ),
             JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(READ));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
@@ -312,7 +325,8 @@ class FilterServiceTest {
             JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(READ),
             JsonPointer.valueOf("/defendant/address"), ImmutableSet.of(READ));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
@@ -344,13 +358,89 @@ class FilterServiceTest {
             JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
             JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(READ));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
                 .claimant(Claimant.builder()
                     .address(Address.builder()
                         .city("London")
+                        .build())
+                    .build()
+                )
+                .defendant(Defendant.builder()
+                    .name("Marry")
+                    .address(Address.builder()
+                        .city("Swansea")
+                        .postcode("SA1")
+                        .build())
+                    .build()
+                )
+                .amount(100)
+                .build()
+            )
+        );
+    }
+
+    @Test
+    void itShouldBePossibleToShowEverythingExceptTopLevelObjectWithMultipleLeafLevelExceptions() throws IOException {
+        JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
+
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf(""), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
+            JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/claimant/address/postcode"), ImmutableSet.of(READ));
+
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
+
+        assertThat(returnedJson).isEqualTo(mapper.valueToTree(
+            Resource.builder()
+                .claimant(Claimant.builder()
+                    .address(Address.builder()
+                        .city("London")
+                        .postcode("SE1")
+                        .build())
+                    .build()
+                )
+                .defendant(Defendant.builder()
+                    .name("Marry")
+                    .address(Address.builder()
+                        .city("Swansea")
+                        .postcode("SA1")
+                        .build())
+                    .build()
+                )
+                .amount(100)
+                .build()
+            )
+        );
+    }
+
+    @Test
+    void itShouldBePossibleToShowEverythingExceptTopLevelObjectWithMultipleLeafLevelExceptionsAtDifferentLevels()
+        throws IOException {
+        JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
+
+        Map<JsonPointer, Set<Permission>> attributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf(""), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
+            JsonPointer.valueOf("/claimant/age"), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(READ),
+            JsonPointer.valueOf("/claimant/address/postcode"), ImmutableSet.of(READ));
+
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
+
+        assertThat(returnedJson).isEqualTo(mapper.valueToTree(
+            Resource.builder()
+                .claimant(Claimant.builder()
+                    .age(21)
+                    .address(Address.builder()
+                        .city("London")
+                        .postcode("SE1")
                         .build())
                     .build()
                 )
@@ -377,7 +467,8 @@ class FilterServiceTest {
             JsonPointer.valueOf("/claimant/address"), ImmutableSet.of(CREATE),
             JsonPointer.valueOf("/claimant/address/city"), ImmutableSet.of(READ));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
@@ -407,7 +498,8 @@ class FilterServiceTest {
     void itShouldBePossibleToHideEverything() throws IOException {
         JsonNode inputJson = mapper.readTree(ClassLoader.getSystemResource("FilterServiceResources/input.json"));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, createPermissions("/name", ImmutableSet.of(CREATE)));
+        JsonNode returnedJson = fs.filterJson(inputJson, createPermissions("/name", ImmutableSet.of(CREATE)),
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isNull();
     }
@@ -431,7 +523,8 @@ class FilterServiceTest {
             .put(JsonPointer.valueOf("/amount"), ImmutableSet.of(CREATE))
             .build();
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isNull();
     }
@@ -444,7 +537,8 @@ class FilterServiceTest {
             JsonPointer.valueOf("/claimant"), ImmutableSet.of(CREATE),
             JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(READ));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
@@ -465,7 +559,8 @@ class FilterServiceTest {
             JsonPointer.valueOf("/claimant/name"), ImmutableSet.of(READ),
             JsonPointer.valueOf("/claimant/age"), ImmutableSet.of(CREATE));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()
@@ -488,7 +583,8 @@ class FilterServiceTest {
             JsonPointer.valueOf("/defendant/mobile"), ImmutableSet.of(CREATE),
             JsonPointer.valueOf("/updated"), ImmutableSet.of(CREATE));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(JsonNodeFactory.instance.objectNode());
     }
@@ -502,7 +598,8 @@ class FilterServiceTest {
             JsonPointer.valueOf("/amountInPounds"), ImmutableSet.of(READ),
             JsonPointer.valueOf("/amount"), ImmutableSet.of(CREATE));
 
-        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions);
+        JsonNode returnedJson = fs.filterJson(inputJson, attributePermissions,
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC), ImmutableSet.of(PUBLIC));
 
         assertThat(returnedJson).isEqualTo(mapper.valueToTree(
             Resource.builder()

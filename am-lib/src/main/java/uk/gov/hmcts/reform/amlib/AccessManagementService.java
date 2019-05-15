@@ -27,11 +27,11 @@ import uk.gov.hmcts.reform.amlib.models.RolePermissions;
 
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
@@ -41,7 +41,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
@@ -136,10 +135,10 @@ public class AccessManagementService {
      * Filters a list of {@link JsonNode} to remove fields that user has no access to (no READ permission) and returns
      * an envelope response consisting of id, filtered json and permissions for attributes.
      *
-     * @param userId                          accessor ID
-     * @param userRoles                       accessor roles
-     * @param resources                       envelope {@link Resource} and corresponding metadata
-     * @param attributeSecurityClassification input security classification map from CCD
+     * @param userId                           accessor ID
+     * @param userRoles                        accessor roles
+     * @param resources                        envelope {@link Resource} and corresponding metadata
+     * @param attributeSecurityClassifications input security classification map from CCD
      * @return envelope list of {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions
      * if access to resource is configured, otherwise null
      * @throws PersistenceException if any persistence errors were encountered
@@ -148,9 +147,9 @@ public class AccessManagementService {
                                                          @NotEmpty Set<@NotBlank String> userRoles,
                                                          @NotNull List<@NotNull @Valid Resource> resources,
                                                          @NotEmpty @Valid Map<JsonPointer, SecurityClassification>
-                                                             attributeSecurityClassification) {
+                                                             attributeSecurityClassifications) {
         return resources.stream()
-            .map(resource -> filterResource(userId, userRoles, resource, attributeSecurityClassification))
+            .map(resource -> filterResource(userId, userRoles, resource, attributeSecurityClassifications))
             .collect(toList());
     }
 
@@ -158,27 +157,27 @@ public class AccessManagementService {
      * Filters {@link JsonNode} to remove fields that user has no access to (no READ permission). In addition to that
      * method also returns map of all permissions that user has to resource.
      *
-     * @param userId                          accessor ID
-     * @param userRoles                       accessor roles
-     * @param resource                        envelope {@link Resource} and corresponding metadata
-     * @param attributeSecurityClassification input security classification map from CCD
+     * @param userId                           accessor ID
+     * @param userRoles                        accessor roles
+     * @param resource                         envelope {@link Resource} and corresponding metadata
+     * @param attributeSecurityClassifications input security classification map from CCD
      * @return envelope {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions if
      * access to resource is configured, otherwise null.
      * @throws PersistenceException if any persistence errors were encountered
      */
     @AuditLog("filtered access to resource '{{resource.id}}' defined as '{{resource.definition.serviceName}}|"
         + "{{resource.definition.resourceType}}|{{resource.definition.resourceName}}' for accessor '{{userId}}' "
-        + "in roles '{{userRoles}}' and SecurityClassification {{attributeSecurityClassification}} : "
+        + "in roles '{{userRoles}}' and SecurityClassification {{attributeSecurityClassifications}} : "
         + "{{result.access.accessType}} access with relationships {{result.relationships}} "
         + "and permissions {{result.access.permissions}}")
     public FilteredResourceEnvelope filterResource(@NotBlank String userId,
                                                    @NotEmpty Set<@NotBlank String> userRoles,
                                                    @NotNull @Valid Resource resource,
                                                    @NotEmpty @Valid Map<@NotNull JsonPointer, SecurityClassification>
-                                                       attributeSecurityClassification) {
+                                                       attributeSecurityClassifications) {
 
         //Throws NoSuchElementException exception when root is missing
-        if (isNull(attributeSecurityClassification.get(JsonPointer.valueOf("")))) {
+        if (isNull(attributeSecurityClassifications.get(JsonPointer.valueOf("")))) {
             throw new NoSuchElementException("Root element not found in input Security Classification");
         }
 
@@ -219,22 +218,29 @@ public class AccessManagementService {
         final Integer maxUserRole = getMaxSecurityRole(userRoles);
 
         //gets user security classification
-        SecurityClassification userSecurityClassification = EnumSet.allOf(SecurityClassification.class)
-            .stream()
+        SecurityClassification userSecurityClassification = EnumSet.allOf(SecurityClassification.class).stream()
             .filter(securityClassification -> securityClassification.getHierarchy() == maxUserRole)
             .collect(collectingAndThen(toList(), li -> li.get(0)));
 
-        attributePermissions = filterAttributePermission(attributePermissions,
-            getFilteredAttributesBySecurityClassification(SecurityClassifications
-                    .getVisibleSecurityClassifications(maxUserRole),
-                attributeSecurityClassification));
+        Set<SecurityClassification> userSecurityClassifications = SecurityClassifications
+            .getVisibleSecurityClassifications(maxUserRole);
 
-        JsonNode filteredJson = filterService.filterJson(resource.getData(), attributePermissions);
+        JsonNode filteredJson = filterService.filterJson(resource.getData(), attributePermissions,
+            attributeSecurityClassifications, userSecurityClassifications);
+
+        /*Map<JsonPointer, Set<Permission>> attributePermissionsWithSecurityClassification =
+            filterAttributePermission(attributePermissions, getFilteredAttributesBySecurityClassification(
+                SecurityClassifications.getVisibleSecurityClassifications(maxUserRole),
+                attributeSecurityClassifications));*/
+
+        Map<JsonPointer, Set<Permission>> attributePermissionsWithSecurityClassification =
+            filterAttributePermissionsBySecurityClassification(attributePermissions,
+                attributeSecurityClassifications, userSecurityClassifications);
+
         Set<String> relationships = explicitAccess.stream()
             .map(ExplicitAccessRecord::getRelationship)
             .collect(toSet());
 
-        removeEmptyNodeValues(filteredJson);
         return FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resource.getId())
@@ -243,49 +249,33 @@ public class AccessManagementService {
                 .build())
             .userSecurityClassification(userSecurityClassification.toString())
             .access(AccessEnvelope.builder()
-                .permissions(attributePermissions)
+                .permissions(attributePermissionsWithSecurityClassification)
                 .accessType(accessType)
                 .build())
             .relationships(relationships)
             .build();
     }
 
-    /**
-     * Removes empty nodes from data.
-     *
-     * @param node JsonNode
-     */
-    private void removeEmptyNodeValues(JsonNode node) {
-        if (nonNull(node)) {
-            Iterator<JsonNode> it = node.iterator();
-            while (it.hasNext()) {
-                JsonNode child = it.next();
-                if (child.isObject() && child.isEmpty(null)) {
-                    it.remove();
-                } else {
-                    removeEmptyNodeValues(child);
+    private Map<JsonPointer, Set<Permission>> filterAttributePermissionsBySecurityClassification(
+        Map<JsonPointer, Set<Permission>> attributePermissions, Map<JsonPointer, SecurityClassification>
+        attributeSecurityClassifications, Set<SecurityClassification> userSecurityClassifications) {
+
+        Map<JsonPointer, Set<Permission>> attributePermissionsWithSecurityClassification = new ConcurrentHashMap<>();
+
+        attributePermissions.forEach((attribute, permissions) -> {
+            SecurityClassification attributeSecurityClassification = attributeSecurityClassifications.get(attribute);
+            if (attributeSecurityClassification == null) {
+                JsonPointer parentAttribute = attribute.head();
+                while (attributeSecurityClassifications.get(parentAttribute) == null) {
+                    parentAttribute = parentAttribute.head();
                 }
+                attributeSecurityClassification = attributeSecurityClassifications.get(parentAttribute);
             }
-        }
-    }
-
-    private Map<JsonPointer, Set<Permission>> filterAttributePermission(
-        Map<JsonPointer, Set<Permission>> attributePermissions, Set<JsonPointer> visibleAttributes) {
-
-        return attributePermissions.entrySet().stream()
-            .filter(entry -> visibleAttributes.contains(entry.getKey()))
-            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    @SuppressWarnings("LineLength")
-    private Set<JsonPointer> getFilteredAttributesBySecurityClassification(final Set<SecurityClassification> securityClassifications,
-                                                                           @NotEmpty @Valid Map<JsonPointer, SecurityClassification>
-                                                                               attributeSecurityClassification) {
-        return attributeSecurityClassification.entrySet().stream()
-            .filter(attributes -> securityClassifications.stream()
-                .anyMatch(classification -> classification.equals(attributes.getValue())))
-            .map(Map.Entry::getKey)
-            .collect(toSet());
+            if (userSecurityClassifications.contains(attributeSecurityClassification)) {
+                attributePermissionsWithSecurityClassification.put(attribute, permissions);
+            }
+        });
+        return attributePermissionsWithSecurityClassification;
     }
 
     private Integer getMaxSecurityRole(@NotEmpty Set<String> userRoles) {

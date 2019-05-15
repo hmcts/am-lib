@@ -138,7 +138,7 @@ public class AccessManagementService {
      * @param userId                          accessor ID
      * @param userRoles                       accessor roles
      * @param resources                       envelope {@link Resource} and corresponding metadata
-     * @param attributeSecurityClassification input security classification map from CCD
+     * @param attributesSecurityClassification input security classification map from CCD
      * @return envelope list of {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions
      * if access to resource is configured, otherwise null
      * @throws PersistenceException if any persistence errors were encountered
@@ -147,9 +147,9 @@ public class AccessManagementService {
                                                          @NotEmpty Set<@NotBlank String> userRoles,
                                                          @NotNull List<@NotNull @Valid Resource> resources,
                                                          @NotEmpty @Valid Map<JsonPointer, SecurityClassification>
-                                                             attributeSecurityClassification) {
+                                                             attributesSecurityClassification) {
         return resources.stream()
-            .map(resource -> filterResource(userId, userRoles, resource, attributeSecurityClassification))
+            .map(resource -> filterResource(userId, userRoles, resource, attributesSecurityClassification))
             .collect(toList());
     }
 
@@ -273,6 +273,13 @@ public class AccessManagementService {
         return filteredJson;
     }
 
+    /**
+     * Filter only visible attributes form received attribute permissions map.
+     *
+     * @param attributePermissions Map
+     * @param visibleAttributes Set
+     * @return Map
+     */
     private Map<JsonPointer, Set<Permission>> filterAttributePermission(
         Map<JsonPointer, Set<Permission>> attributePermissions, Set<JsonPointer> visibleAttributes) {
 

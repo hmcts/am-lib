@@ -370,43 +370,6 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .build());
     }
 
-    /*@Test
-    void whenNoGivenSecurityClassificationThenInheritFromParent() {
-        JsonPointer attribute = JsonPointer.valueOf(PARENT_AND_CHILD_ATTRIBUTE);
-        Map<JsonPointer, SecurityClassification> attributeSecurityClassifications = new ConcurrentHashMap<>();
-        attributeSecurityClassifications.put(JsonPointer.valueOf(""), PRIVATE);
-        attributeSecurityClassifications.put(JsonPointer.valueOf(PARENT_ATTRIBUTE), PUBLIC);
-
-        SecurityClassification securityClassification = service.findInheritedAttributeSecurityClassification(
-            attribute, attributeSecurityClassifications);
-
-        assertThat(securityClassification).isEqualTo(PUBLIC);
-    }
-
-    @Test
-    void whenNoGivenSecurityClassificationThenInheritFromRoot() {
-        JsonPointer attribute = JsonPointer.valueOf(PARENT_AND_CHILD_ATTRIBUTE);
-        Map<JsonPointer, SecurityClassification> attributeSecurityClassifications = new ConcurrentHashMap<>();
-        attributeSecurityClassifications.put(JsonPointer.valueOf(""), PRIVATE);
-
-        SecurityClassification securityClassification = service.findInheritedAttributeSecurityClassification(
-            attribute, attributeSecurityClassifications);
-
-        assertThat(securityClassification).isEqualTo(PRIVATE);
-    }
-
-    @Test
-    void whenNoGivenSecurityClassificationAndNoRootSecurityClassificationThenGiveNone() {
-        JsonPointer attribute = JsonPointer.valueOf(PARENT_AND_CHILD_ATTRIBUTE);
-        Map<JsonPointer, SecurityClassification> attributeSecurityClassifications = new ConcurrentHashMap<>();
-        attributeSecurityClassifications.put(JsonPointer.valueOf("/xyz"), PRIVATE);
-
-        SecurityClassification securityClassification = service.findInheritedAttributeSecurityClassification(
-            attribute, attributeSecurityClassifications);
-
-        assertThat(securityClassification).isEqualTo(NONE);
-    }*/
-
     private DefaultPermissionGrant createDefaultPermissionGrant(String roleName,
                                                                 ResourceDefinition resourceDefinition,
                                                                 String attribute,

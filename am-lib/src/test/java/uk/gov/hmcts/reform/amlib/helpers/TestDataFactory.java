@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.amlib.helpers;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
@@ -66,6 +67,14 @@ public final class TestDataFactory {
             .id(resourceId)
             .definition(resourceDefinition)
             .data(DATA)
+            .build();
+    }
+
+    public static Resource createResource(String resourceId, ResourceDefinition resourceDefinition, JsonNode data) {
+        return Resource.builder()
+            .id(resourceId)
+            .definition(resourceDefinition)
+            .data(data)
             .build();
     }
 }

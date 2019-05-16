@@ -206,10 +206,10 @@ public class FilterService {
     private void removeFieldsFromData(JsonNode resource, List<JsonPointer> nodesToKeep, List<JsonPointer> nodesToRemove) {
         nodesToRemove.forEach(pointerCandidateForRemoval -> {
             log.debug(">> Pointer candidate for removal: " + pointerCandidateForRemoval);
-            List<JsonPointer> childPointersWithRead = nodesToKeep.stream()
-                .filter(pointerWithRead -> pointerWithRead.toString().startsWith(pointerCandidateForRemoval.toString() + "/"))
+            List<JsonPointer> viewableChildPointers = nodesToKeep.stream()
+                .filter(viewablePointer -> viewablePointer.toString().startsWith(pointerCandidateForRemoval.toString() + "/"))
                 .collect(Collectors.toList());
-            if (childPointersWithRead.isEmpty()) {
+            if (viewableChildPointers.isEmpty()) {
                 // remove whole node
                 log.debug(">>> Removing '" + pointerCandidateForRemoval + "'");
                 JsonNode node = resource.at(pointerCandidateForRemoval.head());
@@ -217,22 +217,21 @@ public class FilterService {
                     ((ObjectNode) node).remove(pointerCandidateForRemoval.last().toString().substring(1));
                 }
             } else {
-                // retain node's children with READ
+                // retain node's viewable children
                 JsonNode node = resource.at(pointerCandidateForRemoval);
                 if (node instanceof ObjectNode) {
-                    Map<JsonPointer, Set<String>> branchNodesToKeep = new ConcurrentHashMap<>();
-                    childPointersWithRead.forEach(childPointerWithRead -> {
+                    Map<JsonPointer, Set<String>> viewableNodes = new ConcurrentHashMap<>();
+                    viewableChildPointers.forEach(viewableChildPointer -> {
                         JsonPointer fieldPointer;
-                        JsonPointer parentPointer = childPointerWithRead;
+                        JsonPointer parentPointer = viewableChildPointer;
                         do {
                             fieldPointer = parentPointer.last();
                             parentPointer = parentPointer.head();
-                            branchNodesToKeep.computeIfAbsent(parentPointer, k -> new HashSet<>());
-                            branchNodesToKeep.get(parentPointer).add(fieldPointer.toString().substring(1));
+                            viewableNodes.computeIfAbsent(parentPointer, k -> new HashSet<>());
+                            viewableNodes.get(parentPointer).add(fieldPointer.toString().substring(1));
                         } while (!Objects.equals(pointerCandidateForRemoval, parentPointer));
                     });
-                    branchNodesToKeep.forEach((pointer, fieldsToKeep) ->
-                        ((ObjectNode) resource.at(pointer)).retain(fieldsToKeep));
+                    viewableNodes.forEach((pointer, fields) -> ((ObjectNode) resource.at(pointer)).retain(fields));
                 }
             }
         });

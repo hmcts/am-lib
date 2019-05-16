@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.RolePermissions;
 
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -214,26 +213,18 @@ public class AccessManagementService {
             accessType = EXPLICIT;
         }
 
-        //called max security role once to avoided multiple db calls
-        final Integer maxUserRole = getMaxSecurityRole(userRoles);
+        final Integer maxSecurityClassificationHierarchy = getMaxSecurityClassificationHierarchyForRoles(userRoles);
 
-        //gets user security classification
-        SecurityClassification userSecurityClassification = EnumSet.allOf(SecurityClassification.class).stream()
-            .filter(securityClassification -> securityClassification.getHierarchy() == maxUserRole)
-            .collect(collectingAndThen(toList(), li -> li.get(0)));
+        SecurityClassification userSecurityClassification =
+            SecurityClassification.valueOf(maxSecurityClassificationHierarchy);
 
         Set<SecurityClassification> userSecurityClassifications = SecurityClassifications
-            .getVisibleSecurityClassifications(maxUserRole);
+            .getVisibleSecurityClassifications(maxSecurityClassificationHierarchy);
 
-        JsonNode filteredJson = filterService.filterJson(resource.getData(), attributePermissions,
+        JsonNode filteredData = filterService.filterJson(resource.getData(), attributePermissions,
             attributeSecurityClassifications, userSecurityClassifications);
 
-        /*Map<JsonPointer, Set<Permission>> attributePermissionsWithSecurityClassification =
-            filterAttributePermission(attributePermissions, getFilteredAttributesBySecurityClassification(
-                SecurityClassifications.getVisibleSecurityClassifications(maxUserRole),
-                attributeSecurityClassifications));*/
-
-        Map<JsonPointer, Set<Permission>> attributePermissionsWithSecurityClassification =
+        Map<JsonPointer, Set<Permission>> viewableAttributePermissions =
             filterAttributePermissionsBySecurityClassification(attributePermissions,
                 attributeSecurityClassifications, userSecurityClassifications);
 
@@ -245,11 +236,11 @@ public class AccessManagementService {
             .resource(Resource.builder()
                 .id(resource.getId())
                 .definition(resource.getDefinition())
-                .data(filteredJson)
+                .data(filteredData)
                 .build())
             .userSecurityClassification(userSecurityClassification.toString())
             .access(AccessEnvelope.builder()
-                .permissions(attributePermissionsWithSecurityClassification)
+                .permissions(viewableAttributePermissions)
                 .accessType(accessType)
                 .build())
             .relationships(relationships)
@@ -278,7 +269,7 @@ public class AccessManagementService {
         return attributePermissionsWithSecurityClassification;
     }
 
-    private Integer getMaxSecurityRole(@NotEmpty Set<String> userRoles) {
+    private Integer getMaxSecurityClassificationHierarchyForRoles(@NotEmpty Set<String> userRoles) {
         return jdbi.withExtension(AccessManagementRepository.class, dao ->
             dao.getRoles(userRoles, Stream.of(EXPLICIT, ROLE_BASED).collect(toSet())).stream()
                 .mapToInt(role -> role.getSecurityClassification().getHierarchy())
@@ -365,7 +356,7 @@ public class AccessManagementService {
     @SuppressWarnings("LineLength")
     @AuditLog("returned resources that user with roles '{{userRoles}}' has create permission to: {{result}}")
     public Set<ResourceDefinition> getResourceDefinitionsWithRootCreatePermission(@NotEmpty Set<@NotBlank String> userRoles) {
-        Integer maxSecurityClassificationForRole = getMaxSecurityRole(userRoles);
+        Integer maxSecurityClassificationForRole = getMaxSecurityClassificationHierarchyForRoles(userRoles);
 
         return jdbi.withExtension(AccessManagementRepository.class, dao ->
             dao.getResourceDefinitionsWithRootCreatePermission(

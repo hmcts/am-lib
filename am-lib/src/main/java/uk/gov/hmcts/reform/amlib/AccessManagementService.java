@@ -224,7 +224,7 @@ public class AccessManagementService {
         JsonNode filteredData = filterService.filterJson(resource.getData(), attributePermissions,
             attributeSecurityClassifications, userSecurityClassifications);
 
-        Map<JsonPointer, Set<Permission>> viewableAttributePermissions =
+        Map<JsonPointer, Set<Permission>> visibleAttributePermissions =
             filterAttributePermissionsBySecurityClassification(attributePermissions,
                 attributeSecurityClassifications, userSecurityClassifications);
 
@@ -240,7 +240,7 @@ public class AccessManagementService {
                 .build())
             .userSecurityClassification(userSecurityClassification.toString())
             .access(AccessEnvelope.builder()
-                .permissions(viewableAttributePermissions)
+                .permissions(visibleAttributePermissions)
                 .accessType(accessType)
                 .build())
             .relationships(relationships)

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
 import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
@@ -20,10 +21,12 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import java.util.Collections;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
@@ -33,9 +36,10 @@ import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.RESTRICTED;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
 
-@SuppressWarnings({"LineLength", "PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"LineLength", "PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports"})
 class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrationBaseTest {
 
     private static AccessManagementService service = initService(AccessManagementService.class);
@@ -501,6 +505,49 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
             .build());
     }
 
+    @Test
+    void whenUserWithExplicitAccessWithHighestSecurityClassificationThenReturnAllAttributes() {
+        String idamRoleWithExplicitAccess = UUID.randomUUID().toString();
+        importerService.addRole(idamRoleWithExplicitAccess, IDAM, PUBLIC, EXPLICIT);
+
+        Map<JsonPointer, Set<Permission>> attributePermissions = new ConcurrentHashMap<>();
+        attributePermissions.put(JsonPointer.valueOf(""), ImmutableSet.of(READ));
+        attributePermissions.put(JsonPointer.valueOf(rootLevelAttribute), ImmutableSet.of(READ));
+        attributePermissions.put(JsonPointer.valueOf(rootLevelObject), ImmutableSet.of(READ));
+        attributePermissions.put(JsonPointer.valueOf(rootLevelObject + nestedAttribute), ImmutableSet.of(READ));
+
+        service.grantExplicitResourceAccess(createGrant(
+            resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition, attributePermissions));
+
+        Map<JsonPointer, SecurityClassification> attributeSecurityClassifications =
+            Collections.singletonMap(JsonPointer.valueOf(""), PUBLIC);
+
+        grantAllDefaultPermissionsForRole(idamRoleWithExplicitAccess);
+        JsonNode data = createSecurityClassificationData();
+
+        FilteredResourceEnvelope result = service.filterResource(
+            accessorId, ImmutableSet.of(idamRoleWithExplicitAccess), createResource(resourceId,
+                resourceDefinition, data), attributeSecurityClassifications);
+
+        assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(resourceDefinition)
+                .data(data)
+                .build())
+            .userSecurityClassification(PUBLIC)
+            .access(AccessEnvelope.builder()
+                .permissions(ImmutableMap.of(
+                    JsonPointer.valueOf(""), ImmutableSet.of(READ),
+                    JsonPointer.valueOf(rootLevelAttribute), ImmutableSet.of(READ),
+                    JsonPointer.valueOf(rootLevelObject), ImmutableSet.of(READ),
+                    JsonPointer.valueOf(rootLevelObject + nestedAttribute), ImmutableSet.of(READ)))
+                .accessType(EXPLICIT)
+                .build())
+            .relationships(ImmutableSet.of(idamRoleWithExplicitAccess))
+            .build());
+    }
+
     private void grantAllDefaultPermissionsForRole(String role) {
         importerService.grantDefaultPermission(
             createDefaultPermissionGrant(role, resourceDefinition, "", ImmutableSet.of(READ), PUBLIC));
@@ -509,7 +556,8 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
         importerService.grantDefaultPermission(
             createDefaultPermissionGrant(role, resourceDefinition, rootLevelObject, ImmutableSet.of(READ), PUBLIC));
         importerService.grantDefaultPermission(
-            createDefaultPermissionGrant(role, resourceDefinition, rootLevelObject + nestedAttribute, ImmutableSet.of(READ), PUBLIC));
+            createDefaultPermissionGrant(role, resourceDefinition, rootLevelObject + nestedAttribute,
+                ImmutableSet.of(READ), PUBLIC));
     }
 
     private JsonNode createSecurityClassificationData() {

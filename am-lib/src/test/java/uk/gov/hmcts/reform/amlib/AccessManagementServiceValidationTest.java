@@ -80,7 +80,6 @@ class AccessManagementServiceValidationTest {
             ));
     }
 
-
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
     void getRolePermissionsMethodShouldRejectInvalidArguments(ResourceDefinition resourceDefinition, String roleName) {

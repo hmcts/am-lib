@@ -239,6 +239,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
             ImmutableSet.of(idamRoleWithRoleBasedRestrictedAccess), createResource(resourceId,
                 resourceDefinition, data), attributePermissions);
 
+
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resourceId)
@@ -567,4 +568,3 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
                 .put(nestedAttribute.replace("/",""), nestedAttributeValue));
     }
 }
-

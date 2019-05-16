@@ -233,6 +233,7 @@ public class AccessManagementService {
             .map(ExplicitAccessRecord::getRelationship)
             .collect(toSet());
 
+        // filterService.removeFieldsHavingLowerSecurityClassifications(filteredJson,attributePermissions);
         return FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resource.getId())

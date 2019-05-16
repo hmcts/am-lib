@@ -11,8 +11,7 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import java.util.Map;
 import java.util.Set;
 
-import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
-
+@SuppressWarnings("LineLength")
 public final class DefaultRoleSetupDataFactory {
 
     private DefaultRoleSetupDataFactory() {
@@ -26,7 +25,8 @@ public final class DefaultRoleSetupDataFactory {
         return ImmutableMap.of(attribute, pair);
     }
 
-    public static DefaultPermissionGrant createDefaultPermissionGrant(String roleName, ResourceDefinition resource, String attribute, Set<Permission> permissions) {
+    public static DefaultPermissionGrant createDefaultPermissionGrant(String roleName, ResourceDefinition resource, String attribute,
+                                                                      Set<Permission> permissions, SecurityClassification securityClassification) {
         return DefaultPermissionGrant.builder()
             .roleName(roleName)
             .resourceDefinition(ResourceDefinition.builder()
@@ -34,7 +34,7 @@ public final class DefaultRoleSetupDataFactory {
                 .resourceType(resource.getResourceType())
                 .resourceName(resource.getResourceName())
                 .build())
-            .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf(attribute), permissions, PUBLIC))
+            .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf(attribute), permissions, securityClassification))
             .build();
     }
 

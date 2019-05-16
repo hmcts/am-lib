@@ -1,13 +1,16 @@
 package uk.gov.hmcts.reform.amlib;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.helpers.InvalidArgumentsProvider;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -57,9 +60,11 @@ class AccessManagementServiceValidationTest {
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
-    void filterResourceMethodShouldRejectInvalidArguments(String userId, Set<String> userRoles, Resource resource) {
+    void filterResourceMethodShouldRejectInvalidArguments(
+        String userId, Set<String> userRoles, Resource resource,
+        Map<JsonPointer, SecurityClassification> attributeSecurityClassifications) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.filterResource(userId, userRoles, resource))
+            .isThrownBy(() -> service.filterResource(userId, userRoles, resource, attributeSecurityClassifications))
             .withMessageMatching(expectedValidationMessagesRegex(
                 "userId - must not be blank",
                 "userRoles - must not be empty",
@@ -70,9 +75,11 @@ class AccessManagementServiceValidationTest {
                 "resource.definition.serviceName - must not be blank",
                 "resource.definition.resourceType - must not be blank",
                 "resource.definition.resourceName - must not be blank",
-                "resource.data - must not be null"
+                "resource.data - must not be null",
+                "attributeSecurityClassification - must not be empty"
             ));
     }
+
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)

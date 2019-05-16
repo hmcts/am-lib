@@ -26,6 +26,6 @@ public class AccessManagementServiceBenchmarks {
             .id(resourceId)
             .definition(resourceDefinition)
             .data(data.resourceDataFor(resourceDefinition.getServiceName()))
-            .build());
+            .build(), data.getSecurityClassifications(resourceDefinition.getServiceName()));
     }
 }

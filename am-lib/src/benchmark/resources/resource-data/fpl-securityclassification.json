@@ -1,0 +1,9 @@
+{
+  "": "PUBLIC",
+  "/caseLocalAuthority": "PUBLIC",
+  "/caseName": "PUBLIC",
+  "/risks/claimant": "PUBLIC",
+  "/correspondenceAddress/physicalHarm": "PRIVATE",
+  "/sexualAbuseOccurrences": "RESTRICTED",
+  "/orders/orderType": "RESTRICTED"
+}

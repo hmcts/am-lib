@@ -162,7 +162,8 @@ public class AccessManagementService {
      * @param attributeSecurityClassifications input security classification map from CCD
      * @return envelope {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions if
      * access to resource is configured, otherwise null.
-     * @throws PersistenceException if any persistence errors were encountered
+     * @throws PersistenceException if any persistence errors were encountered,
+     * or NoSuchElementException if root element missing
      */
     @AuditLog("filtered access to resource '{{resource.id}}' defined as '{{resource.definition.serviceName}}|"
         + "{{resource.definition.resourceType}}|{{resource.definition.resourceName}}' for accessor '{{userId}}' "
@@ -238,7 +239,7 @@ public class AccessManagementService {
                 .definition(resource.getDefinition())
                 .data(filteredData)
                 .build())
-            .userSecurityClassification(userSecurityClassification.toString())
+            .userSecurityClassification(userSecurityClassification)
             .access(AccessEnvelope.builder()
                 .permissions(visibleAttributePermissions)
                 .accessType(accessType)

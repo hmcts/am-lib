@@ -126,6 +126,25 @@ public class FilterService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Returns fields with visible security Classifications.
+     *
+     * @param resource JsonNode
+     * @param visibleAttributes List
+     */
+    public void retainFieldsWithVisibleSecurityClassifications(JsonNode resource, List<JsonPointer> visibleAttributes) {
+
+        Collection<Map<JsonPointer, Set<String>>> pointersByDepth = decomposePointersByDepth(visibleAttributes).values();
+        log.debug(">> Pointer candidates for retaining: " + pointersByDepth);
+        pointersByDepth.forEach(map -> map.forEach((key, value) -> {
+            JsonNode node = resource.at(key);
+            if (node instanceof ObjectNode) {
+                ((ObjectNode) node).retain(value);
+            }
+        }));
+    }
+
+
     @SuppressWarnings("PMD.UseConcurrentHashMap") // Sorted map is needed; instance is local as well
     private void retainFieldsWithReadPermission(JsonNode resource, List<JsonPointer> uniqueNodesWithRead) {
 

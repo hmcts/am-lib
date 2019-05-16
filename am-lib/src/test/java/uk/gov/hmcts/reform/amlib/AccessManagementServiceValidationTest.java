@@ -62,9 +62,9 @@ class AccessManagementServiceValidationTest {
     @ArgumentsSource(InvalidArgumentsProvider.class)
     void filterResourceMethodShouldRejectInvalidArguments(
         String userId, Set<String> userRoles, Resource resource,
-        Map<JsonPointer, SecurityClassification> attributeMap) {
+        Map<JsonPointer, SecurityClassification> attributeSecurityClassifications) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.filterResource(userId, userRoles, resource, attributeMap))
+            .isThrownBy(() -> service.filterResource(userId, userRoles, resource, attributeSecurityClassifications))
             .withMessageMatching(expectedValidationMessagesRegex(
                 "userId - must not be blank",
                 "userRoles - must not be empty",

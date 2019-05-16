@@ -36,7 +36,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.crea
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
 
-@SuppressWarnings({"LineLength", "PMD.TooManyMethods"})
+@SuppressWarnings({"LineLength", "PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals"})
 class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrationBaseTest {
 
     private static final String NAME_ATTRIBUTE = "/name";
@@ -343,7 +343,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
     void whenNoSecurityClassificationThenShouldInheritFromClosestParent() {
         Map<JsonPointer, SecurityClassification> securityClassifications = new ConcurrentHashMap<>();
         securityClassifications.put(JsonPointer.valueOf(""), PRIVATE);
-        securityClassifications.put(JsonPointer.valueOf(NAME_ATTRIBUTE), PUBLIC);
+        securityClassifications.put(JsonPointer.valueOf(NAME_ATTRIBUTE), PRIVATE);
         securityClassifications.put(JsonPointer.valueOf(ADDRESS_ATTRIBUTE), PUBLIC);
 
         grantAllDefaultPermissionsForRole(idamRoleWithRoleBasedAccess);
@@ -352,16 +352,19 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
             accessorId, ImmutableSet.of(idamRoleWithRoleBasedAccess), createResource(resourceId,
                 resourceDefinition), securityClassifications);
 
+        JsonNode data = JsonNodeFactory.instance.objectNode()
+            .set("address", JsonNodeFactory.instance.objectNode()
+                .put("city", "London"));
+
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resourceId)
                 .definition(resourceDefinition)
-                .data(DATA)
+                .data(data)
                 .build())
             .userSecurityClassification(PUBLIC.toString())
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(
-                    JsonPointer.valueOf(NAME_ATTRIBUTE), ImmutableSet.of(READ),
                     JsonPointer.valueOf(ADDRESS_ATTRIBUTE), ImmutableSet.of(READ),
                     JsonPointer.valueOf(CITY_ATTRIBUTE), ImmutableSet.of(READ)))
                 .accessType(ROLE_BASED)
@@ -434,6 +437,51 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
                     JsonPointer.valueOf(""), ImmutableSet.of(READ),
                     JsonPointer.valueOf(NAME_ATTRIBUTE), ImmutableSet.of(READ),
                     JsonPointer.valueOf(ADDRESS_ATTRIBUTE), ImmutableSet.of(READ)))
+                .accessType(ROLE_BASED)
+                .build())
+            .relationships(ImmutableSet.of())
+            .build());
+    }
+
+    @Test
+    void whenMixtureOfPermissionsAndSecurityClassificationsThenFilteringShouldHandleBothIndependently() {
+        String idamRoleWithRoleBasedPrivateAccess = UUID.randomUUID().toString();
+        importerService.addRole(idamRoleWithRoleBasedPrivateAccess, IDAM, PRIVATE, ROLE_BASED);
+
+        Map<JsonPointer, SecurityClassification> securityClassifications = new ConcurrentHashMap<>();
+        securityClassifications.put(JsonPointer.valueOf(""), PRIVATE);
+        securityClassifications.put(JsonPointer.valueOf(NAME_ATTRIBUTE), RESTRICTED);
+        securityClassifications.put(JsonPointer.valueOf(ADDRESS_ATTRIBUTE), PRIVATE);
+        securityClassifications.put(JsonPointer.valueOf(CITY_ATTRIBUTE), PUBLIC);
+
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedPrivateAccess,
+            resourceDefinition, "", ImmutableSet.of(CREATE), PUBLIC));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedPrivateAccess,
+            resourceDefinition, NAME_ATTRIBUTE, ImmutableSet.of(READ), PUBLIC));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedPrivateAccess,
+            resourceDefinition, ADDRESS_ATTRIBUTE, ImmutableSet.of(READ), PUBLIC));
+        importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedPrivateAccess,
+            resourceDefinition, CITY_ATTRIBUTE, ImmutableSet.of(CREATE), PUBLIC));
+
+        FilteredResourceEnvelope result = service.filterResource(
+            accessorId, ImmutableSet.of(idamRoleWithRoleBasedPrivateAccess), createResource(resourceId,
+                resourceDefinition), securityClassifications);
+
+        JsonNode data = JsonNodeFactory.instance.objectNode()
+            .set("address", JsonNodeFactory.instance.objectNode());
+
+        assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(resourceDefinition)
+                .data(data)
+                .build())
+            .userSecurityClassification(PRIVATE.toString())
+            .access(AccessEnvelope.builder()
+                .permissions(ImmutableMap.of(
+                    JsonPointer.valueOf(""), ImmutableSet.of(CREATE),
+                    JsonPointer.valueOf(ADDRESS_ATTRIBUTE), ImmutableSet.of(READ),
+                    JsonPointer.valueOf(CITY_ATTRIBUTE), ImmutableSet.of(CREATE)))
                 .accessType(ROLE_BASED)
                 .build())
             .relationships(ImmutableSet.of())

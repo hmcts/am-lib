@@ -68,7 +68,8 @@ public class DataState {
                         Map<JsonPointer, SecurityClassification> securityClassificationMap = new HashMap<>();
                         new ObjectMapper().readValue(dataReader, HashMap.class)
                             .forEach((jsonPointer,securityClassification) ->  securityClassificationMap
-                                .put(JsonPointer.valueOf((String)jsonPointer), SecurityClassification.valueOf((String)securityClassification)));
+                                .put(JsonPointer.valueOf((String)jsonPointer),
+                                    SecurityClassification.valueOf((String)securityClassification)));
                         return  securityClassificationMap;
                     }
                 } catch (IOException ex) {

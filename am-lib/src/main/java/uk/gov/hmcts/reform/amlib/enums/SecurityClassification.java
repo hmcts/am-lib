@@ -24,10 +24,11 @@ public enum SecurityClassification {
     }
 
     /**
-     * Gives a SecurityClassification enum corresponding to a given hierarchy.
+     * Converts the integer representation of SecurityClassification to the
+     * enum representation of SecurityClassification.
      *
-     * @param hierarchy
-     * @return SecurityClassification
+     * @param hierarchy Integer representation of SecurityClassification
+     * @return Enum representation of SecurityClassification
      */
     public static SecurityClassification valueOf(int hierarchy) {
         return Arrays.stream(values())

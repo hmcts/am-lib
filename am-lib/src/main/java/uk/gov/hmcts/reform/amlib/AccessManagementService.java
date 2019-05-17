@@ -233,7 +233,6 @@ public class AccessManagementService {
             .map(ExplicitAccessRecord::getRelationship)
             .collect(toSet());
 
-        // filterService.removeFieldsHavingLowerSecurityClassifications(filteredJson,attributePermissions);
         return FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resource.getId())
@@ -253,10 +252,12 @@ public class AccessManagementService {
         Map<JsonPointer, Set<Permission>> attributePermissions, Map<JsonPointer, SecurityClassification>
         attributeSecurityClassifications, Set<SecurityClassification> userSecurityClassifications) {
 
-        Map<JsonPointer, Set<Permission>> attributePermissionsWithSecurityClassification = new ConcurrentHashMap<>();
+        Map<JsonPointer, Set<Permission>> visibleAttributePermissions = new ConcurrentHashMap<>();
 
         attributePermissions.forEach((attribute, permissions) -> {
             SecurityClassification attributeSecurityClassification = attributeSecurityClassifications.get(attribute);
+
+            // if no security classification, inherit from parent
             if (attributeSecurityClassification == null) {
                 JsonPointer parentAttribute = attribute.head();
                 while (attributeSecurityClassifications.get(parentAttribute) == null) {
@@ -264,11 +265,13 @@ public class AccessManagementService {
                 }
                 attributeSecurityClassification = attributeSecurityClassifications.get(parentAttribute);
             }
+
+            // if sufficient security classification, add to map of visible attributes
             if (userSecurityClassifications.contains(attributeSecurityClassification)) {
-                attributePermissionsWithSecurityClassification.put(attribute, permissions);
+                visibleAttributePermissions.put(attribute, permissions);
             }
         });
-        return attributePermissionsWithSecurityClassification;
+        return visibleAttributePermissions;
     }
 
     private Integer getMaxSecurityClassificationHierarchyForRoles(@NotEmpty Set<String> userRoles) {

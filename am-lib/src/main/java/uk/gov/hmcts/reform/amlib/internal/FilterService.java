@@ -20,6 +20,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.NONE;
 
@@ -69,7 +70,7 @@ public class FilterService {
         List<JsonPointer> nodesToKeep = new ArrayList<>();
         nodesToPotentiallyKeep.forEach(node -> {
             SecurityClassification nodeSecurityClassification = attributeSecurityClassifications.get(node);
-            if (nodeSecurityClassification == null) {
+            if (isNull(nodeSecurityClassification)) {
                 nodeSecurityClassification = inheritAttributeSecurityClassification(
                     node, attributeSecurityClassifications);
             }
@@ -88,8 +89,8 @@ public class FilterService {
                                                                           Map<JsonPointer, SecurityClassification>
                                                                               attributeSecurityClassifications) {
         JsonPointer parentAttribute = attribute.head();
-        while (attributeSecurityClassifications.get(parentAttribute) == null) {
-            if (parentAttribute.toString().equals("")) {
+        while (isNull(attributeSecurityClassifications.get(parentAttribute))) {
+            if (parentAttribute.toString().isEmpty()) {
                 return NONE;
             }
             parentAttribute = parentAttribute.head();
@@ -125,25 +126,6 @@ public class FilterService {
             .map(Map.Entry::getKey)
             .collect(Collectors.toList());
     }
-
-    /**
-     * Returns fields with visible security Classifications.
-     *
-     * @param resource JsonNode
-     * @param visibleAttributes List
-     */
-    public void retainFieldsWithVisibleSecurityClassifications(JsonNode resource, List<JsonPointer> visibleAttributes) {
-
-        Collection<Map<JsonPointer, Set<String>>> pointersByDepth = decomposePointersByDepth(visibleAttributes).values();
-        log.debug(">> Pointer candidates for retaining: " + pointersByDepth);
-        pointersByDepth.forEach(map -> map.forEach((key, value) -> {
-            JsonNode node = resource.at(key);
-            if (node instanceof ObjectNode) {
-                ((ObjectNode) node).retain(value);
-            }
-        }));
-    }
-
 
     @SuppressWarnings("PMD.UseConcurrentHashMap") // Sorted map is needed; instance is local as well
     private void retainFieldsWithReadPermission(JsonNode resource, List<JsonPointer> uniqueNodesWithRead) {

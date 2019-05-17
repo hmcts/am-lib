@@ -23,6 +23,12 @@ public enum SecurityClassification {
         return maxHierarchy >= this.getHierarchy();
     }
 
+    /**
+     * Gives a SecurityClassification enum corresponding to a given hierarchy.
+     *
+     * @param hierarchy
+     * @return SecurityClassification
+     */
     public static SecurityClassification valueOf(int hierarchy) {
         return Arrays.stream(values())
             .filter(securityClassification -> securityClassification.hierarchy == hierarchy)

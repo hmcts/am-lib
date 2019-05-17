@@ -197,6 +197,7 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: versions.springBoot
 
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.reformLogging

@@ -1,8 +1,5 @@
 dependencies:
-- name: postgresql
-  version: ~3.9.1
-  repository: '@stable'
 - name: java
-  version: ~0.0.12
+  version: ~2.0.6
   repository: '@hmcts'
   alias: am-lib-test

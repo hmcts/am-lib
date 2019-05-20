@@ -181,6 +181,7 @@ repositories {
 // enforces it's own (older) version which is not recommended.
 def versions = [
         reformLogging   : '5.0.1',
+        reformHealthStarter: '0.0.4',
         springBoot      : springBoot.class.package.implementationVersion,
         springfoxSwagger: '2.9.2',
         flyway          : '5.2.4'
@@ -200,6 +201,7 @@ dependencies {
 
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.reformLogging
+    compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: versions.reformHealthStarter
 
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     compile group: 'org.flywaydb', name: 'flyway-core', version: versions.flyway

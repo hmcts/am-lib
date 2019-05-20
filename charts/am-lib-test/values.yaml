@@ -1,0 +1,18 @@
+am-lib-test:
+  image: ${IMAGE_NAME}
+  ingressHost: ${SERVICE_FQDN}
+  applicationPort: 3703
+  environment:
+    AM_DB_HOST: {{ .Release.Name }}-postgresql
+    AM_DB_PORT: 5432
+    AM_DB_NAME: am
+    AM_DB_USERNAME: amuser
+    AM_DB_PASSWORD: ampass
+    ENABLE_DB_MIGRATE_IN_SERVICE: true
+
+  postgresql:
+    postgresqlUsername: amuser
+    postgresqlPassword: ampass
+    postgresqlDatabase: am
+    persistence:
+      enabled: false

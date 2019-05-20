@@ -10,9 +10,9 @@ am-lib-test:
     AM_DB_PASSWORD: ampass
     ENABLE_DB_MIGRATE_IN_SERVICE: true
 
-postgresql:
-  postgresqlUsername: amuser
-  postgresqlPassword: ampass
-  postgresqlDatabase: am
-  persistence:
-    enabled: false
+  postgresql:
+    postgresqlUsername: amuser
+    postgresqlPassword: ampass
+    postgresqlDatabase: am
+    persistence:
+      enabled: false

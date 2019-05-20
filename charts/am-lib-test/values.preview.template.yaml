@@ -1,0 +1,5 @@
+am-lib-test:
+  image: ${IMAGE_NAME}
+  ingressHost: ${SERVICE_FQDN}
+postgresql:
+  enabled: true

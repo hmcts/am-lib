@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.amlib.internal;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
@@ -20,93 +21,93 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
-import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.NONE;
 
 @Slf4j
 @SuppressWarnings("LineLength")
 public class FilterService {
 
-    private static final JsonPointer WHOLE_RESOURCE_POINTER = JsonPointer.valueOf("");
+    private static final JsonPointer ROOT_ATTRIBUTE = JsonPointer.valueOf("");
 
     public JsonNode filterJson(JsonNode resource,
                                Map<JsonPointer, Set<Permission>> attributePermissions,
                                Map<JsonPointer, SecurityClassification> attributeSecurityClassifications,
                                Set<SecurityClassification> userSecurityClassifications) {
 
-        List<JsonPointer> nodesToKeep = filterPointersWithReadPermission(attributePermissions);
-        log.debug("> Nodes with READ access: " + nodesToKeep);
-
         JsonNode resourceCopy = resource.deepCopy();
+        ResourceMutationLists mutationLists = new ResourceMutationLists();
 
-        List<JsonPointer> nodesToRemove = filterPointersWithoutReadPermission(attributePermissions);
-        log.debug("> Nodes without READ access: " + nodesToRemove);
+        createMutationListsBasedOnPermissions(mutationLists, attributePermissions);
 
-        nodesToKeep = filterNodesBySecurityClassification(nodesToKeep, nodesToRemove,
+        modifyMutationListsBasedOnSecurityClassifications(mutationLists,
             attributeSecurityClassifications, userSecurityClassifications);
 
-        if (!nodesToKeep.contains(WHOLE_RESOURCE_POINTER)) {
-            List<JsonPointer> uniqueNodesWithRead = reducePointersToUniqueList(nodesToKeep);
-            log.debug("> Unique nodes with READ access: " + uniqueNodesWithRead);
+        if (!mutationLists.getNodesToRetain().contains(ROOT_ATTRIBUTE)) {
+            List<JsonPointer> uniqueNodesToRetain = reducePointersToUniqueList(mutationLists.getNodesToRetain());
+            log.debug("> Unique nodes with visibility: " + uniqueNodesToRetain);
 
-            retainFieldsWithReadPermission(resourceCopy, uniqueNodesWithRead);
+            retainVisibleFields(resourceCopy, uniqueNodesToRetain);
         }
 
-        if (nodesToKeep.isEmpty()) {
+        if (mutationLists.getNodesToRetain().isEmpty()) {
             return null;
         }
 
-        removeFieldsFromData(resourceCopy, nodesToKeep, nodesToRemove);
+        removeFieldsFromData(resourceCopy, mutationLists);
 
         return resourceCopy;
     }
 
-    private List<JsonPointer> filterNodesBySecurityClassification(List<JsonPointer> nodesToPotentiallyKeep,
-                                                     List<JsonPointer> nodesToRemove,
-                                                     Map<JsonPointer, SecurityClassification>
-                                                         attributeSecurityClassifications,
-                                                     Set<SecurityClassification> userSecurityClassifications) {
-        List<JsonPointer> nodesToKeep = new ArrayList<>();
-        nodesToPotentiallyKeep.forEach(node -> {
+    private void createMutationListsBasedOnPermissions(ResourceMutationLists mutationLists,
+                                                       Map<JsonPointer, Set<Permission>> attributePermissions) {
+        attributePermissions.forEach((attribute, permissions) -> {
+            if (permissions.contains(READ)) {
+                mutationLists.addNodeToRetain(attribute);
+                log.debug("> Node with READ access: " + attribute.toString());
+            } else {
+                mutationLists.addNodeToDelete(attribute);
+                log.debug("> Node without READ access: " + attribute.toString());
+            }
+        });
+    }
+
+    private void modifyMutationListsBasedOnSecurityClassifications(
+        ResourceMutationLists mutationLists, Map<JsonPointer, SecurityClassification> attributeSecurityClassifications,
+        Set<SecurityClassification> userSecurityClassifications) {
+
+        List<JsonPointer> nodesWithRead = new ArrayList<>(mutationLists.getNodesToRetain());
+        nodesWithRead.forEach(node -> {
+
+            // get attribute security classification
             SecurityClassification nodeSecurityClassification = attributeSecurityClassifications.get(node);
-            if (isNull(nodeSecurityClassification)) {
-                nodeSecurityClassification = inheritAttributeSecurityClassification(
+            if (nodeSecurityClassification == null) {
+                nodeSecurityClassification = inheritAttributeSecurityClassificationFromParent(
                     node, attributeSecurityClassifications);
             }
 
-            if (userSecurityClassifications.contains(nodeSecurityClassification)) {
-                nodesToKeep.add(node);
-            } else {
+            // if insufficient security classification, move to list of nodes to delete
+            if (!userSecurityClassifications.contains(nodeSecurityClassification)) {
+                mutationLists.moveNodeFromRetainListToDeleteList(node);
                 log.debug("> Node without security classification access: " + node);
-                nodesToRemove.add(node);
             }
         });
-        return nodesToKeep;
     }
 
-    private SecurityClassification inheritAttributeSecurityClassification(JsonPointer attribute,
-                                                                          Map<JsonPointer, SecurityClassification>
-                                                                              attributeSecurityClassifications) {
+    private SecurityClassification inheritAttributeSecurityClassificationFromParent(
+        JsonPointer attribute, Map<JsonPointer, SecurityClassification> attributeSecurityClassifications) {
+
         JsonPointer parentAttribute = attribute.head();
-        while (isNull(attributeSecurityClassifications.get(parentAttribute))) {
-            if (parentAttribute.toString().isEmpty()) {
-                return NONE;
-            }
+        while (attributeSecurityClassifications.get(parentAttribute) == null) {
             parentAttribute = parentAttribute.head();
+            if (parentAttribute.toString().isEmpty()) {
+                break;
+            }
         }
         return attributeSecurityClassifications.get(parentAttribute);
     }
 
-    private List<JsonPointer> filterPointersWithReadPermission(Map<JsonPointer, Set<Permission>> attributePermissions) {
-        return attributePermissions.entrySet().stream()
-            .filter(entry -> entry.getValue().contains(READ))
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toList());
-    }
-
-    private List<JsonPointer> reducePointersToUniqueList(List<JsonPointer> nodesWithRead) {
-        return nodesWithRead.stream()
+    private List<JsonPointer> reducePointersToUniqueList(List<JsonPointer> visibleNodes) {
+        return visibleNodes.stream()
             .sorted(Comparator.comparing(JsonPointer::toString))
             .reduce(new ArrayList<>(),
                 (List<JsonPointer> result, JsonPointer pointerCandidate) -> {
@@ -120,17 +121,10 @@ public class FilterService {
                 }, (f, s) -> f);
     }
 
-    private List<JsonPointer> filterPointersWithoutReadPermission(Map<JsonPointer, Set<Permission>> attributePermissions) {
-        return attributePermissions.entrySet().stream()
-            .filter(entry -> !entry.getValue().contains(READ))
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toList());
-    }
-
     @SuppressWarnings("PMD.UseConcurrentHashMap") // Sorted map is needed; instance is local as well
-    private void retainFieldsWithReadPermission(JsonNode resource, List<JsonPointer> uniqueNodesWithRead) {
+    private void retainVisibleFields(JsonNode resource, List<JsonPointer> uniqueVisibleNodes) {
 
-        Collection<Map<JsonPointer, Set<String>>> pointersByDepth = decomposePointersByDepth(uniqueNodesWithRead).values();
+        Collection<Map<JsonPointer, Set<String>>> pointersByDepth = decomposePointersByDepth(uniqueVisibleNodes).values();
         log.debug(">> Pointer candidates for retaining: " + pointersByDepth);
 
         pointersByDepth.forEach(map -> map.forEach((key, value) -> {
@@ -203,26 +197,38 @@ public class FilterService {
                 }, (firstPointer, secondPointer) -> firstPointer);
     }
 
+    /**
+     * Filters a resource based on a list of nodes to be retained and a list of nodes to be deleted.
+     * Nodes marked for deletion may carry child nodes which are marked for retention; in this situation,
+     * the parent node is retained along with all other relative child nodes which are on the retention
+     * list. Any other relative child nodes spawning from that parent node are deleted.
+     */
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    private void removeFieldsFromData(JsonNode resource, List<JsonPointer> nodesToKeep, List<JsonPointer> nodesToRemove) {
-        nodesToRemove.forEach(pointerCandidateForRemoval -> {
-            log.debug(">> Pointer candidate for removal: " + pointerCandidateForRemoval);
-            List<JsonPointer> visibleChildPointers = nodesToKeep.stream()
-                .filter(visiblePointer -> visiblePointer.toString().startsWith(pointerCandidateForRemoval.toString() + "/"))
+    private void removeFieldsFromData(JsonNode resource, ResourceMutationLists mutationLists) {
+        mutationLists.getNodesToDelete().forEach(pointerCandidateForDeletion -> {
+            log.debug(">> Node candidate for removal: " + pointerCandidateForDeletion);
+
+            List<JsonPointer> visibleChildPointers = mutationLists.getNodesToRetain().stream()
+                .filter(visiblePointer -> visiblePointer.toString().startsWith(pointerCandidateForDeletion.toString() + "/"))
                 .collect(Collectors.toList());
+
+            // if attribute has no visible child nodes, delete node from data
             if (visibleChildPointers.isEmpty()) {
-                // remove whole node
-                log.debug(">>> Removing '" + pointerCandidateForRemoval + "'");
-                JsonNode node = resource.at(pointerCandidateForRemoval.head());
+                log.debug(">>> Removing '" + pointerCandidateForDeletion + "'");
+                JsonNode node = resource.at(pointerCandidateForDeletion.head());
                 if (node instanceof ObjectNode) {
-                    ((ObjectNode) node).remove(pointerCandidateForRemoval.last().toString().substring(1));
+                    ((ObjectNode) node).remove(pointerCandidateForDeletion.last().toString().substring(1));
                 }
+
+            // if attribute has visible child nodes, retain only visible children
             } else {
-                // retain node's visible children
-                JsonNode node = resource.at(pointerCandidateForRemoval);
+                log.debug(">>> Removing invisible child nodes from '" + pointerCandidateForDeletion + "'");
+                JsonNode node = resource.at(pointerCandidateForDeletion);
                 if (node instanceof ObjectNode) {
                     Map<JsonPointer, Set<String>> visibleNodes = new ConcurrentHashMap<>();
                     visibleChildPointers.forEach(visibleChildPointer -> {
+
+                        // for each visible child node, add to visible list along with all parent nodes up to attribute
                         JsonPointer fieldPointer;
                         JsonPointer parentPointer = visibleChildPointer;
                         do {
@@ -230,11 +236,33 @@ public class FilterService {
                             parentPointer = parentPointer.head();
                             visibleNodes.computeIfAbsent(parentPointer, k -> new HashSet<>());
                             visibleNodes.get(parentPointer).add(fieldPointer.toString().substring(1));
-                        } while (!Objects.equals(pointerCandidateForRemoval, parentPointer));
+                            log.debug(">>>> Retaining visible node '" + fieldPointer.toString() + "'");
+                        } while (!Objects.equals(pointerCandidateForDeletion, parentPointer));
                     });
+
+                    // retain only the nodes in visible list
                     visibleNodes.forEach((pointer, fields) -> ((ObjectNode) resource.at(pointer)).retain(fields));
                 }
             }
         });
+    }
+
+    @Getter
+    private class ResourceMutationLists {
+        private final List<JsonPointer> nodesToRetain = new ArrayList<>();
+        private final List<JsonPointer> nodesToDelete = new ArrayList<>();
+
+        private void addNodeToRetain(JsonPointer node) {
+            nodesToRetain.add(node);
+        }
+
+        private void addNodeToDelete(JsonPointer node) {
+            nodesToDelete.add(node);
+        }
+
+        private void moveNodeFromRetainListToDeleteList(JsonPointer node) {
+            nodesToRetain.remove(node);
+            addNodeToDelete(node);
+        }
     }
 }

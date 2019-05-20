@@ -176,7 +176,7 @@ public class AccessManagementService {
                                                    @NotEmpty @Valid Map<@NotNull JsonPointer, SecurityClassification>
                                                        attributeSecurityClassifications) {
 
-        //Throws NoSuchElementException exception when root is missing
+        //inThrows NoSuchElementException exception when root is missing
         if (isNull(attributeSecurityClassifications.get(JsonPointer.valueOf("")))) {
             throw new NoSuchElementException("Root element not found in input Security Classification");
         }
@@ -217,17 +217,17 @@ public class AccessManagementService {
         final Integer maxSecurityClassificationHierarchy = getMaxSecurityClassificationHierarchyForRoles(userRoles);
 
         SecurityClassification userSecurityClassification =
-            SecurityClassification.valueOf(maxSecurityClassificationHierarchy);
+            SecurityClassification.fromHierarchy(maxSecurityClassificationHierarchy);
 
-        Set<SecurityClassification> userSecurityClassifications = SecurityClassifications
+        Set<SecurityClassification> visibleSecurityClassificationsForUser = SecurityClassifications
             .getVisibleSecurityClassifications(maxSecurityClassificationHierarchy);
 
-        JsonNode filteredData = filterService.filterJson(resource.getData(), attributePermissions,
-            attributeSecurityClassifications, userSecurityClassifications);
+        JsonNode filteredJson = filterService.filterJson(resource.getData(), attributePermissions,
+            attributeSecurityClassifications, visibleSecurityClassificationsForUser);
 
         Map<JsonPointer, Set<Permission>> visibleAttributePermissions =
             filterAttributePermissionsBySecurityClassification(attributePermissions,
-                attributeSecurityClassifications, userSecurityClassifications);
+                attributeSecurityClassifications, visibleSecurityClassificationsForUser);
 
         Set<String> relationships = explicitAccess.stream()
             .map(ExplicitAccessRecord::getRelationship)
@@ -237,7 +237,7 @@ public class AccessManagementService {
             .resource(Resource.builder()
                 .id(resource.getId())
                 .definition(resource.getDefinition())
-                .data(filteredData)
+                .data(filteredJson)
                 .build())
             .userSecurityClassification(userSecurityClassification)
             .access(AccessEnvelope.builder()
@@ -262,6 +262,9 @@ public class AccessManagementService {
                 JsonPointer parentAttribute = attribute.head();
                 while (attributeSecurityClassifications.get(parentAttribute) == null) {
                     parentAttribute = parentAttribute.head();
+                    if (parentAttribute.toString().isEmpty()) {
+                        break;
+                    }
                 }
                 attributeSecurityClassification = attributeSecurityClassifications.get(parentAttribute);
             }

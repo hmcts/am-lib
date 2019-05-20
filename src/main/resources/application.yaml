@@ -2,6 +2,9 @@ server:
   port: 3703
 
 management:
+  endpoint:
+    health:
+      show-details: "always"
   endpoints:
     web:
       base-path: /

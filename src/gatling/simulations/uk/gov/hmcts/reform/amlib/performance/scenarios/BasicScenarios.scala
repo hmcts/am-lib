@@ -16,13 +16,13 @@ object BasicScenarios {
         .pause(1.second)
     )
 
-  val filterResource: ScenarioBuilder = scenario("Filter Resource")
-    .forever(
-      feed(CreateResourceAccess.feed)
-        .exec(AccessManagement.createResourceAssess)
-        .exec(AccessManagement.filterResource)
-        .pause(1.second)
-    )
+//  val filterResource: ScenarioBuilder = scenario("Filter Resource")
+//    .forever(
+//      feed(CreateResourceAccess.feed)
+//        .exec(AccessManagement.createResourceAssess)
+//        .exec(AccessManagement.filterResource)
+//        .pause(1.second)
+//    )
 
   val revokeResourceAccess: ScenarioBuilder = scenario("Revoke Resource Access")
     .forever(

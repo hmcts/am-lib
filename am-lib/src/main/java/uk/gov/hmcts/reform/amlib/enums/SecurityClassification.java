@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.amlib.enums;
 
+import java.util.Arrays;
+import java.util.NoSuchElementException;
+
 public enum SecurityClassification {
     NONE(0),
     PUBLIC(1),
@@ -18,5 +21,19 @@ public enum SecurityClassification {
 
     public boolean isVisible(int maxHierarchy) {
         return maxHierarchy >= this.getHierarchy();
+    }
+
+    /**
+     * Converts the hierarchical integer representation of SecurityClassification to the
+     * enum representation of SecurityClassification.
+     *
+     * @param hierarchy Hierarchical integer representation of SecurityClassification
+     * @return Enum representation of SecurityClassification
+     */
+    public static SecurityClassification fromHierarchy(int hierarchy) {
+        return Arrays.stream(values())
+            .filter(securityClassification -> securityClassification.hierarchy == hierarchy)
+            .findFirst()
+            .orElseThrow(NoSuchElementException::new);
     }
 }

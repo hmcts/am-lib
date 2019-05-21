@@ -76,10 +76,9 @@ class AccessManagementServiceValidationTest {
                 "resource.definition.resourceType - must not be blank",
                 "resource.definition.resourceName - must not be blank",
                 "resource.data - must not be null",
-                "attributeSecurityClassification - must not be empty"
+                "attributeSecurityClassifications - must not be empty"
             ));
     }
-
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)

@@ -1,3 +1,18 @@
+# [0.8.0](https://github.com/hmcts/am-lib/compare/0.7.0...0.8.0) (2019-05-21)
+
+
+### Bug Fixes
+
+* AM-279 - Modified the jdk from oraclejdk to openjdk ([#158](https://github.com/hmcts/am-lib/issues/158)) ([2cdc9d7](https://github.com/hmcts/am-lib/commit/2cdc9d7))
+
+
+### Features
+
+* Filtering uses security classification(AM-77) ([#164](https://github.com/hmcts/am-lib/issues/164)) ([1dae741](https://github.com/hmcts/am-lib/commit/1dae741))
+* retrieve security classifications of attributes for a role ([#142](https://github.com/hmcts/am-lib/issues/142)) ([1ad4a29](https://github.com/hmcts/am-lib/commit/1ad4a29))
+
+
+
 # [0.7.0](https://github.com/hmcts/am-lib/compare/0.6.0...0.7.0) (2019-04-24)
 
 

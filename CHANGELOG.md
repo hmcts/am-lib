@@ -1,3 +1,12 @@
+# [0.9.0](https://github.com/hmcts/am-lib/compare/0.8.0...0.9.0) (2019-05-21)
+
+
+### Features
+
+* enhanced filtering logic for security classification inheritance ([#180](https://github.com/hmcts/am-lib/issues/180)) ([279a889](https://github.com/hmcts/am-lib/commit/279a889))
+
+
+
 # [0.8.0](https://github.com/hmcts/am-lib/compare/0.7.0...0.8.0) (2019-05-21)
 
 

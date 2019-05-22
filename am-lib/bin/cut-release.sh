@@ -74,7 +74,11 @@ function change_version() {
   local current_version=${1}
   local next_version=${2}
 
-  sed -i '' "s|version=${current_version}|version=${next_version}|" ${dir}/../gradle.properties
+  #for mas os
+  #sed -i '' "s|version=${current_version}|version=${next_version}|" ${dir}/../gradle.properties
+
+  #for windows
+  sed -i "s/version=${current_version}/version=${next_version}/" ${dir}/../gradle.properties
 }
 
 function update_changelog() {

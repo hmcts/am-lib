@@ -1,3 +1,12 @@
+## [0.9.2](https://github.com/hmcts/am-lib/compare/0.9.1...0.9.2) (2019-05-22)
+
+
+### Bug Fixes
+
+* update jackson-databind version ([#191](https://github.com/hmcts/am-lib/issues/191)) ([8394a2b](https://github.com/hmcts/am-lib/commit/8394a2b))
+
+
+
 ## [0.9.1](https://github.com/hmcts/am-lib/compare/0.9.0...0.9.1) (2019-05-21)
 
 

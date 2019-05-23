@@ -1,3 +1,12 @@
+## [0.9.4](https://github.com/hmcts/am-lib/compare/0.9.3...0.9.4) (2019-05-23)
+
+
+### Bug Fixes
+
+* Gatling test case fix for Filter-Resource (AM-303) ([#192](https://github.com/hmcts/am-lib/issues/192)) ([59f092e](https://github.com/hmcts/am-lib/commit/59f092e))
+
+
+
 ## [0.9.3](https://github.com/hmcts/am-lib/compare/0.9.2...0.9.3) (2019-05-23)
 
 

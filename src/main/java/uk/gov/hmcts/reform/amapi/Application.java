@@ -30,5 +30,6 @@ public class Application implements CommandLineRunner {
             .resourceName("claim")
             .build());
         importerService.addRole("caseworker", RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
+        importerService.addRole("Role 1", RoleType.RESOURCE, SecurityClassification.PUBLIC, AccessType.ROLE_BASED);
     }
 }

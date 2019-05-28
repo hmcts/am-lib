@@ -4,12 +4,16 @@ import com.google.common.collect.ImmutableSet;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.states.BenchmarkState;
 import uk.gov.hmcts.reform.amlib.states.DataState;
 
+import java.util.concurrent.TimeUnit;
+
 @BenchmarkMode(Mode.Throughput)
+@OutputTimeUnit(TimeUnit.SECONDS)
 @SuppressWarnings({"PMD.NonStaticInitializer", "PMD.EmptyCatchBlock"})
 public class AccessManagementServiceBenchmarks {
 

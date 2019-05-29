@@ -41,3 +41,6 @@ classes/
 /src/gatling/bin/
 /src/gatling/lib/
 /src/gatling/target/
+
+# CCD migration data
+/migration/ccd.csv

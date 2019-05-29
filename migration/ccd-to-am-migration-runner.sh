@@ -27,5 +27,6 @@ psql \
     --set ON_ERROR_STOP=off \
     $DB
 
-echo "migration successful"
+echo "migration finished"
+echo
 exit 0

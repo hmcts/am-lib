@@ -54,4 +54,20 @@ ALTER TABLE access_management ADD CONSTRAINT relationship_fkey
     FOREIGN KEY (relationship)
     REFERENCES roles(role_name);
 
+WITH errors AS
+(
+    SELECT * FROM stage
+    EXCEPT
+        SELECT resource_id AS case_data_id, resource_name AS case_type_id,
+            accessor_id AS user_id, relationship AS case_role
+        FROM access_management
+)
+SELECT COUNT(*) AS "migration errors" FROM errors;
+
+SELECT * FROM stage
+EXCEPT
+    SELECT resource_id AS case_data_id, resource_name AS case_type_id,
+        accessor_id AS user_id, relationship AS case_role
+    FROM access_management;
+
 COMMIT;

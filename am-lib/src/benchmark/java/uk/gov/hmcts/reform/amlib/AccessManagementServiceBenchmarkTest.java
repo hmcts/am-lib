@@ -35,8 +35,8 @@ class AccessManagementServiceBenchmarkTest {
 
         Options options = new OptionsBuilder()
             .include(AccessManagementServiceBenchmarks.class.getSimpleName())
-            .warmupIterations(parseInt(getValueOrDefault("BENCHMARK_WARMUP_ITERATIONS", "1")))
-            .measurementIterations(parseInt(getValueOrDefault("BENCHMARK_MEASUREMENT_ITERATIONS", "2")))
+            .warmupIterations(parseInt(getValueOrDefault("BENCHMARK_WARMUP_ITERATIONS", "4")))
+            .measurementIterations(parseInt(getValueOrDefault("BENCHMARK_MEASUREMENT_ITERATIONS", "50")))
             .threads(max(getRuntime().availableProcessors() / 2, 1))
             .forks(0)
             .shouldFailOnError(true)

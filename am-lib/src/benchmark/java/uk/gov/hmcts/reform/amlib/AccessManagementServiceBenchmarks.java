@@ -12,7 +12,8 @@ import uk.gov.hmcts.reform.amlib.states.DataState;
 
 import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode(Mode.All)
+
+@BenchmarkMode({Mode.Throughput, Mode.AverageTime})
 @OutputTimeUnit(TimeUnit.SECONDS)
 @SuppressWarnings({"PMD.NonStaticInitializer", "PMD.EmptyCatchBlock"})
 public class AccessManagementServiceBenchmarks {

@@ -1,16 +1,23 @@
 package uk.gov.hmcts.reform.amapi.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 
 import static org.apache.http.entity.mime.MIME.CONTENT_TYPE;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -26,11 +33,22 @@ import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.RESOURCE_NOT_FOUND;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
 public class ControllerExceptionAdviceTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private DefaultRoleSetupImportService importerService;
+
+    @BeforeEach
+    void init() {
+        doNothing().when(importerService).addService(anyString());
+        doNothing().when(importerService).addResourceDefinition(any());
+        doNothing().when(importerService).addRole(anyString(), any(), any(), any());
+    }
 
     /**
      * Test Controller Exception Handler Message Not readable.

@@ -8,7 +8,6 @@ CREATE TEMP TABLE stage
 )
 ON COMMIT DROP;
 
-ALTER TABLE access_management DROP CONSTRAINT "AccessManagement_pkey";
 ALTER TABLE access_management DROP CONSTRAINT access_management_unique;
 ALTER TABLE access_management DROP CONSTRAINT access_management_resources_fkey;
 ALTER TABLE access_management DROP CONSTRAINT relationship_fkey;
@@ -42,8 +41,6 @@ WITH ins_access_management AS
 )
 SELECT COUNT(*) AS "access_management inserts" FROM ins_access_management;
 
-ALTER TABLE access_management ADD CONSTRAINT "AccessManagement_pkey"
-    PRIMARY KEY (access_management_id);
 ALTER TABLE access_management ADD CONSTRAINT access_management_unique
     UNIQUE (resource_id, accessor_id, accessor_type, "attribute", resource_type,
     service_name, resource_name, relationship);

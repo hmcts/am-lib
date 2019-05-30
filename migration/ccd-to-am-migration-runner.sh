@@ -23,6 +23,7 @@ psql \
     -U $USER \
     -f $INIT_SQL \
     --set AUTOCOMMIT=off \
+    --set ON_ERROR_ROLLBACK=on \
     --set ON_ERROR_STOP=off \
     $DB
 
@@ -34,6 +35,7 @@ psql \
     -U $USER \
     -f $MAIN_SQL \
     --set AUTOCOMMIT=off \
+    --set ON_ERROR_ROLLBACK=on \
     --set ON_ERROR_STOP=off \
     $DB
 

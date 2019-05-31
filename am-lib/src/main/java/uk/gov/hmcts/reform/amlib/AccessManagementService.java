@@ -169,7 +169,8 @@ public class AccessManagementService {
         + "{{resource.definition.resourceType}}|{{resource.definition.resourceName}}' for accessor '{{userId}}' "
         + "in roles '{{userRoles}}' and SecurityClassification {{attributeSecurityClassifications}} : "
         + "{{result.access.accessType}} access with relationships {{result.relationships}} "
-        + "and permissions {{result.access.permissions}}")
+        + "and permissions {{result.access.permissions}} and user security classifications "
+        + "is {{result.userSecurityClassification}}")
     public FilteredResourceEnvelope filterResource(@NotBlank String userId,
                                                    @NotEmpty Set<@NotBlank String> userRoles,
                                                    @NotNull @Valid Resource resource,

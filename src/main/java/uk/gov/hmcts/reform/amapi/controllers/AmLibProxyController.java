@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * Default endpoints per application.
@@ -40,7 +41,7 @@ public class AmLibProxyController {
         @ApiResponse(code = 400, message = "Incomplete request information or Malformed input request"),
         @ApiResponse(code = 500, message = "Internal server error")
     })
-    @PostMapping("/create-resource-access")
+    @PostMapping(value = "/create-resource-access",consumes = (APPLICATION_JSON_VALUE))
     public ResponseEntity<ExplicitAccessGrant> createResourceAccess(@RequestBody ExplicitAccessGrant amData,
                                      @RequestHeader(name = "Caller", defaultValue = "Anonymous") String caller) {
         try {
@@ -61,7 +62,7 @@ public class AmLibProxyController {
         @ApiResponse(code = 400, message = "Incomplete request information or Malformed input request"),
         @ApiResponse(code = 500, message = "Internal server error")
     })
-    @DeleteMapping("/revoke-resource-access")
+    @DeleteMapping(value = "/revoke-resource-access", consumes = (APPLICATION_JSON_VALUE))
     public ResponseEntity<Void> revokeResourceAccess(@RequestBody ExplicitAccessMetadata request,
                                      @RequestHeader(name = "Caller", defaultValue = "Anonymous") String caller) {
         try {
@@ -82,7 +83,7 @@ public class AmLibProxyController {
         @ApiResponse(code = 400, message = "Incomplete request information or Malformed input request"),
         @ApiResponse(code = 500, message = "Internal server error")
     })
-    @PostMapping("/filter-resource")
+    @PostMapping(value = "/filter-resource", consumes = (APPLICATION_JSON_VALUE))
     public FilteredResourceEnvelope filterResource(@RequestBody FilterResource request) {
         return am.filterResource(request.getUserId(), request.getUserRoles(),
             request.getResource(), request.getAttributeSecurityClassification());

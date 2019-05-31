@@ -1,8 +1,9 @@
-package uk.gov.hmcts.reform.amapi.controller;
+package uk.gov.hmcts.reform.amapi.controllers;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.io.Resources;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
 import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +49,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert","PMD.ExcessiveImports","PMD.LawOfDemeter"})
-public class ControllerTest {
+public class AmLibProxyControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -68,19 +70,8 @@ public class ControllerTest {
     @Test
     public void testCreateResourceAccess() throws Exception {
 
-        String inputJson = "{\n"
-            + "  \"resourceId\": \"1234\",\n"
-            + "  \"resourceDefinition\": {\n"
-            + "    \"serviceName\": \"cmc\",\n"
-            + "    \"resourceType\": \"case\",\n"
-            + "    \"resourceName\": \"claim\"},\n"
-            + "  \"accessorIds\": [\"12345\"],\n"
-            + "  \"accessorType\": \"USER\",\n"
-            + "  \"attributePermissions\": {\n"
-            + "    \"\": [\"CREATE\", \"READ\", \"UPDATE\"]\n"
-            + "  },\n"
-            + "  \"relationship\": \"caseworker\"\n"
-            + "}";
+        String inputJson = Resources.toString(Resources
+            .getResource("input-data/createResourceAccess.json"), StandardCharsets.UTF_8);
 
         doNothing().when(accessManagementService).grantExplicitResourceAccess(any());
 
@@ -104,18 +95,8 @@ public class ControllerTest {
     @Test
     public void testRevokeResourceAccess() throws Exception {
 
-        String inputJson = "{\n"
-            + "  \"resourceId\": \"${resourceId}\",\n"
-            + "  \"resourceDefinition\": {\n"
-            + "    \"serviceName\": \"cmc\",\n"
-            + "    \"resourceType\": \"case\",\n"
-            + "    \"resourceName\": \"claim\"\n"
-            + "  },\n"
-            + "  \"accessorId\": \"${accessorId}\",\n"
-            + "  \"accessorType\": \"USER\",\n"
-            + "  \"attribute\": \"\",\n"
-            + "  \"relationship\": \"caseworker\"\n"
-            + "}";
+        String inputJson = Resources.toString(Resources
+            .getResource("input-data/revokeResourceAccess.json"), StandardCharsets.UTF_8);
 
         doNothing().when(accessManagementService).revokeResourceAccess(any());
 
@@ -129,31 +110,8 @@ public class ControllerTest {
     @Test
     public void testFilterResource() throws Exception {
 
-        String inputJson = "{\n"
-            + "  \"userId\": \"1234\",\n"
-            + "  \"userRoles\": [\n"
-            + "    \"caseworker\"\n"
-            + "  ],\n"
-            + "  \"resource\": {\n"
-            + "    \"id\": \"1234\",\n"
-            + "    \"definition\": {\n"
-            + "      \"serviceName\": \"cmc\",\n"
-            + "      \"resourceType\": \"case\",\n"
-            + "      \"resourceName\": \"claim\"\n"
-            + "    },\n"
-            + "    \"data\": {\n"
-            + "      \"json\": \"resource\"\n"
-            + "    }\n"
-            + "  },\n"
-            + "  \"attributeSecurityClassification\":{ \"\": \"PUBLIC\",\n"
-            + "    \"/externalId\": \"PUBLIC\",\n"
-            + "    \"/referenceNumber\": \"PUBLIC\",\n"
-            + "    \"/referenceNumber/claimant\": \"PUBLIC\",\n"
-            + "    \"/correspondenceAddress/line1\": \"PRIVATE\",\n"
-            + "    \"/defendant/type\": \"RESTRICTED\"\n"
-            + "  }\n"
-            + "}\n"
-            + "\n";
+        String inputJson = Resources.toString(Resources
+            .getResource("input-data/filterResource.json"), StandardCharsets.UTF_8);
 
         ObjectMapper mapper = new ObjectMapper();
         final FilterResource filterResource = mapper.readValue(inputJson, FilterResource.class);

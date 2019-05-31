@@ -1,0 +1,12 @@
+{
+  "resourceId": "1234",
+  "resourceDefinition": {
+    "serviceName": "cmc",
+    "resourceType": "case",
+    "resourceName": "claim"
+  },
+  "accessorId": "1234",
+  "accessorType": "USER",
+  "attribute": "",
+  "relationship": "caseworker"
+}

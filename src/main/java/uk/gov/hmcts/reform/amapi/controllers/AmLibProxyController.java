@@ -56,8 +56,8 @@ public class AmLibProxyController {
     @ApiResponses(value = {
         @ApiResponse(code = 204, message = "Successfully revoked user access for resource"),
         @ApiResponse(code = 415, message = "Unsupported media type.Excepted json"),
-        @ApiResponse(code = 401, message = "Accessing the resource you were trying to reach is forbidden."
-            + "Please use a valid access token"),
+        @ApiResponse(code = 401, message = "You are not authorized to perform this particular request. "
+            + "Please provide a valid access token in the request"),
         @ApiResponse(code = 400, message = "Incomplete request information or Malformed input request"),
         @ApiResponse(code = 500, message = "Internal server error")
     })

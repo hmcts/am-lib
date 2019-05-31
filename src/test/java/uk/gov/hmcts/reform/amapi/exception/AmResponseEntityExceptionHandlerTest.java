@@ -1,5 +1,6 @@
-package uk.gov.hmcts.reform.amapi.controller;
+package uk.gov.hmcts.reform.amapi.exception;
 
+import com.google.common.io.Resources;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+
+import java.nio.charset.StandardCharsets;
 
 import static org.apache.http.entity.mime.MIME.CONTENT_TYPE;
 import static org.hamcrest.Matchers.is;
@@ -35,7 +38,7 @@ import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.RESOURCE_NOT_FOUND;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-public class ControllerExceptionAdviceTest {
+public class AmResponseEntityExceptionHandlerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -58,22 +61,8 @@ public class ControllerExceptionAdviceTest {
     @Test
     public void testHandleHttpMessageNotReadable() throws Exception {
 
-        String invalidJson = "{\n"
-            + "  \"userId\": \"${accessorId}\",\n"
-            + "  \"userRoles\": [\n"
-            + "    \"caseworker\"\n"
-            + "  ],\n"
-            + "  \"resource\": {\n"
-            + "    \"id\": \"${resourceId}\",\n"
-            + "    \"definition\": {\n"
-            + "      \"serviceName\": \"cmc\",\n"
-            + "      \"resourceType\": \"case\",\n"
-            + "      \"resourceName\": \"claim\"\n"
-            + "    },\n"
-            + "    \"data\": {\n"
-            + "      \"json\": \"resource\"\n"
-            + "    }\n"
-            + "  },,,";
+        String invalidJson = Resources.toString(Resources
+            .getResource("exception-mapper-data/malformedInput.json"), StandardCharsets.UTF_8);
 
         this.mockMvc.perform(post("/lib/filter-resource")
             .content(invalidJson)
@@ -95,25 +84,11 @@ public class ControllerExceptionAdviceTest {
     @Test
     public void testHandleHttpMediaTypeNotSupported() throws Exception {
 
-        String invalidJson = "{\n"
-            + "  \"userId\": \"${accessorId}\",\n"
-            + "  \"userRoles\": [\n"
-            + "    \"caseworker\"\n"
-            + "  ],\n"
-            + "  \"resource\": {\n"
-            + "    \"id\": \"${resourceId}\",\n"
-            + "    \"definition\": {\n"
-            + "      \"serviceName\": \"cmc\",\n"
-            + "      \"resourceType\": \"case\",\n"
-            + "      \"resourceName\": \"claim\"\n"
-            + "    },\n"
-            + "    \"data\": {\n"
-            + "      \"json\": \"resource\"\n"
-            + "    }\n"
-            + "  }";
+        String inputJson = Resources.toString(Resources
+            .getResource("input-data/filterResource.json"), StandardCharsets.UTF_8);
 
         this.mockMvc.perform(post("/lib/filter-resource")
-            .content(invalidJson)
+            .content(inputJson)
             .header(CONTENT_TYPE, TEXT_HTML))
             .andDo(print())
             .andExpect(status().isUnsupportedMediaType());
@@ -151,27 +126,8 @@ public class ControllerExceptionAdviceTest {
     @Test
     public void testHandleInternalServerErrors() throws Exception {
 
-        String invalidJson = "{\n"
-            + "  \"userId\": \"${accessorId}\",\n"
-            + "  \"userRoles\": [\n"
-            + "    \"caseworker\"\n"
-            + "  ],\n"
-            + "  \"resource\": {\n"
-            + "    \"id\": \"${resourceId}\",\n"
-            + "    \"definition\": {\n"
-            + "      \"serviceName\": \"cmc\",\n"
-            + "      \"resourceType\": \"case\",\n"
-            + "      \"resourceName\": \"claim\"\n"
-            + "    },\n"
-            + "    \"data\": {\n"
-            + "      \"json\": \"resource\"\n"
-            + "    }\n"
-            + "  },\n"
-            + "  \"attributeSecurityClassification\":{ \n"
-            + "    \"/externalId\": \"PUBLIC\"\n"
-            + "  \n"
-            + "  }\n"
-            + "}\n";
+        String invalidJson = Resources.toString(Resources
+            .getResource("exception-mapper-data/filterResourceWithMissingRoot.json"), StandardCharsets.UTF_8);
 
         this.mockMvc.perform(post("/lib/filter-resource")
             .content(invalidJson)

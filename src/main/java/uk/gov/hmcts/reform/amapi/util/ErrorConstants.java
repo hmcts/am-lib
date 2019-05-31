@@ -9,9 +9,9 @@ import lombok.experimental.UtilityClass;
 })
 public class ErrorConstants {
 
-    public static String MALFORMED_JSON =  "Malformed Input Request";
+    public static final String MALFORMED_JSON =  "Malformed Input Request";
 
-    public static String RESOURCE_NOT_FOUND =  "Resource Not Found";
+    public static final String RESOURCE_NOT_FOUND =  "Resource Not Found";
 
-    public static String UNSUPPORTED_MEDIA_TYPES = "Unsupported Media Types";
+    public static final String UNSUPPORTED_MEDIA_TYPES = "Unsupported Media Types";
 }

@@ -1,0 +1,25 @@
+{
+  "userId": "1234",
+  "userRoles": [
+    "caseworker"
+  ],
+  "resource": {
+    "id": "1234",
+    "definition": {
+      "serviceName": "cmc",
+      "resourceType": "case",
+      "resourceName": "claim"
+    },
+    "data": {
+      "json": "resource"
+    }
+  },
+  "attributeSecurityClassification":{
+    "/externalId": "PUBLIC",
+    "/referenceNumber": "PUBLIC",
+    "/referenceNumber/claimant": "PUBLIC",
+    "/correspondenceAddress/line1": "PRIVATE",
+    "/defendant/type": "RESTRICTED"
+  }
+}
+

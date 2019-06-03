@@ -8,6 +8,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
 import java.lang.reflect.Method;
+import java.security.InvalidParameterException;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -31,7 +32,7 @@ public class ValidationAspect {
 
         if (!violations.isEmpty()) {
             String messages = violations.stream().map(this::toMessage).collect(joining("; "));
-            throw new IllegalArgumentException(messages);
+            throw new InvalidParameterException(messages);
         }
 
         return joinPoint.proceed();

@@ -6,18 +6,24 @@ import io.gatling.http.request.builder.HttpRequestBuilder
 
 object AccessManagement {
 
-  private def postRequest(url: String, body: String): HttpRequestBuilder =
+  private def postRequest(url: String, body: String, statusExpected: Int): HttpRequestBuilder =
     http(url)
       .post("/lib" + url)
       .body(ElFileBody(body)).asJson
-      .check(status.is(200))
+      .check(status.is(statusExpected))
+
+  private def deleteRequest(url: String, body: String): HttpRequestBuilder =
+    http(url)
+      .delete("/lib" + url)
+      .body(ElFileBody(body)).asJson
+      .check(status.is(204))
 
   def createResourceAssess: HttpRequestBuilder =
-    postRequest("/create-resource-access","createResourceAccess.json")
+    postRequest("/create-resource-access","createResourceAccess.json", 201)
 
   def filterResource: HttpRequestBuilder =
-    postRequest("/filter-resource", "filterResource.json")
+    postRequest("/filter-resource", "filterResource.json", 200)
 
   def revokeResourceAccess: HttpRequestBuilder =
-    postRequest("/revoke-resource-access", "revokeResourceAccess.json")
+    deleteRequest("/revoke-resource-access", "revokeResourceAccess.json")
 }

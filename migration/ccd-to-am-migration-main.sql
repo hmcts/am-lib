@@ -14,6 +14,8 @@ ALTER TABLE access_management DROP CONSTRAINT relationship_fkey;
 
 SELECT COUNT(*) AS "columns to migrate" FROM stage;
 
+SELECT COUNT(*) AS "pre-migration access_management count" FROM access_management;
+
 INSERT INTO access_management (resource_id, accessor_type, accessor_id,
         "attribute", permissions, service_name, resource_name,
         resource_type, relationship)
@@ -42,6 +44,8 @@ ALTER TABLE access_management ADD CONSTRAINT relationship_fkey
     REFERENCES roles(role_name);
 
 COMMIT;
+
+SELECT COUNT(*) AS "post-migration access_management count" FROM access_management;
 
 WITH errors AS
 (

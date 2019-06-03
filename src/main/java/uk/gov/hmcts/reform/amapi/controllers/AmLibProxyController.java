@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amapi.models.FilterResource;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
@@ -42,6 +43,7 @@ public class AmLibProxyController {
         @ApiResponse(code = 500, message = "Internal server error")
     })
     @PostMapping(value = "/create-resource-access",consumes = (APPLICATION_JSON_VALUE))
+    @ResponseStatus(CREATED)
     public ResponseEntity<ExplicitAccessGrant> createResourceAccess(@RequestBody ExplicitAccessGrant amData,
                                      @RequestHeader(name = "Caller", defaultValue = "Anonymous") String caller) {
         try {
@@ -63,6 +65,7 @@ public class AmLibProxyController {
         @ApiResponse(code = 500, message = "Internal server error")
     })
     @DeleteMapping(value = "/revoke-resource-access", consumes = (APPLICATION_JSON_VALUE))
+    @ResponseStatus(NO_CONTENT)
     public ResponseEntity<Void> revokeResourceAccess(@RequestBody ExplicitAccessMetadata request,
                                      @RequestHeader(name = "Caller", defaultValue = "Anonymous") String caller) {
         try {

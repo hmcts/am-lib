@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 
 import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
@@ -24,8 +25,10 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
+import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.INVALID_REQUEST;
 import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.MALFORMED_JSON;
 import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.RESOURCE_NOT_FOUND;
+import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.SERVICE_FAILED;
 import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.UNSUPPORTED_MEDIA_TYPES;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -94,6 +97,21 @@ public class AmResponseEntityExceptionHandler extends ResponseEntityExceptionHan
             .build();
 
         return new ResponseEntity<>(errorDetails, new HttpHeaders(), BAD_REQUEST);
+    }
+
+
+    @ResponseBody
+    @ExceptionHandler({PersistenceException.class})
+    public ResponseEntity<Object> handleJdbiPersistenceErrors(PersistenceException ex) {
+
+        ErrorResponse errorDetails = ErrorResponse.builder()
+            .errorDescription(SERVICE_FAILED)
+            .errorMessage(INVALID_REQUEST)
+            .status(INTERNAL_SERVER_ERROR).errorCode(INTERNAL_SERVER_ERROR.value())
+            .timeStamp(getTimeStamp())
+            .build();
+
+        return new ResponseEntity<>(errorDetails, new HttpHeaders(), INTERNAL_SERVER_ERROR);
     }
 
     @ResponseBody

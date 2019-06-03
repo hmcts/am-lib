@@ -1,0 +1,20 @@
+{
+  "userId": "1234",
+  "userRoles": [
+    "caseworker"
+  ],
+  "resource": {
+
+    "definition": {
+      "serviceName": "cmc",
+      "resourceType": "case",
+      "resourceName": "claim"
+    },
+    "data": {
+      "json": "resource"
+    }
+  },
+  "attributeSecurityClassification":{
+    "": "PUBLIC"
+  }
+}

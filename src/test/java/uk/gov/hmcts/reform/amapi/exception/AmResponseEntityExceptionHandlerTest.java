@@ -77,6 +77,29 @@ public class AmResponseEntityExceptionHandlerTest {
     }
 
     /**
+     * Test Controller Exception Handler Message Not readable.
+     *
+     * @throws Exception when exceptional condition happens
+     */
+    @Test
+    public void testHandleMissingInputParameterException() throws Exception {
+
+        String invalidJson = Resources.toString(Resources
+            .getResource("exception-mapper-data/missingValidInputParameter.json"), StandardCharsets.UTF_8);
+
+        this.mockMvc.perform(post("/lib/filter-resource")
+            .content(invalidJson)
+            .header(CONTENT_TYPE, APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errorMessage", is("filterResource.resource.id - must not be blank")))
+            .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+            .andExpect(jsonPath("$.errorCode", is(BAD_REQUEST.value())))
+            .andExpect(jsonPath("$.timeStamp", notNullValue()))
+            .andExpect(jsonPath("$.errorDescription", notNullValue()));
+    }
+
+    /**
      * Test Media type not supported.
      *
      * @throws Exception when exceptional condition happens

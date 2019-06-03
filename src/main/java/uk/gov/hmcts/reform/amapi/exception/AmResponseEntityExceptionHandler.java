@@ -15,6 +15,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -79,6 +80,20 @@ public class AmResponseEntityExceptionHandler extends ResponseEntityExceptionHan
 
         return new ResponseEntity<>(
             errorDetails, new HttpHeaders(), NOT_FOUND);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(InvalidParameterException.class)
+    public ResponseEntity<Object> handleMissingInputParameterException(InvalidParameterException ex) {
+
+        ErrorResponse errorDetails = ErrorResponse.builder()
+            .errorDescription(getRootException(ex).getLocalizedMessage())
+            .errorMessage(getRootException(ex).getLocalizedMessage())
+            .status(BAD_REQUEST).errorCode(BAD_REQUEST.value())
+            .timeStamp(getTimeStamp())
+            .build();
+
+        return new ResponseEntity<>(errorDetails, new HttpHeaders(), BAD_REQUEST);
     }
 
     @ResponseBody

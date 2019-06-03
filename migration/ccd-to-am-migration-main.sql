@@ -10,7 +10,7 @@ CREATE TEMP TABLE stage
 ALTER TABLE access_management DROP CONSTRAINT access_management_resources_fkey;
 ALTER TABLE access_management DROP CONSTRAINT relationship_fkey;
 
-\COPY stage FROM 'ccd.csv' DELIMITER ',' CSV HEADER;
+\COPY stage FROM 'am-migration.csv' DELIMITER ',' CSV HEADER;
 
 SELECT COUNT(*) AS "columns to migrate" FROM stage;
 

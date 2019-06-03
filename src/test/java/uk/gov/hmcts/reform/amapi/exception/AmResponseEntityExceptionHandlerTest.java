@@ -37,7 +37,7 @@ import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.RESOURCE_NOT_FOUND;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert","PMD.AvoidDuplicateLiterals"})
 public class AmResponseEntityExceptionHandlerTest {
 
     @Autowired

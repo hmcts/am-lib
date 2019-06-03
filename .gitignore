@@ -43,4 +43,4 @@ classes/
 /src/gatling/target/
 
 # CCD migration data
-/migration/ccd.csv
+/migration/am-migration.csv

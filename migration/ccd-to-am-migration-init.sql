@@ -8,7 +8,7 @@ CREATE TEMP TABLE stage
 )
 ON COMMIT DROP;
 
-\COPY stage FROM 'ccd.csv' DELIMITER ',' CSV HEADER;
+\COPY stage FROM 'am-migration.csv' DELIMITER ',' CSV HEADER;
 
 WITH ins_services AS
 (

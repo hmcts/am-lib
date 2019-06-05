@@ -64,7 +64,7 @@ public class AmResponseEntityExceptionHandlerTest {
         String invalidJson = Resources.toString(Resources
             .getResource("exception-mapper-data/malformedInput.json"), StandardCharsets.UTF_8);
 
-        this.mockMvc.perform(post("/lib/filter-resource")
+        this.mockMvc.perform(post("/api/filter-resource")
             .content(invalidJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
@@ -87,7 +87,7 @@ public class AmResponseEntityExceptionHandlerTest {
         String invalidJson = Resources.toString(Resources
             .getResource("exception-mapper-data/missingValidInputParameter.json"), StandardCharsets.UTF_8);
 
-        this.mockMvc.perform(post("/lib/filter-resource")
+        this.mockMvc.perform(post("/api/filter-resource")
             .content(invalidJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
@@ -110,7 +110,7 @@ public class AmResponseEntityExceptionHandlerTest {
         String inputJson = Resources.toString(Resources
             .getResource("input-data/filterResource.json"), StandardCharsets.UTF_8);
 
-        this.mockMvc.perform(post("/lib/filter-resource")
+        this.mockMvc.perform(post("/api/filter-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, TEXT_HTML))
             .andDo(print())
@@ -152,7 +152,7 @@ public class AmResponseEntityExceptionHandlerTest {
         String invalidJson = Resources.toString(Resources
             .getResource("exception-mapper-data/filterResourceWithMissingRoot.json"), StandardCharsets.UTF_8);
 
-        this.mockMvc.perform(post("/lib/filter-resource")
+        this.mockMvc.perform(post("/api/filter-resource")
             .content(invalidJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())

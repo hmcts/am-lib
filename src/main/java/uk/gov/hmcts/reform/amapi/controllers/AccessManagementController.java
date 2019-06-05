@@ -27,11 +27,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * Default endpoints per application.
  */
 @RestController
-@RequestMapping("lib")
-public class AmLibProxyController {
+@RequestMapping("api")
+public class AccessManagementController {
 
     @Autowired
-    private AccessManagementService am;
+    private AccessManagementService accessManagementService;
 
     @ApiOperation(value = "Grant resource access to user", response = ExplicitAccessGrant.class)
     @ApiResponses(value = {
@@ -48,7 +48,7 @@ public class AmLibProxyController {
                                      @RequestHeader(name = "Caller", defaultValue = "Anonymous") String caller) {
         try {
             MDC.put("caller", caller);
-            am.grantExplicitResourceAccess(amData);
+            accessManagementService.grantExplicitResourceAccess(amData);
             return new ResponseEntity<>(amData, CREATED);
         } finally {
             MDC.clear();
@@ -70,7 +70,7 @@ public class AmLibProxyController {
                                      @RequestHeader(name = "Caller", defaultValue = "Anonymous") String caller) {
         try {
             MDC.put("caller", caller);
-            am.revokeResourceAccess(request);
+            accessManagementService.revokeResourceAccess(request);
             return new ResponseEntity<>(NO_CONTENT);
         } finally {
             MDC.clear();
@@ -88,7 +88,7 @@ public class AmLibProxyController {
     })
     @PostMapping(value = "/filter-resource", consumes = (APPLICATION_JSON_VALUE))
     public FilteredResourceEnvelope filterResource(@RequestBody FilterResource request) {
-        return am.filterResource(request.getUserId(), request.getUserRoles(),
+        return accessManagementService.filterResource(request.getUserId(), request.getUserRoles(),
             request.getResource(), request.getAttributeSecurityClassification());
     }
 }

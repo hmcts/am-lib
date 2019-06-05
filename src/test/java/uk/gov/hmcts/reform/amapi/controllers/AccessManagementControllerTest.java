@@ -49,7 +49,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert","PMD.ExcessiveImports","PMD.LawOfDemeter"})
-public class AmLibProxyControllerTest {
+public class AccessManagementControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -75,7 +75,7 @@ public class AmLibProxyControllerTest {
 
         doNothing().when(accessManagementService).grantExplicitResourceAccess(any());
 
-        this.mockMvc.perform(post("/lib/create-resource-access")
+        this.mockMvc.perform(post("/api/create-resource-access")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
@@ -100,7 +100,7 @@ public class AmLibProxyControllerTest {
 
         doNothing().when(accessManagementService).revokeResourceAccess(any());
 
-        this.mockMvc.perform(delete("/lib/revoke-resource-access")
+        this.mockMvc.perform(delete("/api/revoke-resource-access")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
@@ -136,7 +136,7 @@ public class AmLibProxyControllerTest {
             filterResource.getResource(), filterResource.getAttributeSecurityClassification()))
             .thenReturn(filteredResourceEnvelope);
 
-        this.mockMvc.perform(post("/lib/filter-resource")
+        this.mockMvc.perform(post("/api/filter-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())

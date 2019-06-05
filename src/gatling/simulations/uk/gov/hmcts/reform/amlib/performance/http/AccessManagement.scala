@@ -8,13 +8,13 @@ object AccessManagement {
 
   private def postRequest(url: String, body: String, statusExpected: Int): HttpRequestBuilder =
     http(url)
-      .post("/lib" + url)
+      .post("/api" + url)
       .body(ElFileBody(body)).asJson
       .check(status.is(statusExpected))
 
   private def deleteRequest(url: String, body: String): HttpRequestBuilder =
     http(url)
-      .delete("/lib" + url)
+      .delete("/api" + url)
       .body(ElFileBody(body)).asJson
       .check(status.is(204))
 

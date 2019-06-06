@@ -19,11 +19,11 @@ object AccessManagement {
       .check(status.is(204))
 
   def createResourceAssess: HttpRequestBuilder =
-    postRequest("/create-resource-access","createResourceAccess.json", 201)
+    postRequest("/access-resource","createResourceAccess.json", 201)
 
   def filterResource: HttpRequestBuilder =
     postRequest("/filter-resource", "filterResource.json", 200)
 
   def revokeResourceAccess: HttpRequestBuilder =
-    deleteRequest("/revoke-resource-access", "revokeResourceAccess.json")
+    deleteRequest("/access-resource", "revokeResourceAccess.json")
 }

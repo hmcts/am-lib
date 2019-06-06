@@ -3,13 +3,11 @@ package uk.gov.hmcts.reform.amapi.controllers;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,17 +40,13 @@ public class AccessManagementController {
         @ApiResponse(code = 400, message = "Incomplete request information or Malformed input request"),
         @ApiResponse(code = 500, message = "Internal server error")
     })
-    @PostMapping(value = "/create-resource-access",consumes = (APPLICATION_JSON_VALUE))
+    @PostMapping(value = "/access-resource", consumes = (APPLICATION_JSON_VALUE))
     @ResponseStatus(CREATED)
-    public ResponseEntity<ExplicitAccessGrant> createResourceAccess(@RequestBody ExplicitAccessGrant amData,
-                                     @RequestHeader(name = "Caller", defaultValue = "Anonymous") String caller) {
-        try {
-            MDC.put("caller", caller);
-            accessManagementService.grantExplicitResourceAccess(amData);
-            return new ResponseEntity<>(amData, CREATED);
-        } finally {
-            MDC.clear();
-        }
+    public ResponseEntity<ExplicitAccessGrant> createResourceAccess(@RequestBody ExplicitAccessGrant
+                                                                        explicitAccessGrantData) {
+        accessManagementService.grantExplicitResourceAccess(explicitAccessGrantData);
+        return new ResponseEntity<>(explicitAccessGrantData, CREATED);
+
     }
 
     @ApiOperation("Revoke resource access to user")
@@ -64,17 +58,12 @@ public class AccessManagementController {
         @ApiResponse(code = 400, message = "Incomplete request information or Malformed input request"),
         @ApiResponse(code = 500, message = "Internal server error")
     })
-    @DeleteMapping(value = "/revoke-resource-access", consumes = (APPLICATION_JSON_VALUE))
+    @DeleteMapping(value = "/access-resource", consumes = (APPLICATION_JSON_VALUE))
     @ResponseStatus(NO_CONTENT)
-    public ResponseEntity<Void> revokeResourceAccess(@RequestBody ExplicitAccessMetadata request,
-                                     @RequestHeader(name = "Caller", defaultValue = "Anonymous") String caller) {
-        try {
-            MDC.put("caller", caller);
-            accessManagementService.revokeResourceAccess(request);
-            return new ResponseEntity<>(NO_CONTENT);
-        } finally {
-            MDC.clear();
-        }
+    public ResponseEntity<Void> revokeResourceAccess(@RequestBody ExplicitAccessMetadata request) {
+
+        accessManagementService.revokeResourceAccess(request);
+        return new ResponseEntity<>(NO_CONTENT);
     }
 
     @ApiOperation(value = "Filter access to resource", response = ExplicitAccessGrant.class)

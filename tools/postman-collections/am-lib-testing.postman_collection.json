@@ -24,14 +24,14 @@
           "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessorType\": \"USER\",\n    \"resourceDefinition\": {\n    \t\"serviceName\": \"cmc\",\n    \t\"resourceType\": \"case\",\n    \t\"resourceName\": \"claim\"\n    },\n    \"attributePermissions\": {\n    \t\"/test2\": [\"CREATE\", \"READ\"]\n    },\n    \"relationship\": \"caseworker\"\n}"
         },
         "url": {
-          "raw": "localhost:3703/api/create-resource-access",
+          "raw": "localhost:3704/api/access-resource",
           "host": [
             "localhost"
           ],
-          "port": "3703",
+          "port": "3704",
           "path": [
             "api",
-            "create-resource-access"
+            "access-resource"
           ]
         }
       },
@@ -56,14 +56,14 @@
           "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessorType\": \"USER\",\n    \"resourceDefinition\": {\n    \t\"serviceName\": \"cmc\",\n    \t\"resourceType\": \"case\",\n    \t\"resourceName\": \"claim\"\n    },\n    \"attributePermissions\": {\n    \t\"/test\": [\"CREATE\"],\n    \t\"/test2\": [\"CREATE\", \"READ\"],\n    \t\"/test3\": [\"CREATE\", \"UPDATE\"]\n    },\n    \"relationship\" : \"caseworker\"\n}"
         },
         "url": {
-          "raw": "localhost:3703/api/create-resource-access",
+          "raw": "localhost:3704/api/access-resource",
           "host": [
             "localhost"
           ],
-          "port": "3703",
+          "port": "3704",
           "path": [
             "api",
-            "create-resource-access"
+            "access-resource"
           ]
         }
       },
@@ -96,12 +96,12 @@
           "raw": "{\n\t\"userId\": \"UNIQUE-USER-ID\",\n\t\"userRoles\": [\"caseworker\"],\n\t\"resource\": {\n\t\t\"id\": \"my-super-resource-id\",\n\t\t\"definition\": {\n\t\t\t\"serviceName\": \"cmc\",\n\t\t\t\"resourceType\": \"case\",\n\t\t\t\"resourceName\": \"claim\"\n\t\t},\n\t\t\"data\": {\n\t\t\t\"test\": \"test\"\n\t\t}\n\t},\n\t \"attributeSecurityClassification\":{ \n\t \t\"\": \"PUBLIC\"\n\t }\n}"
         },
         "url": {
-          "raw": "http://localhost:3703/api/filter-resource",
+          "raw": "http://localhost:3704/api/filter-resource",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "3703",
+          "port": "3704",
           "path": [
             "api",
             "filter-resource"
@@ -136,14 +136,14 @@
           "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorId\": \"UNIQUE-USER-ID\",\n    \"accessorType\": \"USER\",\n    \"resourceDefinition\": {\n    \t\"serviceName\": \"cmc\",\n    \t\"resourceType\": \"case\",\n    \t\"resourceName\": \"claim\"\n    },\n    \"attribute\": \"\",\n    \"relationship\": \"caseworker\"\n}"
         },
         "url": {
-          "raw": "localhost:3703/api/revoke-resource-access",
+          "raw": "localhost:3704/api/access-resource",
           "host": [
             "localhost"
           ],
-          "port": "3703",
+          "port": "3704",
           "path": [
             "api",
-            "revoke-resource-access"
+            "access-resource"
           ]
         }
       },

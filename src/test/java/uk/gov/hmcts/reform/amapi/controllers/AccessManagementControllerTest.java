@@ -48,8 +48,8 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert","PMD.ExcessiveImports","PMD.LawOfDemeter"})
-public class AmLibProxyControllerTest {
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports", "PMD.LawOfDemeter"})
+public class AccessManagementControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -75,7 +75,7 @@ public class AmLibProxyControllerTest {
 
         doNothing().when(accessManagementService).grantExplicitResourceAccess(any());
 
-        this.mockMvc.perform(post("/lib/create-resource-access")
+        this.mockMvc.perform(post("/api/access-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
@@ -100,7 +100,7 @@ public class AmLibProxyControllerTest {
 
         doNothing().when(accessManagementService).revokeResourceAccess(any());
 
-        this.mockMvc.perform(delete("/lib/revoke-resource-access")
+        this.mockMvc.perform(delete("/api/access-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
@@ -122,7 +122,7 @@ public class AmLibProxyControllerTest {
         permissions.add(Permission.UPDATE);
 
         Map<JsonPointer, Set<Permission>> attributePermissions = new ConcurrentHashMap<>();
-        attributePermissions.put(JsonPointer.valueOf(""),permissions);
+        attributePermissions.put(JsonPointer.valueOf(""), permissions);
         AccessEnvelope envelope = AccessEnvelope.builder().permissions(attributePermissions).build();
 
         Resource resource = Resource.builder().id("1234").data(JsonNodeFactory.instance.objectNode()
@@ -136,7 +136,7 @@ public class AmLibProxyControllerTest {
             filterResource.getResource(), filterResource.getAttributeSecurityClassification()))
             .thenReturn(filteredResourceEnvelope);
 
-        this.mockMvc.perform(post("/lib/filter-resource")
+        this.mockMvc.perform(post("/api/filter-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())

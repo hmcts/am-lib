@@ -1,58 +1,10 @@
 {
   "info": {
     "_postman_id": "9e54ccae-1353-484c-bac8-c6ad21df18f5",
-    "name": "am-lib-testing",
+    "name": "am-api-testing",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
-    {
-      "name": "Filter Resource",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Accept",
-            "type": "text",
-            "value": "application/json"
-          },
-          {
-            "key": "",
-            "type": "text",
-            "value": ""
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "type": "text",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n\t\"userId\": \"UNIQUE-USER-ID\",\n\t\"userRoles\": [\"caseworker\"],\n\t\"resource\": {\n\t\t\"id\": \"my-super-resource-id\",\n\t\t\"definition\": {\n\t\t\t\"serviceName\": \"cmc\",\n\t\t\t\"resourceType\": \"case\",\n\t\t\t\"resourceName\": \"claim\"\n\t\t},\n\t\t\"data\": {\n\t\t\t\"test\": \"test\"\n\t\t}\n\t}\n}"
-        },
-        "url": {
-          "raw": "http://localhost:3703/lib/filter-resource",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "3703",
-          "path": [
-            "lib",
-            "filter-resource"
-          ],
-          "query": [
-            {
-              "key": "",
-              "value": "",
-              "disabled": true
-            }
-          ]
-        }
-      },
-      "response": []
-    },
     {
       "name": "Create Single Resource Access",
       "request": {
@@ -72,14 +24,14 @@
           "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessorType\": \"USER\",\n    \"resourceDefinition\": {\n    \t\"serviceName\": \"cmc\",\n    \t\"resourceType\": \"case\",\n    \t\"resourceName\": \"claim\"\n    },\n    \"attributePermissions\": {\n    \t\"/test2\": [\"CREATE\", \"READ\"]\n    },\n    \"relationship\": \"caseworker\"\n}"
         },
         "url": {
-          "raw": "localhost:3703/lib/create-resource-access",
+          "raw": "localhost:3704/api/access-resource",
           "host": [
             "localhost"
           ],
-          "port": "3703",
+          "port": "3704",
           "path": [
-            "lib",
-            "create-resource-access"
+            "api",
+            "access-resource"
           ]
         }
       },
@@ -104,14 +56,62 @@
           "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorIds\": [\"UNIQUE-USER-ID\"],\n    \"accessorType\": \"USER\",\n    \"resourceDefinition\": {\n    \t\"serviceName\": \"cmc\",\n    \t\"resourceType\": \"case\",\n    \t\"resourceName\": \"claim\"\n    },\n    \"attributePermissions\": {\n    \t\"/test\": [\"CREATE\"],\n    \t\"/test2\": [\"CREATE\", \"READ\"],\n    \t\"/test3\": [\"CREATE\", \"UPDATE\"]\n    },\n    \"relationship\" : \"caseworker\"\n}"
         },
         "url": {
-          "raw": "localhost:3703/lib/create-resource-access",
+          "raw": "localhost:3704/api/access-resource",
           "host": [
             "localhost"
           ],
-          "port": "3703",
+          "port": "3704",
           "path": [
-            "lib",
-            "create-resource-access"
+            "api",
+            "access-resource"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Filter Resource",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "type": "text",
+            "value": "application/json"
+          },
+          {
+            "key": "",
+            "type": "text",
+            "value": ""
+          },
+          {
+            "key": "Content-Type",
+            "name": "Content-Type",
+            "type": "text",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"userId\": \"UNIQUE-USER-ID\",\n\t\"userRoles\": [\"caseworker\"],\n\t\"resource\": {\n\t\t\"id\": \"my-super-resource-id\",\n\t\t\"definition\": {\n\t\t\t\"serviceName\": \"cmc\",\n\t\t\t\"resourceType\": \"case\",\n\t\t\t\"resourceName\": \"claim\"\n\t\t},\n\t\t\"data\": {\n\t\t\t\"test\": \"test\"\n\t\t}\n\t},\n\t \"attributeSecurityClassification\":{ \n\t \t\"\": \"PUBLIC\"\n\t }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3704/api/filter-resource",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3704",
+          "path": [
+            "api",
+            "filter-resource"
+          ],
+          "query": [
+            {
+              "key": "",
+              "value": "",
+              "disabled": true
+            }
           ]
         }
       },
@@ -120,7 +120,7 @@
     {
       "name": "Revoke Resource Access",
       "request": {
-        "method": "POST",
+        "method": "DELETE",
         "header": [
           {
             "key": "Content-Type",
@@ -136,14 +136,14 @@
           "raw": "{\n    \"resourceId\": \"my-super-resource-id\",\n    \"accessorId\": \"UNIQUE-USER-ID\",\n    \"accessorType\": \"USER\",\n    \"resourceDefinition\": {\n    \t\"serviceName\": \"cmc\",\n    \t\"resourceType\": \"case\",\n    \t\"resourceName\": \"claim\"\n    },\n    \"attribute\": \"\",\n    \"relationship\": \"caseworker\"\n}"
         },
         "url": {
-          "raw": "localhost:3703/lib/revoke-resource-access",
+          "raw": "localhost:3704/api/access-resource",
           "host": [
             "localhost"
           ],
-          "port": "3703",
+          "port": "3704",
           "path": [
-            "lib",
-            "revoke-resource-access"
+            "api",
+            "access-resource"
           ]
         }
       },

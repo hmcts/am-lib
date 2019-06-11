@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.amlib.models;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
@@ -30,6 +31,11 @@ public final class ExplicitAccessGrant {
     @NotNull
     private final AccessorType accessorType;
     @NotEmpty
+    @ApiModelProperty(
+        name = "attributePermissions",
+        example  = "{\"/attribute1\": [\"CREATE\",\"READ\",\"UPDATE\"],\"/attribute2\": [\"READ\",\"UPDATE\"],"
+            + "\"/attribute3\": [\"READ\"]}",
+        dataType = "Map[String,List]")
     private final Map<@NotNull JsonPointer, @NotEmpty Set<@NotNull Permission>> attributePermissions;
     @NotBlank
     private final String relationship;

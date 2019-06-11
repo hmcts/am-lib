@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.UNSUPPORTED_MEDIA_TY
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
-public class AmResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+public class AccessManagementResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     @ResponseBody

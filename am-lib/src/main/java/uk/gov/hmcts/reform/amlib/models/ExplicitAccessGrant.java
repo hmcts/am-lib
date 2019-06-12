@@ -35,7 +35,7 @@ public final class ExplicitAccessGrant {
         name = "attributePermissions",
         example  = "{\"/attribute1\": [\"CREATE\",\"READ\",\"UPDATE\"],\"/attribute2\": [\"READ\",\"UPDATE\"],"
             + "\"/attribute3\": [\"READ\"]}",
-        dataType = "Map[String,List]")
+        dataType = "Map[String,Set]")
     private final Map<@NotNull JsonPointer, @NotEmpty Set<@NotNull Permission>> attributePermissions;
     @NotBlank
     private final String relationship;

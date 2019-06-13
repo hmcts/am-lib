@@ -25,5 +25,4 @@ public class SwaggerConfiguration {
             .build().directModelSubstitute(JsonPointer.class, String.class)
             .directModelSubstitute(JsonNode.class,String.class);
     }
-
 }

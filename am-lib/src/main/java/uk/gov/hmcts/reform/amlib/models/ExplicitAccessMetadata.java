@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.amlib.models;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
@@ -25,9 +26,12 @@ public final class ExplicitAccessMetadata {
     @NotNull
     private final AccessorType accessorType;
     @NotNull
+    @ApiModelProperty(name = "attribute", value = "/attribute1",  dataType = "String")
     private final JsonPointer attribute;
+
     private final String relationship;
 
+    @ApiModelProperty(hidden = true)
     public String getAttributeAsString() {
         return getAttribute().toString();
     }

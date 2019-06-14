@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amapi.models.FilterResource;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
@@ -42,6 +44,7 @@ public class AccessManagementController {
     })
     @PostMapping(value = "/access-resource", consumes = (APPLICATION_JSON_VALUE))
     @ResponseStatus(CREATED)
+    @ResponseBody
     public ResponseEntity<ExplicitAccessGrant> createResourceAccess(@RequestBody ExplicitAccessGrant
                                                                         explicitAccessGrantData) {
         accessManagementService.grantExplicitResourceAccess(explicitAccessGrantData);
@@ -76,8 +79,9 @@ public class AccessManagementController {
         @ApiResponse(code = 500, message = "Internal server error")
     })
     @PostMapping(value = "/filter-resource", consumes = (APPLICATION_JSON_VALUE))
-    public FilteredResourceEnvelope filterResource(@RequestBody FilterResource request) {
-        return accessManagementService.filterResource(request.getUserId(), request.getUserRoles(),
-            request.getResource(), request.getAttributeSecurityClassification());
+    @ResponseBody
+    public ResponseEntity<FilteredResourceEnvelope> filterResource(@RequestBody FilterResource request) {
+        return new ResponseEntity<>(accessManagementService.filterResource(request.getUserId(), request.getUserRoles(),
+            request.getResource(), request.getAttributeSecurityClassification()), OK);
     }
 }

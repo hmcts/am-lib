@@ -93,23 +93,27 @@ public class AccessManagementService {
         + "{{accessGrant.resourceDefinition.resourceName}}' for accessors '{{accessGrant.accessorIds}}' "
         + "with relationship '{{accessGrant.relationship}}': {{accessGrant.attributePermissions}}")
     public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant accessGrant) {
-        jdbi.useTransaction(handle -> {
-            AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
-            accessGrant.getAccessorIds().forEach(accessorIds ->
-                accessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
-                    ExplicitAccessRecord.builder()
-                        .resourceId(accessGrant.getResourceId())
-                        .accessorId(accessorIds)
-                        .permissions(attributePermission.getValue())
-                        .accessorType(accessGrant.getAccessorType())
-                        .serviceName(accessGrant.getResourceDefinition().getServiceName())
-                        .resourceType(accessGrant.getResourceDefinition().getResourceType())
-                        .resourceName(accessGrant.getResourceDefinition().getResourceName())
-                        .attribute(attributePermission.getKey())
-                        .relationship(accessGrant.getRelationship())
-                        .build())
-                    .forEach(dao::createAccessManagementRecord));
-        });
+        try {
+            jdbi.useTransaction(handle -> {
+                AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
+                accessGrant.getAccessorIds().forEach(accessorIds ->
+                    accessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
+                        ExplicitAccessRecord.builder()
+                            .resourceId(accessGrant.getResourceId())
+                            .accessorId(accessorIds)
+                            .permissions(attributePermission.getValue())
+                            .accessorType(accessGrant.getAccessorType())
+                            .serviceName(accessGrant.getResourceDefinition().getServiceName())
+                            .resourceType(accessGrant.getResourceDefinition().getResourceType())
+                            .resourceName(accessGrant.getResourceDefinition().getResourceName())
+                            .attribute(attributePermission.getKey())
+                            .relationship(accessGrant.getRelationship())
+                            .build())
+                        .forEach(dao::createAccessManagementRecord));
+            });
+        } catch (Exception ex) {
+            throw new PersistenceException(ex);
+        }
     }
 
     /**
@@ -163,7 +167,7 @@ public class AccessManagementService {
      * @return envelope {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions if
      * access to resource is configured, otherwise null.
      * @throws PersistenceException if any persistence errors were encountered,
-     * or NoSuchElementException if root element missing
+     *                              or NoSuchElementException if root element missing
      */
     @AuditLog("filtered access to resource '{{resource.id}}' defined as '{{resource.definition.serviceName}}|"
         + "{{resource.definition.resourceType}}|{{resource.definition.resourceName}}' for accessor '{{userId}}' "

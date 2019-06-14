@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.UNSUPPORTED_MEDIA_TY
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
+@EnableWebMvc
 public class AccessManagementResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
@@ -116,7 +118,7 @@ public class AccessManagementResponseEntityExceptionHandler extends ResponseEnti
 
     @ResponseBody
     @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class, RuntimeException.class})
-    public ResponseEntity<Object> handleInternalServerErrors(RuntimeException ex, WebRequest request) {
+    public ResponseEntity<Object> handleInternalServerErrors(RuntimeException ex) {
 
         ErrorResponse errorDetails = ErrorResponse.builder()
             .errorDescription(getRootException(ex).getLocalizedMessage())

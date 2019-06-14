@@ -95,8 +95,12 @@ public class DefaultRoleSetupImportService {
     @AuditLog(value = "added resource defined as '{{resourceDefinition.serviceName}}"
         + "|{{resourceDefinition.resourceType}}|{{resourceDefinition.resourceName}}'", severity = DEBUG)
     public void addResourceDefinition(@NotNull @Valid ResourceDefinition resourceDefinition) {
-        jdbi.useExtension(DefaultRoleSetupRepository.class, dao ->
-            dao.addResourceDefinition(resourceDefinition));
+        try {
+            jdbi.useExtension(DefaultRoleSetupRepository.class, dao ->
+                dao.addResourceDefinition(resourceDefinition));
+        } catch (Exception exe) {
+            throw new PersistenceException(exe);
+        }
     }
 
     /**
@@ -112,29 +116,33 @@ public class DefaultRoleSetupImportService {
         + "{{accessGrant.resourceDefinition.resourceName}}' for role '{{accessGrant.roleName}}': "
         + "{{accessGrant.attributePermissions}}")
     public void grantDefaultPermission(@NotNull @Valid DefaultPermissionGrant accessGrant) {
-        jdbi.useTransaction(handle -> {
-            DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
-            accessGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
-                dao.createResourceAttribute(ResourceAttribute.builder()
-                    .serviceName(accessGrant.getResourceDefinition().getServiceName())
-                    .resourceName(accessGrant.getResourceDefinition().getResourceName())
-                    .resourceType(accessGrant.getResourceDefinition().getResourceType())
-                    .attribute(attribute)
-                    .defaultSecurityClassification(permissionAndClassification.getValue())
-                    .build()
-                );
-
-                dao.grantDefaultPermission(
-                    RoleBasedAccessRecord.builder()
+        try {
+            jdbi.useTransaction(handle -> {
+                DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
+                accessGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
+                    dao.createResourceAttribute(ResourceAttribute.builder()
                         .serviceName(accessGrant.getResourceDefinition().getServiceName())
-                        .resourceType(accessGrant.getResourceDefinition().getResourceType())
                         .resourceName(accessGrant.getResourceDefinition().getResourceName())
+                        .resourceType(accessGrant.getResourceDefinition().getResourceType())
                         .attribute(attribute)
-                        .roleName(accessGrant.getRoleName())
-                        .permissions(permissionAndClassification.getKey())
-                        .build());
+                        .defaultSecurityClassification(permissionAndClassification.getValue())
+                        .build()
+                    );
+
+                    dao.grantDefaultPermission(
+                        RoleBasedAccessRecord.builder()
+                            .serviceName(accessGrant.getResourceDefinition().getServiceName())
+                            .resourceType(accessGrant.getResourceDefinition().getResourceType())
+                            .resourceName(accessGrant.getResourceDefinition().getResourceName())
+                            .attribute(attribute)
+                            .roleName(accessGrant.getRoleName())
+                            .permissions(permissionAndClassification.getKey())
+                            .build());
+                });
             });
-        });
+        } catch (Exception exe) {
+            throw new PersistenceException(exe);
+        }
     }
 
     /**

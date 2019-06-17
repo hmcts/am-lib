@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.amlib.models;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -20,6 +21,10 @@ public final class Resource {
     @Valid
     private final ResourceDefinition definition;
     @NotNull
+    @ApiModelProperty(
+        name = "data",
+        example  = "{\"attribute\":\"string\"}",
+        dataType = "string")
     private final JsonNode data;
 
     @JsonPOJOBuilder(withPrefix = "")

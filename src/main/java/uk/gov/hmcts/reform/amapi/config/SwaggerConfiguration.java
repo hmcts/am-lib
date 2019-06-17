@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.amapi.config;
 
+import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
@@ -20,7 +22,7 @@ public class SwaggerConfiguration {
             .select()
             .apis(RequestHandlerSelectors.basePackage(Application.class.getPackage().getName() + ".controllers"))
             .paths(PathSelectors.any())
-            .build();
+            .build().directModelSubstitute(JsonPointer.class, String.class)
+            .directModelSubstitute(JsonNode.class,String.class);
     }
-
 }

@@ -25,7 +25,6 @@ class PipelineSimulation extends Simulation {
       global.responseTime.max.lt(30000)
     )
 */
-
   setUp(
     BasicScenarios.createResourceAccess.inject(
         constantUsersPerSec(100) during (10 minutes)).protocols(httpProtocol),

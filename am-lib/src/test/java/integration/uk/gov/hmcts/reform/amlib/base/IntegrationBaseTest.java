@@ -52,7 +52,7 @@ public abstract class IntegrationBaseTest {
         configuration.dataSource(db.getJdbcUrl(), db.getUsername(), db.getPassword());
         // Due sql migrations have to be in main resources, there are not added to classpath
         // so workaround is to pass relative path to them
-        configuration.locations("filesystem:src/main/resources/db/migration");
+        configuration.locations("filesystem:src/flyway");
         Flyway flyway = new Flyway(configuration);
         flyway.migrate();
     }

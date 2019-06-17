@@ -36,9 +36,9 @@ class PipelineSimulation extends Simulation {
   )
   .throttle(
     reachRps(100) in (10 seconds),
-    holdFor(1 minute),
+    holdFor(2 minute),
     jumpToRps(50),
-    holdFor(5 minutes)
+    holdFor(10 minutes)
   )
   .assertions(
       global.failedRequests.count.is(0),

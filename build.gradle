@@ -258,7 +258,7 @@ test {
 
 integration {
     useJUnitPlatform()
-} 
+}
 
 functional {
     useJUnitPlatform()

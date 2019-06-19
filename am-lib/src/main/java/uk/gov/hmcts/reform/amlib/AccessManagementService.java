@@ -183,7 +183,7 @@ public class AccessManagementService {
         }
 
         List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getExplicitAccess(userId, resource.getId()));
+            dao -> dao.getExplicitAccess(userId, resource.getId(), resource.getDefinition().getResourceType()));
 
         Map<JsonPointer, Set<Permission>> attributePermissions;
         AccessType accessType;

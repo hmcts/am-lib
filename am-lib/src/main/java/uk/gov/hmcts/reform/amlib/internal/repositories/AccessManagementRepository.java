@@ -41,9 +41,9 @@ public interface AccessManagementRepository {
         + "and (access_management.attribute = :attributeAsString or access_management.attribute like concat(:attributeAsString, '/', '%'))")
     void removeAccessManagementRecord(@BindBean ExplicitAccessMetadata explicitAccessMetadata);
 
-    @SqlQuery("select * from access_management where accessor_id=? and resource_id=? and resource_type=?")
+    @SqlQuery("select * from access_management where accessor_id=? and resource_id=?")
     @RegisterConstructorMapper(ExplicitAccessRecord.class)
-    List<ExplicitAccessRecord> getExplicitAccess(String accessorId, String resourceId, String resourceType);
+    List<ExplicitAccessRecord> getExplicitAccess(String accessorId, String resourceId);
 
     @SuppressWarnings("PMD.UseObjectForClearerAPI") // More than 3 parameters makes sense for now, subject to change
     @SqlQuery("select * from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType and resource_name = :resourceName and role_name = :roleName")

@@ -77,7 +77,6 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             createResourceDefinition(serviceName, UUID.randomUUID().toString(), UUID.randomUUID().toString()));
     }
 
-
     @Test
     void whenRowExistsAndHasReadPermissionsShouldReturnEnvelopeWithData() {
         service.grantExplicitResourceAccess(createGrantForWholeDocument(
@@ -90,34 +89,6 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .resource(Resource.builder()
                 .id(resourceId)
                 .definition(resourceDefinition)
-                .data(createSecurityClassificationData())
-                .build())
-            .userSecurityClassification(PUBLIC)
-            .access(AccessEnvelope.builder()
-                .permissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(READ)))
-                .accessType(EXPLICIT)
-                .build())
-            .relationships(ImmutableSet.of(idamRoleWithRoleBaseAccess))
-            .build());
-    }
-
-    @Test
-    void whenSameResourceWithMultipleResourceDefinitionExistsShouldReturnEnvelopeBasedOnResourceType() {
-
-        ResourceDefinition secondResourceDefinition =
-            createResourceDefinition(serviceName, UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        importerService.addResourceDefinition(secondResourceDefinition);
-
-        service.grantExplicitResourceAccess(createGrantForWholeDocument(
-            resourceId, accessorId, idamRoleWithRoleBaseAccess, secondResourceDefinition, ImmutableSet.of(READ)));
-
-        FilteredResourceEnvelope result = service.filterResource(
-            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, secondResourceDefinition, createSecurityClassificationData()), createDefaultSecurityClassifications());
-
-        assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
-            .resource(Resource.builder()
-                .id(resourceId)
-                .definition(secondResourceDefinition)
                 .data(createSecurityClassificationData())
                 .build())
             .userSecurityClassification(PUBLIC)

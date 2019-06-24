@@ -103,6 +103,13 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenSameResourceWithMultipleResourceDefinitionExistsShouldReturnEnvelopeBasedOnResourceType() {
 
+        ResourceDefinition firstResourceDefinition =
+            createResourceDefinition(serviceName, UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        importerService.addResourceDefinition(firstResourceDefinition);
+
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, accessorId, idamRoleWithRoleBaseAccess, firstResourceDefinition, ImmutableSet.of(READ)));
+
         ResourceDefinition secondResourceDefinition =
             createResourceDefinition(serviceName, UUID.randomUUID().toString(), UUID.randomUUID().toString());
         importerService.addResourceDefinition(secondResourceDefinition);

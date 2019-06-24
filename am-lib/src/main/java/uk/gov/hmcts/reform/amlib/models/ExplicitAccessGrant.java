@@ -37,7 +37,7 @@ public final class ExplicitAccessGrant {
             + "\"/attribute3\": [\"READ\"]}",
         dataType = "Map[String,Set]")
     private final Map<@NotNull JsonPointer, @NotEmpty Set<@NotNull Permission>> attributePermissions;
-    @NotBlank
+
     private final String relationship;
 
     @JsonPOJOBuilder(withPrefix = "")

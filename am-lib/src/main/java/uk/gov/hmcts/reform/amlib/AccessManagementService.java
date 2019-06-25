@@ -187,7 +187,7 @@ public class AccessManagementService {
                                                    @NotEmpty Set<@NotBlank String> userRoles,
                                                    @NotNull @Valid Resource resource) {
 
-        return filterResource(userId, userRoles, resource, null);
+        return filter(userId, userRoles, resource, null);
     }
 
     /**
@@ -204,6 +204,18 @@ public class AccessManagementService {
      * @throws PersistenceException if any persistence errors were encountered,
      * or NoSuchElementException if root element missing
      */
+    public FilteredResourceEnvelope filterResource(@NotBlank String userId,
+                                                   @NotEmpty Set<@NotBlank String> userRoles,
+                                                   @NotNull @Valid Resource resource,
+                                                   @NotEmpty @Valid Map<@NotNull JsonPointer, SecurityClassification>
+                                                       attributeSecurityClassifications) {
+
+        if (attributeSecurityClassifications.get(JsonPointer.valueOf("")) == null) {
+            throw new NoSuchElementException("Root element not found in input Security Classification");
+        }
+
+        return filter(userId, userRoles, resource, attributeSecurityClassifications);
+    }
 
     @AuditLog("filtered access to resource '{{resource.id}}' defined as '{{resource.definition.serviceName}}|"
         + "{{resource.definition.resourceType}}|{{resource.definition.resourceName}}' for accessor '{{userId}}' "
@@ -211,11 +223,11 @@ public class AccessManagementService {
         + "{{result.access.accessType}} access with relationships {{result.relationships}} "
         + "and permissions {{result.access.permissions}} and user security classification "
         + "is {{result.userSecurityClassification}}")
-    public FilteredResourceEnvelope filterResource(@NotBlank String userId,
-                                                   @NotEmpty Set<@NotBlank String> userRoles,
-                                                   @NotNull @Valid Resource resource,
-                                                   @NotEmpty @Valid Map<@NotNull JsonPointer, SecurityClassification>
-                                                       attributeSecurityClassifications) {
+    private FilteredResourceEnvelope filter(@NotBlank String userId,
+                                            @NotEmpty Set<@NotBlank String> userRoles,
+                                            @NotNull @Valid Resource resource,
+                                            @NotEmpty @Valid Map<@NotNull JsonPointer, SecurityClassification>
+                                                attributeSecurityClassifications) {
 
         List<ExplicitAccessRecord> explicitAccessRecords = getExplicitAccessRecords(userId, resource);
 
@@ -245,11 +257,6 @@ public class AccessManagementService {
             visibleAttributePermissions = attributePermissions;
 
         } else {
-
-            if (attributeSecurityClassifications.get(JsonPointer.valueOf("")) == null) {
-                throw new NoSuchElementException("Root element not found in input Security Classification");
-            }
-
             Integer maxSecurityClassificationHierarchy = getMaxSecurityClassificationHierarchyForRoles(userRoles);
             Set<SecurityClassification> visibleSecurityClassificationsForUser = SecurityClassifications
                 .getVisibleSecurityClassifications(maxSecurityClassificationHierarchy);

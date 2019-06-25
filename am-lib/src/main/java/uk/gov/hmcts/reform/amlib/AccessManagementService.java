@@ -143,7 +143,7 @@ public class AccessManagementService {
                                                          @NotEmpty Set<@NotBlank String> userRoles,
                                                          @NotNull List<@NotNull @Valid Resource> resources) {
         return resources.stream()
-            .map(resource -> filterResource(userId, userRoles, resource, null))
+            .map(resource -> filterResource(userId, userRoles, resource))
             .collect(toList());
     }
 

@@ -59,10 +59,6 @@ public interface DatabaseHelperRepository {
         + "where resource_id = :resourceId")
     int countExplicitPermissions(String resourceId);
 
-    @SqlQuery("select relationship from access_management "
-        + "where resource_id = :resourceId")
-    String getNullRelationShipForAnnotation(String resourceId);
-
     @SqlQuery("select * from access_management "
         + "where resource_id = :resourceId")
     @RegisterConstructorMapper(ExplicitAccessRecord.class)

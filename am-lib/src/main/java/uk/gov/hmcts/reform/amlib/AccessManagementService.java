@@ -303,10 +303,11 @@ public class AccessManagementService {
         List<ExplicitAccessRecord> explicitAccessRecords) {
 
         List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccessRecords.stream()
-                .collect(collectingAndThen(groupingByWithNullKeys(ExplicitAccessRecord::getRelationship), Map::values)).stream()
-                    .map(explicitAccessRecords -> explicitAccessRecords.stream()
-                        .collect(getMapCollector()))
-                .collect(toList());
+            .collect(collectingAndThen(groupingByWithNullKeys(ExplicitAccessRecord::getRelationship), Map::values))
+            .stream()
+                .map(explicitAccessRecordsForRelationship -> explicitAccessRecordsForRelationship.stream()
+                    .collect(getMapCollector()))
+            .collect(toList());
 
         return permissionsService.merge(permissionsForRelationships);
     }

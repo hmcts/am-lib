@@ -406,8 +406,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             createPermissions(nestedAttribute, ImmutableSet.of(CREATE,READ))));
 
         FilteredResourceEnvelope result = service.filterResource(
-            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition),
-            createPublicSecurityClassifications(rootLevelAttribute, nestedAttribute));
+            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition));
 
 
         assertThat(result).isEqualToComparingFieldByField(FilteredResourceEnvelope.builder()
@@ -416,7 +415,6 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .definition(resourceDefinition)
                 .data(JsonNodeFactory.instance.objectNode())
                 .build())
-            .userSecurityClassification(PUBLIC)
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(
                     JsonPointer.valueOf(rootLevelAttribute), ImmutableSet.of(READ),
@@ -438,8 +436,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             createPermissions(nestedAttribute, ImmutableSet.of(CREATE))));
 
         FilteredResourceEnvelope result = service.filterResource(
-            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition),
-            createPublicSecurityClassifications(rootLevelAttribute, nestedAttribute));
+            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition));
 
         Set<String> exceptedRelationship = new HashSet();
         exceptedRelationship.add(idamRoleWithExplicitAccess);
@@ -451,7 +448,6 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .definition(resourceDefinition)
                 .data(JsonNodeFactory.instance.objectNode())
                 .build())
-            .userSecurityClassification(PUBLIC)
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(
                     JsonPointer.valueOf(rootLevelAttribute), ImmutableSet.of(READ,UPDATE),

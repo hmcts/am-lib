@@ -25,12 +25,14 @@ import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.RolePermissions;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
@@ -40,7 +42,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -202,7 +203,7 @@ public class AccessManagementService {
      * @return envelope {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions if
      * access to resource is configured, otherwise null.
      * @throws PersistenceException if any persistence errors were encountered,
-     * or NoSuchElementException if root element missing
+     *                              or NoSuchElementException if root element missing
      */
     public FilteredResourceEnvelope filterResource(@NotBlank String userId,
                                                    @NotEmpty Set<@NotBlank String> userRoles,
@@ -302,10 +303,10 @@ public class AccessManagementService {
         List<ExplicitAccessRecord> explicitAccessRecords) {
 
         List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccessRecords.stream()
-            .collect(collectingAndThen(groupingBy(ExplicitAccessRecord::getRelationship), Map::values)).stream()
-            .map(relationshipExplicitAccessRecords -> relationshipExplicitAccessRecords.stream()
-                .collect(getMapCollector()))
-            .collect(toList());
+                .collect(collectingAndThen(groupingByWithNullKeys(ExplicitAccessRecord::getRelationship), Map::values)).stream()
+                    .map(explicitAccessRecords -> explicitAccessRecords.stream()
+                        .collect(getMapCollector()))
+                .collect(toList());
 
         return permissionsService.merge(permissionsForRelationships);
     }
@@ -314,6 +315,27 @@ public class AccessManagementService {
         return explicitAccessRecords.stream()
             .map(ExplicitAccessRecord::getRelationship)
             .collect(toSet());
+    }
+
+    /**
+     * check group by when keys are null (eg. usage when relationship key for Annotation is null).
+     *
+     * @param classifier lamda function
+     * @param <T>        Type of Input
+     * @param <A>        Result output
+     * @return
+     */
+    private static <T, A> Collector<T, ?, Map<A, List<T>>> groupingByWithNullKeys(
+        Function<? super T, ? extends A> classifier) {
+        return toMap(
+            classifier,
+            Collections::singletonList,
+            (List<T> oldList, List<T> newCollection) -> {
+                List<T> newList = new ArrayList<>(oldList.size() + 1);
+                newList.addAll(oldList);
+                newList.addAll(newCollection);
+                return newList;
+            });
     }
 
     private Map<JsonPointer, Set<Permission>> filterAttributePermissionsBySecurityClassification(

@@ -18,6 +18,8 @@ import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -27,6 +29,7 @@ import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createPermissionsForAttribute;
@@ -98,6 +101,13 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenSameResourceWithMultipleResourceDefinitionExistsShouldReturnEnvelopeBasedOnResourceType() {
+
+        ResourceDefinition firstResourceDefinition =
+            createResourceDefinition(serviceName, UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        importerService.addResourceDefinition(firstResourceDefinition);
+
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, accessorId, idamRoleWithRoleBaseAccess, firstResourceDefinition, ImmutableSet.of(READ)));
 
         ResourceDefinition secondResourceDefinition =
             createResourceDefinition(serviceName, UUID.randomUUID().toString(), UUID.randomUUID().toString());
@@ -387,6 +397,71 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .build());
     }
 
+    @Test
+    void whenExplicitAccessWithNullRelationshipShouldReturnEnvelope() {
+
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, null, resourceDefinition,
+            createPermissions(rootLevelAttribute, ImmutableSet.of(READ))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, null, resourceDefinition,
+            createPermissions(nestedAttribute, ImmutableSet.of(CREATE,READ))));
+
+        FilteredResourceEnvelope result = service.filterResource(
+            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition),
+            createPublicSecurityClassifications(rootLevelAttribute, nestedAttribute));
+
+
+        assertThat(result).isEqualToComparingFieldByField(FilteredResourceEnvelope.builder()
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(resourceDefinition)
+                .data(JsonNodeFactory.instance.objectNode())
+                .build())
+            .userSecurityClassification(PUBLIC)
+            .access(AccessEnvelope.builder()
+                .permissions(ImmutableMap.of(
+                    JsonPointer.valueOf(rootLevelAttribute), ImmutableSet.of(READ),
+                    JsonPointer.valueOf(nestedAttribute), ImmutableSet.of(CREATE,READ)))
+                .accessType(EXPLICIT)
+                .build())
+            .relationships(Collections.singleton(null))
+            .build());
+    }
+
+    @Test
+    void mergeResultEnvelopeWhenExplicitAccessWithNullRelationshipAndNotnullRelationShip() {
+
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, null, resourceDefinition,
+            createPermissions(rootLevelAttribute, ImmutableSet.of(UPDATE))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition,
+            createPermissions(rootLevelAttribute, ImmutableSet.of(READ))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition,
+            createPermissions(nestedAttribute, ImmutableSet.of(CREATE))));
+
+        FilteredResourceEnvelope result = service.filterResource(
+            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition),
+            createPublicSecurityClassifications(rootLevelAttribute, nestedAttribute));
+
+        Set<String> exceptedRelationship = new HashSet();
+        exceptedRelationship.add(idamRoleWithExplicitAccess);
+        exceptedRelationship.add(null);
+
+        assertThat(result).isEqualToComparingFieldByField(FilteredResourceEnvelope.builder()
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(resourceDefinition)
+                .data(JsonNodeFactory.instance.objectNode())
+                .build())
+            .userSecurityClassification(PUBLIC)
+            .access(AccessEnvelope.builder()
+                .permissions(ImmutableMap.of(
+                    JsonPointer.valueOf(rootLevelAttribute), ImmutableSet.of(READ,UPDATE),
+                    JsonPointer.valueOf(nestedAttribute), ImmutableSet.of(UPDATE, CREATE)))
+                .accessType(EXPLICIT)
+                .build())
+            .relationships(exceptedRelationship)
+            .build());
+    }
+
     private DefaultPermissionGrant createDefaultPermissionGrant(String roleName,
                                                                 ResourceDefinition resourceDefinition,
                                                                 String attribute,
@@ -400,8 +475,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     private JsonNode createData() {
         return JsonNodeFactory.instance.objectNode()
-            .put(rootLevelAttribute.replace("/",""), rootLevelAttributeValue)
-            .set(rootLevelObject.replace("/",""), JsonNodeFactory.instance.objectNode()
+            .put(rootLevelAttribute.replace("/", ""), rootLevelAttributeValue)
+            .set(rootLevelObject.replace("/", ""), JsonNodeFactory.instance.objectNode()
                 .put(rootLevelObjectNestedAttribute, nestedAttributeValue));
     }
 }

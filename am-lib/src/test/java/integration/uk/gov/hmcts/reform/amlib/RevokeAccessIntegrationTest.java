@@ -101,6 +101,14 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
                 .extracting(ExplicitAccessRecord::getAttribute).contains(JsonPointer.valueOf("/test"),
                 JsonPointer.valueOf("/test/nested"));
         }
+
+        @Test
+        void whenRevokingResourceWithNullRelationshipShouldRemoveRecordFromDatabase() {
+            grantExplicitResourceAccess(resourceId, null, "");
+            revokeResourceAccess(resourceId, null, "");
+            assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
+        }
+
     }
 
     @Nested

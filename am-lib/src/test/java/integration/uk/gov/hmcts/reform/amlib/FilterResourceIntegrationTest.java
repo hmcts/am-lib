@@ -433,7 +433,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
                     JsonPointer.valueOf(nestedAttribute), ImmutableSet.of(CREATE,READ)))
                 .accessType(EXPLICIT)
                 .build())
-            .relationships(Collections.singleton(null))
+            .relationships(Collections.emptySet())
             .build());
     }
 
@@ -453,7 +453,6 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         Set<String> exceptedRelationship = new HashSet();
         exceptedRelationship.add(idamRoleWithExplicitAccess);
-        exceptedRelationship.add(null);
 
         assertThat(result).isEqualToComparingFieldByField(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()

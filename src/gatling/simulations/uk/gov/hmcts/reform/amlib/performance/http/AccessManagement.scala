@@ -24,6 +24,9 @@ object AccessManagement {
   def filterResource: HttpRequestBuilder =
     postRequest("/filter-resource", "filterResource.json", 200)
 
+  def filterResourceWithSecurityClassification: HttpRequestBuilder =
+      postRequest("/filter-resource", "filterResourceWithSecurityClassification.json", 200)
+
   def revokeResourceAccess: HttpRequestBuilder =
     deleteRequest("/access-resource", "revokeResourceAccess.json")
 }

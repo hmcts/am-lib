@@ -13,6 +13,13 @@
     "data": {
       "json": "resource"
     }
+  },
+  "attributeSecurityClassification":{ "": "PUBLIC",
+    "/externalId": "PUBLIC",
+    "/referenceNumber": "PUBLIC",
+    "/referenceNumber/claimant": "PUBLIC",
+    "/correspondenceAddress/line1": "PRIVATE",
+    "/defendant/type": "RESTRICTED"
   }
 }
 

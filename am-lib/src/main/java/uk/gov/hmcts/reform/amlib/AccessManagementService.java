@@ -232,7 +232,7 @@ public class AccessManagementService {
                 attributeSecurityClassifications, visibleSecurityClassificationsForUser);
 
         Set<String> relationships = explicitAccess.stream()
-            .map(ExplicitAccessRecord::getRelationship)
+            .map(ExplicitAccessRecord::getRelationship).filter(rel -> rel != null)
             .collect(toSet());
 
         return FilteredResourceEnvelope.builder()

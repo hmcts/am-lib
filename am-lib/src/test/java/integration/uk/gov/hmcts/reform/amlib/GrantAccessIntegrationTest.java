@@ -111,4 +111,13 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .relationship(roleName)
             .build();
     }
+
+    @Test
+    void validateCreatingExplicitAccessWithNullRelationship() {
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, accessorId, null, resourceDefinition, ImmutableSet.of(READ)));
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
+        assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(1)
+            .extracting(ExplicitAccessRecord::getRelationship).first().isNull();
+    }
 }

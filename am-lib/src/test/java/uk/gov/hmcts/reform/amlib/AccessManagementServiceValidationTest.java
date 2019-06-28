@@ -56,29 +56,9 @@ class AccessManagementServiceValidationTest {
             ));
     }
 
-    @ParameterizedTest
+    /*@ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
     void filterResourceMethodShouldRejectInvalidArguments(
-        String userId, Set<String> userRoles, Resource resource) {
-        assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.filterResource(userId, userRoles, resource))
-            .withMessageMatching(expectedValidationMessagesRegex(
-                "userId - must not be blank",
-                "userRoles - must not be empty",
-                "userRoles\\[\\].<iterable element> - must not be blank",
-                "resource - must not be null",
-                "resource.id - must not be blank",
-                "resource.definition - must not be null",
-                "resource.definition.serviceName - must not be blank",
-                "resource.definition.resourceType - must not be blank",
-                "resource.definition.resourceName - must not be blank",
-                "resource.data - must not be null"
-            ));
-    }
-
-    @ParameterizedTest
-    @ArgumentsSource(InvalidArgumentsProvider.class)
-    void filterResourceWithSecurityClassificationMethodShouldRejectInvalidArguments(
         String userId, Set<String> userRoles, Resource resource,
         Map<JsonPointer, SecurityClassification> attributeSecurityClassifications) {
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -93,10 +73,9 @@ class AccessManagementServiceValidationTest {
                 "resource.definition.serviceName - must not be blank",
                 "resource.definition.resourceType - must not be blank",
                 "resource.definition.resourceName - must not be blank",
-                "resource.data - must not be null",
-                "attributeSecurityClassifications - must not be empty"
+                "resource.data - must not be null"
             ));
-    }
+    }*/
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)

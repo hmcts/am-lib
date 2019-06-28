@@ -78,12 +78,7 @@ public class AccessManagementController {
     })
     @PostMapping(value = "/filter-resource", consumes = (APPLICATION_JSON_VALUE))
     public FilteredResourceEnvelope filterResource(@RequestBody FilterResource request) {
-        if (request.getAttributeSecurityClassification() == null) {
-            return accessManagementService.filterResource(request.getUserId(), request.getUserRoles(),
-                request.getResource());
-        } else {
-            return accessManagementService.filterResource(request.getUserId(), request.getUserRoles(),
-                request.getResource(), request.getAttributeSecurityClassification());
-        }
+        return accessManagementService.filterResource(request.getUserId(), request.getUserRoles(),
+            request.getResource(), request.getAttributeSecurityClassification());
     }
 }

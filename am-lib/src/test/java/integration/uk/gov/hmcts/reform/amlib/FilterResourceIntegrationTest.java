@@ -83,7 +83,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         FilteredResourceEnvelope result = service.filterResource(
             accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess),
-            createResource(resourceId, resourceDefinition, createData()));
+            createResource(resourceId, resourceDefinition, createData()), null);
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
@@ -118,7 +118,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         FilteredResourceEnvelope result = service.filterResource(
             accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess),
-            createResource(resourceId, secondResourceDefinition, createData()));
+            createResource(resourceId, secondResourceDefinition, createData()), null);
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
@@ -140,7 +140,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             resourceId, accessorId, idamRoleWithRoleBaseAccess, resourceDefinition, ImmutableSet.of(CREATE)));
 
         FilteredResourceEnvelope result = service.filterResource(
-            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition));
+            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition),
+            null);
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
@@ -163,7 +164,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         FilteredResourceEnvelope result = service.filterResource(
             nonExistingUserId, ImmutableSet.of(idamRoleWithRoleBaseAccess),
-            createResource(nonExistingResourceId, resourceDefinition));
+            createResource(nonExistingResourceId, resourceDefinition),null);
 
         assertThat(result).isNull();
     }
@@ -175,7 +176,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         FilteredResourceEnvelope result = service.filterResource(
             accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess),
-            createResource(resourceId, resourceDefinition, createData()));
+            createResource(resourceId, resourceDefinition, createData()), null);
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
@@ -194,7 +195,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenNoExplicitAccessAndRoleHasExplicitAccessTypeShouldReturnNull() {
         FilteredResourceEnvelope result = service.filterResource(accessorId,
-            ImmutableSet.of(idamRoleWithExplicitAccess), createResource(resourceId, resourceDefinition));
+            ImmutableSet.of(idamRoleWithExplicitAccess), createResource(resourceId, resourceDefinition),
+            null);
 
         assertThat(result).isNull();
     }
@@ -212,7 +214,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         FilteredResourceEnvelope result = service.filterResource(
             accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess, idamRoleWithExplicitAccess),
-            createResource(resourceId, resourceDefinition, createData()));
+            createResource(resourceId, resourceDefinition, createData()), null);
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
@@ -237,8 +239,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             createResource(resourceId, resourceDefinition, createData()),
             createResource(resourceId + 2, resourceDefinition, createData()));
 
-        List<FilteredResourceEnvelope> result = service.filterResource(accessorId,
-            ImmutableSet.of(idamRoleWithRoleBaseAccess), resources);
+        List<FilteredResourceEnvelope> result = service.filterResources(accessorId,
+            ImmutableSet.of(idamRoleWithRoleBaseAccess), resources, null);
 
         List<FilteredResourceEnvelope> expectedResult = ImmutableList.of(
             FilteredResourceEnvelope.builder()
@@ -279,7 +281,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             createResource(resourceId + 2, resourceDefinition));
 
         List<FilteredResourceEnvelope> result =
-            service.filterResource(accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), resources);
+            service.filterResources(accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), resources,
+                null);
 
         List<FilteredResourceEnvelope> expectedResult = ImmutableList.of(
             FilteredResourceEnvelope.builder()
@@ -315,7 +318,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         List<Resource> resources = ImmutableList.of();
 
         List<FilteredResourceEnvelope> result =
-            service.filterResource(accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), resources);
+            service.filterResources(accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), resources,
+                null);
 
         assertThat(result).isEmpty();
     }
@@ -328,7 +332,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             resourceDefinition, createPermissions(rootLevelAttribute, ImmutableSet.of(CREATE))));
 
         FilteredResourceEnvelope result = service.filterResource(accessorId,
-            ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition));
+            ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition),
+            null);
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
@@ -353,7 +358,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             resourceDefinition, createPermissions(nestedAttribute, ImmutableSet.of(CREATE))));
 
         FilteredResourceEnvelope result = service.filterResource(
-            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition));
+            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition),
+            null);
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
@@ -379,7 +385,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             resourceDefinition, createPermissions(nestedAttribute, ImmutableSet.of(CREATE))));
 
         FilteredResourceEnvelope result = service.filterResource(
-            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition));
+            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition),
+            null);
 
         assertThat(result).isEqualToComparingFieldByField(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
@@ -406,7 +413,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             createPermissions(nestedAttribute, ImmutableSet.of(CREATE,READ))));
 
         FilteredResourceEnvelope result = service.filterResource(
-            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition));
+            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition),
+            null);
 
 
         assertThat(result).isEqualToComparingFieldByField(FilteredResourceEnvelope.builder()
@@ -436,7 +444,8 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             createPermissions(nestedAttribute, ImmutableSet.of(CREATE))));
 
         FilteredResourceEnvelope result = service.filterResource(
-            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition));
+            accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition),
+            null);
 
         Set<String> exceptedRelationship = new HashSet();
         exceptedRelationship.add(idamRoleWithExplicitAccess);

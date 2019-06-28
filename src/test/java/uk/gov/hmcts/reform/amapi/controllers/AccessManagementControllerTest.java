@@ -134,7 +134,8 @@ public class AccessManagementControllerTest {
 
         Mockito.when(accessManagementService.filterResource(filterResource.getUserId(),
             filterResource.getUserRoles(),
-            filterResource.getResource()))
+            filterResource.getResource(),
+            filterResource.getAttributeSecurityClassification()))
             .thenReturn(filteredResourceEnvelope);
 
         this.mockMvc.perform(post("/api/filter-resource")

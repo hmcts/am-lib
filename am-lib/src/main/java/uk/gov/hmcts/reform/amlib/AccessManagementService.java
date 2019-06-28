@@ -131,25 +131,6 @@ public class AccessManagementService {
     }
 
     /**
-     * Filters a list of {@link JsonNode} to remove fields that user has no access to (no READ permission) and returns
-     * an envelope response consisting of id, filtered json and permissions for attributes.
-     *
-     * @param userId                           accessor ID
-     * @param userRoles                        accessor roles
-     * @param resources                        envelope {@link Resource} and corresponding metadata
-     * @return envelope list of {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions
-     * if access to resource is configured, otherwise null
-     * @throws PersistenceException if any persistence errors were encountered
-     */
-    public List<FilteredResourceEnvelope> filterResource(@NotBlank String userId,
-                                                         @NotEmpty Set<@NotBlank String> userRoles,
-                                                         @NotNull List<@NotNull @Valid Resource> resources) {
-        return resources.stream()
-            .map(resource -> filterResource(userId, userRoles, resource))
-            .collect(toList());
-    }
-
-    /**
      * Filters a list of {@link JsonNode} to remove fields that user has no access to (no READ permission or
      * insufficient security classification) and returns an envelope response consisting of id, filtered json
      * and permissions for attributes.
@@ -162,34 +143,14 @@ public class AccessManagementService {
      * if access to resource is configured, otherwise null
      * @throws PersistenceException if any persistence errors were encountered
      */
-    public List<FilteredResourceEnvelope> filterResource(@NotBlank String userId,
-                                                         @NotEmpty Set<@NotBlank String> userRoles,
-                                                         @NotNull List<@NotNull @Valid Resource> resources,
-                                                         @NotEmpty @Valid Map<JsonPointer, SecurityClassification>
-                                                             attributeSecurityClassifications) {
+    public List<FilteredResourceEnvelope> filterResources(@NotBlank String userId,
+                                                          @NotEmpty Set<@NotBlank String> userRoles,
+                                                          @NotNull List<@NotNull @Valid Resource> resources,
+                                                          Map<JsonPointer, SecurityClassification>
+                                                              attributeSecurityClassifications) {
         return resources.stream()
             .map(resource -> filterResource(userId, userRoles, resource, attributeSecurityClassifications))
             .collect(toList());
-    }
-
-    /**
-     * Filters {@link JsonNode} to remove fields that user has no access to (no READ permission or insufficient
-     * security classification). In addition to that method also returns map of all permissions that user has to
-     * resource.
-     *
-     * @param userId                           accessor ID
-     * @param userRoles                        accessor roles
-     * @param resource                         envelope {@link Resource} and corresponding metadata
-     * @return envelope {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions if
-     * access to resource is configured, otherwise null.
-     * @throws PersistenceException if any persistence errors were encountered,
-     * or NoSuchElementException if root element missing
-     */
-    public FilteredResourceEnvelope filterResource(@NotBlank String userId,
-                                                   @NotEmpty Set<@NotBlank String> userRoles,
-                                                   @NotNull @Valid Resource resource) {
-
-        return filter(userId, userRoles, resource, null);
     }
 
     /**
@@ -206,18 +167,6 @@ public class AccessManagementService {
      * @throws PersistenceException if any persistence errors were encountered,
      *                              or NoSuchElementException if root element missing
      */
-    public FilteredResourceEnvelope filterResource(@NotBlank String userId,
-                                                   @NotEmpty Set<@NotBlank String> userRoles,
-                                                   @NotNull @Valid Resource resource,
-                                                   @NotEmpty @Valid Map<@NotNull JsonPointer, SecurityClassification>
-                                                       attributeSecurityClassifications) {
-
-        if (attributeSecurityClassifications.get(JsonPointer.valueOf("")) == null) {
-            throw new NoSuchElementException("Root element not found in input Security Classification");
-        }
-
-        return filter(userId, userRoles, resource, attributeSecurityClassifications);
-    }
 
     @AuditLog("filtered access to resource '{{resource.id}}' defined as '{{resource.definition.serviceName}}|"
         + "{{resource.definition.resourceType}}|{{resource.definition.resourceName}}' for accessor '{{userId}}' "
@@ -225,11 +174,16 @@ public class AccessManagementService {
         + "{{result.access.accessType}} access with relationships {{result.relationships}} "
         + "and permissions {{result.access.permissions}} and user security classification "
         + "is {{result.userSecurityClassification}}")
-    private FilteredResourceEnvelope filter(@NotBlank String userId,
-                                            @NotEmpty Set<@NotBlank String> userRoles,
-                                            @NotNull @Valid Resource resource,
-                                            @NotEmpty @Valid Map<@NotNull JsonPointer, SecurityClassification>
-                                                attributeSecurityClassifications) {
+    public FilteredResourceEnvelope filterResource(@NotBlank String userId,
+                                                   @NotEmpty Set<@NotBlank String> userRoles,
+                                                   @NotNull @Valid Resource resource,
+                                                   Map<@NotNull JsonPointer, SecurityClassification>
+                                                        attributeSecurityClassifications) {
+
+        if (attributeSecurityClassifications != null
+            && attributeSecurityClassifications.get(JsonPointer.valueOf("")) == null) {
+            throw new NoSuchElementException("Root element not found in input Security Classification");
+        }
 
         List<ExplicitAccessRecord> explicitAccessRecords = getExplicitAccessRecords(userId, resource);
 

@@ -44,6 +44,7 @@ services:
       - AM_DB_USERNAME=amuser
       - AM_DB_PASSWORD=ampass
       - ENABLE_DB_MIGRATE_IN_SERVICE=true
+      - SPRING_FLYWAY_LOCATIONS=filesystem:am-lib/src/flyway
     ports:
       - 3704:3703
     networks:

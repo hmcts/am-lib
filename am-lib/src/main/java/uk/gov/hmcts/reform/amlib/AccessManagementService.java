@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -315,6 +316,7 @@ public class AccessManagementService {
     private Set<String> getRelationshipsFromExplicitAccessRecords(List<ExplicitAccessRecord> explicitAccessRecords) {
         return explicitAccessRecords.stream()
             .map(ExplicitAccessRecord::getRelationship)
+            .filter(Objects::nonNull)
             .collect(toSet());
     }
 

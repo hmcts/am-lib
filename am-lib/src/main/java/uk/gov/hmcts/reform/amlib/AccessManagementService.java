@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.query.AttributeData;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
 import uk.gov.hmcts.reform.amlib.internal.utils.SecurityClassifications;
-import uk.gov.hmcts.reform.amlib.internal.validation.NullOrNotEmpty;
+import uk.gov.hmcts.reform.amlib.internal.validation.ValidAttributeSecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
 import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -178,15 +178,9 @@ public class AccessManagementService {
     public FilteredResourceEnvelope filterResource(@NotBlank String userId,
                                                    @NotEmpty Set<@NotBlank String> userRoles,
                                                    @NotNull @Valid Resource resource,
-                                                   @NullOrNotEmpty @Valid
+                                                   @ValidAttributeSecurityClassification
                                                            Map<@NotNull JsonPointer, SecurityClassification>
                                                            attributeSecurityClassifications) {
-
-        if (attributeSecurityClassifications != null
-            && hasNoRootAttribute(attributeSecurityClassifications)) {
-            throw new NoSuchElementException(
-                "attributeSecurityClassifications - no security classification for root attribute");
-        }
 
         List<ExplicitAccessRecord> explicitAccessRecords = getExplicitAccessRecords(userId, resource);
 
@@ -240,11 +234,6 @@ public class AccessManagementService {
                 .build())
             .relationships(relationships)
             .build();
-    }
-
-    private Boolean hasNoRootAttribute(Map<JsonPointer, SecurityClassification> attributeSecurityClassification) {
-        return attributeSecurityClassification.isEmpty()
-            || attributeSecurityClassification.get(JsonPointer.valueOf("")) == null;
     }
 
     private List<ExplicitAccessRecord> getExplicitAccessRecords(String userId, Resource resource) {

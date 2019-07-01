@@ -13,8 +13,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ElementType.PARAMETER})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = NullOrNotEmptyValidator.class)
-public @interface NullOrNotEmpty {
+@Constraint(validatedBy = AttributeSecurityClassificationValidator.class)
+public @interface ValidAttributeSecurityClassification {
     String message() default "{javax.validation.constraints.Pattern.message}";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default {};

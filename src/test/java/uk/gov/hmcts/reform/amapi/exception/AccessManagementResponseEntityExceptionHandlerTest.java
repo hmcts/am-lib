@@ -22,7 +22,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -147,7 +146,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
      * @throws Exception when exceptional condition happens
      */
     @Test
-    public void testHandleInternalServerErrors() throws Exception {
+    public void testMissingSecurityClassificationRootError() throws Exception {
 
         String invalidJson = Resources.toString(Resources
             .getResource("exception-mapper-data/filterResourceWithMissingRoot.json"), StandardCharsets.UTF_8);
@@ -156,11 +155,11 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
             .content(invalidJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
-            .andExpect(status().isInternalServerError())
+            .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errorMessage", is(
-                "attributeSecurityClassifications - no security classification for root attribute")))
-            .andExpect(jsonPath("$.status", is("INTERNAL_SERVER_ERROR")))
-            .andExpect(jsonPath("$.errorCode", is(INTERNAL_SERVER_ERROR.value())))
+                "filterResource.attributeSecurityClassifications - no security classification for root attribute")))
+            .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+            .andExpect(jsonPath("$.errorCode", is(BAD_REQUEST.value())))
             .andExpect(jsonPath("$.timeStamp", notNullValue()))
             .andExpect(jsonPath("$.errorDescription", notNullValue()));
     }

@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -309,7 +308,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
 
         grantAllDefaultPermissionsForRole(idamRoleWithRoleBasedRestrictedAccess);
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
             service.filterResource(accessorId, ImmutableSet.of(idamRoleWithRoleBasedRestrictedAccess),
                 createResource(resourceId, resourceDefinition, createSecurityClassificationData()),
                 attributePermissions);

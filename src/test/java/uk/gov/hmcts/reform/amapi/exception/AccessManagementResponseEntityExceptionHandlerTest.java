@@ -157,7 +157,8 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isInternalServerError())
-            .andExpect(jsonPath("$.errorMessage", is("Root element not found in input Security Classification")))
+            .andExpect(jsonPath("$.errorMessage", is(
+                "attributeSecurityClassifications - no security classification for root attribute")))
             .andExpect(jsonPath("$.status", is("INTERNAL_SERVER_ERROR")))
             .andExpect(jsonPath("$.errorCode", is(INTERNAL_SERVER_ERROR.value())))
             .andExpect(jsonPath("$.timeStamp", notNullValue()))

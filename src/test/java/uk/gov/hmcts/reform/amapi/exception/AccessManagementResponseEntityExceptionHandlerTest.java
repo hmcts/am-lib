@@ -108,7 +108,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
     public void testHandleHttpMediaTypeNotSupported() throws Exception {
 
         String inputJson = Resources.toString(Resources
-            .getResource("input-data/filterResource.json"), StandardCharsets.UTF_8);
+            .getResource("input-data/filterResourceWithSecurityClassification.json"), StandardCharsets.UTF_8);
 
         this.mockMvc.perform(post("/api/filter-resource")
             .content(inputJson)
@@ -163,5 +163,4 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
             .andExpect(jsonPath("$.timeStamp", notNullValue()))
             .andExpect(jsonPath("$.errorDescription", notNullValue()));
     }
-
 }

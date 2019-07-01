@@ -29,6 +29,10 @@ public class FilterService {
 
     private static final JsonPointer ROOT_ATTRIBUTE = JsonPointer.valueOf("");
 
+    public JsonNode filterJson(JsonNode resource, Map<JsonPointer, Set<Permission>> attributePermissions) {
+        return filterJson(resource, attributePermissions, null, null);
+    }
+
     public JsonNode filterJson(JsonNode resource,
                                Map<JsonPointer, Set<Permission>> attributePermissions,
                                Map<JsonPointer, SecurityClassification> attributeSecurityClassifications,
@@ -39,8 +43,10 @@ public class FilterService {
 
         createMutationListsBasedOnPermissions(mutationLists, attributePermissions);
 
-        modifyMutationListsBasedOnSecurityClassifications(mutationLists,
-            attributeSecurityClassifications, userSecurityClassifications);
+        if (attributeSecurityClassifications != null) {
+            modifyMutationListsBasedOnSecurityClassifications(mutationLists,
+                attributeSecurityClassifications, userSecurityClassifications);
+        }
 
         if (!mutationLists.getNodesToRetain().contains(ROOT_ATTRIBUTE)) {
             List<JsonPointer> uniqueNodesToRetain = reducePointersToUniqueList(mutationLists.getNodesToRetain());

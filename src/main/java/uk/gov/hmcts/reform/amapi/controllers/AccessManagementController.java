@@ -26,6 +26,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  */
 @RestController
 @RequestMapping("api")
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals"})
 public class AccessManagementController {
 
     @Autowired
@@ -69,7 +70,7 @@ public class AccessManagementController {
     @ApiOperation(value = "Filter access to resource", response = ExplicitAccessGrant.class)
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successfully returns filtered output"),
-        @ApiResponse(code = 415, message = "Unsupported media type.Excepted json"),
+        @ApiResponse(code = 415, message = "Unsupported media type. Expected json"),
         @ApiResponse(code = 401, message = "You are not authorized to perform this particular request. "
             + "Please provide a valid access token in the request"),
         @ApiResponse(code = 400, message = "Incomplete request information or Malformed input request"),

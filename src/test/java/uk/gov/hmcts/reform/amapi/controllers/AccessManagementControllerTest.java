@@ -48,7 +48,8 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports", "PMD.LawOfDemeter"})
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports", "PMD.LawOfDemeter",
+    "PMD.AvoidDuplicateLiterals"})
 public class AccessManagementControllerTest {
 
     @Autowired
@@ -115,6 +116,48 @@ public class AccessManagementControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         final FilterResource filterResource = mapper.readValue(inputJson, FilterResource.class);
+
+        Set<Permission> permissions = new HashSet<>();
+        permissions.add(Permission.CREATE);
+        permissions.add(Permission.READ);
+        permissions.add(Permission.UPDATE);
+
+        Map<JsonPointer, Set<Permission>> attributePermissions = new ConcurrentHashMap<>();
+        attributePermissions.put(JsonPointer.valueOf(""), permissions);
+        AccessEnvelope envelope = AccessEnvelope.builder().permissions(attributePermissions).build();
+
+        Resource resource = Resource.builder().id("1234").data(JsonNodeFactory.instance.objectNode()
+            .put("json", "resource")).build();
+
+        FilteredResourceEnvelope filteredResourceEnvelope = FilteredResourceEnvelope.builder()
+            .resource(resource).access(envelope).build();
+
+        Mockito.when(accessManagementService.filterResource(filterResource.getUserId(),
+            filterResource.getUserRoles(),
+            filterResource.getResource(),
+            filterResource.getAttributeSecurityClassification()))
+            .thenReturn(filteredResourceEnvelope);
+
+        this.mockMvc.perform(post("/api/filter-resource")
+            .content(inputJson)
+            .header(CONTENT_TYPE, APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.resource.id", is("1234")))
+            .andExpect(jsonPath("$.access.permissions").exists())
+            .andExpect(jsonPath("$.access.permissions.*", hasItem(is(containsInAnyOrder("CREATE", "READ", "UPDATE")))))
+            .andExpect(jsonPath("$.resource.data.json", is("resource")));
+    }
+
+    @Test
+    public void testFilterResourceWithSecurityClassification() throws Exception {
+
+        String inputJson = Resources.toString(Resources
+            .getResource("input-data/filterResourceWithSecurityClassification.json"), StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        final FilterResource filterResource = mapper.readValue(inputJson,
+            FilterResource.class);
 
         Set<Permission> permissions = new HashSet<>();
         permissions.add(Permission.CREATE);

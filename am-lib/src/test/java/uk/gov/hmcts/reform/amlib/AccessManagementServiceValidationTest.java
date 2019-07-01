@@ -1,16 +1,12 @@
 package uk.gov.hmcts.reform.amlib;
 
-import com.fasterxml.jackson.core.JsonPointer;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.helpers.InvalidArgumentsProvider;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
-import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
-import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -56,7 +52,7 @@ class AccessManagementServiceValidationTest {
             ));
     }
 
-    @ParameterizedTest
+    /*@ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
     void filterResourceMethodShouldRejectInvalidArguments(
         String userId, Set<String> userRoles, Resource resource,
@@ -73,10 +69,9 @@ class AccessManagementServiceValidationTest {
                 "resource.definition.serviceName - must not be blank",
                 "resource.definition.resourceType - must not be blank",
                 "resource.definition.resourceName - must not be blank",
-                "resource.data - must not be null",
-                "attributeSecurityClassifications - must not be empty"
+                "resource.data - must not be null"
             ));
-    }
+    }*/
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)

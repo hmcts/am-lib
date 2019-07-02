@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.query.AttributeData;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
 import uk.gov.hmcts.reform.amlib.internal.utils.SecurityClassifications;
+import uk.gov.hmcts.reform.amlib.internal.validation.ValidAttributeSecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
 import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -25,12 +26,15 @@ import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.RolePermissions;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
@@ -39,10 +43,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -131,8 +132,9 @@ public class AccessManagementService {
     }
 
     /**
-     * Filters a list of {@link JsonNode} to remove fields that user has no access to (no READ permission) and returns
-     * an envelope response consisting of id, filtered json and permissions for attributes.
+     * Filters a list of {@link JsonNode} to remove fields that user has no access to (no READ permission or
+     * insufficient security classification) and returns an envelope response consisting of id, filtered json
+     * and permissions for attributes.
      *
      * @param userId                           accessor ID
      * @param userRoles                        accessor roles
@@ -142,19 +144,20 @@ public class AccessManagementService {
      * if access to resource is configured, otherwise null
      * @throws PersistenceException if any persistence errors were encountered
      */
-    public List<FilteredResourceEnvelope> filterResource(@NotBlank String userId,
-                                                         @NotEmpty Set<@NotBlank String> userRoles,
-                                                         @NotNull List<@NotNull @Valid Resource> resources,
-                                                         @NotEmpty @Valid Map<JsonPointer, SecurityClassification>
-                                                             attributeSecurityClassifications) {
+    public List<FilteredResourceEnvelope> filterResources(@NotBlank String userId,
+                                                          @NotEmpty Set<@NotBlank String> userRoles,
+                                                          @NotNull List<@NotNull @Valid Resource> resources,
+                                                          Map<JsonPointer, SecurityClassification>
+                                                              attributeSecurityClassifications) {
         return resources.stream()
             .map(resource -> filterResource(userId, userRoles, resource, attributeSecurityClassifications))
             .collect(toList());
     }
 
     /**
-     * Filters {@link JsonNode} to remove fields that user has no access to (no READ permission). In addition to that
-     * method also returns map of all permissions that user has to resource.
+     * Filters {@link JsonNode} to remove fields that user has no access to (no READ permission or insufficient
+     * security classification). In addition to that method also returns map of all permissions that user has to
+     * resource.
      *
      * @param userId                           accessor ID
      * @param userRoles                        accessor roles
@@ -163,8 +166,9 @@ public class AccessManagementService {
      * @return envelope {@link FilteredResourceEnvelope} with resource ID, filtered JSON and map of permissions if
      * access to resource is configured, otherwise null.
      * @throws PersistenceException if any persistence errors were encountered,
-     * or NoSuchElementException if root element missing
+     *                              or NoSuchElementException if root element missing
      */
+
     @AuditLog("filtered access to resource '{{resource.id}}' defined as '{{resource.definition.serviceName}}|"
         + "{{resource.definition.resourceType}}|{{resource.definition.resourceName}}' for accessor '{{userId}}' "
         + "in roles '{{userRoles}}' and SecurityClassification {{attributeSecurityClassifications}} : "
@@ -174,65 +178,48 @@ public class AccessManagementService {
     public FilteredResourceEnvelope filterResource(@NotBlank String userId,
                                                    @NotEmpty Set<@NotBlank String> userRoles,
                                                    @NotNull @Valid Resource resource,
-                                                   @NotEmpty @Valid Map<@NotNull JsonPointer, SecurityClassification>
-                                                       attributeSecurityClassifications) {
+                                                   @ValidAttributeSecurityClassification
+                                                           Map<@NotNull JsonPointer, SecurityClassification>
+                                                           attributeSecurityClassifications) {
 
-        //inThrows NoSuchElementException exception when root is missing
-        if (isNull(attributeSecurityClassifications.get(JsonPointer.valueOf("")))) {
-            throw new NoSuchElementException("Root element not found in input Security Classification");
-        }
-
-        List<ExplicitAccessRecord> explicitAccess = jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getExplicitAccess(userId, resource.getId(), resource.getDefinition().getResourceType()));
+        List<ExplicitAccessRecord> explicitAccessRecords = getExplicitAccessRecords(userId, resource);
 
         Map<JsonPointer, Set<Permission>> attributePermissions;
         AccessType accessType;
+        Set<String> relationships = Collections.emptySet();
 
-        if (explicitAccess.isEmpty()) {
-            Set<String> filteredRoles = filterRolesWithExplicitAccessType(userRoles);
-
-            if (requireNonNull(filteredRoles).isEmpty()) {
-                return null;
-            }
-
-            attributePermissions = getPermissionsToResourceForRoles(resource.getDefinition(), filteredRoles);
-
-            if (attributePermissions == null) {
-                return null;
-            }
-
+        if (explicitAccessRecords.isEmpty()) {
+            attributePermissions = getRoleAttributePermissions(userRoles, resource);
             accessType = ROLE_BASED;
-
         } else {
-            List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccess.stream()
-                .collect(collectingAndThen(groupingBy(ExplicitAccessRecord::getRelationship), Map::values))
-                .stream()
-                .map(explicitAccessRecords -> explicitAccessRecords.stream()
-                    .collect(getMapCollector()))
-                .collect(toList());
-
-            attributePermissions = permissionsService.merge(permissionsForRelationships);
+            attributePermissions = getExplicitAttributePermissions(explicitAccessRecords);
             accessType = EXPLICIT;
+            relationships = getRelationshipsFromExplicitAccessRecords(explicitAccessRecords);
         }
 
-        final Integer maxSecurityClassificationHierarchy = getMaxSecurityClassificationHierarchyForRoles(userRoles);
+        if (attributePermissions == null) {
+            return null;
+        }
 
-        SecurityClassification userSecurityClassification =
-            SecurityClassification.fromHierarchy(maxSecurityClassificationHierarchy);
+        JsonNode filteredJson;
+        Map<JsonPointer, Set<Permission>> visibleAttributePermissions;
+        SecurityClassification userSecurityClassification = null;
 
-        Set<SecurityClassification> visibleSecurityClassificationsForUser = SecurityClassifications
-            .getVisibleSecurityClassifications(maxSecurityClassificationHierarchy);
+        if (attributeSecurityClassifications == null) {
+            filteredJson = filterService.filterJson(resource.getData(), attributePermissions);
+            visibleAttributePermissions = attributePermissions;
 
-        JsonNode filteredJson = filterService.filterJson(resource.getData(), attributePermissions,
-            attributeSecurityClassifications, visibleSecurityClassificationsForUser);
+        } else {
+            Integer maxSecurityClassificationHierarchy = getMaxSecurityClassificationHierarchyForRoles(userRoles);
+            Set<SecurityClassification> visibleSecurityClassificationsForUser = SecurityClassifications
+                .getVisibleSecurityClassifications(maxSecurityClassificationHierarchy);
 
-        Map<JsonPointer, Set<Permission>> visibleAttributePermissions =
-            filterAttributePermissionsBySecurityClassification(attributePermissions,
+            userSecurityClassification = SecurityClassification.fromHierarchy(maxSecurityClassificationHierarchy);
+            filteredJson = filterService.filterJson(resource.getData(), attributePermissions,
                 attributeSecurityClassifications, visibleSecurityClassificationsForUser);
-
-        Set<String> relationships = explicitAccess.stream()
-            .map(ExplicitAccessRecord::getRelationship)
-            .collect(toSet());
+            visibleAttributePermissions = filterAttributePermissionsBySecurityClassification(
+                attributePermissions, attributeSecurityClassifications, visibleSecurityClassificationsForUser);
+        }
 
         return FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
@@ -247,6 +234,62 @@ public class AccessManagementService {
                 .build())
             .relationships(relationships)
             .build();
+    }
+
+    private List<ExplicitAccessRecord> getExplicitAccessRecords(String userId, Resource resource) {
+        return jdbi.withExtension(AccessManagementRepository.class,
+            dao -> dao.getExplicitAccess(userId, resource.getId(), resource.getDefinition().getResourceType()));
+    }
+
+    private Map<JsonPointer, Set<Permission>> getRoleAttributePermissions(Set<String> userRoles,
+                                                                          Resource resource) {
+        Set<String> filteredRoles = filterRolesWithExplicitAccessType(userRoles);
+        Map<JsonPointer, Set<Permission>> attributePermissions = null;
+        if (!filteredRoles.isEmpty()) {
+            attributePermissions = getPermissionsToResourceForRoles(resource.getDefinition(), filteredRoles);
+        }
+        return attributePermissions;
+    }
+
+    private Map<JsonPointer, Set<Permission>> getExplicitAttributePermissions(
+        List<ExplicitAccessRecord> explicitAccessRecords) {
+
+        List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccessRecords.stream()
+            .collect(collectingAndThen(groupingByWithNullKeys(ExplicitAccessRecord::getRelationship), Map::values))
+            .stream()
+                .map(explicitAccessRecordsForRelationship -> explicitAccessRecordsForRelationship.stream()
+                    .collect(getMapCollector()))
+            .collect(toList());
+
+        return permissionsService.merge(permissionsForRelationships);
+    }
+
+    private Set<String> getRelationshipsFromExplicitAccessRecords(List<ExplicitAccessRecord> explicitAccessRecords) {
+        return explicitAccessRecords.stream()
+            .map(ExplicitAccessRecord::getRelationship)
+            .filter(Objects::nonNull)
+            .collect(toSet());
+    }
+
+    /**
+     * check group by when keys are null (eg. usage when relationship key for Annotation is null).
+     *
+     * @param classifier lamda function
+     * @param <T>        Type of Input
+     * @param <A>        Result output
+     * @return
+     */
+    private static <T, A> Collector<T, ?, Map<A, List<T>>> groupingByWithNullKeys(
+        Function<? super T, ? extends A> classifier) {
+        return toMap(
+            classifier,
+            Collections::singletonList,
+            (List<T> oldList, List<T> newCollection) -> {
+                List<T> newList = new ArrayList<>(oldList.size() + 1);
+                newList.addAll(oldList);
+                newList.addAll(newCollection);
+                return newList;
+            });
     }
 
     private Map<JsonPointer, Set<Permission>> filterAttributePermissionsBySecurityClassification(
@@ -287,10 +330,6 @@ public class AccessManagementService {
     }
 
     private Set<String> filterRolesWithExplicitAccessType(Set<String> userRoles) {
-        if (userRoles.isEmpty()) {
-            return null;
-        }
-
         return jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getRoles(userRoles, Collections.singleton(ROLE_BASED)).stream()
                 .map(Role::getRoleName)

@@ -27,7 +27,7 @@ public class AttributeSecurityClassificationValidator implements
                 return false;
             } else if (attributeSecurityClassifications.get(JsonPointer.valueOf("")) == null) {
                 setConstraintValidatorContextMessage(
-                    "no security classification for root attribute",
+                    "must contain root attribute",
                     constraintValidatorContext);
                 return false;
 

@@ -157,7 +157,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
             .andDo(print())
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errorMessage", is(
-                "filterResource.attributeSecurityClassifications - no security classification for root attribute")))
+                "filterResource.attributeSecurityClassifications - must contain root attribute")))
             .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
             .andExpect(jsonPath("$.errorCode", is(BAD_REQUEST.value())))
             .andExpect(jsonPath("$.timeStamp", notNullValue()))

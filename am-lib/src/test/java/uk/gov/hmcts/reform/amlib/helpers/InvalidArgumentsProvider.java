@@ -130,7 +130,7 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
         Object[] invalidValues = generateInvalidValues(invalidValueClass);
 
         return ObjectArrays.concat(
-            new Object[]{null, emptyCollection},
+            new Object[]{emptyCollection},
             Arrays.stream(invalidValues).filter(Objects::nonNull).map(collectionCreationFn).toArray(),
             Object.class
         );

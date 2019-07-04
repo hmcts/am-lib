@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.FilterResourceService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
@@ -42,6 +43,8 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createResource;
 class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrationBaseTest {
 
     private static AccessManagementService service = initService(AccessManagementService.class);
+    private static FilterResourceService filterResourceService = initService(FilterResourceService.class);
+
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
 
     private String resourceId;
@@ -86,7 +89,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
         grantAllDefaultPermissionsForRole(idamRoleWithRoleBasedPrivateAccess);
         JsonNode data = createSecurityClassificationData();
 
-        FilteredResourceEnvelope result = service.filterResource(accessorId,
+        FilteredResourceEnvelope result = filterResourceService.filterResource(accessorId,
             ImmutableSet.of(idamRoleWithRoleBasedPrivateAccess), createResource(resourceId,
                 resourceDefinition, data), attributePermissions);
 
@@ -124,7 +127,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
         grantAllDefaultPermissionsForRole(idamRoleWithRoleBasedPrivateAccess);
         JsonNode data = createSecurityClassificationData();
 
-        FilteredResourceEnvelope result = service.filterResource(accessorId,
+        FilteredResourceEnvelope result = filterResourceService.filterResource(accessorId,
             ImmutableSet.of(idamRoleWithRoleBasedPrivateAccess),
             createResource(resourceId, resourceDefinition, data), attributePermissions);
 
@@ -160,7 +163,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
         grantAllDefaultPermissionsForRole(idamRoleWithRoleBasedAccess);
         JsonNode data = createSecurityClassificationData();
 
-        FilteredResourceEnvelope result = service.filterResource(accessorId,
+        FilteredResourceEnvelope result = filterResourceService.filterResource(accessorId,
             ImmutableSet.of(idamRoleWithRoleBasedAccess), createResource(resourceId,
                 resourceDefinition, data), attributeSecurityClassifications);
 
@@ -193,7 +196,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
 
         grantAllDefaultPermissionsForRole(idamRoleWithRoleBasedPrivateAccess);
 
-        FilteredResourceEnvelope result = service.filterResource(accessorId,
+        FilteredResourceEnvelope result = filterResourceService.filterResource(accessorId,
             ImmutableSet.of(idamRoleWithRoleBasedPrivateAccess), createResource(resourceId,
                 resourceDefinition, createSecurityClassificationData()), attributeSecurityClassifications);
 
@@ -234,7 +237,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
         grantAllDefaultPermissionsForRole(idamRoleWithRoleBasedRestrictedAccess);
         JsonNode data = createSecurityClassificationData();
 
-        FilteredResourceEnvelope result = service.filterResource(accessorId,
+        FilteredResourceEnvelope result = filterResourceService.filterResource(accessorId,
             ImmutableSet.of(idamRoleWithRoleBasedRestrictedAccess), createResource(resourceId,
                 resourceDefinition, data), attributePermissions);
 
@@ -274,7 +277,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
         grantAllDefaultPermissionsForRole(idamRoleWithRoleBasedPrivateAccess);
         JsonNode data = createSecurityClassificationData();
 
-        FilteredResourceEnvelope result = service.filterResource(accessorId,
+        FilteredResourceEnvelope result = filterResourceService.filterResource(accessorId,
             ImmutableSet.of(idamRoleWithRoleBasedRestrictedAccess, idamRoleWithRoleBasedPrivateAccess),
             createResource(resourceId, resourceDefinition, data), attributePermissions);
 
@@ -309,7 +312,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
         grantAllDefaultPermissionsForRole(idamRoleWithRoleBasedRestrictedAccess);
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            service.filterResource(accessorId, ImmutableSet.of(idamRoleWithRoleBasedRestrictedAccess),
+            filterResourceService.filterResource(accessorId, ImmutableSet.of(idamRoleWithRoleBasedRestrictedAccess),
                 createResource(resourceId, resourceDefinition, createSecurityClassificationData()),
                 attributePermissions);
         });
@@ -332,7 +335,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedAccess,
             resourceDefinition, rootLevelObject + nestedAttribute, ImmutableSet.of(CREATE), PUBLIC));
 
-        FilteredResourceEnvelope result = service.filterResource(
+        FilteredResourceEnvelope result = filterResourceService.filterResource(
             accessorId, ImmutableSet.of(idamRoleWithRoleBasedAccess), createResource(resourceId,
                 resourceDefinition, createSecurityClassificationData()), securityClassifications);
 
@@ -368,7 +371,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
 
         grantAllDefaultPermissionsForRole(idamRoleWithRoleBasedAccess);
 
-        FilteredResourceEnvelope result = service.filterResource(
+        FilteredResourceEnvelope result = filterResourceService.filterResource(
             accessorId, ImmutableSet.of(idamRoleWithRoleBasedAccess), createResource(resourceId,
                 resourceDefinition, createSecurityClassificationData()), securityClassifications);
 
@@ -404,7 +407,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
         grantAllDefaultPermissionsForRole(idamRoleWithRoleBasedPrivateAccess);
         JsonNode data = createSecurityClassificationData();
 
-        FilteredResourceEnvelope result = service.filterResource(
+        FilteredResourceEnvelope result = filterResourceService.filterResource(
             accessorId, ImmutableSet.of(idamRoleWithRoleBasedPrivateAccess), createResource(resourceId,
                 resourceDefinition, data), securityClassifications);
 
@@ -438,7 +441,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
 
         grantAllDefaultPermissionsForRole(idamRoleWithRoleBasedPrivateAccess);
 
-        FilteredResourceEnvelope result = service.filterResource(
+        FilteredResourceEnvelope result = filterResourceService.filterResource(
             accessorId, ImmutableSet.of(idamRoleWithRoleBasedPrivateAccess), createResource(resourceId,
                 resourceDefinition, createSecurityClassificationData()), securityClassifications);
 
@@ -480,7 +483,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedAccess,
             resourceDefinition, rootLevelObject + nestedAttribute, ImmutableSet.of(CREATE), PUBLIC));
 
-        FilteredResourceEnvelope result = service.filterResource(
+        FilteredResourceEnvelope result = filterResourceService.filterResource(
             accessorId, ImmutableSet.of(idamRoleWithRoleBasedAccess), createResource(resourceId,
                 resourceDefinition, createSecurityClassificationData()), securityClassifications);
 
@@ -525,7 +528,7 @@ class FilterResourceWithSecurityClassificationTest extends PreconfiguredIntegrat
         grantAllDefaultPermissionsForRole(idamRoleWithExplicitAccess);
         JsonNode data = createSecurityClassificationData();
 
-        FilteredResourceEnvelope result = service.filterResource(
+        FilteredResourceEnvelope result = filterResourceService.filterResource(
             accessorId, ImmutableSet.of(idamRoleWithExplicitAccess), createResource(resourceId,
                 resourceDefinition, data), attributeSecurityClassifications);
 

@@ -21,10 +21,12 @@ public class AttributeSecurityClassificationValidator implements
                            ConstraintValidatorContext constraintValidatorContext) {
         if (attributeSecurityClassifications != null) {
             if (attributeSecurityClassifications.isEmpty()) {
-                setConstraintValidatorContextMessage("must not be empty", constraintValidatorContext);
+                setConstraintValidatorContextMessage("must not be empty",
+                    constraintValidatorContext);
                 return false;
             } else if (attributeSecurityClassifications.get(JsonPointer.valueOf("")) == null) {
-                setConstraintValidatorContextMessage("must contain root attribute", constraintValidatorContext);
+                setConstraintValidatorContextMessage("must contain root attribute",
+                    constraintValidatorContext);
                 return false;
             }
         }

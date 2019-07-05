@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -18,9 +17,8 @@ import javax.validation.constraints.NotNull;
 public final class ExplicitAccessMetadata {
     @NotBlank
     private final String resourceId;
-    @NotNull
-    @Valid
-    private final ResourceDefinition resourceDefinition;
+    @NotBlank
+    private final String resourceType;
     @NotBlank
     private final String accessorId;
     @NotNull
@@ -30,6 +28,8 @@ public final class ExplicitAccessMetadata {
     private final JsonPointer attribute;
 
     private final String relationship;
+    private final String resourceName;
+    private final String serviceName;
 
     @ApiModelProperty(hidden = true)
     public String getAttributeAsString() {

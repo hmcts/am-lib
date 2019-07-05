@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.helpers.InvalidArgumentsProvider;
+import uk.gov.hmcts.reform.amlib.internal.validation.ValidAttributeSecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
@@ -48,10 +49,7 @@ class AccessManagementServiceValidationTest {
                 "accessMetadata.resourceId - must not be blank",
                 "accessMetadata.accessorId - must not be blank",
                 "accessMetadata.accessorType - must not be null",
-                "accessMetadata.resourceDefinition - must not be null",
-                "accessMetadata.resourceDefinition.serviceName - must not be blank",
-                "accessMetadata.resourceDefinition.resourceType - must not be blank",
-                "accessMetadata.resourceDefinition.resourceName - must not be blank",
+                "accessMetadata.resourceType - must not be blank",
                 "accessMetadata.attribute - must not be null"
             ));
     }
@@ -59,7 +57,7 @@ class AccessManagementServiceValidationTest {
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
     void filterResourceMethodShouldRejectInvalidArguments(
-        String userId, Set<String> userRoles, Resource resource,
+        String userId, Set<String> userRoles, Resource resource, @ValidAttributeSecurityClassification
         Map<JsonPointer, SecurityClassification> attributeSecurityClassifications) {
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> service.filterResource(userId, userRoles, resource, attributeSecurityClassifications))

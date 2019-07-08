@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.amlib.states;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import uk.gov.hmcts.reform.amlib.AccessManagementService;
+import uk.gov.hmcts.reform.amlib.FilterResourceService;
 import uk.gov.hmcts.reform.amlib.utils.DatabaseUtils;
 
 import java.nio.file.Path;
@@ -14,7 +14,7 @@ import static uk.gov.hmcts.reform.amlib.utils.EnvironmentVariableUtils.getValueO
 
 @State(Scope.Benchmark)
 public class BenchmarkState {
-    public AccessManagementService service;
+    public FilterResourceService service;
 
     @Setup
     public void populateDatabase() throws Throwable {
@@ -35,6 +35,6 @@ public class BenchmarkState {
 
     @Setup
     public void initiateService() {
-        service = new AccessManagementService(createDataSource());
+        service = new FilterResourceService(createDataSource());
     }
 }

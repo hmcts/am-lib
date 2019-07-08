@@ -27,13 +27,11 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collector;
@@ -46,7 +44,6 @@ import javax.validation.constraints.NotNull;
 
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -210,21 +207,18 @@ public class FilterResourceService {
 
         final List<AccessResourceEnvelope> accessResourceEnvelopes = new ArrayList<>();
 
-        explicitAccessRecords.stream().collect(collectingAndThen(toCollection(() ->
-                new TreeSet<>(Comparator.comparing(ExplicitAccessRecord::getAccessorId))),
-            ArrayList::new)).stream().forEach(explicitAccessRecord -> {
-                //set permissions
-                Map<JsonPointer, Set<Permission>> permissions = getExplicitAttributePermissions(
-                    explicitAccessRecordsMap.get(explicitAccessRecord.getAccessorId()));
-                //set relationships
-                Set<String> relationships = getRelationshipsFromExplicitAccessRecords(
-                    explicitAccessRecordsMap.get(explicitAccessRecord.getAccessorId()));
-                AccessEnvelope accessEnvelope = AccessEnvelope.builder().permissions(permissions).build();
-                accessResourceEnvelopes.add(AccessResourceEnvelope.builder()
-                    .accessorId(explicitAccessRecord.getAccessorId())
-                    .access(accessEnvelope).accessorType(explicitAccessRecord.getAccessorType())
-                    .relationships(relationships).build());
-            });
+        explicitAccessRecordsMap.entrySet().forEach(explicitAccessRecord -> {
+            //set permissions
+            Map<JsonPointer, Set<Permission>> permissions = getExplicitAttributePermissions(
+                explicitAccessRecord.getValue());
+            //set relationships
+            Set<String> relationships = getRelationshipsFromExplicitAccessRecords(explicitAccessRecord.getValue());
+            AccessEnvelope accessEnvelope = AccessEnvelope.builder().permissions(permissions).build();
+            accessResourceEnvelopes.add(AccessResourceEnvelope.builder()
+                .accessorId(explicitAccessRecord.getKey())
+                .access(accessEnvelope).accessorType(AccessorType.USER)
+                .relationships(relationships).build());
+        });
 
         return AccessorListByResourceEnvelope.builder()
             .explicitAccessResourceEnvelopesList(accessResourceEnvelopes)

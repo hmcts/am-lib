@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amlib.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonPointer;
 import lombok.Builder;
 import lombok.Data;
@@ -13,5 +14,6 @@ import java.util.Set;
 @Builder
 public final class AccessEnvelope {
     private final Map<JsonPointer, Set<Permission>> permissions;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private final AccessType accessType;
 }

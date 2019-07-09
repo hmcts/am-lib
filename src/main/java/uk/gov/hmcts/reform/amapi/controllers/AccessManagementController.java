@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amapi.models.FilterResource;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
+import uk.gov.hmcts.reform.amlib.FilterResourceService;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
@@ -31,6 +32,9 @@ public class AccessManagementController {
 
     @Autowired
     private AccessManagementService accessManagementService;
+
+    @Autowired
+    FilterResourceService filterResourceService;
 
     @ApiOperation(value = "Grant resource access to user", response = ExplicitAccessGrant.class)
     @ApiResponses(value = {
@@ -78,7 +82,7 @@ public class AccessManagementController {
     })
     @PostMapping(value = "/filter-resource", consumes = (APPLICATION_JSON_VALUE))
     public FilteredResourceEnvelope filterResource(@RequestBody FilterResource request) {
-        return accessManagementService.filterResource(request.getUserId(), request.getUserRoles(),
+        return filterResourceService.filterResource(request.getUserId(), request.getUserRoles(),
             request.getResource(), request.getAttributeSecurityClassification());
     }
 }

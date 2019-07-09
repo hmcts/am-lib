@@ -39,7 +39,6 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
         List<Arguments> combinations = new ArrayList<>();
-
         Type[] parameterTypes = context.getRequiredTestMethod().getGenericParameterTypes();
         Annotation[][] annotations = context.getRequiredTestMethod().getParameterAnnotations();
         for (int i = 0; i < parameterTypes.length; i++) {

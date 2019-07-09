@@ -15,8 +15,8 @@ plugins {
     id 'pmd'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
-    id 'org.springframework.boot' version '2.1.4.RELEASE'
-    id 'org.owasp.dependencycheck' version '4.0.2'
+    id 'org.springframework.boot' version '2.1.5.RELEASE'
+    id 'org.owasp.dependencycheck' version '5.1.0'
     id 'com.github.ben-manes.versions' version '0.21.0'
     id "org.flywaydb.flyway" version "5.2.4"
 }
@@ -184,7 +184,8 @@ def versions = [
         reformHealthStarter: '0.0.4',
         springBoot      : springBoot.class.package.implementationVersion,
         springfoxSwagger: '2.9.2',
-        flyway          : '5.2.4'
+        flyway          : '5.2.4',
+        guava           : '28.0-jre'
 ]
 
 dependencies {
@@ -198,8 +199,15 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: versions.springBoot
 
-    compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
-    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
+    compile (group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger) {
+      exclude group: "com.google.guava", module: "guava"
+    }
+
+    compile (group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger) {
+      exclude group: "com.google.guava", module: "guava"
+    }
+
+    compile group: 'com.google.guava', name: 'guava', version: versions.guava
 
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.reformLogging

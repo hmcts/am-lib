@@ -20,16 +20,33 @@
     <sha1>6936e700f0fb1b50bac0698ada4347a769d40199</sha1>
     <cpe>cpe:/a:apache:groovy</cpe>
   </suppress>
+
   <suppress>
-    <notes><![CDATA[file name: tomcat-embed-core-9.0.17.jar - Spring Boot dependency, not applicable as
+    <notes><![CDATA[file name: groovy-xml-2.5.7.jar]]></notes>
+    <sha1>7cd039b9ec0f8f3896fff31a08f82aa61282ec10</sha1>
+    <cpe>cpe:/a:apache:groovy</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[file name: groovy-json-2.5.7.jar]]></notes>
+    <sha1>00fbe5c5450d2b9b4a940391b37f2089cc8bec27</sha1>
+    <cpe>cpe:/a:apache:groovy</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[file name: groovy-2.5.7.jar]]></notes>
+    <sha1>99907efe4b69f800c42584386f5d668e4d952bd5</sha1>
+    <cpe>cpe:/a:apache:groovy</cpe>
+  </suppress>
+
+  <suppress>
+    <notes><![CDATA[file name: tomcat-embed-core-9.0.19.jar - Spring Boot dependency, not applicable as
     vulnerability only applies to Windows environments and vulnerable components is disabled by default]]></notes>
-    <sha1>aacb92c34eb2e88f38a060c9fcaaae329a79c9ca</sha1>
+    <sha1>56e42e12bf92b713befd0700430f7c5c0af68d49</sha1>
     <cpe>cpe:/a:apache:tomcat</cpe>
   </suppress>
   <suppress>
-    <notes><![CDATA[file name: tomcat-embed-websocket-9.0.17.jar - Spring Boot dependency, not applicable as
+    <notes><![CDATA[file name: tomcat-embed-websocket-9.0.19.jar - Spring Boot dependency, not applicable as
     vulnerability only applies to Windows environments and vulnerable components is disabled by default]]></notes>
-    <sha1>a786505cc2697f7f2d8693c0c318270cc8addd92</sha1>
+    <sha1>dee79022818f490203f4901f5651f3233aee14db</sha1>
     <cpe>cpe:/a:apache:tomcat</cpe>
   </suppress>
   <suppress>

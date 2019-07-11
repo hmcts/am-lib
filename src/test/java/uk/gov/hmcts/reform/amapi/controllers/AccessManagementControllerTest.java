@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.amapi.models.FilterResource;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.FilterResourceService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
@@ -60,6 +61,9 @@ public class AccessManagementControllerTest {
 
     @MockBean
     private AccessManagementService accessManagementService;
+
+    @MockBean
+    private FilterResourceService filterResourceService;
 
     @BeforeEach
     void init() {
@@ -132,7 +136,7 @@ public class AccessManagementControllerTest {
         FilteredResourceEnvelope filteredResourceEnvelope = FilteredResourceEnvelope.builder()
             .resource(resource).access(envelope).build();
 
-        Mockito.when(accessManagementService.filterResource(filterResource.getUserId(),
+        Mockito.when(filterResourceService.filterResource(filterResource.getUserId(),
             filterResource.getUserRoles(),
             filterResource.getResource(),
             filterResource.getAttributeSecurityClassification()))
@@ -174,7 +178,7 @@ public class AccessManagementControllerTest {
         FilteredResourceEnvelope filteredResourceEnvelope = FilteredResourceEnvelope.builder()
             .resource(resource).access(envelope).userSecurityClassification(SecurityClassification.PUBLIC).build();
 
-        Mockito.when(accessManagementService.filterResource(filterResource.getUserId(),
+        Mockito.when(filterResourceService.filterResource(filterResource.getUserId(),
             filterResource.getUserRoles(),
             filterResource.getResource(), filterResource.getAttributeSecurityClassification()))
             .thenReturn(filteredResourceEnvelope);

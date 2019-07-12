@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.helpers.InvalidArgumentsProvider;
+import uk.gov.hmcts.reform.amlib.internal.validation.ValidAttributeSecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 
 import java.util.Map;
@@ -22,7 +23,7 @@ public class FilterResourceServiceValidationTest {
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
     void filterResourceMethodShouldRejectInvalidArguments(
-        String userId, Set<String> userRoles, Resource resource,
+        String userId, Set<String> userRoles, Resource resource, @ValidAttributeSecurityClassification
         Map<JsonPointer, SecurityClassification> attributeSecurityClassifications) {
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> service.filterResource(userId, userRoles, resource, attributeSecurityClassifications))

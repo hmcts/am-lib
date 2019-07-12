@@ -1,5 +1,5 @@
 insert into services (service_name, service_description) values ('cmc', null)
-on conflict on constraint services_pkey do update set service_description = null;
+on conflict on constraint services_pkey do nothing;
 
 insert into resources (service_name, resource_type, resource_name) values ('cmc', 'case', 'claim')
  on conflict on constraint resources_pkey do nothing;

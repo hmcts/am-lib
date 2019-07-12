@@ -66,6 +66,23 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .first().extracting(ExplicitAccessRecord::getAttributeAsString).isEqualTo("");
     }
 
+    @Test
+    void whenResourceNameAndServiceNameNotGivenShouldRevokeAccessBasedOnResourceIdAndResourceType() {
+        ResourceDefinition resourceDefinitionWithNulls = ResourceDefinition.builder()
+            .serviceName(null)
+            .resourceName(null)
+            .resourceType(resourceDefinition.getResourceType())
+            .build();
+
+        grantExplicitResourceAccess(resourceId, relationship, "");
+
+        service.revokeResourceAccess(
+            createMetadata(resourceId, accessorId, relationship, resourceDefinitionWithNulls, JsonPointer.valueOf(""))
+        );
+
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
+    }
+
     @Nested
     class RelationshipMatchingTests {
         @Test

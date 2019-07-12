@@ -44,10 +44,7 @@ class AccessManagementServiceValidationTest {
                 "accessMetadata.resourceId - must not be blank",
                 "accessMetadata.accessorId - must not be blank",
                 "accessMetadata.accessorType - must not be null",
-                "accessMetadata.resourceDefinition - must not be null",
-                "accessMetadata.resourceDefinition.serviceName - must not be blank",
-                "accessMetadata.resourceDefinition.resourceType - must not be blank",
-                "accessMetadata.resourceDefinition.resourceName - must not be blank",
+                "accessMetadata.resourceType - must not be blank",
                 "accessMetadata.attribute - must not be null"
             ));
     }

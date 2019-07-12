@@ -1,10 +1,8 @@
 {
   "resourceId": "${resourceId}",
-  "resourceDefinition": {
-    "serviceName": "cmc",
-    "resourceType": "case",
-    "resourceName": "claim"
-  },
+  "serviceName": "cmc",
+  "resourceType": "case",
+  "resourceName": "claim",
   "accessorId": "${accessorId}",
   "accessorType": "USER",
   "attribute": "",

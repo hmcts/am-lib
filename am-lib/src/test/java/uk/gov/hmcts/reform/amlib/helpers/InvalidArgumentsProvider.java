@@ -10,6 +10,7 @@ import com.google.common.collect.ObjectArrays;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
+import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.Pair;
 
 import java.lang.annotation.Annotation;
@@ -20,6 +21,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,17 +30,19 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.validation.Constraint;
 
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.AvoidThrowingRawExceptionTypes"})
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
+
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.AvoidThrowingRawExceptionTypes", "PMD.UseVarargs"})
 public class InvalidArgumentsProvider implements ArgumentsProvider {
 
     @Override
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
         List<Arguments> combinations = new ArrayList<>();
-
         Type[] parameterTypes = context.getRequiredTestMethod().getGenericParameterTypes();
+        Annotation[][] annotations = context.getRequiredTestMethod().getParameterAnnotations();
         for (int i = 0; i < parameterTypes.length; i++) {
-            Object[] invalidValues = generateInvalidValues(parameterTypes[i]);
+            Object[] invalidValues = generateInvalidValues(parameterTypes[i], annotations[i]);
             for (Object invalidValue : invalidValues) {
                 Object[] arguments = new Object[parameterTypes.length];
                 arguments[i] = invalidValue;
@@ -57,7 +61,7 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
     }
 
     @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
-    private Object[] generateInvalidValues(Type parameterType) {
+    private Object[] generateInvalidValues(Type parameterType, Annotation[] annotations) {
         if (parameterType instanceof Class) {
             return generateInvalidValues((Class<?>) parameterType);
         } else if (parameterType instanceof ParameterizedType) {
@@ -67,11 +71,14 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
             if (Collection.class.isAssignableFrom(rawType) || Map.class.isAssignableFrom(rawType)) {
                 Class<?> actualElementType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
                 if (List.class.isAssignableFrom(rawType)) {
-                    return generateInvalidCollections(actualElementType, ImmutableList.of(), ImmutableList::of);
+                    return generateInvalidCollections(actualElementType, ImmutableList.of(), ImmutableList::of,
+                        annotations);
                 } else if (Set.class.isAssignableFrom(rawType)) {
-                    return generateInvalidCollections(actualElementType, ImmutableSet.of(), ImmutableSet::of);
+                    return generateInvalidCollections(actualElementType, ImmutableSet.of(), ImmutableSet::of,
+                        annotations);
                 } else if (Map.class.isAssignableFrom(rawType)) {
-                    return generateInvalidMap(actualElementType, ImmutableMap.of(),  map -> ImmutableMap.of());
+                    return generateInvalidMap(actualElementType, ImmutableMap.of(),  map -> ImmutableMap.of(),
+                        annotations);
                 }
             }
         }
@@ -114,8 +121,9 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
 
     private Object[] generateInvalidCollections(Class<?> invalidValueClass,
                                                 Collection<?> emptyCollection,
-                                                Function<Object, Collection<Object>> collectionCreationFn) {
-        Object[] invalidValues = generateInvalidValues(invalidValueClass);
+                                                Function<Object, Collection<Object>> collectionCreationFn,
+                                                Annotation[] annotations) {
+        Object[] invalidValues = generateInvalidValues(invalidValueClass, annotations);
 
         return ObjectArrays.concat(
             new Object[]{null, emptyCollection},
@@ -126,11 +134,20 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
 
     private Object[] generateInvalidMap(Class<?> invalidValueClass,
                                                 Map<?,?> emptyCollection,
-                                                Function<Object, Map<Object,Object>> collectionCreationFn) {
-        Object[] invalidValues = generateInvalidValues(invalidValueClass);
+                                                Function<Object, Map<Object,Object>> collectionCreationFn,
+                                                Annotation[] annotations) {
+        Object[] invalidValues = generateInvalidValues(invalidValueClass, annotations);
+        Object[] variableInvalidValues;
+        if (isParameterAnnotation(annotations, "ValidAttributeSecurityClassification")) {
+            Map<JsonPointer, SecurityClassification> invalidAttributeSecurityClassification =
+                Collections.singletonMap(JsonPointer.valueOf("/test"), PUBLIC);
+            variableInvalidValues = new Object[]{emptyCollection, invalidAttributeSecurityClassification};
+        } else {
+            variableInvalidValues = new Object[]{null, emptyCollection};
+        }
 
         return ObjectArrays.concat(
-            new Object[]{emptyCollection},
+            variableInvalidValues,
             Arrays.stream(invalidValues).filter(Objects::nonNull).map(collectionCreationFn).toArray(),
             Object.class
         );
@@ -217,5 +234,14 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
 
     private boolean isValidationConstraint(Annotation annotation) {
         return annotation.annotationType().getDeclaredAnnotation(Constraint.class) != null;
+    }
+
+    private Boolean isParameterAnnotation(Annotation[] annotations, String annotation) {
+        for (Annotation a : annotations) {
+            if (a.toString().contains(annotation)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

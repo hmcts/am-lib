@@ -45,6 +45,10 @@ allprojects {
 
 def DATABASE_USER = project.properties['DATABASE_USER'] ?: "amuser"
 def DATABASE_NAME = project.properties['DATABASE_NAME'] ?: "am"
+def ENVIRONMENT_NAME = project.properties['ENVIRONMENT'] ?: "local"
+def DATABASE_HOST = project.properties['DATABASE_HOST'] ?: "localhost"
+def DATABASE_PASSWORD = project.properties['DATABASE_PASSWORD'] ?: ""
+def DATABASE_PORT = project.properties['DATABASE_PORT'] ?: "5433"
 
 project(":am-lib") {
   apply plugin: 'info.solidsoft.pitest'
@@ -270,17 +274,21 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
 
 task loadPerformaceTestdata(type: Exec) {
   if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-    commandLine 'cmd', '/c', file("${project.projectDir}/src/gatling/load-or-delete-data-win.bat"), file("${project.projectDir}/src/gatling/testdata"), "load", "${DATABASE_USER}", "${DATABASE_NAME}"
+    commandLine 'cmd', '/c', file("${project.projectDir}/src/gatling/load-or-delete-data-win.bat"),
+      file("${project.projectDir}/src/gatling/testdata"), "load", "${DATABASE_USER}", "${DATABASE_NAME}", "${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
   } else {
-    commandLine 'sh', file("${project.projectDir}/src/gatling/load-or-delete-data.sh"), file("${project.projectDir}/src/gatling/testdata"), "load", "${DATABASE_USER}", "${DATABASE_NAME}"
+    commandLine 'sh', file("${project.projectDir}/src/gatling/load-or-delete-data.sh"), 
+      file("${project.projectDir}/src/gatling/testdata"), "load", "${DATABASE_USER}", "${DATABASE_NAME}","${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
   }
 }
 
 task deletePerformaceTestdata(type: Exec) {
   if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-    commandLine 'cmd', '/c', file("${project.projectDir}/src/gatling/load-or-delete-data-win.bat"), file("${project.projectDir}/src/gatling/testdata"), "delete", "${DATABASE_USER}", "${DATABASE_NAME}"
+    commandLine 'cmd', '/c', file("${project.projectDir}/src/gatling/load-or-delete-data-win.bat"),
+      file("${project.projectDir}/src/gatling/testdata"), "delete", "${DATABASE_USER}", "${DATABASE_NAME}", "${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
   } else {
-    commandLine 'sh', file("${project.projectDir}/src/gatling/load-or-delete-data.sh"), file("${project.projectDir}/src/gatling/testdata"), "delete" ,"${DATABASE_USER}", "${DATABASE_NAME}"
+    commandLine 'sh', file("${project.projectDir}/src/gatling/load-or-delete-data.sh"),
+      file("${project.projectDir}/src/gatling/testdata"), "delete" ,"${DATABASE_USER}", "${DATABASE_NAME}", "${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
   }
 }
 

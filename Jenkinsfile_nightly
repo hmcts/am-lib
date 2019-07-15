@@ -59,9 +59,11 @@ withNightlyPipeline(type, product, component) {
   before('PerformanceTest') {
     sh "echo 'Benchmark is about to start'"
     sh "./gradlew benchmark --info --rerun-tasks && ./gradlew jmhReport --info --rerun-tasks"
+    sh "./gradlew loadPerformaceTestdata -PDATABASE_USER={DATABASE_USER} -PDATABASE_NAME={DATABASE_NAME}"
   }
 
   after('PerformanceTest') {
+    sh "./gradlew deletePerformaceTestdata -PDATABASE_USER={DATABASE_USER} -PDATABASE_NAME={DATABASE_NAME}"
     archiveArtifacts allowEmptyArchive: true, artifacts: 'am-lib/build/reports/jmh/result.json'
     publishHTML([
       reportDir: 'am-lib/build/reports/jmh',

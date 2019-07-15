@@ -1,3 +1,28 @@
+## [0.10.4](https://github.com/hmcts/am-lib/compare/0.9.4...0.10.4) (2019-07-15)
+
+
+### Bug Fixes
+
+* add Role accessor type Am-326 ([#226](https://github.com/hmcts/am-lib/issues/226)) ([bed6457](https://github.com/hmcts/am-lib/commit/bed6457))
+* Am 328 filter resource add resource type ([#224](https://github.com/hmcts/am-lib/issues/224)) ([b50da30](https://github.com/hmcts/am-lib/commit/b50da30))
+* Am-309 Gatling Testing: Default data insertion ([#241](https://github.com/hmcts/am-lib/issues/241)) ([4121175](https://github.com/hmcts/am-lib/commit/4121175))
+* AM-327 support for null relationship ([#225](https://github.com/hmcts/am-lib/issues/225)) ([b971923](https://github.com/hmcts/am-lib/commit/b971923))
+* Api Refactor Create/Revoke and Filter Resource AM ([#205](https://github.com/hmcts/am-lib/issues/205)) ([16cc41d](https://github.com/hmcts/am-lib/commit/16cc41d))
+* Aspect logging for user highest security classification in Filter resource api ([#201](https://github.com/hmcts/am-lib/issues/201)) ([0285062](https://github.com/hmcts/am-lib/commit/0285062))
+* Log file changed to see gatling logs in Jenkins ([#193](https://github.com/hmcts/am-lib/issues/193)) ([d28612d](https://github.com/hmcts/am-lib/commit/d28612d))
+* update invalid arguments provider ([#233](https://github.com/hmcts/am-lib/issues/233)) ([a295a98](https://github.com/hmcts/am-lib/commit/a295a98))
+
+
+### Features
+
+* AM-API Exception Handling and Swagger Support ([#200](https://github.com/hmcts/am-lib/issues/200)) ([547bcd2](https://github.com/hmcts/am-lib/commit/547bcd2))
+* CCD to AM migration scripts (AM-266) ([#197](https://github.com/hmcts/am-lib/issues/197)) ([b0f607f](https://github.com/hmcts/am-lib/commit/b0f607f))
+* error handling for db migration scripts (AM-308) ([#202](https://github.com/hmcts/am-lib/issues/202)) ([f1f56e4](https://github.com/hmcts/am-lib/commit/f1f56e4))
+* optional security classification methods (AM-323) ([#227](https://github.com/hmcts/am-lib/issues/227)) ([767ebb0](https://github.com/hmcts/am-lib/commit/767ebb0))
+* revoke access with optional resource name and service name ([#238](https://github.com/hmcts/am-lib/issues/238)) ([2459411](https://github.com/hmcts/am-lib/commit/2459411))
+
+
+
 ## [0.9.4](https://github.com/hmcts/am-lib/compare/0.9.3...0.9.4) (2019-05-23)
 
 

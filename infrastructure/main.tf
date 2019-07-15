@@ -26,8 +26,8 @@ module "am-api" {
   additional_host_name = "${var.external_host_name != "" ? var.external_host_name : "null"}"
   capacity            = "${var.capacity}"
   instance_size       = "${var.instance_size}"
-  asp_rg               = "${local.asp_rg}"
-  asp_name             = "${local.asp_name}"
+  asp_rg              = "${local.asp_rg}"
+  asp_name            = "${local.asp_name}"
   common_tags         = "${var.common_tags}"
 
   app_settings = {
@@ -52,19 +52,20 @@ module "postgres-am-api" {
   database_name       = "${var.db_name}"
   postgresql_version  = "10"
   common_tags         = "${var.common_tags}"
+  subscription        = "${var.subscription}"
 }
 
 # region save DB details to Azure Key Vault
 module "am-vault-api" {
-  source = "git@github.com:hmcts/moj-module-key-vault?ref=master"
-  name = "${var.raw_product}-${var.component}-${local.shortEnv}"
-  product = "${var.product}"
-  env = "${var.env}"
-  tenant_id = "${var.tenant_id}"
-  object_id = "${var.jenkins_AAD_objectId}"
+  source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
+  name                = "${var.raw_product}-${var.component}-${local.shortEnv}"
+  product             = "${var.product}"
+  env                 = "${var.env}"
+  tenant_id           = "${var.tenant_id}"
+  object_id           = "${var.jenkins_AAD_objectId}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   product_group_object_id = "${var.product_group_object_id}"
-  common_tags = "${var.common_tags}"
+  common_tags         = "${var.common_tags}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {

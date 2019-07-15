@@ -56,7 +56,9 @@ public final class TestDataFactory {
             .resourceId(resourceId)
             .accessorId(accessorId)
             .accessorType(USER)
-            .resourceDefinition(resourceDefinition)
+            .resourceType(resourceDefinition.getResourceType())
+            .resourceName(resourceDefinition.getResourceName())
+            .serviceName(resourceDefinition.getServiceName())
             .attribute(attribute)
             .relationship(relationship)
             .build();

@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-
 public class AttributeSecurityClassificationValidator implements
     ConstraintValidator<ValidAttributeSecurityClassification, Map<JsonPointer, SecurityClassification>> {
 
@@ -26,11 +25,9 @@ public class AttributeSecurityClassificationValidator implements
                     constraintValidatorContext);
                 return false;
             } else if (attributeSecurityClassifications.get(JsonPointer.valueOf("")) == null) {
-                setConstraintValidatorContextMessage(
-                    "must contain root attribute",
+                setConstraintValidatorContextMessage("must contain root attribute",
                     constraintValidatorContext);
                 return false;
-
             }
         }
         return true;

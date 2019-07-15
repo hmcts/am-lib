@@ -29,7 +29,6 @@ module "am-api" {
   asp_rg              = "${local.asp_rg}"
   asp_name            = "${local.asp_name}"
   common_tags         = "${var.common_tags}"
-  subscription        = "${var.subscription}"
 
   app_settings = {
     LOGBACK_REQUIRE_ALERT_LEVEL = "false"
@@ -67,7 +66,6 @@ module "am-vault-api" {
   resource_group_name = "${azurerm_resource_group.rg.name}"
   product_group_object_id = "${var.product_group_object_id}"
   common_tags         = "${var.common_tags}"
-  subscription        = "${var.subscription}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {

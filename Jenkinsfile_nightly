@@ -60,14 +60,14 @@ withNightlyPipeline(type, product, component) {
     sh "echo 'Benchmark is about to start'"
     sh "./gradlew benchmark --info --rerun-tasks && ./gradlew jmhReport --info --rerun-tasks"
     print "calling loadPerformanceTestData gatling"
-    sh "./gradlew loadPerformanceTestData -PDATABASE_USER=${DATABASE_USER} " +
+    sh "./gradlew loadPerformanceTestData -PDATABASE_USER=${DATABASE_USERNAME} " +
       "-PDATABASE_NAME=${DATABASE_NAME} -PDATABASE_PASSWORD=${DATABASE_PASSWORD} -PDATABASE_HOST=${DATABASE_HOST} -PDATABASE_PORT=${DATABASE_PORT} -PENVIRONMENT=${params.ENVIRONMENT}"
     print "done loadPerformanceTestData gatling"
   }
 
   after('PerformanceTest') {
     print "calling deletePerformanceTestData gatling"
-    sh "./gradlew deletePerformanceTestData -PDATABASE_USER=${DATABASE_USER} " +
+    sh "./gradlew deletePerformanceTestData -PDATABASE_USER=${DATABASE_USERNAME} " +
       "-PDATABASE_NAME=${DATABASE_NAME} -PDATABASE_PASSWORD=${DATABASE_PASSWORD} -PDATABASE_HOST=${DATABASE_HOST} -PDATABASE_PORT=${DATABASE_PORT} -PENVIRONMENT=${params.ENVIRONMENT}"
     print "done deletePerformanceTestData gatling"
     archiveArtifacts allowEmptyArchive: true, artifacts: 'am-lib/build/reports/jmh/result.json'

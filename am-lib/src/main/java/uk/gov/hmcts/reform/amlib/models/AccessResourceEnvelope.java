@@ -10,7 +10,6 @@ import java.util.Set;
 @Builder
 public class AccessResourceEnvelope {
     private final String accessorId;
-    private final AccessEnvelope access;
     private final AccessorType accessorType;
     private final Set<String> relationships;
 }

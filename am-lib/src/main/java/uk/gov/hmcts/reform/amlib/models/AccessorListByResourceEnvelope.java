@@ -9,9 +9,7 @@ import java.util.List;
 @Data
 @Builder
 public class AccessorListByResourceEnvelope {
-
-    @JsonProperty("explicitAccess")
-    List<AccessResourceEnvelope> explicitAccessResourceEnvelopesList;
-
     String resourceId;
+    @JsonProperty("explicitAccess")
+    List<AccessResourceEnvelope> explicitAccesses;
 }

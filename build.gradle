@@ -8,6 +8,7 @@ buildscript {
   dependencies {
     classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
     pitest 'org.pitest:pitest-junit5-plugin:0.9'
+    classpath("net.serenity-bdd:serenity-gradle-plugin:2.0.57")
   }
 }
 
@@ -28,6 +29,9 @@ subprojects {
     apply plugin: 'org.owasp.dependencycheck'
     apply plugin: 'com.github.ben-manes.versions'
 }
+
+apply plugin: 'net.serenity-bdd.aggregator'
+apply plugin: 'idea'
 
 allprojects {
   // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
@@ -80,16 +84,13 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 sourceSets {
-    test {
-        java.srcDir 'src/test/java'
-    }
     functional {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
             srcDir file('src/functionalTest/java')
         }
-        resources.srcDir file('src/test/resources')
+          resources.srcDir file('src/functionalTest/resources')
     }
 
     test {
@@ -117,6 +118,7 @@ tasks.withType(JavaCompile) {
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
+    finalizedBy aggregate
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
@@ -131,8 +133,8 @@ configurations {
 
 task smoke(type: Test) {
     description = "Runs Smoke Tests"
-    testClassesDirs = sourceSets.functional.output.classesDirs
-    classpath = sourceSets.functional.runtimeClasspath
+    //testClassesDirs = sourceSets.smoke.output.classesDirs
+    //classpath = sourceSets.smoke.runtimeClasspath
 
     useJUnitPlatform {
         includeTags = ['SmokeTest']
@@ -191,7 +193,8 @@ def versions = [
         springBoot      : springBoot.class.package.implementationVersion,
         springfoxSwagger: '2.9.2',
         flyway          : '5.2.4',
-        guava           : '28.0-jre'
+        guava           : '28.0-jre',
+        serenity        : '2.0.52'
 ]
 
 dependencies {
@@ -231,12 +234,30 @@ dependencies {
         exclude group: 'junit', module: 'junit'
     }
 
+    functionalCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
+      force = true
+    }
     integrationTestCompile sourceSets.main.runtimeClasspath
     integrationTestCompile sourceSets.test.runtimeClasspath
 
     functionalCompile sourceSets.main.runtimeClasspath
     functionalCompile sourceSets.test.runtimeClasspath
+
+    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
+    functionalCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+    functionalAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+    functionalCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
+    functionalCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
+    functionalCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
+    functionalCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
+    functionalCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 }
+
+
+
+
 
 mainClassName = 'uk.gov.hmcts.reform.amapi.Application'
 
@@ -292,6 +313,4 @@ integration {
     useJUnitPlatform()
 }
 
-functional {
-    useJUnitPlatform()
-}
+gradle.startParameter.continueOnFailure = true

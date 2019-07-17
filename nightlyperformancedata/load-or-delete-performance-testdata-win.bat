@@ -9,10 +9,10 @@ if "%DATABASE_NAME%" == "" (
     set "DATABASE_NAME=am"
 )
 if "%2" == "load" (
-  set "FILE_NAME=initial-data-load"
+  set "FILE_NAME=load-data"
 ) ELSE (
     set "FILE_NAME=delete-data"
 )
 docker cp %1  am-lib-testing-service-db:/tmp/
-docker exec -i am-lib-testing-service-db psql -U %DATABASE_USER% -d %DATABASE_NAME% -f /tmp/testdata/%FILE_NAME%.sql
+docker exec -i am-lib-testing-service-db psql -U %DATABASE_USER% -d %DATABASE_NAME% -f /tmp/sql/%FILE_NAME%.sql
 echo done

@@ -274,21 +274,21 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
 
 task loadPerformanceTestData(type: Exec) {
   if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-    commandLine 'cmd', '/c', file("${project.projectDir}/src/gatling/load-or-delete-data-win.bat"),
-      file("${project.projectDir}/src/gatling/testdata"), "load", "${DATABASE_USER}", "${DATABASE_NAME}", "${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
+    commandLine 'cmd', '/c', file("${project.projectDir}/nightlyperformancedata/load-or-delete-performance-testdata-win.bat"),
+      file("${project.projectDir}/nightlyperformancedata/sql"), "load", "${DATABASE_USER}", "${DATABASE_NAME}", "${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
   } else {
-    commandLine 'sh', file("${project.projectDir}/src/gatling/load-or-delete-data.sh"),
-      file("${project.projectDir}/src/gatling/testdata"), "load", "${DATABASE_USER}", "${DATABASE_NAME}","${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
+    commandLine 'sh', file("${project.projectDir}/nightlyperformancedata/load-or-delete-data.sh"),
+      file("${project.projectDir}/nightlyperformancedata/sql"), "load", "${DATABASE_USER}", "${DATABASE_NAME}","${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
   }
 }
 
 task deletePerformanceTestData(type: Exec) {
   if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-    commandLine 'cmd', '/c', file("${project.projectDir}/src/gatling/load-or-delete-data-win.bat"),
-      file("${project.projectDir}/src/gatling/testdata"), "delete", "${DATABASE_USER}", "${DATABASE_NAME}", "${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
+    commandLine 'cmd', '/c', file("${project.projectDir}/nightlyperformancedata/load-or-delete-performance-testdata-win.bat"),
+      file("${project.projectDir}/nightlyperformancedata/sql"), "delete", "${DATABASE_USER}", "${DATABASE_NAME}", "${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
   } else {
-    commandLine 'sh', file("${project.projectDir}/src/gatling/load-or-delete-data.sh"),
-      file("${project.projectDir}/src/gatling/testdata"), "delete" ,"${DATABASE_USER}", "${DATABASE_NAME}", "${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
+    commandLine 'sh', file("${project.projectDir}/nightlyperformancedata/load-or-delete-data.sh"),
+      file("${project.projectDir}/nightlyperformancedata/sql"), "delete" ,"${DATABASE_USER}", "${DATABASE_NAME}", "${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
   }
 }
 

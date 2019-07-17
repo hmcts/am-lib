@@ -191,7 +191,7 @@ public class FilterResourceService {
      * @param resourceId   resourceId
      * @param resourceName resourceName
      * @param resourceType resourceType
-     * @return ResourceAccessorsEnvelope ResourceAccessor
+     * @return ResourceAccessorsEnvelope resourceAccessorsEnvelope
      */
     @AuditLog("returns access rights for given resource with resource id '{{resourceId}}' "
         + "  resource name '{{resourceName}} and resource type '{{resourceType}}' : with result resource id "

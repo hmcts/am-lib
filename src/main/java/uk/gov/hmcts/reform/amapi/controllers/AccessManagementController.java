@@ -93,10 +93,9 @@ public class AccessManagementController {
         response = ResourceAccessorsEnvelope.class)
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successfully returns users who have access to a resource"),
-        //@ApiResponse(code = 415, message = "Unsupported media type. Expected json"),
         @ApiResponse(code = 401, message = "You are not authorized to perform this particular request. "
             + "Please provide a valid access token in the request"),
-        @ApiResponse(code = 400, message = "Incomplete request information or Malformed input request"),
+        @ApiResponse(code = 400, message = "Incomplete request information or malformed input request"),
         @ApiResponse(code = 500, message = "Internal server error")
     })
     @GetMapping("/resource/resourceType/{resourceType}/resourceName/{resourceName}/resourceId/{resourceId}")

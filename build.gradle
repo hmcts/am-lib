@@ -259,10 +259,6 @@ dependencies {
     functionalCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 }
 
-
-
-
-
 mainClassName = 'uk.gov.hmcts.reform.amapi.Application'
 
 bootJar {

@@ -49,7 +49,7 @@ public class FilterResourceServiceValidationTest {
         String resourceId, String resourceName, String resourceType) {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.returnResourceAccessList(resourceId, resourceName, resourceType))
+            .isThrownBy(() -> service.returnResourceAccessors(resourceId, resourceName, resourceType))
             .withMessageMatching(expectedValidationMessagesRegex(
                 "resourceId - must not be blank",
                 "resourceName - must not be blank",

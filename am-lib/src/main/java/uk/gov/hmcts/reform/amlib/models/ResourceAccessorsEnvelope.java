@@ -8,8 +8,8 @@ import java.util.List;
 
 @Data
 @Builder
-public class AccessorListByResourceEnvelope {
+public class ResourceAccessorsEnvelope {
     String resourceId;
     @JsonProperty("explicitAccess")
-    List<AccessResourceEnvelope> explicitAccesses;
+    List<ResourceAccessor> explicitAccessors;
 }

@@ -11,6 +11,8 @@ properties([
 
 @Library("Infrastructure")
 
+import uk.gov.hmcts.contino.AppPipelineConfig
+
 def type = "java"
 def product = "am"
 def component = "lib-test"

@@ -11,9 +11,12 @@ properties([
 
 @Library("Infrastructure")
 
+import uk.gov.hmcts.contino.AppPipelineConfig
+
 def type = "java"
 def product = "am"
 def component = "lib-test"
+
 
 List<Map<String, Object>> secrets = [
   secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
@@ -22,6 +25,10 @@ List<Map<String, Object>> secrets = [
   secret('am-lib-test-POSTGRES-USER', 'DATABASE_USERNAME'),
   secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASSWORD')
 ]
+
+def subscription = "nonprod"
+def config = new AppPipelineConfig()
+config.vaultSecrets = secrets
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [ $class: 'AzureKeyVaultSecret',

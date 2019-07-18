@@ -42,12 +42,18 @@
     vulnerability only applies to Windows environments and vulnerable components is disabled by default]]></notes>
     <sha1>56e42e12bf92b713befd0700430f7c5c0af68d49</sha1>
     <cpe>cpe:/a:apache:tomcat</cpe>
+    <cpe>cpe:/a:apache_software_foundation:tomcat</cpe>
+    <cpe>cpe:/a:apache_tomcat:apache_tomcat</cpe>
+    <cve>CVE-2019-10072</cve>
   </suppress>
+
   <suppress>
     <notes><![CDATA[file name: tomcat-embed-websocket-9.0.19.jar - Spring Boot dependency, not applicable as
     vulnerability only applies to Windows environments and vulnerable components is disabled by default]]></notes>
     <sha1>dee79022818f490203f4901f5651f3233aee14db</sha1>
     <cpe>cpe:/a:apache:tomcat</cpe>
+    <cpe>cpe:/a:apache_software_foundation:tomcat</cpe>
+    <cpe>cpe:/a:apache_tomcat:apache_tomcat</cpe>
   </suppress>
   <suppress>
     <notes><![CDATA[file name: applicationinsights-core-2.3.1.jar (shaded: io.netty:netty-tcnative-boringssl-static:2.0.17.Final)]]></notes>

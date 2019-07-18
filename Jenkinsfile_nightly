@@ -18,12 +18,23 @@ def product = "am"
 def component = "lib-test"
 
 
-List<Map<String, Object>> secrets = [
+/*List<Map<String, Object>> secrets = [
   secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
   secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
   secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
   secret('am-lib-test-POSTGRES-USER', 'DATABASE_USERNAME'),
   secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASSWORD')
+]*/
+
+def secretId = "am-lib-test-${params.ENVIRONMENT}"
+def secrets = [
+  (secretId): [
+    secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
+    secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
+    secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
+    secret('am-lib-test-POSTGRES-USER', 'DATABASE_USERNAME'),
+    secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASSWORD')
+  ]
 ]
 
 def subscription = "nonprod"
@@ -39,8 +50,8 @@ static Map<String, Object> secret(String secretName, String envVariable) {
 }
 
 withNightlyPipeline(type, product, component) {
-  setVaultName('am-lib-test')
-  loadVaultSecrets(secrets)
+  //setVaultName('am-lib-test')
+  //loadVaultSecrets(secrets)
 
   enableMutationTest()
   enablePerformanceTest()

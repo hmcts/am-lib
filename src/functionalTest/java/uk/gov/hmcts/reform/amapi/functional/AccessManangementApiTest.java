@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,7 +23,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
-
+@Slf4j
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert","PMD.AvoidDuplicateLiterals"})
@@ -46,19 +47,25 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
             + ", serviceName=" + amApiClient.getSeriviceName()
             + ", resourceType=" + amApiClient.getResourceType()
             + "}";
-        Response response = amApiClient.createExplicitAccess().post(amApiClient.getAccessUrl()
-            + "api/access-resource");
-        response.then().statusCode(201);
-        response.then().log();
-        JsonPath responseBody =  response.getBody().jsonPath();
-        assertThat(responseBody.get("accessorIds").toString()).isEqualTo("[" + amApiClient.getAccessorId() + "]");
-        assertThat(responseBody.get("resourceId").toString()).isEqualTo(amApiClient.getResourceId());
-        assertThat(responseBody.get("resourceDefinition").toString()).isEqualTo(expectedResourceDef);
-        assertThat(responseBody.get("relationship").toString()).isEqualTo(amApiClient.getRelationship());
-        assertThat(responseBody.get("attributePermissions").toString()).contains("CREATE");
-        assertThat(responseBody.get("attributePermissions").toString()).contains("READ");
-        assertThat(responseBody.get("attributePermissions").toString()).contains("UPDATE");
-        assertThat(responseBody.get("accessorType").toString()).isEqualTo(USER.toString());
+        try {
+            Response response = amApiClient.createExplicitAccess().post(amApiClient.getAccessUrl()
+                + "api/access-resource");
+            response.then().statusCode(201);
+            response.then().log();
+            JsonPath responseBody = response.getBody().jsonPath();
+            assertThat(responseBody.get("accessorIds").toString()).isEqualTo("[" + amApiClient.getAccessorId() + "]");
+            assertThat(responseBody.get("resourceId").toString()).isEqualTo(amApiClient.getResourceId());
+            assertThat(responseBody.get("resourceDefinition").toString()).isEqualTo(expectedResourceDef);
+            assertThat(responseBody.get("relationship").toString()).isEqualTo(amApiClient.getRelationship());
+            assertThat(responseBody.get("attributePermissions").toString()).contains("CREATE");
+            assertThat(responseBody.get("attributePermissions").toString()).contains("READ");
+            assertThat(responseBody.get("attributePermissions").toString()).contains("UPDATE");
+            assertThat(responseBody.get("accessorType").toString()).isEqualTo(USER.toString());
+        }
+        catch(Exception e){
+            log.error("verifyGrantExplicitAccessApi : " + e.toString());
+            response.then().log();
+        }
     }
 
     @Test
@@ -99,10 +106,16 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
 
     @Test
     public void verifyGrantExplicitAccessErrorScenariosInvalidMediaType() {
-        Response response = amApiClient.createExplicitAccess()
-            .header("Content-Type", "application/xml")
-            .post(amApiClient.getAccessUrl() + "api/access-resource");
-        response.then().statusCode(415);
+        try {
+            Response response = amApiClient.createExplicitAccess()
+                .header("Content-Type", "application/xml")
+                .post(amApiClient.getAccessUrl() + "api/access-resource");
+            response.then().statusCode(415);
+        }
+        catch (Exception e){
+            log.error("verifyGrantExplicitAccessApi : " + e.toString());
+            response.then().log();
+        }
     }
 
     @Test

@@ -15,7 +15,7 @@ public class HealthCheckTest extends FunctionalTestSuite {
     @Test
     @Tag("SmokeTest")
     public void healthcheckReturns200() {
-        amApiClient.buildRequest().get("http://localhost:3704/health")
+        amApiClient.buildRequest().get(amApiClient.getAccessUrl() + "health")
             .then().statusCode(200)
             .and().body("status", equalTo("UP"));
     }

@@ -61,8 +61,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
             assertThat(responseBody.get("attributePermissions").toString()).contains("READ");
             assertThat(responseBody.get("attributePermissions").toString()).contains("UPDATE");
             assertThat(responseBody.get("accessorType").toString()).isEqualTo(USER.toString());
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             log.error("verifyGrantExplicitAccessApi : " + e.toString());
             response.then().log();
         }
@@ -111,8 +110,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
                 .header("Content-Type", "application/xml")
                 .post(amApiClient.getAccessUrl() + "api/access-resource");
             response.then().statusCode(415);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.error("verifyGrantExplicitAccessApi : " + e.toString());
             response.then().log();
         }

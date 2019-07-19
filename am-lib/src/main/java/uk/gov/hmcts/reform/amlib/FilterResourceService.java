@@ -33,7 +33,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
@@ -42,7 +41,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -129,7 +127,7 @@ public class FilterResourceService {
                                                        Map<@NotNull JsonPointer, SecurityClassification>
                                                        attributeSecurityClassifications) {
 
-        List<ExplicitAccessRecord> explicitAccessRecords = getExplicitAccessRecords(userId, resource);
+        List<ExplicitAccessRecord> explicitAccessRecords = getExplicitAccessRecords(userId, userRoles, resource);
 
         Map<JsonPointer, Set<Permission>> attributePermissions;
         AccessType accessType;
@@ -234,9 +232,12 @@ public class FilterResourceService {
     }
 
 
-    private List<ExplicitAccessRecord> getExplicitAccessRecords(String userId, Resource resource) {
+    private List<ExplicitAccessRecord> getExplicitAccessRecords(String userId,
+                                                                @NotEmpty Set<String> userRoles,
+                                                                Resource resource) {
         return jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getExplicitAccess(userId, resource.getId(), resource.getDefinition().getResourceType()));
+            dao -> dao.getExplicitAccess(userId, userRoles, resource.getId(),
+                resource.getDefinition().getResourceType()));
     }
 
     private Map<JsonPointer, Set<Permission>> getRoleAttributePermissions(Set<String> userRoles,
@@ -252,16 +253,51 @@ public class FilterResourceService {
     private Map<JsonPointer, Set<Permission>> getExplicitAttributePermissions(
         List<ExplicitAccessRecord> explicitAccessRecords) {
 
-        List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccessRecords.stream()
+        // BUG: IF USER/ROLE HAS SAME RELATIONSHIP (INCLUDING NULL), MERGE WILL THROW ERROR: DUPLICATE KEY [READ]
+
+        // group by accessorid
+        Map<String, List<ExplicitAccessRecord>> permissionsByAccessorId = explicitAccessRecords.stream()
+            .collect(groupingBy(ExplicitAccessRecord::getAccessorId));
+
+        // merge permissions for each accessorid
+        List<Map<JsonPointer, Set<Permission>>> mergedPermissionsByAccessorId = new ArrayList<>();
+        permissionsByAccessorId.forEach((accessorId, accessorExplicitAccessRecords) -> {
+            List<Map<JsonPointer, Set<Permission>>> permissions = accessorExplicitAccessRecords.stream()
+                .map(explicitAccessRecord -> Collections.singletonMap(explicitAccessRecord.getAttribute(),
+                    explicitAccessRecord.getPermissions()))
+                .collect(toList());
+            Map<JsonPointer, Set<Permission>> mergedPermissionForAccessorId =
+                permissionsService.merge(permissions);
+            mergedPermissionsByAccessorId.add(mergedPermissionForAccessorId);
+        });
+
+        return permissionsService.merge(mergedPermissionsByAccessorId);
+
+
+        /*List<Map<JsonPointer, Set<Permission>>> permissions = explicitAccessRecords.stream()
+            .map(explicitAccessRecord -> Collections.singletonMap(explicitAccessRecord.getAttribute(),
+                explicitAccessRecord.getPermissions()))
+            .collect(toList());*/
+
+        /*List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccessRecords.stream()
             .collect(collectingAndThen(groupingByWithNullKeys(ExplicitAccessRecord::getRelationship), Map::values))
             .stream()
             .map(explicitAccessRecordsForRelationship -> explicitAccessRecordsForRelationship.stream()
                 .collect(getMapCollector()))
-            .collect(toList());
+            .collect(toList());*/
 
-        return permissionsService.merge(permissionsForRelationships);
+        /*Collection<List<ExplicitAccessRecord>> temp1 = explicitAccessRecords.stream()
+            .collect(collectingAndThen(groupingByWithNullKeys(ExplicitAccessRecord::getRelationship), Map::values));
+
+        List<Map<JsonPointer, Set<Permission>>> temp2 = temp1.stream()
+            .map(explicitAccessRecordsForRelationship -> explicitAccessRecordsForRelationship.stream()
+                .collect(getMapCollector()))
+            .collect(toList());*/
+
+        //return permissionsService.merge(permissions);
+
+        //return permissionsService.merge(permissionsForRelationships);
     }
-
 
     private Set<String> getRelationshipsFromExplicitAccessRecords(List<ExplicitAccessRecord> explicitAccessRecords) {
         return explicitAccessRecords.stream()
@@ -291,28 +327,6 @@ public class FilterResourceService {
         }
 
         return permissionsService.merge(permissionsForRoles);
-    }
-
-
-    /**
-     * check group by when keys are null (eg. usage when relationship key for Annotation is null).
-     *
-     * @param classifier lamda function
-     * @param <T>        Type of Input
-     * @param <A>        Result output
-     * @return
-     */
-    private static <T, A> Collector<T, ?, Map<A, List<T>>> groupingByWithNullKeys(
-        Function<? super T, ? extends A> classifier) {
-        return toMap(
-            classifier,
-            Collections::singletonList,
-            (List<T> oldList, List<T> newCollection) -> {
-                List<T> newList = new ArrayList<>(oldList.size() + 1);
-                newList.addAll(oldList);
-                newList.addAll(newCollection);
-                return newList;
-            });
     }
 
     private Map<JsonPointer, Set<Permission>> filterAttributePermissionsBySecurityClassification(

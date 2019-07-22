@@ -697,17 +697,21 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             resourceDefinition, createPermissions(rootLevelAttribute, ImmutableSet.of(READ))));
         service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess,
             resourceDefinition, createPermissions(nestedAttribute, ImmutableSet.of(CREATE))));
-        service.grantExplicitResourceAccess(createGrantForRole(resourceId, idamRoleWithRoleBasedAccess, null,
+        service.grantExplicitResourceAccess(createGrantForRole(resourceId, idamRoleWithExplicitAccess, null,
             resourceDefinition, createPermissions(nestedAttribute, ImmutableSet.of(DELETE))));
 
         FilteredResourceEnvelope result = filterResourceService.filterResource(accessorId,
-            ImmutableSet.of(idamRoleWithRoleBasedAccess), createResource(resourceId, resourceDefinition), null);
+            ImmutableSet.of(idamRoleWithExplicitAccess), createResource(resourceId, resourceDefinition, createData()),
+            null);
+
+        JsonNode expectedData = JsonNodeFactory.instance.objectNode()
+            .put(rootLevelAttribute.replace("/", ""), rootLevelAttributeValue);
 
         assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
             .resource(Resource.builder()
                 .id(resourceId)
                 .definition(resourceDefinition)
-                .data(JsonNodeFactory.instance.objectNode())
+                .data(expectedData)
                 .build())
             .access(AccessEnvelope.builder()
                 .permissions(ImmutableMap.of(

@@ -253,50 +253,20 @@ public class FilterResourceService {
     private Map<JsonPointer, Set<Permission>> getExplicitAttributePermissions(
         List<ExplicitAccessRecord> explicitAccessRecords) {
 
-        // BUG: IF USER/ROLE HAS SAME RELATIONSHIP (INCLUDING NULL), MERGE WILL THROW ERROR: DUPLICATE KEY [READ]
+        // group records by accessor / relationship combo
+        Map<String, List<ExplicitAccessRecord>> recordsByAccessorIdAndRelationship = explicitAccessRecords.stream()
+            .collect(groupingBy(ear -> ear.getAccessorId() + "." + ear.getRelationship()));
 
-        // group by accessorid
-        Map<String, List<ExplicitAccessRecord>> permissionsByAccessorId = explicitAccessRecords.stream()
-            .collect(groupingBy(ExplicitAccessRecord::getAccessorId));
-
-        // merge permissions for each accessorid
-        List<Map<JsonPointer, Set<Permission>>> mergedPermissionsByAccessorId = new ArrayList<>();
-        permissionsByAccessorId.forEach((accessorId, accessorExplicitAccessRecords) -> {
-            List<Map<JsonPointer, Set<Permission>>> permissions = accessorExplicitAccessRecords.stream()
-                .map(explicitAccessRecord -> Collections.singletonMap(explicitAccessRecord.getAttribute(),
-                    explicitAccessRecord.getPermissions()))
-                .collect(toList());
-            Map<JsonPointer, Set<Permission>> mergedPermissionForAccessorId =
-                permissionsService.merge(permissions);
-            mergedPermissionsByAccessorId.add(mergedPermissionForAccessorId);
+        // create map of attribute permissions for each accessor / relationship combo
+        List<Map<JsonPointer, Set<Permission>>> permissionsByAccessorIdAndRelationship = new ArrayList<>();
+        recordsByAccessorIdAndRelationship.forEach((accessorId, records) -> {
+            Map<JsonPointer, Set<Permission>> permissions = new ConcurrentHashMap<>();
+            records.forEach(record -> permissions.put(record.getAttribute(), record.getPermissions()));
+            permissionsByAccessorIdAndRelationship.add(permissions);
         });
 
-        return permissionsService.merge(mergedPermissionsByAccessorId);
-
-
-        /*List<Map<JsonPointer, Set<Permission>>> permissions = explicitAccessRecords.stream()
-            .map(explicitAccessRecord -> Collections.singletonMap(explicitAccessRecord.getAttribute(),
-                explicitAccessRecord.getPermissions()))
-            .collect(toList());*/
-
-        /*List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccessRecords.stream()
-            .collect(collectingAndThen(groupingByWithNullKeys(ExplicitAccessRecord::getRelationship), Map::values))
-            .stream()
-            .map(explicitAccessRecordsForRelationship -> explicitAccessRecordsForRelationship.stream()
-                .collect(getMapCollector()))
-            .collect(toList());*/
-
-        /*Collection<List<ExplicitAccessRecord>> temp1 = explicitAccessRecords.stream()
-            .collect(collectingAndThen(groupingByWithNullKeys(ExplicitAccessRecord::getRelationship), Map::values));
-
-        List<Map<JsonPointer, Set<Permission>>> temp2 = temp1.stream()
-            .map(explicitAccessRecordsForRelationship -> explicitAccessRecordsForRelationship.stream()
-                .collect(getMapCollector()))
-            .collect(toList());*/
-
-        //return permissionsService.merge(permissions);
-
-        //return permissionsService.merge(permissionsForRelationships);
+        // merge attribute permissions between each accessor / relationship combo
+        return permissionsService.merge(permissionsByAccessorIdAndRelationship);
     }
 
     private Set<String> getRelationshipsFromExplicitAccessRecords(List<ExplicitAccessRecord> explicitAccessRecords) {

@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import java.util.Map;
 import java.util.Set;
 
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.ROLE;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 
@@ -40,6 +41,21 @@ public final class TestDataFactory {
             .resourceId(resourceId)
             .accessorIds(ImmutableSet.of(accessorId))
             .accessorType(USER)
+            .resourceDefinition(resourceDefinition)
+            .attributePermissions(attributePermissions)
+            .relationship(relationship)
+            .build();
+    }
+
+    public static ExplicitAccessGrant createGrantForRole(String resourceId,
+                                                         String accessorId,
+                                                         String relationship,
+                                                         ResourceDefinition resourceDefinition,
+                                                         Map<JsonPointer, Set<Permission>> attributePermissions) {
+        return ExplicitAccessGrant.builder()
+            .resourceId(resourceId)
+            .accessorIds(ImmutableSet.of(accessorId))
+            .accessorType(ROLE)
             .resourceDefinition(resourceDefinition)
             .attributePermissions(attributePermissions)
             .relationship(relationship)

@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.amapi.functional.client.AmApiClient;
 public class FunctionalTestSuite {
 
 
-    @Value("${accessInstance}")
+    @Value("${targetInstance}")
     protected String accessUrl;
 
     public AmApiClient amApiClient;

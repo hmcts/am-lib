@@ -6,6 +6,11 @@ import io.gatling.http.request.builder.HttpRequestBuilder
 
 object AccessManagement {
 
+  private def getRequest(url: String): HttpRequestBuilder =
+    http(url)
+      .get("/api" + url)
+      .check(status.is(200))
+
   private def postRequest(url: String, body: String, statusExpected: Int): HttpRequestBuilder =
     http(url)
       .post("/api" + url)
@@ -26,4 +31,8 @@ object AccessManagement {
 
   def revokeResourceAccess: HttpRequestBuilder =
     deleteRequest("/access-resource", "revokeResourceAccess.json")
+
+  def returnResourceAccessors: HttpRequestBuilder =
+    getRequest("/resource/resourceType/case/resourceName/claim/resourceId/${resourceId}")
+
 }

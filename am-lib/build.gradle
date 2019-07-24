@@ -94,7 +94,7 @@ dependencies {
     compile group: 'org.aspectj', name: 'aspectjrt', version: '1.9.4'
     compile group: 'io.swagger', name: 'swagger-annotations', version: '1.5.22'
     
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.0'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.0.0'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.12.2'
     testCompile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
@@ -105,7 +105,7 @@ dependencies {
 
     benchmarkAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.21'
 
-    benchmarkImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.2'
+    benchmarkImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
     benchmarkCompile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
     benchmarkCompile sourceSets.main.runtimeClasspath
     benchmarkCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'

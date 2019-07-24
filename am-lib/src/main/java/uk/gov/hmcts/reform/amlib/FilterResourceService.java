@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
-import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
@@ -18,11 +17,11 @@ import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepositor
 import uk.gov.hmcts.reform.amlib.internal.utils.SecurityClassifications;
 import uk.gov.hmcts.reform.amlib.internal.validation.ValidAttributeSecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
-import uk.gov.hmcts.reform.amlib.models.AccessResourceEnvelope;
-import uk.gov.hmcts.reform.amlib.models.AccessorListByResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
 import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
+import uk.gov.hmcts.reform.amlib.models.ResourceAccessor;
+import uk.gov.hmcts.reform.amlib.models.ResourceAccessorsEnvelope;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
+
 import javax.sql.DataSource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -47,6 +47,7 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class FilterResourceService {
@@ -188,39 +189,39 @@ public class FilterResourceService {
      * @param resourceId   resourceId
      * @param resourceName resourceName
      * @param resourceType resourceType
-     * @return AccessorListByResourceEnvelope AccessResourceEnvelope
+     * @return ResourceAccessorsEnvelope resourceAccessorsEnvelope
      */
     @AuditLog("returns access rights for given resource with resource id '{{resourceId}}' "
         + "  resource name '{{resourceName}} and resource type '{{resourceType}}' : with result resource id "
-        + " {{result.resourceId}} and data {{result.explicitAccessResourceEnvelopesList}}")
-    public AccessorListByResourceEnvelope returnResourceAccessList(@NotBlank String resourceId,
-                                           @NotBlank String resourceName, @NotBlank String resourceType) {
+        + " {{result.resourceId}} and data {{result.explicitAccessors}}")
+    public ResourceAccessorsEnvelope returnResourceAccessors(@NotBlank String resourceId,
+                                                             @NotBlank String resourceName,
+                                                             @NotBlank String resourceType) {
 
-        //collect root-level attribute
         List<ExplicitAccessRecord> explicitAccessRecords = jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getExplicitAccessForResource(resourceId, resourceName, resourceType, AccessorType.USER));
+            dao -> dao.getExplicitAccessForResource(resourceId, resourceName, resourceType, USER));
 
-        Map<String, List<ExplicitAccessRecord>> explicitAccessRecordsMap = explicitAccessRecords.stream()
+        Map<String, List<ExplicitAccessRecord>> explicitAccessRecordsByAccessorId = explicitAccessRecords.stream()
             .collect(groupingBy(ExplicitAccessRecord::getAccessorId));
 
-        final List<AccessResourceEnvelope> accessResourceEnvelopes = new ArrayList<>();
+        List<ResourceAccessor> resourceAccessors = new ArrayList<>();
 
-        explicitAccessRecordsMap.entrySet().forEach(explicitAccessRecord -> {
-            //set permissions
-            Map<JsonPointer, Set<Permission>> permissions = getExplicitAttributePermissions(
-                explicitAccessRecord.getValue());
-            //set relationships
-            Set<String> relationships = getRelationshipsFromExplicitAccessRecords(explicitAccessRecord.getValue());
-            AccessEnvelope accessEnvelope = AccessEnvelope.builder().permissions(permissions).build();
-            accessResourceEnvelopes.add(AccessResourceEnvelope.builder()
-                .accessorId(explicitAccessRecord.getKey())
-                .access(accessEnvelope).accessorType(AccessorType.USER)
-                .relationships(relationships).build());
+        explicitAccessRecordsByAccessorId.forEach((accessorId, accessorExplicitAccessRecords) -> {
+            Map<JsonPointer, Set<Permission>> permissions =
+                getExplicitAttributePermissions(accessorExplicitAccessRecords);
+            Set<String> relationships = getRelationshipsFromExplicitAccessRecords(accessorExplicitAccessRecords);
+            resourceAccessors.add(ResourceAccessor.builder()
+                .accessorId(accessorId)
+                .accessorType(USER)
+                .relationships(relationships)
+                .permissions(permissions)
+                .build());
         });
 
-        return AccessorListByResourceEnvelope.builder()
-            .explicitAccessResourceEnvelopesList(accessResourceEnvelopes)
-            .resourceId(resourceId).build();
+        return ResourceAccessorsEnvelope.builder()
+            .explicitAccessors(resourceAccessors)
+            .resourceId(resourceId)
+            .build();
     }
 
     private Integer getMaxSecurityClassificationHierarchyForRoles(@NotEmpty Set<String> userRoles) {

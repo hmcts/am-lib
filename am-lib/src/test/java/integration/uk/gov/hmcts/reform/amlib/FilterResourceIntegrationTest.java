@@ -12,14 +12,13 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.FilterResourceService;
-import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
-import uk.gov.hmcts.reform.amlib.models.AccessResourceEnvelope;
-import uk.gov.hmcts.reform.amlib.models.AccessorListByResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
+import uk.gov.hmcts.reform.amlib.models.ResourceAccessor;
+import uk.gov.hmcts.reform.amlib.models.ResourceAccessorsEnvelope;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.Collections;
@@ -34,6 +33,7 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
@@ -442,14 +442,14 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void mergeResultEnvelopeWhenExplicitAccessWithNullRelationshipAndNotnullRelationShip() {
+    void mergeResultEnvelopeWhenExplicitAccessWithNullRelationshipAndNotNullRelationship() {
 
         service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, null, resourceDefinition,
             createPermissions(rootLevelAttribute, ImmutableSet.of(UPDATE))));
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition,
-            createPermissions(rootLevelAttribute, ImmutableSet.of(READ))));
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition,
-            createPermissions(nestedAttribute, ImmutableSet.of(CREATE))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess,
+            resourceDefinition, createPermissions(rootLevelAttribute, ImmutableSet.of(READ))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess,
+            resourceDefinition, createPermissions(nestedAttribute, ImmutableSet.of(CREATE))));
 
         FilteredResourceEnvelope result = filterResourceService.filterResource(
             accessorId, ImmutableSet.of(idamRoleWithRoleBaseAccess), createResource(resourceId, resourceDefinition),
@@ -475,7 +475,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void testReturnResourceAccessList() {
+    void testReturnResourceAccessListWithAtLeastOneAccessorForResource() {
 
         String resourceType = UUID.randomUUID().toString();
         String resourceName = UUID.randomUUID().toString();
@@ -486,37 +486,49 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         String accessorId1 = UUID.randomUUID().toString();
         String accessorId2 = UUID.randomUUID().toString();
 
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition,
-            createPermissions("", ImmutableSet.of(UPDATE, READ))));
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition,
-            createPermissions(rootLevelAttribute, ImmutableSet.of(UPDATE, READ))));
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition,
-            createPermissions(nestedAttribute, ImmutableSet.of(CREATE))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess,
+            resourceDefinition, createPermissions("", ImmutableSet.of(UPDATE, READ))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess,
+            resourceDefinition, createPermissions(rootLevelAttribute, ImmutableSet.of(UPDATE, READ))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess,
+            resourceDefinition, createPermissions(nestedAttribute, ImmutableSet.of(CREATE))));
 
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId1, idamRoleWithExplicitAccess, resourceDefinition,
-            createPermissions("", ImmutableSet.of(UPDATE))));
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId2, idamRoleWithExplicitAccess, resourceDefinition,
-            createPermissions("", ImmutableSet.of(READ))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId1, idamRoleWithExplicitAccess,
+            resourceDefinition, createPermissions("", ImmutableSet.of(UPDATE))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId2, idamRoleWithExplicitAccess,
+            resourceDefinition, createPermissions("", ImmutableSet.of(READ))));
 
-        AccessorListByResourceEnvelope result = filterResourceService
-            .returnResourceAccessList(resourceId, resourceName, resourceType);
-        result.getExplicitAccessResourceEnvelopesList().sort(Comparator.comparing(AccessResourceEnvelope::getAccessorId));
+        ResourceAccessorsEnvelope result = filterResourceService
+            .returnResourceAccessors(resourceId, resourceName, resourceType);
 
-        List<AccessResourceEnvelope> expectedExplicitAccessResourceEnvelopesList = ImmutableList.of(
-            AccessResourceEnvelope.builder().accessorId(accessorId).access(AccessEnvelope.builder()
-            .permissions(createPermissions("", ImmutableSet.of(UPDATE, READ)))
-            .build()).accessorType(AccessorType.USER).relationships(ImmutableSet.of(idamRoleWithExplicitAccess)).build(),
-            AccessResourceEnvelope.builder().accessorId(accessorId1).access(AccessEnvelope.builder()
+        result.getExplicitAccessors().sort(Comparator.comparing(ResourceAccessor::getAccessorId));
+
+        List<ResourceAccessor> expectedExplicitResourceEnvelopesList = ImmutableList.of(
+            ResourceAccessor.builder()
+                .accessorId(accessorId)
+                .accessorType(USER)
+                .relationships(ImmutableSet.of(idamRoleWithExplicitAccess))
+                .permissions(createPermissions("", ImmutableSet.of(UPDATE, READ)))
+                .build(),
+            ResourceAccessor.builder()
+                .accessorId(accessorId1)
+                .accessorType(USER)
+                .relationships(ImmutableSet.of(idamRoleWithExplicitAccess))
                 .permissions(createPermissions("", ImmutableSet.of(UPDATE)))
-                .build()).accessorType(AccessorType.USER).relationships(ImmutableSet.of(idamRoleWithExplicitAccess)).build(),
-            AccessResourceEnvelope.builder().accessorId(accessorId2).access(AccessEnvelope.builder()
+                .build(),
+            ResourceAccessor.builder()
+                .accessorId(accessorId2)
+                .accessorType(USER)
+                .relationships(ImmutableSet.of(idamRoleWithExplicitAccess))
                 .permissions(createPermissions("", ImmutableSet.of(READ)))
-                .build()).accessorType(AccessorType.USER).relationships(ImmutableSet.of(idamRoleWithExplicitAccess)).build());
+                .build());
 
-        assertThat(result).isEqualToComparingFieldByField(AccessorListByResourceEnvelope.builder()
-            .explicitAccessResourceEnvelopesList(expectedExplicitAccessResourceEnvelopesList.stream().sorted(Comparator
-                .comparing(AccessResourceEnvelope::getAccessorId))
-                .collect(Collectors.toList())).resourceId(resourceId).build());
+        assertThat(result).isEqualToComparingFieldByField(ResourceAccessorsEnvelope.builder()
+            .resourceId(resourceId)
+            .explicitAccessors(expectedExplicitResourceEnvelopesList.stream()
+                .sorted(Comparator.comparing(ResourceAccessor::getAccessorId))
+                .collect(Collectors.toList()))
+            .build());
     }
 
     @Test
@@ -525,11 +537,13 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         String resourceType = UUID.randomUUID().toString();
         String resourceName = UUID.randomUUID().toString();
 
-        AccessorListByResourceEnvelope result = filterResourceService
-            .returnResourceAccessList(resourceId, resourceName, resourceType);
+        ResourceAccessorsEnvelope result = filterResourceService
+            .returnResourceAccessors(resourceId, resourceName, resourceType);
 
-        assertThat(result).isEqualToComparingFieldByField(AccessorListByResourceEnvelope.builder()
-            .explicitAccessResourceEnvelopesList(emptyList()).resourceId(resourceId));
+        assertThat(result).isEqualToComparingFieldByField(ResourceAccessorsEnvelope.builder()
+            .resourceId(resourceId)
+            .explicitAccessors(emptyList())
+            .build());
     }
 
     @Test
@@ -544,21 +558,23 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
         String accessorId1 = UUID.randomUUID().toString();
         String accessorId2 = UUID.randomUUID().toString();
 
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition,
-            createPermissions(rootLevelAttribute, ImmutableSet.of(UPDATE, READ))));
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition,
-            createPermissions(nestedAttribute, ImmutableSet.of(CREATE))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess,
+            resourceDefinition, createPermissions(rootLevelAttribute, ImmutableSet.of(UPDATE, READ))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess,
+            resourceDefinition, createPermissions(nestedAttribute, ImmutableSet.of(CREATE))));
 
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId1, idamRoleWithExplicitAccess, resourceDefinition,
-            createPermissions(rootLevelAttribute, ImmutableSet.of(UPDATE))));
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId2, idamRoleWithExplicitAccess, resourceDefinition,
-            createPermissions(rootLevelAttribute, ImmutableSet.of(READ))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId1, idamRoleWithExplicitAccess,
+            resourceDefinition, createPermissions(rootLevelAttribute, ImmutableSet.of(UPDATE))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId2, idamRoleWithExplicitAccess,
+            resourceDefinition, createPermissions(rootLevelAttribute, ImmutableSet.of(READ))));
 
-        AccessorListByResourceEnvelope result = filterResourceService
-            .returnResourceAccessList(resourceId, resourceName, resourceType);
+        ResourceAccessorsEnvelope result = filterResourceService
+            .returnResourceAccessors(resourceId, resourceName, resourceType);
 
-        assertThat(result).isEqualToComparingFieldByField(AccessorListByResourceEnvelope.builder()
-                .explicitAccessResourceEnvelopesList(emptyList()).resourceId(resourceId));
+        assertThat(result).isEqualToComparingFieldByField(ResourceAccessorsEnvelope.builder()
+            .resourceId(resourceId)
+            .explicitAccessors(emptyList())
+            .build());
     }
 
     @Test
@@ -572,28 +588,30 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             createResourceDefinition(serviceName, resourceType, resourceName));
         importerService.addRole(idamRoleWithExplicitAccess1, IDAM, PUBLIC, EXPLICIT);
 
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition,
-            createPermissions("", ImmutableSet.of(UPDATE, READ))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess,
+            resourceDefinition, createPermissions("", ImmutableSet.of(UPDATE, READ))));
 
-        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess1, resourceDefinition,
-            createPermissions("", ImmutableSet.of(CREATE))));
-        AccessorListByResourceEnvelope result = filterResourceService
-            .returnResourceAccessList(resourceId, resourceName, resourceType);
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, idamRoleWithExplicitAccess1,
+            resourceDefinition, createPermissions("", ImmutableSet.of(CREATE))));
+        ResourceAccessorsEnvelope result = filterResourceService
+            .returnResourceAccessors(resourceId, resourceName, resourceType);
 
-        result.getExplicitAccessResourceEnvelopesList().sort(Comparator.comparing(AccessResourceEnvelope::getAccessorId));
+        result.getExplicitAccessors().sort(Comparator.comparing(ResourceAccessor::getAccessorId));
 
-        List<AccessResourceEnvelope> expectedExplicitAccessResourceEnvelopesList = ImmutableList.of(
-            AccessResourceEnvelope.builder().accessorId(accessorId).access(AccessEnvelope.builder()
+        List<ResourceAccessor> expectedExplicitResourceEnvelopesList = ImmutableList.of(
+            ResourceAccessor.builder()
+                .accessorId(accessorId)
+                .accessorType(USER)
+                .relationships(ImmutableSet.of(idamRoleWithExplicitAccess, idamRoleWithExplicitAccess1))
                 .permissions(createPermissions("", ImmutableSet.of(UPDATE, READ, CREATE)))
-                .build()).accessorType(AccessorType.USER).relationships(ImmutableSet.of(
-                idamRoleWithExplicitAccess, idamRoleWithExplicitAccess1)).build()
-           );
+                .build());
 
-        assertThat(result).isEqualToComparingFieldByField(AccessorListByResourceEnvelope.builder()
-            .explicitAccessResourceEnvelopesList(expectedExplicitAccessResourceEnvelopesList.stream().sorted(Comparator
-                .comparing(AccessResourceEnvelope::getAccessorId))
-                .collect(Collectors.toList())).resourceId(resourceId).build());
-
+        assertThat(result).isEqualToComparingFieldByField(ResourceAccessorsEnvelope.builder()
+            .resourceId(resourceId)
+            .explicitAccessors(expectedExplicitResourceEnvelopesList.stream()
+                .sorted(Comparator.comparing(ResourceAccessor::getAccessorId))
+                .collect(Collectors.toList()))
+            .build());
     }
 
     private DefaultPermissionGrant createDefaultPermissionGrant(String roleName,

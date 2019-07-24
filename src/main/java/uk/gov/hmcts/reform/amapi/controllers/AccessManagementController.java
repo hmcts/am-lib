@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,7 @@ import uk.gov.hmcts.reform.amlib.FilterResourceService;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
+import uk.gov.hmcts.reform.amlib.models.ResourceAccessorsEnvelope;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -84,5 +87,21 @@ public class AccessManagementController {
     public FilteredResourceEnvelope filterResource(@RequestBody FilterResource request) {
         return filterResourceService.filterResource(request.getUserId(), request.getUserRoles(),
             request.getResource(), request.getAttributeSecurityClassification());
+    }
+
+    @ApiOperation(value = "Finds users who have explicit access to a resource",
+        response = ResourceAccessorsEnvelope.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successfully returns users who have access to a resource"),
+        @ApiResponse(code = 401, message = "You are not authorized to perform this particular request. "
+            + "Please provide a valid access token in the request"),
+        @ApiResponse(code = 400, message = "Incomplete request information or malformed input request"),
+        @ApiResponse(code = 500, message = "Internal server error")
+    })
+    @GetMapping("/resource/resourceType/{resourceType}/resourceName/{resourceName}/resourceId/{resourceId}")
+    public ResourceAccessorsEnvelope returnResourceAccessors(@PathVariable("resourceType") String resourceType,
+                                                             @PathVariable("resourceName") String resourceName,
+                                                             @PathVariable("resourceId") String resourceId) {
+        return filterResourceService.returnResourceAccessors(resourceId, resourceName, resourceType);
     }
 }

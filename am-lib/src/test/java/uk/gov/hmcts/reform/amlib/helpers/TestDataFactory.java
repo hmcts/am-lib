@@ -38,10 +38,20 @@ public final class TestDataFactory {
                                                   String relationship,
                                                   ResourceDefinition resourceDefinition,
                                                   Map<JsonPointer, Set<Permission>> attributePermissions) {
+        return createGrant(resourceId, accessorId, relationship, resourceDefinition, attributePermissions, USER);
+    }
+
+    public static ExplicitAccessGrant createGrant(String resourceId,
+                                                             String accessorId,
+                                                             String relationship,
+                                                             ResourceDefinition resourceDefinition,
+                                                             Map<JsonPointer, Set<Permission>> attributePermissions,
+                                                             AccessorType accessorType) {
+
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(ImmutableSet.of(accessorId))
-            .accessorType(USER)
+            .accessorType(accessorType)
             .resourceDefinition(resourceDefinition)
             .attributePermissions(attributePermissions)
             .relationship(relationship)
@@ -62,6 +72,7 @@ public final class TestDataFactory {
             .attributePermissions(attributePermissions)
             .relationship(relationship)
             .build();
+
     }
 
     public static Map<JsonPointer, Set<Permission>> createPermissions(String attribute, Set<Permission> permissions) {

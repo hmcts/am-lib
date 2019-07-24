@@ -725,6 +725,65 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
+    public void filterResourceWithWildcardAccessorShouldAccessibleToAnyUser() {
+
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, null, resourceDefinition,
+            createPermissions(rootLevelAttribute, ImmutableSet.of(UPDATE))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, "*", null, resourceDefinition,
+            createPermissions(rootLevelAttribute, ImmutableSet.of(READ)), DEFAULT));
+
+
+        FilteredResourceEnvelope result = filterResourceService.filterResource(
+            "anyUser", ImmutableSet.of(idamRoleWithExplicitAccess), createResource(resourceId, resourceDefinition),
+            null);
+
+
+        assertThat(result).isEqualToComparingFieldByField(FilteredResourceEnvelope.builder()
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(resourceDefinition)
+                .data(JsonNodeFactory.instance.objectNode())
+                .build())
+            .access(AccessEnvelope.builder()
+                .permissions(ImmutableMap.of(
+                    JsonPointer.valueOf(rootLevelAttribute), ImmutableSet.of(READ)))
+                .accessType(EXPLICIT)
+                .build())
+            .relationships(Collections.emptySet())
+            .build());
+    }
+
+
+    @Test
+    public void filterResourceWithWildcardAccessor() {
+
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, null, resourceDefinition,
+            createPermissions(rootLevelAttribute, ImmutableSet.of(UPDATE))));
+        service.grantExplicitResourceAccess(createGrant(resourceId, "*", null, resourceDefinition,
+            createPermissions(rootLevelAttribute, ImmutableSet.of(READ)), DEFAULT));
+
+
+        FilteredResourceEnvelope result = filterResourceService.filterResource(
+            accessorId, ImmutableSet.of(idamRoleWithExplicitAccess), createResource(resourceId, resourceDefinition),
+            null);
+
+
+        assertThat(result).isEqualToComparingFieldByField(FilteredResourceEnvelope.builder()
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(resourceDefinition)
+                .data(JsonNodeFactory.instance.objectNode())
+                .build())
+            .access(AccessEnvelope.builder()
+                .permissions(ImmutableMap.of(
+                    JsonPointer.valueOf(rootLevelAttribute), ImmutableSet.of(READ, UPDATE)))
+                .accessType(EXPLICIT)
+                .build())
+            .relationships(Collections.emptySet())
+            .build());
+    }
+
+    @Test
     void testReturnResourceAccessList() {
 
         String resourceType = UUID.randomUUID().toString();

@@ -31,6 +31,11 @@ public interface AccessManagementRepository {
         + "on conflict on constraint access_management_unique do update set permissions = :permissionsAsInt")
     void createAccessManagementRecord(@BindBean ExplicitAccessRecord explicitAccessRecord);
 
+    @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, accessor_type, service_name, resource_type, resource_name, attribute, relationship) "
+        + "values (:resourceId, :accessorId, :permissionsAsInt, cast(:accessorType as accessor_type), :serviceName, :resourceType, :resourceName, :attributeAsString, :relationship)"
+        + "on conflict (resource_id, accessor_id, accessor_type, attribute, resource_type, service_name, resource_name) where relationship is null do update set permissions = :permissionsAsInt")
+    void createAccessManagementRecordForNullRelationship(@BindBean ExplicitAccessRecord explicitAccessRecord);
+
     @SqlUpdate("delete from access_management where "
         + "access_management.resource_id = :resourceId "
         + "and access_management.accessor_id = :accessorId "

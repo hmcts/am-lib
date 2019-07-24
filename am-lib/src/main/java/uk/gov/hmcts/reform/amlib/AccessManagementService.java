@@ -28,6 +28,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
@@ -89,7 +90,14 @@ public class AccessManagementService {
                         .attribute(attributePermission.getKey())
                         .relationship(accessGrant.getRelationship())
                         .build())
-                    .forEach(dao::createAccessManagementRecord));
+                    .forEach(expAccessRecord -> {
+                        if (nonNull(accessGrant.getRelationship())) {
+                            dao.createAccessManagementRecord(expAccessRecord);
+                        } else {
+                            //Avoid duplicate insertion on Null relationship
+                            dao.createAccessManagementRecordForNullRelationship(expAccessRecord);
+                        }
+                    }));
         });
     }
 

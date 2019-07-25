@@ -22,6 +22,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.DEFAULT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
@@ -79,6 +80,18 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             resourceId, accessorId, roleName, resourceDefinition, ImmutableSet.of(READ)));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
+    }
+
+    @Test
+    void createExplicitAccessWithWildCard() {
+        Map<JsonPointer, Set<Permission>> multipleAttributePermissions = ImmutableMap.of(
+            JsonPointer.valueOf(""), ImmutableSet.of(CREATE, READ, UPDATE),
+            JsonPointer.valueOf("/name"), ImmutableSet.of(CREATE, READ, UPDATE));
+
+        service.grantExplicitResourceAccess(createGrant(
+            resourceId, "*", roleName, resourceDefinition, multipleAttributePermissions, DEFAULT));
+
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(2);
     }
 
     @Test

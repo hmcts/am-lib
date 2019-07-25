@@ -31,4 +31,12 @@ object BasicScenarios {
         .exec(AccessManagement.revokeResourceAccess)
         .pause(1.second)
     )
+
+  val returnResourceAccessors: ScenarioBuilder = scenario("Return Resource Accessors")
+    .forever(
+      feed(ReturnResourceAccessors.feed)
+        .exec(AccessManagement.createResourceAssess)
+        .exec(AccessManagement.returnResourceAccessors)
+        .pause(1.second)
+    )
 }

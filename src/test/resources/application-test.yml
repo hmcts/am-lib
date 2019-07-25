@@ -1,3 +1,8 @@
+targetInstance: ${TEST_URL:http://localhost:3704}
+s2s-url: ${S2S_URL_FOR_TESTS:http://127.0.0.1:8502}
+s2s-name: am_accessmgmt_api
+# Test key - not used in any deployed vaults or services
+s2s-secret: ${S2S_SECRET:OQHGSGHVQXUEXH7F}
 spring:
   profiles: test
   flyway:

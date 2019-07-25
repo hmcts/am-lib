@@ -19,8 +19,8 @@ print_help() {
 }
 
 # script execution flags
-GRADLE_CLEAN=false
-GRADLE_INSTALL=false
+GRADLE_CLEAN=true
+GRADLE_INSTALL=true
 
 # TODO custom environment variables application requires.
 # TODO also consider enlisting them in help string above ^
@@ -30,7 +30,40 @@ GRADLE_INSTALL=false
 #S2S_URL=localhost
 #S2S_SECRET=secret
 
+# Test S2S key - not used in any HMCTS key vaults or services
+export S2S_SECRET=OQHGSGHVQXUEXH7F
+export S2S_MICROSERVICE=am_accessmgmt_api
+
+build_s2s_image() {
+    git clone git@github.com:hmcts/s2s-test-tool.git
+    cd s2s-test-tool
+    git checkout allow-all-microservices
+    ./gradlew build
+    docker build -t hmcts/service-token-provider .
+    cd .. && rm -rf s2s-test-tool
+}
+
+clean_old_docker_artifacts() {
+    docker stop am-lib-testing-service
+    docker stop am-lib-testing-service-db
+    docker stop service-token-provider
+
+    docker rm am-lib-testing-service
+    docker rm am-lib-testing-service-db
+    docker rm service-token-provider
+
+    docker rmi hmcts/am-lib-testing-service
+    docker rmi hmcts/am-lib-testing-service-db
+    docker rmi hmcts/service-token-provider
+
+}
+
 execute_script() {
+
+  clean_old_docker_artifacts
+
+  build_s2s_image
+
   cd $(dirname "$0")/..
 
   if [ ${GRADLE_CLEAN} = true ]
@@ -45,11 +78,15 @@ execute_script() {
     ./gradlew assemble
   fi
 
+  export SERVER_PORT="${SERVER_PORT:-8090}"
+
 #  echo "Assigning environment variables.."
 #
 #  export DB_PASSWORD=${DB_PASSWORD}
 #  export S2S_URL=${S2S_URL}
 #  export S2S_SECRET=${S2S_SECRET}
+
+  chmod +x bin/*
 
   echo "Bringing up docker containers.."
 

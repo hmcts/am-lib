@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,11 +23,11 @@ import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.FilterResourceService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
-import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
-import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
-import uk.gov.hmcts.reform.amlib.models.ResourceAccessor;
+import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.ResourceAccessorsEnvelope;
+import uk.gov.hmcts.reform.amlib.models.ResourceAccessor;
+import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -42,9 +43,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -54,13 +55,14 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
+
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports", "PMD.LawOfDemeter",
     "PMD.AvoidDuplicateLiterals"})
-public class AccessManagementControllerTest {
+public class AccessManagementControllerTest extends SecurityAuthorizationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -74,11 +76,15 @@ public class AccessManagementControllerTest {
     @MockBean
     private FilterResourceService filterResourceService;
 
+    private String s2sToken;
+
     @BeforeEach
     void init() {
         doNothing().when(importerService).addService(anyString());
         doNothing().when(importerService).addResourceDefinition(any());
         doNothing().when(importerService).addRole(anyString(), any(), any(), any());
+
+        s2sToken = getS2sToken();
     }
 
     @Test
@@ -91,7 +97,8 @@ public class AccessManagementControllerTest {
 
         this.mockMvc.perform(post("/api/access-resource")
             .content(inputJson)
-            .header(CONTENT_TYPE, APPLICATION_JSON))
+            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .header("ServiceAuthorization", s2sToken))
             .andDo(print())
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.resourceId", is("1234")))
@@ -116,7 +123,8 @@ public class AccessManagementControllerTest {
 
         this.mockMvc.perform(delete("/api/access-resource")
             .content(inputJson)
-            .header(CONTENT_TYPE, APPLICATION_JSON))
+            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .header("ServiceAuthorization", s2sToken))
             .andDo(print())
             .andExpect(status().isNoContent());
     }
@@ -153,7 +161,8 @@ public class AccessManagementControllerTest {
 
         this.mockMvc.perform(post("/api/filter-resource")
             .content(inputJson)
-            .header(CONTENT_TYPE, APPLICATION_JSON))
+            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .header("ServiceAuthorization", s2sToken))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.resource.id", is("1234")))
@@ -194,6 +203,7 @@ public class AccessManagementControllerTest {
 
         this.mockMvc.perform(post("/api/filter-resource")
             .content(inputJson)
+            .header("ServiceAuthorization", s2sToken)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isOk())
@@ -235,5 +245,11 @@ public class AccessManagementControllerTest {
             .andExpect(jsonPath("$.explicitAccess[0].relationships.*", containsInAnyOrder("caseworker")))
             .andExpect(jsonPath("$.explicitAccess[0].permissions.*",
                 hasItem(is(containsInAnyOrder("CREATE", "READ", "UPDATE")))));
+    }
+
+    @AfterEach
+    @Override
+    public void tearDown() {
+        //doNothing
     }
 }

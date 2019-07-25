@@ -6,11 +6,19 @@ def type = "java"
 def product = "am"
 def component = "lib-test"
 
+def secrets = [
+  's2s-${env}': [
+    secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
+  ]
+]
+
 withPipeline(type, product, component) {
   setVaultName('am')
   enableDockerBuild()
   installCharts()
   enableDbMigration()
+
+  env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 
   onMaster {
     enableSlackNotifications('#am-master-builds')

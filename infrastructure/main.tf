@@ -13,6 +13,10 @@ locals {
   sharedAspRg = "${var.raw_product}-shared-infrastructure-${local.envInUse}"
   asp_name = "${(var.env == "preview" || var.env == "spreview") ? "null" : local.sharedAspName}"
   asp_rg = "${(var.env == "preview" || var.env == "spreview") ? "null" : local.sharedAspRg}"
+
+  s2s_url = "http://rpe-service-auth-provider-${local.envInUse}.service.core-compute-${local.envInUse}.internal"
+  s2s_vault_name = "s2s-${local.envInUse}"
+  s2s_vault_uri = "https://s2s-${local.envInUse}.vault.azure.net/"
 }
 
 module "am-api" {
@@ -40,6 +44,7 @@ module "am-api" {
     AM_DB_USERNAME = "${module.postgres-am-api.user_name}"
     AM_DB_PASSWORD = "${module.postgres-am-api.postgresql_password}"
     AM_DB_PARAMS = "?sslmode=require"
+    S2S_URL = "${local.s2s_url}"
   }
 }
 
@@ -114,4 +119,23 @@ data "azurerm_key_vault" "am-shared-vault" {
   resource_group_name = "${local.sharedResourceGroup}"
 }
 
+data "azurerm_key_vault" "s2s_key_vault" {
+  name = "s2s-${local.envInUse}"
+  resource_group_name = "rpe-service-auth-provider-${local.envInUse}"
+}
+
+data "azurerm_key_vault_secret" "s2s_microservice" {
+  name = "s2s-microservice"
+  key_vault_id = "${data.azurerm_key_vault.am-shared-vault.id}"
+}
+
+data "azurerm_key_vault_secret" "s2s_url" {
+  name = "s2s-url"
+  key_vault_id = "${data.azurerm_key_vault.am-shared-vault.id}"
+}
+
+data "azurerm_key_vault_secret" "s2s_secret" {
+  name = "microservicekey-am-accessmgmt-api"
+  key_vault_id = "${data.azurerm_key_vault.s2s_key_vault.id}"
+}
 # endregion

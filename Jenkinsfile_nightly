@@ -20,7 +20,8 @@ List<Map<String, Object>> secrets = [
   secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
   secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
   secret('am-lib-test-POSTGRES-USER', 'DATABASE_USERNAME'),
-  secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASSWORD')
+  secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASSWORD'),
+  secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
 ]
 
 static Map<String, Object> secret(String secretName, String envVariable) {
@@ -40,6 +41,7 @@ withNightlyPipeline(type, product, component) {
   enableSlackNotifications('#am-master-builds')
 
   env.TEST_URL = params.URL_TO_TEST
+  env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 
   after('checkout') {
     sh '''

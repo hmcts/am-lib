@@ -1,9 +1,22 @@
 #!groovy
 @Library("Infrastructure") _
 
+properties([
+  parameters([
+    string(name: 'S2S_URL_TO_TEST', defaultValue: 'http://rpe-service-auth-provider-sandbox.service.core-compute-sandbox.internal', description: 'S2S component URL'),
+    string(name: 'S2S_SECRET_TO_TEST', defaultValue: '*****', description: 'S2S secret'),
+  ])
+])
+
 def type = "java"
 def product = "am"
 def component = "lib-test"
+
+def secrets = [
+  's2s-${env}': [
+    secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
+  ]
+]
 
 withPipeline(type, product, component) {
   enableDbMigration()
@@ -14,4 +27,6 @@ withPipeline(type, product, component) {
     enableDockerBuild()
     installCharts()
   }
+  env.S2S_URL_FOR_TESTS = params.S2S_URL_TO_TEST
+  env.S2S_SECRET = params.S2S_SECRET_TO_TEST
 }

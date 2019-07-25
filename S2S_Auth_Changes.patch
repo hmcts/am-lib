@@ -1,0 +1,783 @@
+Index: am-lib/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/build.gradle	(date 1563190358000)
++++ am-lib/build.gradle	(date 1563867377004)
+@@ -199,6 +199,8 @@
+ 
+     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
++    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
++    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
+     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9.1'
+ 
+     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
+@@ -223,7 +225,11 @@
+ 
+     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.6'
+     compile group: 'org.flywaydb', name: 'flyway-core', version: versions.flyway
+-
++    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
++    compile(group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3') {
++        // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
++        exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
++    }
+     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.0'
+     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
+ 
+Index: am-lib/Jenkinsfile_CNP
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/Jenkinsfile_CNP	(date 1563190358000)
++++ am-lib/Jenkinsfile_CNP	(date 1563891049172)
+@@ -6,12 +6,20 @@
+ def product = "am"
+ def component = "lib-test"
+ 
++def secrets = [
++  's2s-${env}': [
++    secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
++  ]
++]
++
+ withPipeline(type, product, component) {
+   setVaultName('am')
+   enableDockerBuild()
+   installCharts()
+   enableDbMigration()
+ 
++  env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
++
+   onMaster {
+     enableSlackNotifications('#am-master-builds')
+ 
+Index: am-lib/src/main/java/uk/gov/hmcts/reform/amapi/util/ErrorConstants.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/src/main/java/uk/gov/hmcts/reform/amapi/util/ErrorConstants.java	(date 1563190358000)
++++ am-lib/src/main/java/uk/gov/hmcts/reform/amapi/util/ErrorConstants.java	(date 1564002454407)
+@@ -18,4 +18,6 @@
+     public static final String INVALID_REQUEST =  "There is a problem with your request. Please check and try again";
+ 
+     public static final String SERVICE_FAILED = "The execution of the service failed";
++
++    public static final String ACCESS_DENIED =  "Access Denied";
+ }
+Index: am-lib/bin/run-in-docker.sh
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/bin/run-in-docker.sh	(date 1563190358000)
++++ am-lib/bin/run-in-docker.sh	(date 1563891125907)
+@@ -19,8 +19,8 @@
+ }
+ 
+ # script execution flags
+-GRADLE_CLEAN=false
+-GRADLE_INSTALL=false
++GRADLE_CLEAN=true
++GRADLE_INSTALL=true
+ 
+ # TODO custom environment variables application requires.
+ # TODO also consider enlisting them in help string above ^
+@@ -30,7 +30,40 @@
+ #S2S_URL=localhost
+ #S2S_SECRET=secret
+ 
++# Test S2S key - not used in any HMCTS key vaults or services
++export S2S_SECRET=OQHGSGHVQXUEXH7F
++export S2S_MICROSERVICE=am_accessmgmt_api
++
++build_s2s_image() {
++    git clone git@github.com:hmcts/s2s-test-tool.git
++    cd s2s-test-tool
++    git checkout allow-all-microservices
++    ./gradlew build
++    docker build -t hmcts/service-token-provider .
++    cd .. && rm -rf s2s-test-tool
++}
++
++clean_old_docker_artifacts() {
++    docker stop am-lib-testing-service
++    docker stop am-lib-testing-service-db
++    docker stop service-token-provider
++
++    docker rm am-lib-testing-service
++    docker rm am-lib-testing-service-db
++    docker rm service-token-provider
++
++    docker rmi hmcts/am-lib-testing-service
++    docker rmi hmcts/am-lib-testing-service-db
++    docker rmi hmcts/service-token-provider
++
++}
++
+ execute_script() {
++
++  clean_old_docker_artifacts
++
++  build_s2s_image
++
+   cd $(dirname "$0")/..
+ 
+   if [ ${GRADLE_CLEAN} = true ]
+@@ -45,12 +78,16 @@
+     ./gradlew assemble
+   fi
+ 
++  export SERVER_PORT="${SERVER_PORT:-8090}"
++
+ #  echo "Assigning environment variables.."
+ #
+ #  export DB_PASSWORD=${DB_PASSWORD}
+ #  export S2S_URL=${S2S_URL}
+ #  export S2S_SECRET=${S2S_SECRET}
+ 
++  chmod +x bin/*
++
+   echo "Bringing up docker containers.."
+ 
+   docker-compose up
+Index: am-lib/charts/am-lib-test/values.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/charts/am-lib-test/values.yaml	(date 1563190358000)
++++ am-lib/charts/am-lib-test/values.yaml	(date 1563891049125)
+@@ -8,6 +8,15 @@
+     AM_DB_USERNAME: amuser
+     ENABLE_DB_MIGRATE_IN_SERVICE: true
+   image: "https://hmcts.azurecr.io/hmcts/am-lib-test:latest"
++  keyVaults:
++    "s2s":
++      resourceGroup: rpe-service-auth-provider
++      secrets:
++        - microservicekey-am-accessmgmt-api
++    "am":
++      resourceGroup: am
++      secrets:
++        - s2s-url
+   postgresql:
+     persistence:
+       enabled: false
+Index: am-lib/src/main/java/uk/gov/hmcts/reform/amapi/controllers/AccessManagementController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/src/main/java/uk/gov/hmcts/reform/amapi/controllers/AccessManagementController.java	(date 1563190358000)
++++ am-lib/src/main/java/uk/gov/hmcts/reform/amapi/controllers/AccessManagementController.java	(date 1563393644019)
+@@ -5,12 +5,12 @@
+ import io.swagger.annotations.ApiResponses;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.http.ResponseEntity;
+-import org.springframework.web.bind.annotation.DeleteMapping;
+ import org.springframework.web.bind.annotation.PostMapping;
+-import org.springframework.web.bind.annotation.RequestBody;
+ import org.springframework.web.bind.annotation.RequestMapping;
+ import org.springframework.web.bind.annotation.ResponseStatus;
+ import org.springframework.web.bind.annotation.RestController;
++import org.springframework.web.bind.annotation.RequestBody;
++import org.springframework.web.bind.annotation.DeleteMapping;
+ import uk.gov.hmcts.reform.amapi.models.FilterResource;
+ import uk.gov.hmcts.reform.amlib.AccessManagementService;
+ import uk.gov.hmcts.reform.amlib.FilterResourceService;
+@@ -47,8 +47,9 @@
+     })
+     @PostMapping(value = "/access-resource", consumes = (APPLICATION_JSON_VALUE))
+     @ResponseStatus(CREATED)
+-    public ResponseEntity<ExplicitAccessGrant> createResourceAccess(@RequestBody ExplicitAccessGrant
+-                                                                        explicitAccessGrantData) {
++    public ResponseEntity<ExplicitAccessGrant> createResourceAccess(
++        @RequestBody ExplicitAccessGrant explicitAccessGrantData) {
++
+         accessManagementService.grantExplicitResourceAccess(explicitAccessGrantData);
+         return new ResponseEntity<>(explicitAccessGrantData, CREATED);
+ 
+@@ -65,7 +66,8 @@
+     })
+     @DeleteMapping(value = "/access-resource", consumes = (APPLICATION_JSON_VALUE))
+     @ResponseStatus(NO_CONTENT)
+-    public ResponseEntity<Void> revokeResourceAccess(@RequestBody ExplicitAccessMetadata request) {
++    public ResponseEntity<Void> revokeResourceAccess(
++        @RequestBody ExplicitAccessMetadata request) {
+ 
+         accessManagementService.revokeResourceAccess(request);
+         return new ResponseEntity<>(NO_CONTENT);
+@@ -81,7 +83,12 @@
+         @ApiResponse(code = 500, message = "Internal server error")
+     })
+     @PostMapping(value = "/filter-resource", consumes = (APPLICATION_JSON_VALUE))
+-    public FilteredResourceEnvelope filterResource(@RequestBody FilterResource request) {
++    public FilteredResourceEnvelope filterResource(
++        //@RequestHeader(name = "ServiceAuthorization", required = false) String serviceAuthHeader,
++        @RequestBody FilterResource request) {
++
++        //String serviceName = authService.authenticate(serviceAuthHeader);
++        //log.debug("> Calling Service name in filterResource() method : " + serviceName);
+         return filterResourceService.filterResource(request.getUserId(), request.getUserRoles(),
+             request.getResource(), request.getAttributeSecurityClassification());
+     }
+Index: am-lib/src/integrationTest/java/uk/gov/hmcts/reform/amapi/controllers/GetWelcomeTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/src/integrationTest/java/uk/gov/hmcts/reform/amapi/controllers/GetWelcomeTest.java	(date 1563190358000)
++++ am-lib/src/integrationTest/java/uk/gov/hmcts/reform/amapi/controllers/GetWelcomeTest.java	(date 1563917928168)
+@@ -1,18 +1,27 @@
+ package uk.gov.hmcts.reform.amapi.controllers;
+ 
++import org.junit.jupiter.api.AfterEach;
+ import org.junit.jupiter.api.DisplayName;
+ import org.junit.jupiter.api.Test;
++import org.junit.jupiter.api.extension.ExtendWith;
+ import org.springframework.beans.factory.annotation.Autowired;
+-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
++import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
++import org.springframework.boot.test.context.SpringBootTest;
++import org.springframework.test.context.junit.jupiter.SpringExtension;
+ import org.springframework.test.web.servlet.MockMvc;
+ import org.springframework.test.web.servlet.MvcResult;
+ 
+ import static org.assertj.core.api.Assertions.assertThat;
++import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
++import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
++import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
+ 
+-@WebMvcTest
+-class GetWelcomeTest {
++@ExtendWith(SpringExtension.class)
++@SpringBootTest
++@AutoConfigureMockMvc
++class GetWelcomeTest extends SecurityAuthorizationTest {
+ 
+     @Autowired
+     private transient MockMvc mockMvc;
+@@ -20,8 +29,17 @@
+     @DisplayName("Should welcome upon root request with 200 response code")
+     @Test
+     void welcomeRootEndpoint() throws Exception {
+-        MvcResult response = mockMvc.perform(get("/")).andExpect(status().isOk()).andReturn();
++        MvcResult response = mockMvc.perform(get("/")
++            .header(CONTENT_TYPE, APPLICATION_JSON))
++            .andDo(print())
++            .andExpect(status().isOk()).andReturn();
+ 
+         assertThat(response.getResponse().getContentAsString()).startsWith("Welcome");
+     }
++
++    @AfterEach
++    @Override
++    public void tearDown() {
++        //doNothing
++    }
+ }
+Index: am-lib/src/test/resources/application-test.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/src/test/resources/application-test.yml	(date 1563190358000)
++++ am-lib/src/test/resources/application-test.yml	(date 1563891165219)
+@@ -1,3 +1,8 @@
++targetInstance: ${TEST_URL:http://localhost:3704}
++s2s-url: ${S2S_URL_FOR_TESTS:http://127.0.0.1:8502}
++s2s-name: am_accessmgmt_api
++# Test key - not used in any deployed vaults or services
++s2s-secret: ${S2S_SECRET:OQHGSGHVQXUEXH7F}
+ spring:
+   profiles: test
+   flyway:
+Index: am-lib/infrastructure/main.tf
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/infrastructure/main.tf	(date 1563190358000)
++++ am-lib/infrastructure/main.tf	(date 1563891049149)
+@@ -13,6 +13,10 @@
+   sharedAspRg = "${var.raw_product}-shared-infrastructure-${local.envInUse}"
+   asp_name = "${(var.env == "preview" || var.env == "spreview") ? "null" : local.sharedAspName}"
+   asp_rg = "${(var.env == "preview" || var.env == "spreview") ? "null" : local.sharedAspRg}"
++
++  s2s_url = "http://rpe-service-auth-provider-${local.envInUse}.service.core-compute-${local.envInUse}.internal"
++  s2s_vault_name = "s2s-${local.envInUse}"
++  s2s_vault_uri = "https://s2s-${local.envInUse}.vault.azure.net/"
+ }
+ 
+ module "am-api" {
+@@ -40,6 +44,7 @@
+     AM_DB_USERNAME = "${module.postgres-am-api.user_name}"
+     AM_DB_PASSWORD = "${module.postgres-am-api.postgresql_password}"
+     AM_DB_PARAMS = "?sslmode=require"
++    S2S_URL = "${local.s2s_url}"
+   }
+ }
+ 
+@@ -114,4 +119,23 @@
+   resource_group_name = "${local.sharedResourceGroup}"
+ }
+ 
++data "azurerm_key_vault" "s2s_key_vault" {
++  name = "s2s-${local.envInUse}"
++  resource_group_name = "rpe-service-auth-provider-${local.envInUse}"
++}
++
++data "azurerm_key_vault_secret" "s2s_microservice" {
++  name = "s2s-microservice"
++  key_vault_id = "${data.azurerm_key_vault.am-shared-vault.id}"
++}
++
++data "azurerm_key_vault_secret" "s2s_url" {
++  name = "s2s-url"
++  key_vault_id = "${data.azurerm_key_vault.am-shared-vault.id}"
++}
++
++data "azurerm_key_vault_secret" "s2s_secret" {
++  name = "microservicekey-am-accessmgmt-api"
++  key_vault_id = "${data.azurerm_key_vault.s2s_key_vault.id}"
++}
+ # endregion
+Index: am-lib/src/main/resources/application.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/src/main/resources/application.yaml	(date 1563190358000)
++++ am-lib/src/main/resources/application.yaml	(date 1563891152263)
+@@ -9,6 +9,13 @@
+     web:
+       base-path: /
+ 
++auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8502}
++idam:
++  s2s-auth:
++    totp_secret: ${S2S_SECRET:AAAAAAAAAAAAAAAC}
++    microservice: am_accessmgmt_api
++    url: ${S2S_URL:http://127.0.0.1:8502}
++
+ spring:
+   application:
+     name: Access Management
+@@ -25,3 +32,6 @@
+     add-mappings: false
+   mvc:
+     throw-exception-if-no-handler-found: true
++security:
++  authorisedServices:
++    - am_accessmgmt_api
+Index: am-lib/Jenkinsfile_parameterized
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/Jenkinsfile_parameterized	(date 1563190358000)
++++ am-lib/Jenkinsfile_parameterized	(date 1563891049086)
+@@ -1,10 +1,23 @@
+ #!groovy
+ @Library("Infrastructure") _
+ 
++properties([
++  parameters([
++    string(name: 'S2S_URL_TO_TEST', defaultValue: 'http://rpe-service-auth-provider-sandbox.service.core-compute-sandbox.internal', description: 'S2S component URL'),
++    string(name: 'S2S_SECRET_TO_TEST', defaultValue: '*****', description: 'S2S secret'),
++  ])
++])
++
+ def type = "java"
+ def product = "am"
+ def component = "lib-test"
+ 
++def secrets = [
++  's2s-${env}': [
++    secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
++  ]
++]
++
+ withPipeline(type, product, component) {
+   enableDbMigration()
+   echo env.CHANGE_TITLE
+@@ -14,4 +27,6 @@
+     enableDockerBuild()
+     installCharts()
+   }
++  env.S2S_URL_FOR_TESTS = params.S2S_URL_TO_TEST
++  env.S2S_SECRET = params.S2S_SECRET_TO_TEST
+ }
+Index: am-lib/src/test/java/uk/gov/hmcts/reform/amapi/exception/AccessManagementResponseEntityExceptionHandlerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/src/test/java/uk/gov/hmcts/reform/amapi/exception/AccessManagementResponseEntityExceptionHandlerTest.java	(date 1563190358000)
++++ am-lib/src/test/java/uk/gov/hmcts/reform/amapi/exception/AccessManagementResponseEntityExceptionHandlerTest.java	(date 1564004200333)
+@@ -1,6 +1,7 @@
+ package uk.gov.hmcts.reform.amapi.exception;
+ 
+ import com.google.common.io.Resources;
++import org.junit.jupiter.api.AfterEach;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+ import org.junit.jupiter.api.extension.ExtendWith;
+@@ -11,6 +12,8 @@
+ import org.springframework.test.context.ActiveProfiles;
+ import org.springframework.test.context.junit.jupiter.SpringExtension;
+ import org.springframework.test.web.servlet.MockMvc;
++import uk.gov.hmcts.reform.amapi.controllers.SecurityAuthorizationTest;
++import uk.gov.hmcts.reform.amlib.AccessManagementService;
+ import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+ 
+ import java.nio.charset.StandardCharsets;
+@@ -21,23 +24,21 @@
+ import static org.mockito.ArgumentMatchers.any;
+ import static org.mockito.ArgumentMatchers.anyString;
+ import static org.mockito.Mockito.doNothing;
+-import static org.springframework.http.HttpStatus.BAD_REQUEST;
+-import static org.springframework.http.HttpStatus.NOT_FOUND;
++import static org.springframework.http.HttpStatus.*;
+ import static org.springframework.http.MediaType.TEXT_HTML;
+ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
+-import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.MALFORMED_JSON;
+-import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.RESOURCE_NOT_FOUND;
++import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.*;
+ 
+ @ExtendWith(SpringExtension.class)
+ @SpringBootTest
+ @AutoConfigureMockMvc
+ @ActiveProfiles("test")
+ @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert","PMD.AvoidDuplicateLiterals","PMD.ExcessiveImports"})
+-public class AccessManagementResponseEntityExceptionHandlerTest {
++public class AccessManagementResponseEntityExceptionHandlerTest extends SecurityAuthorizationTest {
+ 
+     @Autowired
+     private MockMvc mockMvc;
+@@ -45,11 +46,18 @@
+     @MockBean
+     private DefaultRoleSetupImportService importerService;
+ 
++    @MockBean
++    private AccessManagementService accessManagementService;
++
++    private String s2sToken;
++
+     @BeforeEach
+     void init() {
+         doNothing().when(importerService).addService(anyString());
+         doNothing().when(importerService).addResourceDefinition(any());
+         doNothing().when(importerService).addRole(anyString(), any(), any(), any());
++
++        s2sToken = getS2sToken();
+     }
+ 
+     /**
+@@ -65,7 +73,8 @@
+ 
+         this.mockMvc.perform(post("/api/filter-resource")
+             .content(invalidJson)
+-            .header(CONTENT_TYPE, APPLICATION_JSON))
++            .header(CONTENT_TYPE, APPLICATION_JSON)
++            .header("ServiceAuthorization", s2sToken))
+             .andDo(print())
+             .andExpect(status().isBadRequest())
+             .andExpect(jsonPath("$.errorMessage", is(MALFORMED_JSON)))
+@@ -75,6 +84,32 @@
+             .andExpect(jsonPath("$.errorDescription", notNullValue()));
+     }
+ 
++
++
++    /**
++     * Test Controller Exception Handler Message Not readable.
++     *
++     * @throws Exception when exceptional condition happens
++     */
++    @Test
++    public void testS2SAuthTokenMissingCondition() throws Exception {
++
++        String inputJson = Resources.toString(Resources
++            .getResource("input-data/createResourceAccess.json"), StandardCharsets.UTF_8);
++
++        doNothing().when(accessManagementService).grantExplicitResourceAccess(any());
++
++        this.mockMvc.perform(post("/api/access-resource")
++            .content(inputJson)
++            .header(CONTENT_TYPE, APPLICATION_JSON))
++            .andDo(print())
++            .andExpect(status().isForbidden())
++            .andExpect(jsonPath("$.errorMessage", is(ACCESS_DENIED)))
++            .andExpect(jsonPath("$.status", is("FORBIDDEN")))
++            .andExpect(jsonPath("$.errorCode", is(FORBIDDEN.value())))
++            .andExpect(jsonPath("$.timeStamp", notNullValue()));
++    }
++
+     /**
+      * Test Controller Exception Handler Message Not readable.
+      *
+@@ -88,7 +123,8 @@
+ 
+         this.mockMvc.perform(post("/api/filter-resource")
+             .content(invalidJson)
+-            .header(CONTENT_TYPE, APPLICATION_JSON))
++            .header(CONTENT_TYPE, APPLICATION_JSON)
++            .header("ServiceAuthorization", s2sToken))
+             .andDo(print())
+             .andExpect(status().isBadRequest())
+             .andExpect(jsonPath("$.errorMessage", is("filterResource.resource.id - must not be blank")))
+@@ -111,7 +147,8 @@
+ 
+         this.mockMvc.perform(post("/api/filter-resource")
+             .content(inputJson)
+-            .header(CONTENT_TYPE, TEXT_HTML))
++            .header(CONTENT_TYPE, TEXT_HTML)
++            .header("ServiceAuthorization", s2sToken))
+             .andDo(print())
+             .andExpect(status().isUnsupportedMediaType());
+     }
+@@ -128,7 +165,8 @@
+ 
+         this.mockMvc.perform(post("/invalidUrl")
+             .content(invalidJson)
+-            .header(CONTENT_TYPE, APPLICATION_JSON))
++            .header(CONTENT_TYPE, APPLICATION_JSON)
++            .header("ServiceAuthorization", s2sToken))
+             .andDo(print())
+             .andExpect(status().isNotFound())
+             .andExpect(jsonPath("$.errorMessage", is(RESOURCE_NOT_FOUND)))
+@@ -153,7 +191,8 @@
+ 
+         this.mockMvc.perform(post("/api/filter-resource")
+             .content(invalidJson)
+-            .header(CONTENT_TYPE, APPLICATION_JSON))
++            .header(CONTENT_TYPE, APPLICATION_JSON)
++            .header("ServiceAuthorization", s2sToken))
+             .andDo(print())
+             .andExpect(status().isBadRequest())
+             .andExpect(jsonPath("$.errorMessage", is(
+@@ -163,4 +202,11 @@
+             .andExpect(jsonPath("$.timeStamp", notNullValue()))
+             .andExpect(jsonPath("$.errorDescription", notNullValue()));
+     }
++
++
++    @AfterEach
++    @Override
++    public void tearDown() {
++        //doNothing
++    }
+ }
+Index: am-lib/Jenkinsfile_nightly
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/Jenkinsfile_nightly	(date 1563190358000)
++++ am-lib/Jenkinsfile_nightly	(date 1563891049190)
+@@ -20,7 +20,8 @@
+   secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
+   secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
+   secret('am-lib-test-POSTGRES-USER', 'DATABASE_USERNAME'),
+-  secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASSWORD')
++  secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASSWORD'),
++  secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
+ ]
+ 
+ static Map<String, Object> secret(String secretName, String envVariable) {
+@@ -40,6 +41,7 @@
+   enableSlackNotifications('#am-master-builds')
+ 
+   env.TEST_URL = params.URL_TO_TEST
++  env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+ 
+   after('checkout') {
+     sh '''
+Index: am-lib/docker-compose.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/docker-compose.yml	(date 1563190358000)
++++ am-lib/docker-compose.yml	(date 1563891195773)
+@@ -25,6 +25,7 @@
+     container_name: am-lib-testing-service
+     depends_on:
+       - am-lib-testing-service-db
++      - service-auth-provider-api
+     environment:
+       # these environment variables are used by java-logging library
+       - ROOT_APPENDER
+@@ -44,8 +45,40 @@
+       - AM_DB_USERNAME=amuser
+       - AM_DB_PASSWORD=ampass
+       - ENABLE_DB_MIGRATE_IN_SERVICE=true
++      - S2S_URL=http://service-auth-provider-api:8080
++      - S2S_SECRET=${S2S_SECRET}
+     ports:
+       - 3704:3703
++      - ${SERVER_PORT:-8090}:${SERVER_PORT:-8090}
++    networks:
++      - am-lib-testing-service-network
++  service-auth-provider-api:
++    image: hmcts/service-auth-provider-app
++    container_name: service-auth-provider-api
++    healthcheck:
++      interval: 10s
++      timeout: 10s
++      retries: 10
++    ports:
++      - 8502:8080
++    environment:
++      JAVA_OPTS: -Xmx384m
++      SERVER_PORT: 8080
++      MICROSERVICEKEYS_AM_ACCESSMGMT_API: "${S2S_SECRET}"
++      TESTING_SUPPORT_ENABLED: "true"
++    networks:
++      - am-lib-testing-service-network
++  service-token-provider:
++    image: hmcts/service-token-provider
++    container_name: service-token-provider
++    environment:
++      - S2S_URL=http://service-auth-provider-api:8080
++      - S2S_MICROSERVICE=am_accessmgmt_api
++      - S2S_SECRET=${S2S_SECRET}
++    ports:
++      - 8089:${SERVER_PORT:-8090}
++    depends_on:
++      - service-auth-provider-api
+     networks:
+       - am-lib-testing-service-network
+ networks:
+Index: am-lib/src/test/java/uk/gov/hmcts/reform/amapi/controllers/AccessManagementControllerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/src/test/java/uk/gov/hmcts/reform/amapi/controllers/AccessManagementControllerTest.java	(date 1563190358000)
++++ am-lib/src/test/java/uk/gov/hmcts/reform/amapi/controllers/AccessManagementControllerTest.java	(date 1563979918086)
+@@ -4,6 +4,7 @@
+ import com.fasterxml.jackson.databind.ObjectMapper;
+ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+ import com.google.common.io.Resources;
++import org.junit.jupiter.api.AfterEach;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+ import org.junit.jupiter.api.extension.ExtendWith;
+@@ -51,7 +52,7 @@
+ @ActiveProfiles("test")
+ @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports", "PMD.LawOfDemeter",
+     "PMD.AvoidDuplicateLiterals"})
+-public class AccessManagementControllerTest {
++public class AccessManagementControllerTest extends SecurityAuthorizationTest {
+ 
+     @Autowired
+     private MockMvc mockMvc;
+@@ -65,11 +66,15 @@
+     @MockBean
+     private FilterResourceService filterResourceService;
+ 
++    private String s2sToken;
++
+     @BeforeEach
+     void init() {
+         doNothing().when(importerService).addService(anyString());
+         doNothing().when(importerService).addResourceDefinition(any());
+         doNothing().when(importerService).addRole(anyString(), any(), any(), any());
++
++        s2sToken = getS2sToken();
+     }
+ 
+     @Test
+@@ -82,7 +87,8 @@
+ 
+         this.mockMvc.perform(post("/api/access-resource")
+             .content(inputJson)
+-            .header(CONTENT_TYPE, APPLICATION_JSON))
++            .header(CONTENT_TYPE, APPLICATION_JSON)
++            .header("ServiceAuthorization", s2sToken))
+             .andDo(print())
+             .andExpect(status().isCreated())
+             .andExpect(jsonPath("$.resourceId", is("1234")))
+@@ -107,7 +113,8 @@
+ 
+         this.mockMvc.perform(delete("/api/access-resource")
+             .content(inputJson)
+-            .header(CONTENT_TYPE, APPLICATION_JSON))
++            .header(CONTENT_TYPE, APPLICATION_JSON)
++            .header("ServiceAuthorization", s2sToken))
+             .andDo(print())
+             .andExpect(status().isNoContent());
+     }
+@@ -144,7 +151,8 @@
+ 
+         this.mockMvc.perform(post("/api/filter-resource")
+             .content(inputJson)
+-            .header(CONTENT_TYPE, APPLICATION_JSON))
++            .header(CONTENT_TYPE, APPLICATION_JSON)
++            .header("ServiceAuthorization", s2sToken))
+             .andDo(print())
+             .andExpect(status().isOk())
+             .andExpect(jsonPath("$.resource.id", is("1234")))
+@@ -185,6 +193,7 @@
+ 
+         this.mockMvc.perform(post("/api/filter-resource")
+             .content(inputJson)
++            .header("ServiceAuthorization", s2sToken)
+             .header(CONTENT_TYPE, APPLICATION_JSON))
+             .andDo(print())
+             .andExpect(status().isOk())
+@@ -194,4 +203,10 @@
+             .andExpect(jsonPath("$.userSecurityClassification", is("PUBLIC")))
+             .andExpect(jsonPath("$.resource.data.json", is("resource")));
+     }
++
++    @AfterEach
++    @Override
++    public void tearDown() {
++        //doNothing
++    }
+ }
+Index: am-lib/am-lib/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/am-lib/build.gradle	(date 1563190358000)
++++ am-lib/am-lib/build.gradle	(date 1563867444355)
+@@ -93,7 +93,7 @@
+     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.17.Final'
+     compile group: 'org.aspectj', name: 'aspectjrt', version: '1.9.4'
+     compile group: 'io.swagger', name: 'swagger-annotations', version: '1.5.22'
+-    
++
+     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.0'
+     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.0.0'
+     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.12.2'
+Index: am-lib/charts/am-lib-test/values.preview.template.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- am-lib/charts/am-lib-test/values.preview.template.yaml	(date 1563190358000)
++++ am-lib/charts/am-lib-test/values.preview.template.yaml	(date 1563368114173)
+@@ -1,5 +1,7 @@
+ am-lib-test:
+   image: ${IMAGE_NAME}
+   ingressHost: ${SERVICE_FQDN}
++  environment:
++    S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+ postgresql:
+   enabled: true

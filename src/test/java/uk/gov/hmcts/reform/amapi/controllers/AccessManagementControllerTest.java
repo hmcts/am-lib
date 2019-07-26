@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.amapi.controllers;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +25,11 @@ import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
 import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
+import uk.gov.hmcts.reform.amlib.models.ResourceAccessor;
+import uk.gov.hmcts.reform.amlib.models.ResourceAccessorsEnvelope;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -39,11 +43,16 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -122,9 +131,9 @@ public class AccessManagementControllerTest {
         final FilterResource filterResource = mapper.readValue(inputJson, FilterResource.class);
 
         Set<Permission> permissions = new HashSet<>();
-        permissions.add(Permission.CREATE);
-        permissions.add(Permission.READ);
-        permissions.add(Permission.UPDATE);
+        permissions.add(CREATE);
+        permissions.add(READ);
+        permissions.add(UPDATE);
 
         Map<JsonPointer, Set<Permission>> attributePermissions = new ConcurrentHashMap<>();
         attributePermissions.put(JsonPointer.valueOf(""), permissions);
@@ -164,9 +173,9 @@ public class AccessManagementControllerTest {
             FilterResource.class);
 
         Set<Permission> permissions = new HashSet<>();
-        permissions.add(Permission.CREATE);
-        permissions.add(Permission.READ);
-        permissions.add(Permission.UPDATE);
+        permissions.add(CREATE);
+        permissions.add(READ);
+        permissions.add(UPDATE);
 
         Map<JsonPointer, Set<Permission>> attributePermissions = new ConcurrentHashMap<>();
         attributePermissions.put(JsonPointer.valueOf(""), permissions);
@@ -193,5 +202,38 @@ public class AccessManagementControllerTest {
             .andExpect(jsonPath("$.access.permissions.*", hasItem(is(containsInAnyOrder("CREATE", "READ", "UPDATE")))))
             .andExpect(jsonPath("$.userSecurityClassification", is("PUBLIC")))
             .andExpect(jsonPath("$.resource.data.json", is("resource")));
+    }
+
+    @Test
+    public void testReturnResourceAccessors() throws Exception {
+
+        String resourceType = "case";
+        String resourceName = "claim";
+        String resourceId = "0011";
+
+        ResourceAccessorsEnvelope resourceAccessorsEnvelope = ResourceAccessorsEnvelope.builder()
+            .resourceId(resourceId)
+            .explicitAccessors(Collections.singletonList(ResourceAccessor.builder()
+                .accessorId("5511")
+                .accessorType(USER)
+                .relationships(ImmutableSet.of("caseworker"))
+                .permissions(Collections.singletonMap(JsonPointer.valueOf(""), ImmutableSet.of(READ, UPDATE, CREATE)))
+                .build()))
+            .build();
+
+        Mockito.when(filterResourceService.returnResourceAccessors(resourceId, resourceName, resourceType))
+            .thenReturn(resourceAccessorsEnvelope);
+
+        this.mockMvc.perform(get("/api/resource/resourceType/" + resourceType + "/resourceName/"
+            + resourceName + "/resourceId/" + resourceId))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.resourceId", is("0011")))
+            .andExpect(jsonPath("$.explicitAccess").exists())
+            .andExpect(jsonPath("$.explicitAccess[0].accessorId", is("5511")))
+            .andExpect(jsonPath("$.explicitAccess[0].accessorType", is("USER")))
+            .andExpect(jsonPath("$.explicitAccess[0].relationships.*", containsInAnyOrder("caseworker")))
+            .andExpect(jsonPath("$.explicitAccess[0].permissions.*",
+                hasItem(is(containsInAnyOrder("CREATE", "READ", "UPDATE")))));
     }
 }

@@ -32,6 +32,7 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.DEFAULT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
@@ -43,6 +44,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.crea
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForAccessorType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForRole;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
@@ -860,6 +862,65 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .explicitAccessors(expectedExplicitResourceEnvelopesList.stream()
                 .sorted(Comparator.comparing(ResourceAccessor::getAccessorId))
                 .collect(Collectors.toList()))
+            .build());
+    }
+
+    @Test
+    public void filterResourceWithWildcardAccessorShouldAccessibleToAnyUser() {
+
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, null, resourceDefinition,
+            createPermissions(rootLevelAttribute, ImmutableSet.of(UPDATE))));
+        service.grantExplicitResourceAccess(createGrantForAccessorType(resourceId, "*", null, resourceDefinition,
+            createPermissions(rootLevelAttribute, ImmutableSet.of(READ)), DEFAULT));
+
+
+        FilteredResourceEnvelope result = filterResourceService.filterResource(
+            "anyUser", ImmutableSet.of(idamRoleWithExplicitAccess), createResource(resourceId, resourceDefinition),
+            null);
+
+
+        assertThat(result).isEqualToComparingFieldByField(FilteredResourceEnvelope.builder()
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(resourceDefinition)
+                .data(JsonNodeFactory.instance.objectNode())
+                .build())
+            .access(AccessEnvelope.builder()
+                .permissions(ImmutableMap.of(
+                    JsonPointer.valueOf(rootLevelAttribute), ImmutableSet.of(READ)))
+                .accessType(EXPLICIT)
+                .build())
+            .relationships(Collections.emptySet())
+            .build());
+    }
+
+
+    @Test
+    public void filterResourceWithWildcardAccessorShouldReturnWildcardAndUserPermission() {
+
+        service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, null, resourceDefinition,
+            createPermissions(rootLevelAttribute, ImmutableSet.of(UPDATE))));
+        service.grantExplicitResourceAccess(createGrantForAccessorType(resourceId, "*", null, resourceDefinition,
+            createPermissions(rootLevelAttribute, ImmutableSet.of(READ)), DEFAULT));
+
+
+        FilteredResourceEnvelope result = filterResourceService.filterResource(
+            accessorId, ImmutableSet.of(idamRoleWithExplicitAccess), createResource(resourceId, resourceDefinition),
+            null);
+
+
+        assertThat(result).isEqualToComparingFieldByField(FilteredResourceEnvelope.builder()
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(resourceDefinition)
+                .data(JsonNodeFactory.instance.objectNode())
+                .build())
+            .access(AccessEnvelope.builder()
+                .permissions(ImmutableMap.of(
+                    JsonPointer.valueOf(rootLevelAttribute), ImmutableSet.of(READ, UPDATE)))
+                .accessType(EXPLICIT)
+                .build())
+            .relationships(Collections.emptySet())
             .build());
     }
 

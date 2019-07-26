@@ -126,6 +126,20 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
         }
 
+
+        @Test
+        void whenRevokingResourceWithWildCard() {
+            service.grantExplicitResourceAccess(
+                createGrant(resourceId, "*", null, resourceDefinition,
+                    createPermissions("", ImmutableSet.of(READ)))
+            );
+
+            service.revokeResourceAccess(
+                createMetadata(resourceId, "*", null, resourceDefinition,
+                    JsonPointer.valueOf(""))
+            );
+            assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
+        }
     }
 
     @Nested
@@ -133,9 +147,7 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         @Test
         void whenRevokingResourceAccessOnRootShouldRemoveRecordFromDatabase() {
             grantExplicitResourceAccess(resourceId, relationship, "");
-
             revokeResourceAccess(resourceId, relationship, "");
-
             assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(0);
         }
 

@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.crea
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForAccessorType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForRole;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
@@ -869,7 +870,7 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, null, resourceDefinition,
             createPermissions(rootLevelAttribute, ImmutableSet.of(UPDATE))));
-        service.grantExplicitResourceAccess(createGrant(resourceId, "*", null, resourceDefinition,
+        service.grantExplicitResourceAccess(createGrantForAccessorType(resourceId, "*", null, resourceDefinition,
             createPermissions(rootLevelAttribute, ImmutableSet.of(READ)), DEFAULT));
 
 
@@ -895,11 +896,11 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
 
     @Test
-    public void filterResourceWithWildcardAccessor() {
+    public void filterResourceWithWildcardAccessorShouldReturnWildcardAndUserPermission() {
 
         service.grantExplicitResourceAccess(createGrant(resourceId, accessorId, null, resourceDefinition,
             createPermissions(rootLevelAttribute, ImmutableSet.of(UPDATE))));
-        service.grantExplicitResourceAccess(createGrant(resourceId, "*", null, resourceDefinition,
+        service.grantExplicitResourceAccess(createGrantForAccessorType(resourceId, "*", null, resourceDefinition,
             createPermissions(rootLevelAttribute, ImmutableSet.of(READ)), DEFAULT));
 
 

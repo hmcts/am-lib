@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForAccessorType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 
@@ -88,7 +89,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             JsonPointer.valueOf(""), ImmutableSet.of(CREATE, READ, UPDATE),
             JsonPointer.valueOf("/name"), ImmutableSet.of(CREATE, READ, UPDATE));
 
-        service.grantExplicitResourceAccess(createGrant(
+        service.grantExplicitResourceAccess(createGrantForAccessorType(
             resourceId, "*", roleName, resourceDefinition, multipleAttributePermissions, DEFAULT));
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(2);

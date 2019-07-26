@@ -48,12 +48,12 @@ public final class TestDataFactory {
             .build();
     }
 
-    public static ExplicitAccessGrant createGrant(String resourceId,
-                                                  String accessorId,
-                                                  String relationship,
-                                                  ResourceDefinition resourceDefinition,
-                                                  Map<JsonPointer, Set<Permission>> attributePermissions,
-                                                  AccessorType accessorType) {
+    public static ExplicitAccessGrant createGrantForAccessorType(String resourceId,
+                                                                 String accessorId,
+                                                                 String relationship,
+                                                                 ResourceDefinition resourceDefinition,
+                                                                 Map<JsonPointer, Set<Permission>> attributePermissions,
+                                                                 AccessorType accessorType) {
 
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)

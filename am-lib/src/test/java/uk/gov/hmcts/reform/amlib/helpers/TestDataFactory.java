@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
@@ -41,6 +42,23 @@ public final class TestDataFactory {
             .resourceId(resourceId)
             .accessorIds(ImmutableSet.of(accessorId))
             .accessorType(USER)
+            .resourceDefinition(resourceDefinition)
+            .attributePermissions(attributePermissions)
+            .relationship(relationship)
+            .build();
+    }
+
+    public static ExplicitAccessGrant createGrantForAccessorType(String resourceId,
+                                                                 String accessorId,
+                                                                 String relationship,
+                                                                 ResourceDefinition resourceDefinition,
+                                                                 Map<JsonPointer, Set<Permission>> attributePermissions,
+                                                                 AccessorType accessorType) {
+
+        return ExplicitAccessGrant.builder()
+            .resourceId(resourceId)
+            .accessorIds(ImmutableSet.of(accessorId))
+            .accessorType(accessorType)
             .resourceDefinition(resourceDefinition)
             .attributePermissions(attributePermissions)
             .relationship(relationship)

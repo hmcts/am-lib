@@ -92,10 +92,10 @@ public class AccessManagementService {
                         .build())
                     .forEach(expAccessRecord -> {
                         if (nonNull(accessGrant.getRelationship())) {
-                            dao.createAccessManagementRecord(expAccessRecord);
+                            dao.grantAccessManagementWithNotNullRelationship(expAccessRecord);
                         } else {
                             //Avoid duplicate insertion on Null relationship
-                            dao.createAccessManagementRecordForNullRelationship(expAccessRecord);
+                            dao.grantAccessManagementWithNullRelationship(expAccessRecord);
                         }
                     }));
         });

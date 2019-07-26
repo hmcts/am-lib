@@ -14,4 +14,14 @@ withPipeline(type, product, component) {
     enableDockerBuild()
     installCharts()
   }
+
+  before('PerformanceTest') {
+    sh "echo 'PerformanceTest is about to start'"
+
+  }
+
+  after('PerformanceTest') {
+    sh "echo 'PerformanceTest is about to end'"
+  }
+
 }

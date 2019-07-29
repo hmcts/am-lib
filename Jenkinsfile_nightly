@@ -85,13 +85,13 @@ withNightlyPipeline(type, product, component) {
           sh "chmod +x /nightlyperformancedata/load-or-delete-performance-testdata.sh"
           sh "/nightlyperformancedata/load-or-delete-performance-testdata.sh \
                         ${WORKSPACE} \
-                        "load" \
+                        'load' \
                         ${DATABASE_USER} \
                         ${DATABASE_NAME} \
                         ${DATABASE_HOST} \
                         ${DATABASE_PASS} \
                         ${DATABASE_PORT} \
-                        ${params.ENVIRONMENT}"
+                        'aat'"
         }
       }
     }

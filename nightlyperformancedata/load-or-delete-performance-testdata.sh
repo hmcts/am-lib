@@ -16,6 +16,7 @@ if [ "$2" = "load" ]; then
 else
     FILE_NAME="delete-data"
 fi
+echo "start data load enironment name::$8"
 if [ "$8" = "aat" ]; then
   echo "executing for aat and file name $FILE_NAME.sql"
   export PGPASSWORD=$6

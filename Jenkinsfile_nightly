@@ -32,8 +32,8 @@ def secrets = [
     secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
     secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
     secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
-    secret('am-lib-test-POSTGRES-USER', 'DATABASE_USERNAME'),
-    secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASSWORD')
+    secret('am-lib-test-POSTGRES-USER', 'DATABASE_USER'),
+    secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASS')
   ]
 ]
 
@@ -86,9 +86,9 @@ withNightlyPipeline(type, product, component) {
           sh "/nightlyperformancedata/load-or-delete-performance-testdata.sh \
                         ${WORKSPACE} \
                         "load" \
-                        ${DATABASE_USERNAME} \
+                        ${DATABASE_USER} \
                         ${DATABASE_NAME} \
-                        ${DATABASE_PASSWORD} \
+                        ${DATABASE_PASS} \
                         ${DATABASE_HOST} \
                         ${DATABASE_PORT} \
                         ${DATABASE_HOST} \
@@ -102,23 +102,23 @@ withNightlyPipeline(type, product, component) {
   after('PerformanceTest') {
     print "calling deletePerformanceTestData gatling"
 
-    withSubscription(subscription) {
+   /* withSubscription(subscription) {
       withTeamSecrets(config, params.ENVIRONMENT) {
         withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}/nightlyperformancedata/:/nightlyperformancedata") {
           sh "chmod +x /nightlyperformancedata/load-or-delete-performance-testdata.sh"
           sh "/nightlyperformancedata/load-or-delete-performance-testdata.sh \
                         ${WORKSPACE} \
                         "delete" \
-                        ${DATABASE_USERNAME} \
+                        ${DATABASE_USER} \
                         ${DATABASE_NAME} \
-                        ${DATABASE_PASSWORD} \
+                        ${DATABASE_PASS} \
                         ${DATABASE_HOST} \
                         ${DATABASE_PORT} \
                         ${DATABASE_HOST} \
                         ${params.ENVIRONMENT}"
         }
       }
-    }
+    }*/
 
     print "done deletePerformanceTestData gatling"
     archiveArtifacts allowEmptyArchive: true, artifacts: 'am-lib/build/reports/jmh/result.json'

@@ -16,11 +16,11 @@ if [ "$2" = "load" ]; then
 else
     FILE_NAME="delete-data"
 fi
-echo "start data load enironment name::$8"
+echo "start data load environment name::$8 and user:: $DATABASE_USER and host:: $5"
 if [ "$8" = "aat" ]; then
   echo "executing for aat and file name $FILE_NAME.sql"
   export PGPASSWORD=$6
-  psql -h $5 -d $DATABASE_NAME -U $DATABASE_USER -p $7 -f /sql/$FILE_NAME.sql
+  psql --set=sslmode=require -h $5 -d $DATABASE_NAME -U $DATABASE_USER -p $7 -f /sql/$FILE_NAME.sql
 else
   echo "executing for local"
   docker cp $1 am-lib-testing-service-db:/tmp/

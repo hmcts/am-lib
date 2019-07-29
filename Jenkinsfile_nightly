@@ -50,8 +50,8 @@ static Map<String, Object> secret(String secretName, String envVariable) {
 }
 
 withNightlyPipeline(type, product, component) {
-  //setVaultName('am-lib-test')
-  //loadVaultSecrets('am-lib-test',secrets)
+  setVaultName('am-lib-test')
+  loadVaultSecrets(secrets)
 
   enableMutationTest()
   enablePerformanceTest()

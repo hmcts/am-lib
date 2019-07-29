@@ -14,9 +14,4 @@ withPipeline(type, product, component) {
     enableDockerBuild()
     installCharts()
   }
-
-  after('DockerBuild') {
-    sh "echo 'DockerBuild complete'"
-
-  }
 }

@@ -11,18 +11,12 @@ withPipeline(type, product, component) {
   if (env.CHANGE_TITLE && !env.CHANGE_TITLE.contains('[PREVIEW]')
     && env.CHANGE_TITLE.contains('[AKS]')) {
     setVaultName('am')
-    enablePerformanceTest()
     enableDockerBuild()
     installCharts()
   }
 
-  before('PerformanceTest') {
-    sh "echo 'PerformanceTest is about to start'"
+  after('DockerBuild') {
+    sh "echo 'DockerBuild complete'"
 
   }
-
-  after('PerformanceTest') {
-    sh "echo 'PerformanceTest is about to end'"
-  }
-
 }

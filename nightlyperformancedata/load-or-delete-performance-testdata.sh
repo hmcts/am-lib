@@ -19,7 +19,7 @@ fi
 echo "start data load environment name::$8 and user:: $DATABASE_USER and host:: $5"
 if [ "$8" = "aat" ]; then
   echo "executing for aat and file name $FILE_NAME.sql"
-  export PGPASSWORD=$6
+  #export PGPASSWORD=$6
   psql "dbname=$DATABASE_NAME sslmode=require" -h $5 -U $DATABASE_USER -p $7 -f /sql/$FILE_NAME.sql
 else
   echo "executing for local"

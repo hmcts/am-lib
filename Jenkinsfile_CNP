@@ -12,6 +12,15 @@ def secrets = [
   ]
 ]
 
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [$class     : 'AzureKeyVaultSecret',
+   secretType : 'Secret',
+   name       : secretName,
+   version    : '',
+   envVariable: envVar
+  ]
+}
+
 withPipeline(type, product, component) {
   setVaultName('am')
   enableDockerBuild()

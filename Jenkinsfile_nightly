@@ -42,10 +42,10 @@ withNightlyPipeline(type, product, component) {
   setVaultName('am-lib-test')
   loadVaultSecrets(secrets)
 
-  enableMutationTest()
-  enablePerformanceTest()
+  //enableMutationTest()
+  //enablePerformanceTest()
   enableSecurityScan()
-  enableSlackNotifications('#am-master-builds')
+  //enableSlackNotifications('#am-master-builds')
 
   after('checkout') {
     sh '''

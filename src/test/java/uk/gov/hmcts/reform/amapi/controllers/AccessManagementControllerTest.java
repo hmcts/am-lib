@@ -235,7 +235,9 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
             .thenReturn(resourceAccessorsEnvelope);
 
         this.mockMvc.perform(get("/api/resource/resourceType/" + resourceType + "/resourceName/"
-            + resourceName + "/resourceId/" + resourceId))
+            + resourceName + "/resourceId/" + resourceId)
+            .header("ServiceAuthorization", s2sToken)
+            .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.resourceId", is("0011")))

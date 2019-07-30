@@ -26,6 +26,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+//import static org.springframework.http.HttpStatus.FORBIDDEN;
+
 import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -34,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.RESOURCE_NOT_FOUND;
 import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.MALFORMED_JSON;
-
+//import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.ACCESS_DENIED;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -94,8 +96,8 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
      *
      * @throws Exception when exceptional condition happens
      */
-    /* @Test
-    public void testS2SAuthTokenMissingCondition() throws Exception {
+    @Test
+    public void testHandleMissingBearerTokenException() throws Exception {
 
         String inputJson = Resources.toString(Resources
             .getResource("input-data/createResourceAccess.json"), StandardCharsets.UTF_8);
@@ -107,11 +109,13 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.errorMessage", is(ACCESS_DENIED)))
+            /*.andExpect(jsonPath("$.errorMessage", is(ACCESS_DENIED)))
             .andExpect(jsonPath("$.status", is("FORBIDDEN")))
             .andExpect(jsonPath("$.errorCode", is(FORBIDDEN.value())))
-            .andExpect(jsonPath("$.timeStamp", notNullValue()));
-    }*/
+            .andExpect(jsonPath("$.timeStamp", notNullValue()))
+            .andExpect(jsonPath("$.errorDescription", notNullValue()))*/;
+
+    }
 
     /**
      * Test Controller Exception Handler Message Not readable.

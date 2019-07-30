@@ -60,4 +60,32 @@
     <gav regex="true">^io\.netty:netty-tcnative-boringssl-static:.*$</gav>
     <cpe>cpe:/a:netty_project:netty</cpe>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: spring-security-config-5.1.1.RELEASE.jar
+   ]]></notes>
+    <gav regex="true">^org\.springframework\.security:spring-security-config:.*$</gav>
+    <cve>CVE-2018-1258</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: spring-security-web-5.1.1.RELEASE.jar
+   ]]></notes>
+    <gav regex="true">^org\.springframework\.security:spring-security-web:.*$</gav>
+    <cve>CVE-2018-1258</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: spring-security-core-5.1.1.RELEASE.jar
+   ]]></notes>
+    <gav regex="true">^org\.springframework\.security:spring-security-core:.*$</gav>
+    <cve>CVE-2018-1258</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: spring-security-crypto-5.1.1.RELEASE.jar
+   ]]></notes>
+    <gav regex="true">^org\.springframework\.security:spring-security-crypto:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+  </suppress>
 </suppressions>

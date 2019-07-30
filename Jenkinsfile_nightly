@@ -91,7 +91,7 @@ withNightlyPipeline(type, product, component) {
                         ${DATABASE_HOST} \
                         ${DATABASE_PASS} \
                         ${DATABASE_PORT} \
-                        'aat'"
+                        ${params.ENVIRONMENT}"
         }
       }
     }

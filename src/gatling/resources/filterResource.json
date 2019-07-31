@@ -1,14 +1,14 @@
 {
   "userId": "${accessorId}",
   "userRoles": [
-    "caseworker"
+    "caseworker-test"
   ],
   "resource": {
     "id": "${resourceId}",
     "definition": {
-      "serviceName": "cmc",
-      "resourceType": "case",
-      "resourceName": "claim"
+      "serviceName": "cmc-test",
+      "resourceType": "case-test",
+      "resourceName": "claim-test"
     },
     "data": {
       "json": "resource"

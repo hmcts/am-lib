@@ -42,8 +42,7 @@ static Map<String, Object> secret(String secretName, String envVariable) {
   ]
 }
 
-def loadOrDeleteFunction(String parameterLoadOrDelete) {
-     print "calling loadPerformanceTestData gatling function"
+def loadOrDeletePerformanceDbData(String parameterLoadOrDelete) {
       withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}/nightlyperformancedata/:/nightlyperformancedata") {
         sh "chmod +x /nightlyperformancedata/load-or-delete-performance-testdata.sh"
         sh "/nightlyperformancedata/load-or-delete-performance-testdata.sh \
@@ -85,11 +84,11 @@ withNightlyPipeline(type, product, component) {
 
   before('PerformanceTest') {
     sh "echo 'Benchmark is about to start'"
-    /*sh "./gradlew benchmark --info --rerun-tasks && ./gradlew jmhReport --info --rerun-tasks"*/
+    sh "./gradlew benchmark --info --rerun-tasks && ./gradlew jmhReport --info --rerun-tasks"
     print "calling loadPerformanceTestData gatling"
     withSubscription(subscription) {
       withTeamSecrets(config, params.ENVIRONMENT) {
-        loadOrDeleteFunction('load')
+        loadOrDeletePerformanceDbData('load')
       }
     }
     print "done loadPerformanceTestData gatling"
@@ -99,7 +98,7 @@ withNightlyPipeline(type, product, component) {
     print "calling deletePerformanceTestData gatling"
     withSubscription(subscription) {
       withTeamSecrets(config, params.ENVIRONMENT) {
-        loadOrDeleteFunction('delete')
+        loadOrDeletePerformanceDbData('delete')
       }
     }
     print "done deletePerformanceTestData gatling"

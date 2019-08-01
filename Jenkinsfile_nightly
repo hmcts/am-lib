@@ -78,4 +78,8 @@ withNightlyPipeline(type, product, component) {
       keepAll: true
     ])
   }
+  
+  after('Security scan') {
+    sh 'rm -rf ./functional-output'
+  }
 }

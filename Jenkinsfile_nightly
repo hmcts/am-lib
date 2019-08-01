@@ -42,10 +42,8 @@ static Map<String, Object> secret(String secretName, String envVariable) {
   ]
 }
 
-def loadOrDeleteFunction(parameterLoadOrDelete) {
-  print "calling loadPerformanceTestData gatling function"
-  withSubscription(subscription) {
-    withTeamSecrets(config, params.ENVIRONMENT) {
+def loadOrDeleteFunction(String parameterLoadOrDelete) {
+     print "calling loadPerformanceTestData gatling function"
       withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}/nightlyperformancedata/:/nightlyperformancedata") {
         sh "chmod +x /nightlyperformancedata/load-or-delete-performance-testdata.sh"
         sh "/nightlyperformancedata/load-or-delete-performance-testdata.sh \
@@ -58,8 +56,6 @@ def loadOrDeleteFunction(parameterLoadOrDelete) {
                         ${DATABASE_PORT} \
                         ${params.ENVIRONMENT}"
       }
-    }
-  }
 }
 
 withNightlyPipeline(type, product, component) {
@@ -91,13 +87,21 @@ withNightlyPipeline(type, product, component) {
     sh "echo 'Benchmark is about to start'"
     /*sh "./gradlew benchmark --info --rerun-tasks && ./gradlew jmhReport --info --rerun-tasks"*/
     print "calling loadPerformanceTestData gatling"
-    loadOrDeleteFunction('load')
+    withSubscription(subscription) {
+      withTeamSecrets(config, params.ENVIRONMENT) {
+        loadOrDeleteFunction('load')
+      }
+    }
     print "done loadPerformanceTestData gatling"
   }
 
   after('PerformanceTest') {
     print "calling deletePerformanceTestData gatling"
-    loadOrDeleteFunction('delete')
+    withSubscription(subscription) {
+      withTeamSecrets(config, params.ENVIRONMENT) {
+        loadOrDeleteFunction('delete')
+      }
+    }
     print "done deletePerformanceTestData gatling"
     archiveArtifacts allowEmptyArchive: true, artifacts: 'am-lib/build/reports/jmh/result.json'
     publishHTML([

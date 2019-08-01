@@ -28,6 +28,8 @@ def secrets = [
   ]
 ]
 
+
+
 def subscription = "nonprod"
 def config = new AppPipelineConfig()
 config.vaultSecrets = secrets
@@ -38,6 +40,25 @@ static Map<String, Object> secret(String secretName, String envVariable) {
     name: secretName,
     envVariable: envVariable
   ]
+}
+
+def loadOrDeleteFunction(parameterLoadOrDelete) {
+  withSubscription(subscription) {
+    withTeamSecrets(config, params.ENVIRONMENT) {
+      withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}/nightlyperformancedata/:/nightlyperformancedata") {
+        sh "chmod +x /nightlyperformancedata/load-or-delete-performance-testdata.sh"
+        sh "/nightlyperformancedata/load-or-delete-performance-testdata.sh \
+                        ${WORKSPACE} \
+                        ${parameterLoadOrDelete} \
+                        ${DATABASE_USER} \
+                        ${DATABASE_NAME} \
+                        ${DATABASE_HOST} \
+                        ${DATABASE_PASS} \
+                        ${DATABASE_PORT} \
+                        ${params.ENVIRONMENT}"
+      }
+    }
+  }
 }
 
 withNightlyPipeline(type, product, component) {
@@ -69,43 +90,13 @@ withNightlyPipeline(type, product, component) {
     sh "echo 'Benchmark is about to start'"
     sh "./gradlew benchmark --info --rerun-tasks && ./gradlew jmhReport --info --rerun-tasks"
     print "calling loadPerformanceTestData gatling"
-    withSubscription(subscription) {
-      withTeamSecrets(config, params.ENVIRONMENT) {
-        withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}/nightlyperformancedata/:/nightlyperformancedata") {
-          sh "chmod +x /nightlyperformancedata/load-or-delete-performance-testdata.sh"
-          sh "/nightlyperformancedata/load-or-delete-performance-testdata.sh \
-                        ${WORKSPACE} \
-                        'load' \
-                        ${DATABASE_USER} \
-                        ${DATABASE_NAME} \
-                        ${DATABASE_HOST} \
-                        ${DATABASE_PASS} \
-                        ${DATABASE_PORT} \
-                        ${params.ENVIRONMENT}"
-        }
-      }
-    }
+    loadOrDeleteFunction('load')
     print "done loadPerformanceTestData gatling"
   }
 
   after('PerformanceTest') {
     print "calling deletePerformanceTestData gatling"
-    withSubscription(subscription) {
-      withTeamSecrets(config, params.ENVIRONMENT) {
-        withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}/nightlyperformancedata/:/nightlyperformancedata") {
-          sh "chmod +x /nightlyperformancedata/load-or-delete-performance-testdata.sh"
-          sh "/nightlyperformancedata/load-or-delete-performance-testdata.sh \
-                        ${WORKSPACE} \
-                        'delete' \
-                        ${DATABASE_USER} \
-                        ${DATABASE_NAME} \
-                        ${DATABASE_HOST} \
-                        ${DATABASE_PASS} \
-                        ${DATABASE_PORT} \
-                        ${params.ENVIRONMENT}"
-        }
-      }
-    }
+    loadOrDeleteFunction('delete')
     print "done deletePerformanceTestData gatling"
     archiveArtifacts allowEmptyArchive: true, artifacts: 'am-lib/build/reports/jmh/result.json'
     publishHTML([

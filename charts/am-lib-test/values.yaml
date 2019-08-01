@@ -14,7 +14,7 @@ am-lib-test:
       secrets:
         - microservicekey-am-accessmgmt-api
     "am":
-      resourceGroup: am
+      resourceGroup: am-shared-infrastructure
       secrets:
         - s2s-url
   postgresql:

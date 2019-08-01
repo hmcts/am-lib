@@ -31,6 +31,8 @@ class PipelineSimulation extends Simulation {
     BasicScenarios.filterResource.inject(
         constantUsersPerSec(100) during (10 minutes)).protocols(httpProtocol),
     BasicScenarios.revokeResourceAccess.inject(
+        constantUsersPerSec(100) during (10 minutes)).protocols(httpProtocol),
+    BasicScenarios.returnResourceAccessors.inject(
         constantUsersPerSec(100) during (10 minutes)).protocols(httpProtocol)
   )
   .throttle(

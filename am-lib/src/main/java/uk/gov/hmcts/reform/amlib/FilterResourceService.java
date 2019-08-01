@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
-import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
@@ -18,11 +17,11 @@ import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepositor
 import uk.gov.hmcts.reform.amlib.internal.utils.SecurityClassifications;
 import uk.gov.hmcts.reform.amlib.internal.validation.ValidAttributeSecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.AccessEnvelope;
-import uk.gov.hmcts.reform.amlib.models.AccessResourceEnvelope;
-import uk.gov.hmcts.reform.amlib.models.AccessorListByResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
 import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
 import uk.gov.hmcts.reform.amlib.models.Resource;
+import uk.gov.hmcts.reform.amlib.models.ResourceAccessor;
+import uk.gov.hmcts.reform.amlib.models.ResourceAccessorsEnvelope;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.ArrayList;
@@ -33,22 +32,22 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
+
 import javax.sql.DataSource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class FilterResourceService {
@@ -129,7 +128,7 @@ public class FilterResourceService {
                                                        Map<@NotNull JsonPointer, SecurityClassification>
                                                        attributeSecurityClassifications) {
 
-        List<ExplicitAccessRecord> explicitAccessRecords = getExplicitAccessRecords(userId, resource);
+        List<ExplicitAccessRecord> explicitAccessRecords = getExplicitAccessRecords(userId, userRoles, resource);
 
         Map<JsonPointer, Set<Permission>> attributePermissions;
         AccessType accessType;
@@ -190,39 +189,39 @@ public class FilterResourceService {
      * @param resourceId   resourceId
      * @param resourceName resourceName
      * @param resourceType resourceType
-     * @return AccessorListByResourceEnvelope AccessResourceEnvelope
+     * @return ResourceAccessorsEnvelope resourceAccessorsEnvelope
      */
     @AuditLog("returns access rights for given resource with resource id '{{resourceId}}' "
         + "  resource name '{{resourceName}} and resource type '{{resourceType}}' : with result resource id "
-        + " {{result.resourceId}} and data {{result.explicitAccessResourceEnvelopesList}}")
-    public AccessorListByResourceEnvelope returnResourceAccessList(@NotBlank String resourceId,
-                                           @NotBlank String resourceName, @NotBlank String resourceType) {
+        + " {{result.resourceId}} and data {{result.explicitAccessors}}")
+    public ResourceAccessorsEnvelope returnResourceAccessors(@NotBlank String resourceId,
+                                                             @NotBlank String resourceName,
+                                                             @NotBlank String resourceType) {
 
-        //collect root-level attribute
         List<ExplicitAccessRecord> explicitAccessRecords = jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getExplicitAccessForResource(resourceId, resourceName, resourceType, AccessorType.USER));
+            dao -> dao.getExplicitAccessForResource(resourceId, resourceName, resourceType, USER));
 
-        Map<String, List<ExplicitAccessRecord>> explicitAccessRecordsMap = explicitAccessRecords.stream()
+        Map<String, List<ExplicitAccessRecord>> explicitAccessRecordsByAccessorId = explicitAccessRecords.stream()
             .collect(groupingBy(ExplicitAccessRecord::getAccessorId));
 
-        final List<AccessResourceEnvelope> accessResourceEnvelopes = new ArrayList<>();
+        List<ResourceAccessor> resourceAccessors = new ArrayList<>();
 
-        explicitAccessRecordsMap.entrySet().forEach(explicitAccessRecord -> {
-            //set permissions
-            Map<JsonPointer, Set<Permission>> permissions = getExplicitAttributePermissions(
-                explicitAccessRecord.getValue());
-            //set relationships
-            Set<String> relationships = getRelationshipsFromExplicitAccessRecords(explicitAccessRecord.getValue());
-            AccessEnvelope accessEnvelope = AccessEnvelope.builder().permissions(permissions).build();
-            accessResourceEnvelopes.add(AccessResourceEnvelope.builder()
-                .accessorId(explicitAccessRecord.getKey())
-                .access(accessEnvelope).accessorType(AccessorType.USER)
-                .relationships(relationships).build());
+        explicitAccessRecordsByAccessorId.forEach((accessorId, accessorExplicitAccessRecords) -> {
+            Map<JsonPointer, Set<Permission>> permissions =
+                getExplicitAttributePermissions(accessorExplicitAccessRecords);
+            Set<String> relationships = getRelationshipsFromExplicitAccessRecords(accessorExplicitAccessRecords);
+            resourceAccessors.add(ResourceAccessor.builder()
+                .accessorId(accessorId)
+                .accessorType(USER)
+                .relationships(relationships)
+                .permissions(permissions)
+                .build());
         });
 
-        return AccessorListByResourceEnvelope.builder()
-            .explicitAccessResourceEnvelopesList(accessResourceEnvelopes)
-            .resourceId(resourceId).build();
+        return ResourceAccessorsEnvelope.builder()
+            .explicitAccessors(resourceAccessors)
+            .resourceId(resourceId)
+            .build();
     }
 
     private Integer getMaxSecurityClassificationHierarchyForRoles(@NotEmpty Set<String> userRoles) {
@@ -234,9 +233,12 @@ public class FilterResourceService {
     }
 
 
-    private List<ExplicitAccessRecord> getExplicitAccessRecords(String userId, Resource resource) {
+    private List<ExplicitAccessRecord> getExplicitAccessRecords(String userId,
+                                                                @NotEmpty Set<String> userRoles,
+                                                                Resource resource) {
         return jdbi.withExtension(AccessManagementRepository.class,
-            dao -> dao.getExplicitAccess(userId, resource.getId(), resource.getDefinition().getResourceType()));
+            dao -> dao.getExplicitAccess(userId, userRoles, resource.getId(),
+                resource.getDefinition().getResourceType()));
     }
 
     private Map<JsonPointer, Set<Permission>> getRoleAttributePermissions(Set<String> userRoles,
@@ -252,16 +254,21 @@ public class FilterResourceService {
     private Map<JsonPointer, Set<Permission>> getExplicitAttributePermissions(
         List<ExplicitAccessRecord> explicitAccessRecords) {
 
-        List<Map<JsonPointer, Set<Permission>>> permissionsForRelationships = explicitAccessRecords.stream()
-            .collect(collectingAndThen(groupingByWithNullKeys(ExplicitAccessRecord::getRelationship), Map::values))
-            .stream()
-            .map(explicitAccessRecordsForRelationship -> explicitAccessRecordsForRelationship.stream()
-                .collect(getMapCollector()))
-            .collect(toList());
+        // group records by accessor / relationship combo
+        Map<String, List<ExplicitAccessRecord>> recordsByAccessorIdAndRelationship = explicitAccessRecords.stream()
+            .collect(groupingBy(ear -> ear.getAccessorId() + "." + ear.getRelationship()));
 
-        return permissionsService.merge(permissionsForRelationships);
+        // create map of attribute permissions for each accessor / relationship combo
+        List<Map<JsonPointer, Set<Permission>>> permissionsByAccessorIdAndRelationship = new ArrayList<>();
+        recordsByAccessorIdAndRelationship.forEach((accessorId, records) -> {
+            Map<JsonPointer, Set<Permission>> permissions = new ConcurrentHashMap<>();
+            records.forEach(record -> permissions.put(record.getAttribute(), record.getPermissions()));
+            permissionsByAccessorIdAndRelationship.add(permissions);
+        });
+
+        // merge attribute permissions between each accessor / relationship combo
+        return permissionsService.merge(permissionsByAccessorIdAndRelationship);
     }
-
 
     private Set<String> getRelationshipsFromExplicitAccessRecords(List<ExplicitAccessRecord> explicitAccessRecords) {
         return explicitAccessRecords.stream()
@@ -291,28 +298,6 @@ public class FilterResourceService {
         }
 
         return permissionsService.merge(permissionsForRoles);
-    }
-
-
-    /**
-     * check group by when keys are null (eg. usage when relationship key for Annotation is null).
-     *
-     * @param classifier lamda function
-     * @param <T>        Type of Input
-     * @param <A>        Result output
-     * @return
-     */
-    private static <T, A> Collector<T, ?, Map<A, List<T>>> groupingByWithNullKeys(
-        Function<? super T, ? extends A> classifier) {
-        return toMap(
-            classifier,
-            Collections::singletonList,
-            (List<T> oldList, List<T> newCollection) -> {
-                List<T> newList = new ArrayList<>(oldList.size() + 1);
-                newList.addAll(oldList);
-                newList.addAll(newCollection);
-                return newList;
-            });
     }
 
     private Map<JsonPointer, Set<Permission>> filterAttributePermissionsBySecurityClassification(

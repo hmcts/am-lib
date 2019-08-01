@@ -29,7 +29,12 @@ public interface AccessManagementRepository {
     @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, accessor_type, service_name, resource_type, resource_name, attribute, relationship) "
         + "values (:resourceId, :accessorId, :permissionsAsInt, cast(:accessorType as accessor_type), :serviceName, :resourceType, :resourceName, :attributeAsString, :relationship)"
         + "on conflict on constraint access_management_unique do update set permissions = :permissionsAsInt")
-    void createAccessManagementRecord(@BindBean ExplicitAccessRecord explicitAccessRecord);
+    void grantAccessManagementWithNotNullRelationship(@BindBean ExplicitAccessRecord explicitAccessRecord);
+
+    @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, accessor_type, service_name, resource_type, resource_name, attribute, relationship) "
+        + "values (:resourceId, :accessorId, :permissionsAsInt, cast(:accessorType as accessor_type), :serviceName, :resourceType, :resourceName, :attributeAsString, :relationship)"
+        + "on conflict (resource_id, accessor_id, accessor_type, attribute, resource_type, service_name, resource_name) where relationship is null do update set permissions = :permissionsAsInt")
+    void grantAccessManagementWithNullRelationship(@BindBean ExplicitAccessRecord explicitAccessRecord);
 
     @SqlUpdate("delete from access_management where "
         + "access_management.resource_id = :resourceId "
@@ -42,11 +47,11 @@ public interface AccessManagementRepository {
         + "and (access_management.attribute = :attributeAsString or access_management.attribute like concat(:attributeAsString, '/', '%'))")
     void removeAccessManagementRecord(@BindBean ExplicitAccessMetadata explicitAccessMetadata);
 
-    @SqlQuery("select * from access_management where accessor_id=? and resource_id=? and resource_type=?")
+    @SqlQuery("select * from access_management where resource_id = :resourceId and resource_type = :resourceType and "
+        + "((accessor_type = 'USER' and accessor_id = :accessorId) or (accessor_type = 'ROLE' and accessor_id in (<userRoles>)) or (accessor_type = 'DEFAULT' and accessor_id = '*'))")
     @RegisterConstructorMapper(ExplicitAccessRecord.class)
-    List<ExplicitAccessRecord> getExplicitAccess(String accessorId, String resourceId, String resourceType);
+    List<ExplicitAccessRecord> getExplicitAccess(String accessorId, @BindList Set<String> userRoles, String resourceId, String resourceType);
 
-    @SuppressWarnings("PMD.UseObjectForClearerAPI") // More than 3 parameters makes sense for now, subject to change
     @SqlQuery("select * from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType and resource_name = :resourceName and role_name = :roleName")
     @RegisterConstructorMapper(RoleBasedAccessRecord.class)
     List<RoleBasedAccessRecord> getRolePermissions(@BindBean ResourceDefinition resourceDefinition, String roleName);

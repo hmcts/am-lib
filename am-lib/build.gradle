@@ -8,7 +8,7 @@ plugins {
     id 'com.jfrog.bintray' version '1.8.4'
     id 'com.github.johnrengelman.shadow' version '5.1.0'
     id "io.freefair.aspectj.post-compile-weaving" version "3.2.1"
-    id "io.freefair.lombok" version "3.8.0"
+    id "io.freefair.lombok" version "3.8.1"
     id "io.morethan.jmhreport" version "0.9.0"
 }
 
@@ -87,25 +87,25 @@ configurations.all {
 
 dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
-    compile group: 'org.jdbi', name: 'jdbi3-core', version: '3.8.1'
-    compile group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.8.1'
+    compile group: 'org.jdbi', name: 'jdbi3-core', version: '3.9.0'
+    compile group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.9.0'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.6'
     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.17.Final'
     compile group: 'org.aspectj', name: 'aspectjrt', version: '1.9.4'
     compile group: 'io.swagger', name: 'swagger-annotations', version: '1.5.22'
     
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.0'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.0.0'
-    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.12.2'
+    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.13.1'
     testCompile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
-    testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.11.4'
+    testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.12.0'
     testCompile group: 'com.google.guava', name: 'guava', version: '28.0-jre'
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: '5.0.1'
 
     benchmarkAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.21'
 
-    benchmarkImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.2'
+    benchmarkImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
     benchmarkCompile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
     benchmarkCompile sourceSets.main.runtimeClasspath
     benchmarkCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'

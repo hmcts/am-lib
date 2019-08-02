@@ -20,6 +20,15 @@ def secrets = [
   ]
 ]
 
+static Map<String, Object> secret(String secretName, String envVariable) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    envVariable: envVariable
+  ]
+}
+
+
 def subscription = "nonprod"
 def config = new AppPipelineConfig()
 config.vaultSecrets = secrets

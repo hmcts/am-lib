@@ -63,7 +63,7 @@ withPipeline(type, product, component) {
       }
     }
 
-    before('Functional Test - AKS preview') {
+    before('functionaltest:aks') {
       sh "echo 'insert functional test data'"
       withSubscription(subscription) {
         withTeamSecrets(config, params.ENVIRONMENT) {
@@ -74,7 +74,7 @@ withPipeline(type, product, component) {
       print "done functional test data insertion"
     }
 
-    after('Functional Test - AKS preview') {
+    after('functionaltest:aks') {
       sh "echo 'delete functional test data'"
       withSubscription(subscription) {
         withTeamSecrets(config, params.ENVIRONMENT) {

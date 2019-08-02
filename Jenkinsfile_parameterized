@@ -1,9 +1,26 @@
 #!groovy
 @Library("Infrastructure") _
 
+import uk.gov.hmcts.contino.AppPipelineConfig
+
 def type = "java"
 def product = "am"
 def component = "lib-test"
+
+def secretId = "am-lib-test-${params.ENVIRONMENT}"
+def secrets = [
+  (secretId): [
+    secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
+    secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
+    secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
+    secret('am-lib-test-POSTGRES-USER', 'DATABASE_USER'),
+    secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASS')
+  ]
+]
+
+def subscription = "nonprod"
+def config = new AppPipelineConfig()
+config.vaultSecrets = secrets
 
 withPipeline(type, product, component) {
   enableDbMigration()
@@ -12,6 +29,29 @@ withPipeline(type, product, component) {
     && env.CHANGE_TITLE.contains('[AKS]')) {
     setVaultName('am')
     enableDockerBuild()
+
+    before('FunctionalTest') {
+      sh "echo 'insert functional test data'"
+      withSubscription(subscription) {
+        withTeamSecrets(config, params.ENVIRONMENT) {
+          sh "./gradlew loadPerformanceTestData -PDATABASE_USER=${DATABASE_USER} " +
+            "-PDATABASE_NAME=${DATABASE_NAME} -PDATABASE_PASSWORD=${DATABASE_PASS} -PDATABASE_HOST=${DATABASE_HOST} -PDATABASE_PORT=${DATABASE_PORT} -PENVIRONMENT=${params.ENVIRONMENT}"
+        }
+      }
+      print "done functional test data insertion"
+    }
+
+    after('FunctionalTest') {
+      sh "echo 'delete functional test data'"
+      withSubscription(subscription) {
+        withTeamSecrets(config, params.ENVIRONMENT) {
+          sh "./gradlew deletePerformanceTestData -PDATABASE_USER=${DATABASE_USER} " +
+            "-PDATABASE_NAME=${DATABASE_NAME} -PDATABASE_PASSWORD=${DATABASE_PASS} -PDATABASE_HOST=${DATABASE_HOST} -PDATABASE_PORT=${DATABASE_PORT} -PENVIRONMENT=${params.ENVIRONMENT}"
+        }
+      }
+      print "done functional test deletion"
+    }
+
     installCharts()
   }
 }

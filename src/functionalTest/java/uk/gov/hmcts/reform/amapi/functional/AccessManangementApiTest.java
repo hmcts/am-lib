@@ -34,10 +34,10 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
     String resourceId = "Siva1234";
     @NotEmpty Set<@NotBlank String> accessorIds;
     String accessorId = "Test1234";
-    String resourceName = "claim";
-    String resourceType = "case";
-    String seriviceName = "cmc";
-    String relationship = "caseworker";
+    String resourceName = "claim-test";
+    String resourceType = "case-test";
+    String seriviceName = "cmc-test";
+    String relationship = "caseworker-test";
     Map<JsonPointer, Set<Permission>> multipleAttributePermissions = ImmutableMap.of(
         JsonPointer.valueOf(""), ImmutableSet.of(CREATE, READ, UPDATE));
 

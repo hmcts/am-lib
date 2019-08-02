@@ -37,10 +37,10 @@ public class AmApiClient {
     String resourceId = "resourceId" + currentDateTime;
     @NotEmpty Set<@NotBlank String> accessorIds;
     String accessorId = "accessorId" + currentDateTime;
-    String resourceName = "claim";
-    String resourceType = "case";
-    String seriviceName = "cmc";
-    String relationship = "caseworker";
+    String resourceName = "claim-test";
+    String resourceType = "case-test";
+    String seriviceName = "cmc-test";
+    String relationship = "caseworker-test";
     Set<String> userRoles = new HashSet<>();
     Map<JsonPointer, Set<Permission>> multipleAttributePermissions = ImmutableMap.of(
         JsonPointer.valueOf(""), ImmutableSet.of(READ, CREATE, UPDATE));

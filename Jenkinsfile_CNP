@@ -63,6 +63,14 @@ withPipeline(type, product, component) {
       }
     }
 
+    after('smoketest:aat') {
+      echo "Disabling prod build"
+      sh "rm -rf infrastructure/"
+    }
+  }
+
+  onPR {
+
     before('functionaltest:aat') {
       sh "echo 'insert functional test data'"
       withSubscription(subscription) {
@@ -85,13 +93,6 @@ withPipeline(type, product, component) {
       print "done functional test deletion"
     }
 
-    after('smoketest:aat') {
-      echo "Disabling prod build"
-      sh "rm -rf infrastructure/"
-    }
-  }
-
-  onPR {
     // channel won't be used instead the user channel configured here is used:
     // https://github.com/hmcts/github-slack-user-mappings
     enableSlackNotifications('#am-pr-builds')

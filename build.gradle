@@ -295,7 +295,7 @@ task loadPerformanceTestData(type: Exec) {
     commandLine 'cmd', '/c', file("${project.projectDir}/nightlyperformancedata/load-or-delete-performance-testdata-win.bat"),
       file("${project.projectDir}/nightlyperformancedata/sql"), "load", "${DATABASE_USER}", "${DATABASE_NAME}", "${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
   } else {
-    commandLine 'sh', file("${project.projectDir}/nightlyperformancedata/load-or-delete-data.sh"),
+    commandLine 'sh', file("${project.projectDir}/nightlyperformancedata/load-or-delete-performance-testdata.sh"),
       file("${project.projectDir}/nightlyperformancedata/sql"), "load", "${DATABASE_USER}", "${DATABASE_NAME}","${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
   }
 }
@@ -305,7 +305,7 @@ task deletePerformanceTestData(type: Exec) {
     commandLine 'cmd', '/c', file("${project.projectDir}/nightlyperformancedata/load-or-delete-performance-testdata-win.bat"),
       file("${project.projectDir}/nightlyperformancedata/sql"), "delete", "${DATABASE_USER}", "${DATABASE_NAME}", "${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
   } else {
-    commandLine 'sh', file("${project.projectDir}/nightlyperformancedata/load-or-delete-data.sh"),
+    commandLine 'sh', file("${project.projectDir}/nightlyperformancedata/load-or-delete-performance-testdata.sh"),
       file("${project.projectDir}/nightlyperformancedata/sql"), "delete" ,"${DATABASE_USER}", "${DATABASE_NAME}", "${DATABASE_HOST}", "${DATABASE_PASSWORD}", "${DATABASE_PORT}", "${ENVIRONMENT_NAME}"
   }
 }

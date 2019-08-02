@@ -23,8 +23,8 @@ public class DatabaseProperties {
             ),
             getValueOrThrow("DATABASE_NAME"),
             new Credentials(
-                getValueOrThrow("DATABASE_USERNAME"),
-                getValueOrThrow("DATABASE_PASSWORD")
+                getValueOrThrow("DATABASE_USER"),
+                getValueOrThrow("DATABASE_PASS")
             )
         );
     }

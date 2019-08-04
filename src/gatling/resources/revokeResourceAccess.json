@@ -1,10 +1,10 @@
 {
   "resourceId": "${resourceId}",
-  "serviceName": "cmc",
-  "resourceType": "case",
-  "resourceName": "claim",
+  "serviceName": "cmc-test",
+  "resourceType": "case-test",
+  "resourceName": "claim-test",
   "accessorId": "${accessorId}",
   "accessorType": "USER",
   "attribute": "",
-  "relationship": "caseworker"
+  "relationship": "caseworker-test"
 }

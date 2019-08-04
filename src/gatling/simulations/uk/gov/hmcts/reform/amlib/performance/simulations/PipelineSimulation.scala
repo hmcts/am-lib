@@ -15,16 +15,17 @@ class PipelineSimulation extends Simulation {
   /* load profile and assertions to be changed once NFRs are defined
       this is just an exemplary simulation */
 
-  /*setUp(
+ /* setUp(
     BasicScenarios.createResourceAccess.inject(loadProfile).protocols(httpProtocol),
     BasicScenarios.filterResource.inject(loadProfile).protocols(httpProtocol),
-    BasicScenarios.revokeResourceAccess.inject(loadProfile).protocols(httpProtocol)
+    BasicScenarios.revokeResourceAccess.inject(loadProfile).protocols(httpProtocol),
+    BasicScenarios.returnResourceAccessors.inject(loadProfile).protocols(httpProtocol)
   ).maxDuration(600.seconds)
     .assertions(
       global.failedRequests.count.is(0),
       global.responseTime.max.lt(30000)
-    )
-*/
+    ) */
+
   setUp(
     BasicScenarios.createResourceAccess.inject(
         constantUsersPerSec(100) during (10 minutes)).protocols(httpProtocol),

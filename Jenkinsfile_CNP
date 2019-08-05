@@ -41,23 +41,23 @@ withPipeline(type, product, component) {
 
   before('functionalTest:preview') {
     sh "echo 'insert functional test data'"
-    withSubscription(subscription) {
-      withTeamSecrets(config, params.ENVIRONMENT) {
+//    withSubscription(subscription) {
+//      withTeamSecrets(config, params.ENVIRONMENT) {
         sh "./gradlew loadPerformanceTestData -PDATABASE_USER=${DATABASE_USER} " +
           "-PDATABASE_NAME=${DATABASE_NAME} -PDATABASE_PASSWORD=${DATABASE_PASS} -PDATABASE_HOST=${DATABASE_HOST} -PDATABASE_PORT=${DATABASE_PORT} -PENVIRONMENT=${params.ENVIRONMENT}"
-      }
-    }
+//      }
+//    }
     print "done functional test data insertion"
   }
 
   after('functionalTest:preview') {
     sh "echo 'delete functional test data'"
-    withSubscription(subscription) {
-      withTeamSecrets(config, params.ENVIRONMENT) {
+//    withSubscription(subscription) {
+//      withTeamSecrets(config, params.ENVIRONMENT) {
         sh "./gradlew deletePerformanceTestData -PDATABASE_USER=${DATABASE_USER} " +
           "-PDATABASE_NAME=${DATABASE_NAME} -PDATABASE_PASSWORD=${DATABASE_PASS} -PDATABASE_HOST=${DATABASE_HOST} -PDATABASE_PORT=${DATABASE_PORT} -PENVIRONMENT=${params.ENVIRONMENT}"
-      }
-    }
+//      }
+//    }
     print "done functional test deletion"
   }
 

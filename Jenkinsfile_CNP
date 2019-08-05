@@ -39,7 +39,7 @@ withPipeline(type, product, component) {
   installCharts()
   enableDbMigration()
 
-  before('functionaltest:${params.ENVIRONMENT}') {
+  before('functionalTest:preview') {
     sh "echo 'insert functional test data'"
     withSubscription(subscription) {
       withTeamSecrets(config, params.ENVIRONMENT) {
@@ -50,7 +50,7 @@ withPipeline(type, product, component) {
     print "done functional test data insertion"
   }
 
-  after('functionaltest:${params.ENVIRONMENT}') {
+  after('functionalTest:preview') {
     sh "echo 'delete functional test data'"
     withSubscription(subscription) {
       withTeamSecrets(config, params.ENVIRONMENT) {

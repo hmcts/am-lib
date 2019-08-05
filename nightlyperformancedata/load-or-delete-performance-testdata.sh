@@ -16,7 +16,8 @@ if [ "$2" = "load" ]; then
 else
     FILE_NAME="delete-data"
 fi
-if [[ ("$8" = "aat") || ("$8" ="aks") ]]; then
+
+if [[ ( "$8" = "aat" ) || ( "$8" = "aks" ) ]]; then
   echo "executing for aat and file name $FILE_NAME.sql"
   psql "dbname=$DATABASE_NAME sslmode=require" -h $5 -U $DATABASE_USER -p $7 -f /nightlyperformancedata/sql/$FILE_NAME.sql
 else

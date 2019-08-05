@@ -9,7 +9,7 @@ class HelloWorldTest extends RestAssuredTest {
 
     @Test
     @Tag("SmokeTest")
-    void helloWorld_returns_200() {
+    void helloWorldReturns200() {
         get("/")
                 .then().statusCode(200);
     }

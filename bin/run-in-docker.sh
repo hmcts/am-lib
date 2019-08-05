@@ -31,7 +31,7 @@ GRADLE_INSTALL=true
 #S2S_SECRET=secret
 
 # Test S2S key - not used in any HMCTS key vaults or services
-export S2S_SECRET=OQHGSGHVQXUEXH7F
+export S2S_SECRET=GJNMFGFAAO4FCVD4
 export S2S_MICROSERVICE=am_accessmgmt_api
 
 build_s2s_image() {

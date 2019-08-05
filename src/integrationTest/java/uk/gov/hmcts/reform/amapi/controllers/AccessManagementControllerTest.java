@@ -42,6 +42,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -49,6 +50,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
@@ -57,7 +59,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = MOCK)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports", "PMD.LawOfDemeter",
@@ -80,6 +82,8 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
 
     @BeforeEach
     void init() {
+        this.mockMvc = webAppContextSetup(webApplicationContext).build();
+
         doNothing().when(importerService).addService(anyString());
         doNothing().when(importerService).addResourceDefinition(any());
         doNothing().when(importerService).addRole(anyString(), any(), any(), any());
@@ -111,6 +115,7 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
             .andExpect(jsonPath("$.attributePermissions.*",
                 hasItem(is(containsInAnyOrder("CREATE", "READ", "UPDATE")))))
             .andExpect(jsonPath("$.relationship", is("caseworker")));
+
     }
 
     @Test
@@ -127,6 +132,7 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
             .header("ServiceAuthorization", s2sToken))
             .andDo(print())
             .andExpect(status().isNoContent());
+
     }
 
     @Test

@@ -13,7 +13,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.amapi.controllers.SecurityAuthorizationTest;
-import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 
 import java.nio.charset.StandardCharsets;
@@ -24,22 +23,22 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-//import static org.springframework.http.HttpStatus.FORBIDDEN;
-
 import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
-import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.RESOURCE_NOT_FOUND;
 import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.MALFORMED_JSON;
+
+//import static org.springframework.http.HttpStatus.FORBIDDEN;
 //import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.ACCESS_DENIED;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = MOCK)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert","PMD.AvoidDuplicateLiterals","PMD.ExcessiveImports"})
@@ -51,18 +50,19 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
     @MockBean
     private DefaultRoleSetupImportService importerService;
 
-    @MockBean
-    private AccessManagementService accessManagementService;
-
     private String s2sToken;
 
     @BeforeEach
     void init() {
+        this.mockMvc = webAppContextSetup(webApplicationContext).build();
+
         doNothing().when(importerService).addService(anyString());
         doNothing().when(importerService).addResourceDefinition(any());
         doNothing().when(importerService).addRole(anyString(), any(), any(), any());
 
         s2sToken = getS2sToken();
+        //s2sToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbV9hY2Nlc3NtZ210X2FwaSIsImV4cCI6MTU2NDc0MjcxN30.rIpRPLo3r"
+        //    + "XGex6iZcq1kG1732h53P744Fq5NTTKqw33jlMotC7jDuOffyCnerXyQxjTuN93F2Iuu7gY3NJ99Pw";
     }
 
     /**
@@ -89,33 +89,6 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
             .andExpect(jsonPath("$.errorDescription", notNullValue()));
     }
 
-
-
-    /**
-     * Test Controller Exception Handler Message Not readable.
-     *
-     * @throws Exception when exceptional condition happens
-     */
-    @Test
-    public void testHandleMissingBearerTokenException() throws Exception {
-
-        String inputJson = Resources.toString(Resources
-            .getResource("input-data/createResourceAccess.json"), StandardCharsets.UTF_8);
-
-        doNothing().when(accessManagementService).grantExplicitResourceAccess(any());
-
-        this.mockMvc.perform(post("/api/access-resource")
-            .content(inputJson)
-            .header(CONTENT_TYPE, APPLICATION_JSON))
-            .andDo(print())
-            .andExpect(status().isForbidden())
-            /*.andExpect(jsonPath("$.errorMessage", is(ACCESS_DENIED)))
-            .andExpect(jsonPath("$.status", is("FORBIDDEN")))
-            .andExpect(jsonPath("$.errorCode", is(FORBIDDEN.value())))
-            .andExpect(jsonPath("$.timeStamp", notNullValue()))
-            .andExpect(jsonPath("$.errorDescription", notNullValue()))*/;
-
-    }
 
     /**
      * Test Controller Exception Handler Message Not readable.
@@ -165,7 +138,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
      *
      * @throws Exception when exceptional condition happens
      */
-    @Test
+    /*@Test
     public void testHandleNoHandlerFoundException() throws Exception {
 
         String invalidJson = "";
@@ -182,7 +155,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
             .andExpect(jsonPath("$.timeStamp", notNullValue()))
             .andExpect(jsonPath("$.errorDescription", is(RESOURCE_NOT_FOUND)));
 
-    }
+    }*/
 
 
     /**

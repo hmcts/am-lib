@@ -43,7 +43,7 @@ withPipeline(type, product, component) {
     sh "echo 'insert functional test data'"
 //    withSubscription(subscription) {
 //      withTeamSecrets(config, params.ENVIRONMENT) {
-        sh "./gradlew loadPerformanceTestData "
+        sh "./gradlew loadPerformanceTestData -PENVIRONMENT='aks"
 //      }
 //    }
     print "done functional test data insertion"
@@ -53,7 +53,7 @@ withPipeline(type, product, component) {
     sh "echo 'delete functional test data'"
 //    withSubscription(subscription) {
 //      withTeamSecrets(config, params.ENVIRONMENT) {
-        sh "./gradlew deletePerformanceTestData "
+        sh "./gradlew deletePerformanceTestData -PENVIRONMENT='aks' "
 //      }
 //    }
     print "done functional test deletion"

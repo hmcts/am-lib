@@ -1,14 +1,14 @@
 {
   "resourceId": "1234",
   "resourceDefinition": {
-    "serviceName": "cmc",
-    "resourceType": "case",
-    "resourceName": "claim"
+    "serviceName": "cmc-test",
+    "resourceType": "case-test",
+    "resourceName": "claim-test"
   },
   "accessorIds": ["12345"],
   "accessorType": "USER",
   "attributePermissions": {
     "": ["CREATE", "READ", "UPDATE"]
   },
-  "relationship": "caseworker"
+  "relationship": "caseworker-test"
 }

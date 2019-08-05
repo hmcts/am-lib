@@ -106,15 +106,15 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
             .andDo(print())
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.resourceId", is("1234")))
-            .andExpect(jsonPath("$.resourceDefinition.serviceName", is("cmc")))
-            .andExpect(jsonPath("$.resourceDefinition.resourceType", is("case")))
-            .andExpect(jsonPath("$.resourceDefinition.resourceName", is("claim")))
+            .andExpect(jsonPath("$.resourceDefinition.serviceName", is("cmc-test")))
+            .andExpect(jsonPath("$.resourceDefinition.resourceType", is("case-test")))
+            .andExpect(jsonPath("$.resourceDefinition.resourceName", is("claim-test")))
             .andExpect(jsonPath("$.accessorIds").value("12345"))
             .andExpect(jsonPath("$.accessorType", is("USER")))
             .andExpect(jsonPath("$.attributePermissions").exists())
             .andExpect(jsonPath("$.attributePermissions.*",
                 hasItem(is(containsInAnyOrder("CREATE", "READ", "UPDATE")))))
-            .andExpect(jsonPath("$.relationship", is("caseworker")));
+            .andExpect(jsonPath("$.relationship", is("caseworker-test")));
 
     }
 
@@ -223,8 +223,8 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
     @Test
     public void testReturnResourceAccessors() throws Exception {
 
-        String resourceType = "case-test";
-        String resourceName = "claim-test";
+        String resourceType = "case-test-test";
+        String resourceName = "claim-test-test";
         String resourceId = "0011";
 
         ResourceAccessorsEnvelope resourceAccessorsEnvelope = ResourceAccessorsEnvelope.builder()
@@ -232,7 +232,7 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
             .explicitAccessors(Collections.singletonList(ResourceAccessor.builder()
                 .accessorId("5511")
                 .accessorType(USER)
-                .relationships(ImmutableSet.of("caseworker-test"))
+                .relationships(ImmutableSet.of("caseworker-test-test"))
                 .permissions(Collections.singletonMap(JsonPointer.valueOf(""), ImmutableSet.of(READ, UPDATE, CREATE)))
                 .build()))
             .build();
@@ -250,7 +250,7 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
             .andExpect(jsonPath("$.explicitAccess").exists())
             .andExpect(jsonPath("$.explicitAccess[0].accessorId", is("5511")))
             .andExpect(jsonPath("$.explicitAccess[0].accessorType", is("USER")))
-            .andExpect(jsonPath("$.explicitAccess[0].relationships.*", containsInAnyOrder("caseworker-test")))
+            .andExpect(jsonPath("$.explicitAccess[0].relationships.*", containsInAnyOrder("caseworker-test-test")))
             .andExpect(jsonPath("$.explicitAccess[0].permissions.*",
                 hasItem(is(containsInAnyOrder("CREATE", "READ", "UPDATE")))));
     }

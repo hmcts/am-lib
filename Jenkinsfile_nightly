@@ -11,18 +11,27 @@ properties([
 
 @Library("Infrastructure")
 
+import uk.gov.hmcts.contino.AppPipelineConfig
+
 def type = "java"
 def product = "am"
 def component = "lib-test"
 
-List<Map<String, Object>> secrets = [
-  secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
-  secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
-  secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
-  secret('am-lib-test-POSTGRES-USER', 'DATABASE_USERNAME'),
-  secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASSWORD'),
-  secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
+def secretId = "am-lib-test-${params.ENVIRONMENT}"
+def secrets = [
+  (secretId): [
+    secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
+    secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
+    secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
+    secret('am-lib-test-POSTGRES-USER', 'DATABASE_USER'),
+    secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASS'),
+    secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
+  ]
 ]
+
+def subscription = "nonprod"
+def config = new AppPipelineConfig()
+config.vaultSecrets = secrets
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [ $class: 'AzureKeyVaultSecret',
@@ -30,6 +39,21 @@ static Map<String, Object> secret(String secretName, String envVariable) {
     name: secretName,
     envVariable: envVariable
   ]
+}
+
+def loadOrDeletePerformanceDbData(String parameterLoadOrDelete) {
+      withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}/nightlyperformancedata/:/nightlyperformancedata") {
+        sh "chmod +x /nightlyperformancedata/load-or-delete-performance-testdata.sh"
+        sh "/nightlyperformancedata/load-or-delete-performance-testdata.sh \
+                        ${WORKSPACE} \
+                        ${parameterLoadOrDelete} \
+                        ${DATABASE_USER} \
+                        ${DATABASE_NAME} \
+                        ${DATABASE_HOST} \
+                        ${DATABASE_PASS} \
+                        ${DATABASE_PORT} \
+                        ${params.ENVIRONMENT}"
+      }
 }
 
 withNightlyPipeline(type, product, component) {
@@ -61,9 +85,23 @@ withNightlyPipeline(type, product, component) {
   before('PerformanceTest') {
     sh "echo 'Benchmark is about to start'"
     sh "./gradlew benchmark --info --rerun-tasks && ./gradlew jmhReport --info --rerun-tasks"
+    print "calling loadPerformanceTestData gatling"
+    withSubscription(subscription) {
+      withTeamSecrets(config, params.ENVIRONMENT) {
+        loadOrDeletePerformanceDbData('load')
+      }
+    }
+    print "done loadPerformanceTestData gatling"
   }
 
   after('PerformanceTest') {
+    print "calling deletePerformanceTestData gatling"
+    withSubscription(subscription) {
+      withTeamSecrets(config, params.ENVIRONMENT) {
+        loadOrDeletePerformanceDbData('delete')
+      }
+    }
+    print "done deletePerformanceTestData gatling"
     archiveArtifacts allowEmptyArchive: true, artifacts: 'am-lib/build/reports/jmh/result.json'
     publishHTML([
       reportDir: 'am-lib/build/reports/jmh',

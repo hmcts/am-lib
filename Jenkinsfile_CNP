@@ -9,7 +9,7 @@ def type = "java"
 def product = "am"
 def component = "lib-test"
 
-def secretId = "am-lib-test-${params.ENVIRONMENT}"
+def secretId = "am-lib-test-aat"
 def secrets = [
   (secretId): [
     secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
@@ -41,11 +41,20 @@ withPipeline(type, product, component) {
 
   before('functionalTest:preview') {
     sh "echo 'insert functional test data'"
-//    withSubscription(subscription) {
-//      withTeamSecrets(config, params.ENVIRONMENT) {
-        sh "./gradlew loadPerformanceTestData -PENVIRONMENT='aks' "
-//      }
-//    }
+
+    withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}/nightlyperformancedata/:/nightlyperformancedata") {
+      sh "chmod +x /nightlyperformancedata/load-or-delete-performance-testdata.sh"
+      sh "/nightlyperformancedata/load-or-delete-performance-testdata.sh \
+                        ${WORKSPACE} \
+                        ${parameterLoadOrDelete} \
+                        ${DATABASE_USER} \
+                        ${DATABASE_NAME} \
+                        ${DATABASE_HOST} \
+                        ${DATABASE_PASS} \
+                        ${DATABASE_PORT} \
+                        ${params.ENVIRONMENT}"
+    }
+
     print "done functional test data insertion"
   }
 

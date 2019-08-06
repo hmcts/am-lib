@@ -2,7 +2,7 @@
 
 @Library("Infrastructure")
 
-import uk.gov.hmcts.contino.AppPipelineConfig
+//import uk.gov.hmcts.contino.AppPipelineConfig
 
 
 def type = "java"
@@ -10,7 +10,7 @@ def product = "am"
 def component = "lib-test"
 
 
-def secretId = "am-lib-test-${params.ENVIRONMENT}"
+/*def secretId = "am-lib-test-${params.ENVIRONMENT}"
 def secrets = [
   (secretId): [
     secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
@@ -21,44 +21,53 @@ def secrets = [
   ]
 ]
 
+
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
    secretType : 'Secret',
    name       : secretName,
    envVariable: envVariable
   ]
-}
+}*/
 
 
-def subscription = "nonprod"
+/*def subscription = "nonprod"
 def config = new AppPipelineConfig()
-config.vaultSecrets = secrets
+config.vaultSecrets = secrets*/
+
+def DATABASE_HOST = 'am-lib-test-POSTGRES-HOST'
+def DATABASE_PORT = 'am-lib-test-POSTGRES-PORT'
+def DATABASE_NAME = 'am-lib-test-POSTGRES-DATABASE'
+def DATABASE_USER = 'am-lib-test-POSTGRES-USER'
+def DATABASE_PASS = 'am-lib-test-POSTGRES-PASS'
+
+
 
 withPipeline(type, product, component) {
   setVaultName('am-lib-test')
-  loadVaultSecrets(secrets)
+
   enableDockerBuild()
   installCharts()
   enableDbMigration()
 
   before('functionalTest:preview') {
     sh "echo 'insert functional test data'"
-    withSubscription(subscription) {
-      withTeamSecrets(config, params.ENVIRONMENT) {
-        withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}/nightlyperformancedata/:/nightlyperformancedata") {
-          sh "chmod +x /nightlyperformancedata/load-or-delete-performance-testdata.sh"
-          sh "/nightlyperformancedata/load-or-delete-performance-testdata.sh \
+
+
+    withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}/nightlyperformancedata/:/nightlyperformancedata") {
+      sh "chmod +x /nightlyperformancedata/load-or-delete-performance-testdata.sh"
+      sh "/nightlyperformancedata/load-or-delete-performance-testdata.sh \
                         ${WORKSPACE} \
-                        ${parameterLoadOrDelete} \
+                        'load' \
                         ${DATABASE_USER} \
                         ${DATABASE_NAME} \
                         ${DATABASE_HOST} \
                         ${DATABASE_PASS} \
                         ${DATABASE_PORT} \
-                        'aks'"
-        }
-      }
+                        ${params.ENVIRONMENT}"
     }
+
+
 
     print "done functional test data insertion"
   }

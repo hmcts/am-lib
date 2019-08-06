@@ -75,4 +75,8 @@ public interface AccessManagementRepository {
     @SqlQuery("select * from access_management where resource_id=? and resource_name=? and resource_type =? and cast(accessor_type as text)  = ? and attribute ='' ")
     @RegisterConstructorMapper(ExplicitAccessRecord.class)
     List<ExplicitAccessRecord> getExplicitAccessForResource(String resourceId, String resourceName, String resourceType, AccessorType accessorType);
+
+    @SqlQuery("select resource_id from access_management where accessor_id = ? and cast(accessor_type as text) = 'USER' and resource_type = 'case' "
+        + "and permissions & 2 = 2 and attribute = ''")
+    List<String> getUserCases(String userId);
 }

@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.RolePermissions;
+import uk.gov.hmcts.reform.amlib.models.UserCasesEnvelope;
 
 import java.util.Collections;
 import java.util.List;
@@ -188,5 +189,18 @@ public class AccessManagementService {
                 userRoles, SecurityClassifications.getVisibleSecurityClassifications(maxSecurityClassificationForRole)));
     }
 
-
+    /**
+     * Returns a list of case ids that a given user has root level read permissions for.
+     *
+     * @param userId a user id
+     * @return a list of case ids that the user has access to
+     */
+    @AuditLog("returned case ids that user with id '{{userId}}' has read permissions to: {{result}}")
+    public UserCasesEnvelope returnUserCases(@NotBlank String userId) {
+        List<String> cases = jdbi.withExtension(AccessManagementRepository.class, dao -> dao.getUserCases(userId));
+        return UserCasesEnvelope.builder()
+            .userId(userId)
+            .cases(cases)
+            .build();
+    }
 }

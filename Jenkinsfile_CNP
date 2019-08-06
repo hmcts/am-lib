@@ -9,6 +9,7 @@ def type = "java"
 def product = "am"
 def component = "lib-test"
 
+
 def secretId = "am-lib-test-${params.ENVIRONMENT}"
 def secrets = [
   (secretId): [
@@ -41,7 +42,7 @@ withPipeline(type, product, component) {
 
   before('functionalTest:preview') {
     sh "echo 'insert functional test data'"
-    withSubscription(subscription) {
+    //withSubscription(subscription) {
       withTeamSecrets(config, params.ENVIRONMENT) {
         withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}/nightlyperformancedata/:/nightlyperformancedata") {
           sh "chmod +x /nightlyperformancedata/load-or-delete-performance-testdata.sh"
@@ -56,7 +57,7 @@ withPipeline(type, product, component) {
                         'aks'"
         }
       }
-    }
+   // }
 
     print "done functional test data insertion"
   }

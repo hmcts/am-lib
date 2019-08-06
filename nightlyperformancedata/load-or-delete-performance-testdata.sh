@@ -17,12 +17,14 @@ else
     FILE_NAME="delete-data"
 fi
 
-if [[ ( "$8" = "aat" ) || ( "$8" = "aks" ) ]]; then
-  echo "executing for aat and file name $FILE_NAME.sql"
-  psql "dbname=$DATABASE_NAME sslmode=require" -h $5 -U $DATABASE_USER -p $7 -f /nightlyperformancedata/sql/$FILE_NAME.sql
-else
+if [ "$8" = "local" ]; then
   echo "executing for local"
   docker cp $1 am-lib-testing-service-db:/tmp/
   docker exec -i am-lib-testing-service-db psql -U $DATABASE_USER -d $DATABASE_NAME -f /tmp/sql/$FILE_NAME.sql
+else
+   echo "executing for aat and file name $FILE_NAME.sql"
+   psql "dbname=$DATABASE_NAME sslmode=require" -h $5 -U $DATABASE_USER -p $7 -f /nightlyperformancedata/sql/$FILE_NAME.sql
 fi
+
+
 echo "completed data load"

@@ -27,6 +27,10 @@ static Map<String, Object> secret(String secretName, String envVariable) {
   ]
 }
 
+def vaultOverrides = [
+  'preview' : 'aat',
+  'spreview': 'saat'
+]
 
 def subscription = "nonprod"
 def config = new AppPipelineConfig()
@@ -35,6 +39,7 @@ config.vaultSecrets = secrets
 
 withPipeline(type, product, component) {
   setVaultName('am-lib-test')
+  overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
   enableDockerBuild()
   installCharts()

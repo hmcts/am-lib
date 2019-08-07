@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amlib;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
@@ -20,6 +21,7 @@ import javax.validation.constraints.NotNull;
 
 import static uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog.Severity.DEBUG;
 
+@Slf4j
 public class DefaultRoleSetupImportService {
     private final Jdbi jdbi;
 
@@ -66,6 +68,7 @@ public class DefaultRoleSetupImportService {
     public void addService(@NotBlank String serviceName, String serviceDescription) {
         jdbi.useExtension(DefaultRoleSetupRepository.class,
             dao -> dao.addService(serviceName, serviceDescription));
+        log.info("added service successfully::");
     }
 
     /**

@@ -104,6 +104,7 @@ public class AccessManagementResponseEntityExceptionHandler extends ResponseEnti
     @ExceptionHandler({PersistenceException.class})
     public ResponseEntity<Object> handleJdbiPersistenceErrors(PersistenceException ex) {
 
+        logger.info("JDBI Persistance EXCEPTION::::" + ex.getMessage());
         ErrorResponse errorDetails = ErrorResponse.builder()
             .errorDescription(SERVICE_FAILED)
             .errorMessage(INVALID_REQUEST)

@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 
 @Aspect
 @Slf4j
+@SuppressWarnings({"PMD.AvoidPrintStackTrace"})
 public class ErrorHandlingAspect {
 
     @Around("execution(public * uk.gov.hmcts.reform.amlib.*Service.*(..))")
@@ -19,6 +20,7 @@ public class ErrorHandlingAspect {
             log.info("JdbiException Exception in aspect:::" + ex.toString());
             log.info("JdbiException Exception cause in aspect:::" + ex.getCause());
             log.info("JdbiException Exception message in aspect:::" + ex.getLocalizedMessage());
+            ex.printStackTrace();
             throw new PersistenceException(ex);
         }
     }

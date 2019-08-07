@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
   <suppress>
     <notes><![CDATA[file name: guava-20.0.jar]]></notes>
     <gav regex="true">^com\.google\.guava:guava:.*$</gav>
@@ -64,7 +64,7 @@
     <notes><![CDATA[file name: fasterxml:jackson-databind:2.9.9.1.jar -not applicable as
     vulnerability only applies to Windows environments and vulnerable components is disabled by default]]></notes>
     <sha1>211dfab27bdd15a569247fee4690a07a177044f8</sha1>
-    <cve>CVE-2019-14379</cve>
+    <cve>CVE-2019-14439</cve>
   </suppress>
 
 </suppressions>

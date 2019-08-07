@@ -20,7 +20,7 @@ public class ErrorHandlingAspect {
             log.info("JdbiException Exception in aspect:::" + ex.toString());
             log.info("JdbiException Exception cause in aspect:::" + ex.getCause());
             log.info("JdbiException Exception message in aspect:::" + ex.getLocalizedMessage());
-            ex.printStackTrace();
+            log.error("JdbiException Exception message in aspect:::", ex);
             throw new PersistenceException(ex);
         }
     }

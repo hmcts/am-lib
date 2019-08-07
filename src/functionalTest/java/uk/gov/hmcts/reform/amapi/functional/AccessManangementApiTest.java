@@ -12,10 +12,10 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
@@ -53,7 +53,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
             response.then().statusCode(201);
             response.then().log();
             JsonPath responseBody = response.getBody().jsonPath();
-            log.info(responseBody.get().toString());
+            log.info("response body verifyGrantExplicitAccessApi::" + responseBody.get().toString());
             assertThat(responseBody.get("accessorIds").toString()).isEqualTo("[" + amApiClient.getAccessorId() + "]");
             assertThat(responseBody.get("resourceId").toString()).isEqualTo(amApiClient.getResourceId());
             assertThat(responseBody.get("resourceDefinition").toString()).isEqualTo(expectedResourceDef);
@@ -73,7 +73,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
         Response accessResponse = amApiClient.createExplicitAccess().post(amApiClient.getAccessUrl()
             + "api/access-resource");
         JsonPath responseBody =  accessResponse.getBody().jsonPath();
-        log.info(responseBody.get().toString());
+        log.info("response body verifyFilterResourceApi::" + responseBody.get().toString());
         Response response = amApiClient.createFilterAccess(responseBody.get("resourceId").toString(),
             amApiClient.getAccessorId()).post(amApiClient.getAccessUrl()
             + "api/filter-resource");

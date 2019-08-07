@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
+import uk.gov.hmcts.reform.amlib.internal.models.Service;
 import uk.gov.hmcts.reform.amlib.internal.repositories.DefaultRoleSetupRepository;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
@@ -69,6 +70,22 @@ public class DefaultRoleSetupImportService {
         jdbi.useExtension(DefaultRoleSetupRepository.class,
             dao -> dao.addService(serviceName, serviceDescription));
         log.info("added service successfully::");
+    }
+
+    /**
+     * get service by service name.
+     *
+     * @param serviceName service name
+     * @return service
+     */
+    public Service getService(@NotBlank String serviceName) {
+
+        //@todo need removed
+        Service service = jdbi.withExtension(DefaultRoleSetupRepository.class, dao ->
+            dao.getService(serviceName));
+
+        log.info("getService::" + service.getServiceName());
+        return  service;
     }
 
     /**

@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.amlib.internal.repositories;
 
+import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
+import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
+import uk.gov.hmcts.reform.amlib.internal.models.Service;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 @SuppressWarnings({
@@ -56,4 +59,9 @@ public interface DefaultRoleSetupRepository {
 
     @SqlUpdate("delete from services where service_name = :serviceName")
     void deleteService(String serviceName);
+
+    @SqlQuery("select * from services "
+        + "where service_name = :serviceName")
+    @RegisterConstructorMapper(Service.class)
+    Service getService(String serviceName);  // @Todo need to removed
 }

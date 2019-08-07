@@ -16,12 +16,12 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
@@ -54,8 +54,8 @@ public class AmApiClient {
     public RequestSpecification buildRequest() {
         return SerenityRest.given()
             .relaxedHTTPSValidation()
-            .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)
-            .header("Accepts", APPLICATION_JSON_UTF8_VALUE);
+            .contentType(APPLICATION_JSON_UTF8_VALUE)
+            .accept(APPLICATION_JSON_UTF8_VALUE);
     }
 
     public RequestSpecification createExplicitAccess() {

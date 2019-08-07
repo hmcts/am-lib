@@ -36,6 +36,7 @@ public class FunctionalTestSuite {
             .serviceName("cmc-test").resourceType("case-test").resourceName("claim-test").build();
         importerService.addResourceDefinition(resourceDefinition);
         importerService.addRole("caseworker-test", RESOURCE, PUBLIC, EXPLICIT);
+        importerService.getService("cmc-test"); //@todo need removed
     }
 
 }

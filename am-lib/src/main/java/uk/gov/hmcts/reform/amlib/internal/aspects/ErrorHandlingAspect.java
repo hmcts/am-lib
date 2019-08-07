@@ -16,7 +16,7 @@ public class ErrorHandlingAspect {
         try {
             return joinPoint.proceed();
         } catch (JdbiException ex) {
-            log.info("JdbiException Exception in aspect:::" + ex.getMessage());
+            log.info("JdbiException Exception in aspect:::" + ex.toString());
             throw new PersistenceException(ex);
         }
     }

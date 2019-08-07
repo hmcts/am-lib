@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.amapi.conf;
 
-import org.postgresql.ds.PGSimpleDataSource;
+import org.postgresql.ds.PGPoolingDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
@@ -18,14 +18,15 @@ public class SerenityBeanConfiguration {
         return new DefaultRoleSetupImportService(createDataSource());
     }
 
+    @SuppressWarnings({"deprecation"})
     public DataSource createDataSource() {
-        PGSimpleDataSource dataSource = new PGSimpleDataSource();
+        PGPoolingDataSource dataSource = new PGPoolingDataSource();
         dataSource.setServerName(getValueOrDefault("DATABASE_HOST", "localhost"));
         dataSource.setPortNumber(Integer.parseInt(getValueOrDefault("DATABASE_PORT", "5433")));
         dataSource.setDatabaseName(getValueOrThrow("DATABASE_NAME"));
         dataSource.setUser(getValueOrThrow("DATABASE_USER"));
         dataSource.setPassword(getValueOrThrow("DATABASE_PASS"));
-
+        dataSource.setMaxConnections(25);
         return dataSource;
     }
 

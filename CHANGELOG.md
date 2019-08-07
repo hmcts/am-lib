@@ -1,3 +1,7 @@
+## [0.11.6](https://github.com/hmcts/am-lib/compare/0.11.5...0.11.6) (2019-08-07)
+
+
+
 ## [0.11.5](https://github.com/hmcts/am-lib/compare/0.11.4...0.11.5) (2019-08-07)
 
 

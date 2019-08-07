@@ -13,7 +13,7 @@ public class SerenityBeanConfiguration {
     @Bean
     DefaultRoleSetupImportService getDefaultRoleSetupImportService() {
 
-        String username = getValueOrThrow("DATABASE_NAME");
+        String username = getValueOrThrow("DATABASE_USER");
         String pass = getValueOrThrow("DATABASE_PASS");
         String url = "jdbc:postgresql://" + getValueOrDefault("DATABASE_HOST", "localhost") + ":"
             + getValueOrDefault("DATABASE_PORT", "5433") + "/" + getValueOrThrow("DATABASE_NAME");

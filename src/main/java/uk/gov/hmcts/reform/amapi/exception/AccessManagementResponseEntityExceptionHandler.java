@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amapi.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.UNSUPPORTED_MEDIA_TY
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
+@Slf4j
 public class AccessManagementResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
@@ -104,7 +106,7 @@ public class AccessManagementResponseEntityExceptionHandler extends ResponseEnti
     @ExceptionHandler({PersistenceException.class})
     public ResponseEntity<Object> handleJdbiPersistenceErrors(PersistenceException ex) {
 
-        logger.info("JDBI Persistance EXCEPTION::::" + ex.getMessage());
+        log.info("JDBI Persistance EXCEPTION::::" + ex.getMessage());
         ErrorResponse errorDetails = ErrorResponse.builder()
             .errorDescription(SERVICE_FAILED)
             .errorMessage(INVALID_REQUEST)

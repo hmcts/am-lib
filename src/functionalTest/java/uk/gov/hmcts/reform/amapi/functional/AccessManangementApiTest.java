@@ -53,6 +53,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
             response.then().statusCode(201);
             response.then().log();
             JsonPath responseBody = response.getBody().jsonPath();
+            log.info(responseBody.get().toString());
             assertThat(responseBody.get("accessorIds").toString()).isEqualTo("[" + amApiClient.getAccessorId() + "]");
             assertThat(responseBody.get("resourceId").toString()).isEqualTo(amApiClient.getResourceId());
             assertThat(responseBody.get("resourceDefinition").toString()).isEqualTo(expectedResourceDef);
@@ -72,6 +73,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
         Response accessResponse = amApiClient.createExplicitAccess().post(amApiClient.getAccessUrl()
             + "api/access-resource");
         JsonPath responseBody =  accessResponse.getBody().jsonPath();
+        log.info(responseBody.get().toString());
         Response response = amApiClient.createFilterAccess(responseBody.get("resourceId").toString(),
             amApiClient.getAccessorId()).post(amApiClient.getAccessUrl()
             + "api/filter-resource");

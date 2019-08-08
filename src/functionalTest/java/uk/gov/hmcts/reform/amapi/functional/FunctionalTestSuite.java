@@ -33,8 +33,10 @@ public class FunctionalTestSuite {
     public void setUp() throws Exception {
         amApiClient = new AmApiClient(accessUrl);
 
-        String deleteFile = getClass().getClassLoader().getResource("delete-data-functional.sql").getPath();
-        String loadFile = getClass().getClassLoader().getResource("load-data-functional.sql").getPath();
+        String deleteFile = Thread.currentThread().getContextClassLoader()
+            .getResource("delete-data-functional.sql").getPath();
+        String loadFile = Thread.currentThread().getContextClassLoader()
+            .getResource("load-data-functional.sql").getPath();
 
         List<Path> paths = new ArrayList<>();
         paths.add(Paths.get(deleteFile.replaceFirst("/", "")));

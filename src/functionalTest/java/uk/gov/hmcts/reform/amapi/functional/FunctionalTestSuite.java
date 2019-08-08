@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.amapi.functional.client.AmApiClient;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,7 +21,8 @@ import static java.lang.System.getenv;
 
 @Slf4j
 @TestPropertySource("classpath:application-functional.yaml")
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ConfusingTernary"})
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ConfusingTernary","PMD.ForLoopCanBeForeach",
+    "PMD.LinguisticNaming"})
 public class FunctionalTestSuite {
 
     @Value("${targetInstance}")
@@ -31,7 +33,7 @@ public class FunctionalTestSuite {
     @Before
     public void setUp() throws Exception {
         amApiClient = new AmApiClient(accessUrl);
-
+        getFiles(new File(Thread.currentThread().getContextClassLoader().getResource("").getPath()));
         Path path = Paths.get("src\\functionalTest\\resources");
         List<Path> paths = new ArrayList<>();
         paths.add(path.resolve("delete-data.sql"));
@@ -53,6 +55,21 @@ public class FunctionalTestSuite {
         log.info("Functional Data inserted::");
     }
 
+
+    public void getFiles(File file) {
+        File[] files;
+        if (file.isFile()) {
+            log.info("list of files::" + file.getAbsolutePath());
+
+        } else {
+            files = file.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                getFiles(files[i]);
+            }
+
+
+        }
+    }
 
     @SuppressWarnings({"deprecation"})
     public DataSource createDataSource() {

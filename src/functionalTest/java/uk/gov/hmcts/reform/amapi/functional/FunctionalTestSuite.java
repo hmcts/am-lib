@@ -17,7 +17,6 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import static java.lang.System.getenv;
-import static java.lang.System.setOut;
 
 @Slf4j
 @TestPropertySource("classpath:application-functional.yaml")
@@ -38,8 +37,6 @@ public class FunctionalTestSuite {
             .getResource("delete-data-functional.sql").getPath();
         String loadFile = Thread.currentThread().getContextClassLoader()
             .getResource("load-data-functional.sql").getPath();
-
-        System.out.println(deleteFile);
 
         List<Path> paths = new ArrayList<>();
         paths.add(Paths.get(deleteFile));

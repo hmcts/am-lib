@@ -17,6 +17,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import static java.lang.System.getenv;
+import static java.lang.System.setOut;
 
 @Slf4j
 @TestPropertySource("classpath:application-functional.yaml")
@@ -38,9 +39,11 @@ public class FunctionalTestSuite {
         String loadFile = Thread.currentThread().getContextClassLoader()
             .getResource("load-data-functional.sql").getPath();
 
+        System.out.println(deleteFile);
+
         List<Path> paths = new ArrayList<>();
-        paths.add(Paths.get(deleteFile.replaceFirst("/", "")));
-        paths.add(Paths.get(loadFile.replaceFirst("/", "")));
+        paths.add(Paths.get(deleteFile));
+        paths.add(Paths.get(loadFile));
 
         try (Connection connection = createDataSource().getConnection()) {
             try (Statement statement = connection.createStatement()) {

@@ -44,7 +44,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
     @Test
     public void verifyGrantExplicitAccessApi() {
         String expectedResourceDef = "{resourceName=" + amApiClient.getResourceName()
-            + ", serviceName=" + amApiClient.getSeriviceName()
+            + ", serviceName=" + amApiClient.getServiceName()
             + ", resourceType=" + amApiClient.getResourceType()
             + "}";
         try {

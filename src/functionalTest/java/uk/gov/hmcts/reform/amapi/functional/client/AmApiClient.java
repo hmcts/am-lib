@@ -39,9 +39,10 @@ public class AmApiClient {
     String accessorId = "accessorId" + currentDateTime;
     String resourceName = "claim-test";
     String resourceType = "case-test";
-    String seriviceName = "cmc-test";
+    String serviceName = "cmc-test";
     String relationship = "caseworker-test";
     Set<String> userRoles = new HashSet<>();
+
     Map<JsonPointer, Set<Permission>> multipleAttributePermissions = ImmutableMap.of(
         JsonPointer.valueOf(""), ImmutableSet.of(READ, CREATE, UPDATE));
 
@@ -66,7 +67,7 @@ public class AmApiClient {
             .accessorIds(accessorIds)
             .accessorType(USER)
             .resourceDefinition(ResourceDefinition.builder()
-                .resourceName(resourceName).resourceType(resourceType).serviceName(seriviceName).build())
+                .resourceName(resourceName).resourceType(resourceType).serviceName(serviceName).build())
             .attributePermissions(multipleAttributePermissions)
             .relationship(relationship)
             .build();
@@ -80,7 +81,7 @@ public class AmApiClient {
             .resourceId(resourceId)
             .resourceName(resourceName)
             .resourceType(resourceType)
-            .serviceName(seriviceName)
+            .serviceName(serviceName)
             .accessorType(USER)
             .attribute(JsonPointer.valueOf(""))
             .relationship(relationship)
@@ -113,7 +114,7 @@ public class AmApiClient {
                 .definition(ResourceDefinition.builder()
                     .resourceName(resourceName)
                     .resourceType(resourceType)
-                    .serviceName(seriviceName)
+                    .serviceName(serviceName)
                     .build())
                 .data(data)
                 .build())

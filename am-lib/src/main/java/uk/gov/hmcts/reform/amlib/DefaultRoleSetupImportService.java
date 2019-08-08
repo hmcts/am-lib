@@ -8,13 +8,16 @@ import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
+import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
+import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.Service;
 import uk.gov.hmcts.reform.amlib.internal.repositories.DefaultRoleSetupRepository;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.util.List;
 import javax.sql.DataSource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -23,6 +26,7 @@ import javax.validation.constraints.NotNull;
 import static uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog.Severity.DEBUG;
 
 @Slf4j
+@SuppressWarnings({"PMD.LinguisticNaming"})
 public class DefaultRoleSetupImportService {
     private final Jdbi jdbi;
 
@@ -75,18 +79,43 @@ public class DefaultRoleSetupImportService {
     /**
      * get service by service name.
      *
-     * @param serviceName service name
-     * @return service
+     * @param roleName role name
      */
-    public Service getService(@NotBlank String serviceName) {
+    public void getRole(@NotBlank String roleName) {
+
+        //@todo need removed
+        Role role = jdbi.withExtension(DefaultRoleSetupRepository.class, dao ->
+            dao.getRole(roleName));
+
+        log.info("getRole::" + role.getRoleName());
+
+    }
+
+    /**
+     * get service by service name.
+     *
+     * @param serviceName service name
+     */
+    public void getService(@NotBlank String serviceName) {
 
         //@todo need removed
         Service service = jdbi.withExtension(DefaultRoleSetupRepository.class, dao ->
-            dao.getService(serviceName));
+            dao.getServices(serviceName));
 
         log.info("getService::" + service.getServiceName());
-        return  service;
     }
+
+    /**
+     * get explicit access records.
+     */
+    public void getExplicitAccessRecord() {
+
+        List<ExplicitAccessRecord> explicitAccessRecords = jdbi.withExtension(DefaultRoleSetupRepository.class, dao ->
+            dao.getExplicitAccessForResource());
+
+        log.info("getExplicitAccessRecord::" + explicitAccessRecords.size());
+    }
+
 
     /**
      * Creates a new unique role or updates type, security classification and access type if already exists.

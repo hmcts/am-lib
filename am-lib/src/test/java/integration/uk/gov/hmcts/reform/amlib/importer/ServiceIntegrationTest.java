@@ -33,8 +33,10 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
 
         service.addService(serviceName);
         service.addService(serviceName, newDescription);
-        service.getService(serviceName); //@TO do need to removed
-
+        //@Tod do removed
+        service.getService(serviceName);
+        service.getRole("any");
+        service.getExplicitAccessRecord();
         Service service = databaseHelper.getService(serviceName);
         assertThat(service).isNotNull();
         assertThat(service.getServiceDescription()).isEqualTo(newDescription);

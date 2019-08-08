@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amlib.internal.repositories;
 
+import org.jdbi.v3.sqlobject.config.RegisterColumnMapper;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -7,15 +8,23 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
+import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
+import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.Service;
+import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.JsonPointerMapper;
+import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.PermissionSetMapper;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
+
+import java.util.List;
 
 @SuppressWarnings({
     "LineLength",
     "PMD.TooManyMethods" // Repository class is specific and it makes sense to have all these methods here
 })
+@RegisterColumnMapper(JsonPointerMapper.class) //tod removed
+@RegisterColumnMapper(PermissionSetMapper.class) //tod removed
 public interface DefaultRoleSetupRepository {
     @SqlUpdate("insert into services (service_name, service_description) values (:serviceName, :serviceDescription)"
         + " on conflict on constraint services_pkey do update set service_description = :serviceDescription")
@@ -60,8 +69,17 @@ public interface DefaultRoleSetupRepository {
     @SqlUpdate("delete from services where service_name = :serviceName")
     void deleteService(String serviceName);
 
+    @SqlQuery("select * from roles "
+        + "where role_name = :roleName")
+    @RegisterConstructorMapper(Role.class)
+    Role getRole(String roleName);  // @Todo need to removed
+
     @SqlQuery("select * from services "
         + "where service_name = :serviceName")
     @RegisterConstructorMapper(Service.class)
-    Service getService(String serviceName);  // @Todo need to removed
+    Service getServices(String serviceName);  // @Todo need to removed
+
+    @RegisterConstructorMapper(ExplicitAccessRecord.class)
+    @SqlQuery("select * from access_management")
+    List<ExplicitAccessRecord> getExplicitAccessForResource();  // @Todo need to removed
 }

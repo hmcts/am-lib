@@ -81,8 +81,6 @@ withPipeline(type, product, component) {
   }
 
   onPR {
-
-    export JAVA_OPTS="$JAVA_OPTS -Xmx1024m"
     // channel won't be used instead the user channel configured here is used:
     // https://github.com/hmcts/github-slack-user-mappings
     enableSlackNotifications('#am-pr-builds')

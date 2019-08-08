@@ -38,7 +38,6 @@ public class FunctionalTestSuite {
         importerService.addRole("caseworker-test", RESOURCE, PUBLIC, EXPLICIT);
         importerService.getRole("caseworker-test"); //@todo need removed
         importerService.getService("cmc-test");//@todo need removed
-        importerService.getExplicitAccessRecord();//@todo need removed
     }
 
 }

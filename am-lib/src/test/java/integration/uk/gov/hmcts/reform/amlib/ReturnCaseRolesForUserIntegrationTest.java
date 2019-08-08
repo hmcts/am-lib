@@ -1,18 +1,30 @@
 package integration.uk.gov.hmcts.reform.amlib;
 
+import com.fasterxml.jackson.core.JsonPointer;
+import com.google.common.collect.ImmutableSet;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
+import uk.gov.hmcts.reform.amlib.models.UserCaseRolesEnvelope;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 
 public class ReturnCaseRolesForUserIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
@@ -36,11 +48,114 @@ public class ReturnCaseRolesForUserIntegrationTest extends PreconfiguredIntegrat
 
     @Test
     void whenUserHasNoAccessToCaseShouldReturnEmptyListOfRoles() {
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, "some user", idamRoleWithExplicitAccess, resourceDefinition, ImmutableSet.of(READ)));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, "other user", idamRoleWithExplicitAccess, resourceDefinition, ImmutableSet.of(READ)));
 
+        UserCaseRolesEnvelope result = service.returnUserCaseRoles(resourceId, accessorId);
+
+        assertThat(result).isEqualTo(UserCaseRolesEnvelope.builder()
+            .caseId(resourceId)
+            .userId(accessorId)
+            .roles(Collections.emptyList())
+            .build());
     }
 
     @Test
-    void whenUserHasAttributeLevelAccessToCaseShouldReturnEmptyListOfRoles() {
+    void whenUserHasNoReadAccessToCaseShouldReturnEmptyListOfRoles() {
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition, ImmutableSet.of(DELETE, UPDATE)));
 
+        UserCaseRolesEnvelope result = service.returnUserCaseRoles(resourceId, accessorId);
+
+        assertThat(result).isEqualTo(UserCaseRolesEnvelope.builder()
+            .caseId(resourceId)
+            .userId(accessorId)
+            .roles(Collections.emptyList())
+            .build());
+    }
+
+    @Test
+    void whenUserHasOnlyAttributeLevelAccessToCaseShouldReturnEmptyListOfRoles() {
+        service.grantExplicitResourceAccess(
+            createGrant(resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition,
+                Collections.singletonMap(JsonPointer.valueOf("/some-attribute"), ImmutableSet.of(CREATE, READ))));
+
+        UserCaseRolesEnvelope result = service.returnUserCaseRoles(resourceId, accessorId);
+
+        assertThat(result).isEqualTo(UserCaseRolesEnvelope.builder()
+            .caseId(resourceId)
+            .userId(accessorId)
+            .roles(Collections.emptyList())
+            .build());
+    }
+
+    @Test
+    void whenUserHasAccessToCaseWithNullRelationshipShouldReturnEmptyListOfRoles() {
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, accessorId, null, resourceDefinition, ImmutableSet.of(READ)));
+
+        UserCaseRolesEnvelope result = service.returnUserCaseRoles(resourceId, accessorId);
+
+        assertThat(result).isEqualTo(UserCaseRolesEnvelope.builder()
+            .caseId(resourceId)
+            .userId(accessorId)
+            .roles(Collections.emptyList())
+            .build());
+    }
+
+    @Test
+    void whenUserHasAccessToCaseWithSingleRelationshipShouldReturnListOfRolesWithSingleRole() {
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition, ImmutableSet.of(READ)));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, "other user", "other role", resourceDefinition, ImmutableSet.of(READ)));
+
+        UserCaseRolesEnvelope result = service.returnUserCaseRoles(resourceId, accessorId);
+
+        assertThat(result).isEqualTo(UserCaseRolesEnvelope.builder()
+            .caseId(resourceId)
+            .userId(accessorId)
+            .roles(Collections.singletonList(idamRoleWithExplicitAccess))
+            .build());
+    }
+
+    @Test
+    void whenUserHasAccessToCaseWithMultipleRelationshipsShouldReturnListOfRolesWithAllRoles() {
+        String idamRoleWithExplicitAccess1 = UUID.randomUUID().toString();
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition, ImmutableSet.of(READ)));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, accessorId, idamRoleWithExplicitAccess1, resourceDefinition, ImmutableSet.of(READ, CREATE)));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, "other user", "other role", resourceDefinition, ImmutableSet.of(READ)));
+
+        UserCaseRolesEnvelope result = service.returnUserCaseRoles(resourceId, accessorId);
+
+        assertThat(result).isEqualTo(UserCaseRolesEnvelope.builder()
+            .caseId(resourceId)
+            .userId(accessorId)
+            .roles(Arrays.asList(idamRoleWithExplicitAccess, idamRoleWithExplicitAccess1))
+            .build());
+    }
+
+    @Test
+    void whenUserHasAccessToCaseWithMultipleRelationshipsIncludingNullShouldReturnListOfRolesWithAllRolesExceptNull() {
+        String idamRoleWithExplicitAccess1 = UUID.randomUUID().toString();
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition, ImmutableSet.of(READ)));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, accessorId, idamRoleWithExplicitAccess1, resourceDefinition, ImmutableSet.of(READ, CREATE)));
+        service.grantExplicitResourceAccess(createGrantForWholeDocument(
+            resourceId, accessorId, null, resourceDefinition, ImmutableSet.of(READ, DELETE)));
+
+        UserCaseRolesEnvelope result = service.returnUserCaseRoles(resourceId, accessorId);
+
+        assertThat(result).isEqualTo(UserCaseRolesEnvelope.builder()
+            .caseId(resourceId)
+            .userId(accessorId)
+            .roles(Arrays.asList(idamRoleWithExplicitAccess, idamRoleWithExplicitAccess1))
+            .build());
     }
 }

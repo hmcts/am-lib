@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.RolePermissions;
+import uk.gov.hmcts.reform.amlib.models.UserCaseRolesEnvelope;
 
 import java.util.Collections;
 import java.util.List;
@@ -188,5 +189,8 @@ public class AccessManagementService {
                 userRoles, SecurityClassifications.getVisibleSecurityClassifications(maxSecurityClassificationForRole)));
     }
 
-
+    public UserCaseRolesEnvelope returnUserCaseRoles(String caseId, String userId) {
+        return UserCaseRolesEnvelope.builder()
+            .build();
+    }
 }

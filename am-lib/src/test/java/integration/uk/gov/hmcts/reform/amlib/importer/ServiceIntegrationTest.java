@@ -9,6 +9,9 @@ import uk.gov.hmcts.reform.amlib.internal.models.Service;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
+import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 
 class ServiceIntegrationTest extends IntegrationBaseTest {
     private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportService.class);
@@ -35,8 +38,10 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
         service.addService(serviceName, newDescription);
         //@Tod do removed
         service.getService(serviceName);
+        service.addRole("any", IDAM, PUBLIC, ROLE_BASED);
         service.getRole("any");
         service.getExplicitAccessRecord();
+
         Service service = databaseHelper.getService(serviceName);
         assertThat(service).isNotNull();
         assertThat(service.getServiceDescription()).isEqualTo(newDescription);

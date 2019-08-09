@@ -189,8 +189,13 @@ public class AccessManagementService {
                 userRoles, SecurityClassifications.getVisibleSecurityClassifications(maxSecurityClassificationForRole)));
     }
 
-    public UserCaseRolesEnvelope returnUserCaseRoles(String caseId, String userId) {
+    public UserCaseRolesEnvelope returnUserCaseRoles(@NotBlank String caseId, @NotBlank String userId) {
+        Set<String> roles = jdbi.withExtension(AccessManagementRepository.class,
+            dao -> dao.getUserCaseRoles(caseId, userId));
         return UserCaseRolesEnvelope.builder()
+            .caseId(caseId)
+            .userId(userId)
+            .roles(roles)
             .build();
     }
 }

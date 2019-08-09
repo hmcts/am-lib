@@ -81,19 +81,19 @@ repositories {
 
 configurations.all {
   resolutionStrategy {
-    force 'com.fasterxml.jackson.core:jackson-databind:2.9.9.1'
-  } 
+    force 'com.fasterxml.jackson.core:jackson-databind:2.9.9.3'
+  }
 }
 
 dependencies {
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9.3'
     compile group: 'org.jdbi', name: 'jdbi3-core', version: '3.9.0'
     compile group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.9.0'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.6'
     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.17.Final'
     compile group: 'org.aspectj', name: 'aspectjrt', version: '1.9.4'
     compile group: 'io.swagger', name: 'swagger-annotations', version: '1.5.22'
-    
+
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.0.0'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.13.2'

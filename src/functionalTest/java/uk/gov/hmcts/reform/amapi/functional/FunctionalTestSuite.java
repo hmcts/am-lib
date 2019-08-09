@@ -1,28 +1,26 @@
 package uk.gov.hmcts.reform.amapi.functional;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
-import org.postgresql.ds.PGPoolingDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
+import uk.gov.hmcts.reform.amapi.conf.SerenityBeanConfiguration;
 import uk.gov.hmcts.reform.amapi.functional.client.AmApiClient;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import javax.sql.DataSource;
+import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
+import static uk.gov.hmcts.reform.amlib.enums.RoleType.RESOURCE;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 
-import static java.lang.System.getenv;
-
-@Slf4j
 @TestPropertySource("classpath:application-functional.yaml")
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ConfusingTernary", "PMD.ForLoopCanBeForeach",
-    "PMD.LinguisticNaming"})
+@Import(SerenityBeanConfiguration.class)
 public class FunctionalTestSuite {
+
+
+    @Autowired
+    private DefaultRoleSetupImportService importerService;
 
     @Value("${targetInstance}")
     protected String accessUrl;
@@ -30,61 +28,14 @@ public class FunctionalTestSuite {
     public AmApiClient amApiClient;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         amApiClient = new AmApiClient(accessUrl);
+        importerService.addService("cmc-test");
 
-        String deleteFile = Thread.currentThread().getContextClassLoader()
-            .getResource("delete-data-functional.sql").getPath();
-        String loadFile = Thread.currentThread().getContextClassLoader()
-            .getResource("load-data-functional.sql").getPath();
-
-        List<Path> paths = new ArrayList<>();
-        paths.add(Paths.get(deleteFile));
-        paths.add(Paths.get(loadFile));
-
-        try (Connection connection = createDataSource().getConnection()) {
-            try (Statement statement = connection.createStatement()) {
-                for (Path pathFile : paths) {
-                    for (String scriptLine : Files.readAllLines(pathFile)) {
-                        statement.addBatch(scriptLine);
-                    }
-                    statement.executeBatch();
-                }
-            }
-        } catch (Exception exe) {
-            log.error("FunctionalTestSuite Data insertion error::" + exe.toString());
-            throw exe;
-        }
-        log.info("Functional Data inserted::");
+        ResourceDefinition resourceDefinition = ResourceDefinition.builder()
+            .serviceName("cmc-test").resourceType("case-test").resourceName("claim-test").build();
+        importerService.addResourceDefinition(resourceDefinition);
+        importerService.addRole("caseworker-test", RESOURCE, PUBLIC, EXPLICIT);
     }
-
-
-    @SuppressWarnings({"deprecation"})
-    public DataSource createDataSource() {
-        PGPoolingDataSource dataSource = new PGPoolingDataSource();
-        dataSource.setServerName(getValueOrDefault("DATABASE_HOST", "localhost"));
-        dataSource.setPortNumber(Integer.parseInt(getValueOrDefault("DATABASE_PORT", "5433")));
-        dataSource.setDatabaseName(getValueOrThrow("DATABASE_NAME"));
-        dataSource.setUser(getValueOrThrow("DATABASE_USER"));
-        dataSource.setPassword(getValueOrThrow("DATABASE_PASS"));
-        dataSource.setMaxConnections(5);
-
-        return dataSource;
-    }
-
-
-    public static String getValueOrDefault(String name, String defaultValue) {
-        String value = getenv(name);
-        return value != null ? value : defaultValue;
-    }
-
-    public static String getValueOrThrow(String name) {
-        String value = getenv(name);
-        if (value == null) {
-            throw new IllegalArgumentException("Environment variable '" + name + "' is missing");
-        }
-        return value;
-    }
-
 
 }

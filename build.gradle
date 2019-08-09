@@ -203,13 +203,13 @@ dependencies {
 
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9.1'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9.3'
 
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: versions.springBoot
-  
-  
+
+
 
     compile (group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger) {
       exclude group: "com.google.guava", module: "guava"

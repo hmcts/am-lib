@@ -20,16 +20,15 @@ public class SerenityBeanConfiguration {
         return new DefaultRoleSetupImportService(createDataSource());
     }
 
-
     @SuppressWarnings({"deprecation"})
     public DataSource createDataSource() {
-        log.info("DB Host name::" + getValueOrDefault("DATABASE_HOST", "localhost"));
+        log.info("DB Host name::" + getValueOrDefault("AM_DB_HOST", "localhost"));
         PGPoolingDataSource dataSource = new PGPoolingDataSource();
-        dataSource.setServerName(getValueOrDefault("DATABASE_HOST", "localhost"));
-        dataSource.setPortNumber(Integer.parseInt(getValueOrDefault("DATABASE_PORT", "5433")));
-        dataSource.setDatabaseName(getValueOrThrow("DATABASE_NAME"));
-        dataSource.setUser(getValueOrThrow("DATABASE_USER"));
-        dataSource.setPassword(getValueOrThrow("DATABASE_PASS"));
+        dataSource.setServerName(getValueOrDefault("AM_DB_NAME", "localhost"));
+        dataSource.setPortNumber(Integer.parseInt(getValueOrDefault("AM_DB_PORT", "5433")));
+        dataSource.setDatabaseName(getValueOrThrow("AM_DB_NAME"));
+        dataSource.setUser(getValueOrThrow("AM_DB_USERNAME"));
+        dataSource.setPassword(getValueOrThrow("AM_DB_PASSWORD"));
         dataSource.setMaxConnections(25);
         return dataSource;
     }

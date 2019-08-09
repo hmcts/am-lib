@@ -77,6 +77,6 @@ public interface AccessManagementRepository {
     List<ExplicitAccessRecord> getExplicitAccessForResource(String resourceId, String resourceName, String resourceType, AccessorType accessorType);
 
     @SqlQuery("select resource_id from access_management where accessor_id = ? and cast(accessor_type as text) = 'USER' and resource_type = 'case' "
-        + "and permissions & 2 = 2 and attribute = ''")
+        + "and permissions & 2 = 2 and attribute = '' order by resource_id")
     List<String> getUserCases(String userId);
 }

@@ -1,6 +1,7 @@
 package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +11,6 @@ import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.UserCasesEnvelope;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -38,7 +38,7 @@ public class ReturnUserCasesIntegrationTest extends PreconfiguredIntegrationBase
 
     @BeforeEach
     void setUp() {
-        resourceId = UUID.randomUUID().toString();
+        resourceId = "a" + UUID.randomUUID().toString();
         accessorId = UUID.randomUUID().toString();
 
         importerService.addRole(idamRoleWithExplicitAccess = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
@@ -57,7 +57,7 @@ public class ReturnUserCasesIntegrationTest extends PreconfiguredIntegrationBase
 
         assertThat(result).isEqualTo(UserCasesEnvelope.builder()
             .userId(accessorId)
-            .cases(Collections.emptyList())
+            .cases(ImmutableList.of())
             .build());
     }
 
@@ -70,7 +70,7 @@ public class ReturnUserCasesIntegrationTest extends PreconfiguredIntegrationBase
 
         assertThat(result).isEqualTo(UserCasesEnvelope.builder()
             .userId(accessorId)
-            .cases(Collections.emptyList())
+            .cases(ImmutableList.of())
             .build());
     }
 
@@ -84,7 +84,7 @@ public class ReturnUserCasesIntegrationTest extends PreconfiguredIntegrationBase
 
         assertThat(result).isEqualTo(UserCasesEnvelope.builder()
             .userId(accessorId)
-            .cases(Collections.emptyList())
+            .cases(ImmutableList.of())
             .build());
     }
 
@@ -99,14 +99,14 @@ public class ReturnUserCasesIntegrationTest extends PreconfiguredIntegrationBase
 
         assertThat(result).isEqualTo(UserCasesEnvelope.builder()
             .userId(accessorId)
-            .cases(Collections.singletonList(resourceId))
+            .cases(ImmutableList.of(resourceId))
             .build());
     }
 
     @Test
     void whenUserHasAccessToMoreThanOneCaseShouldReturnAllCases() {
-        String resourceId1 = UUID.randomUUID().toString();
-        String resourceId2 = UUID.randomUUID().toString();
+        String resourceId1 = "b" + UUID.randomUUID().toString();
+        String resourceId2 = "c" + UUID.randomUUID().toString();
         service.grantExplicitResourceAccess(createGrantForWholeDocument(
             resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition, ImmutableSet.of(READ)));
         service.grantExplicitResourceAccess(createGrantForWholeDocument(
@@ -118,7 +118,7 @@ public class ReturnUserCasesIntegrationTest extends PreconfiguredIntegrationBase
 
         assertThat(result).isEqualTo(UserCasesEnvelope.builder()
             .userId(accessorId)
-            .cases(Arrays.asList(resourceId, resourceId1))
+            .cases(ImmutableList.of(resourceId, resourceId1))
             .build());
     }
 }

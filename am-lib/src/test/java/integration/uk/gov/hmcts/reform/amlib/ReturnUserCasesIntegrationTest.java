@@ -11,7 +11,9 @@ import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.UserCasesEnvelope;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +40,7 @@ public class ReturnUserCasesIntegrationTest extends PreconfiguredIntegrationBase
 
     @BeforeEach
     void setUp() {
-        resourceId = "a" + UUID.randomUUID().toString();
+        resourceId = UUID.randomUUID().toString();
         accessorId = UUID.randomUUID().toString();
 
         importerService.addRole(idamRoleWithExplicitAccess = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
@@ -105,8 +107,8 @@ public class ReturnUserCasesIntegrationTest extends PreconfiguredIntegrationBase
 
     @Test
     void whenUserHasAccessToMoreThanOneCaseShouldReturnAllCases() {
-        String resourceId1 = "b" + UUID.randomUUID().toString();
-        String resourceId2 = "c" + UUID.randomUUID().toString();
+        String resourceId1 = UUID.randomUUID().toString();
+        String resourceId2 = UUID.randomUUID().toString();
         service.grantExplicitResourceAccess(createGrantForWholeDocument(
             resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition, ImmutableSet.of(READ)));
         service.grantExplicitResourceAccess(createGrantForWholeDocument(
@@ -118,7 +120,11 @@ public class ReturnUserCasesIntegrationTest extends PreconfiguredIntegrationBase
 
         assertThat(result).isEqualTo(UserCasesEnvelope.builder()
             .userId(accessorId)
-            .cases(ImmutableList.of(resourceId, resourceId1))
+            .cases(sortedImmutableListOf(resourceId, resourceId1))
             .build());
+    }
+
+    private List<String> sortedImmutableListOf(String... roles) {
+        return ImmutableList.sortedCopyOf(Arrays.asList(roles));
     }
 }

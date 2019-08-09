@@ -17,6 +17,7 @@ import java.util.Set;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
+import static java.lang.System.getenv;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
@@ -43,6 +44,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
 
     @Test
     public void verifyGrantExplicitAccessApi() {
+        log.info("flywaypath::" + getenv("SPRING_FLYWAY_LOCATIONS"));
         String expectedResourceDef = "{resourceName=" + amApiClient.getResourceName()
             + ", serviceName=" + amApiClient.getServiceName()
             + ", resourceType=" + amApiClient.getResourceType()

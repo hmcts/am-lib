@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.amapi.controllers;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,6 +32,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping("api")
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals"})
+@Slf4j
 public class AccessManagementController {
 
     @Autowired
@@ -52,7 +54,9 @@ public class AccessManagementController {
     @ResponseStatus(CREATED)
     public ResponseEntity<ExplicitAccessGrant> createResourceAccess(@RequestBody ExplicitAccessGrant
                                                                         explicitAccessGrantData) {
+        log.info("createResourceAccess controller call starts ::");
         accessManagementService.grantExplicitResourceAccess(explicitAccessGrantData);
+        log.info("createResourceAccess controller call ends::");
         return new ResponseEntity<>(explicitAccessGrantData, CREATED);
 
     }
@@ -69,6 +73,7 @@ public class AccessManagementController {
     @DeleteMapping(value = "/access-resource", consumes = (APPLICATION_JSON_VALUE))
     @ResponseStatus(NO_CONTENT)
     public ResponseEntity<Void> revokeResourceAccess(@RequestBody ExplicitAccessMetadata request) {
+
 
         accessManagementService.revokeResourceAccess(request);
         return new ResponseEntity<>(NO_CONTENT);

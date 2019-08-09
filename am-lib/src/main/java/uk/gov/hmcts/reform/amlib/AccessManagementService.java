@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amlib;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
@@ -35,6 +36,7 @@ import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 
 @SuppressWarnings("PMD.ExcessiveImports")
+@Slf4j
 public class AccessManagementService {
 
     private final Jdbi jdbi;
@@ -75,6 +77,7 @@ public class AccessManagementService {
         + "{{accessGrant.resourceDefinition.resourceName}}' for accessors '{{accessGrant.accessorIds}}' "
         + "with relationship '{{accessGrant.relationship}}': {{accessGrant.attributePermissions}}")
     public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant accessGrant) {
+        log.info("grantExplicitResourceAccess call::");
         jdbi.useTransaction(handle -> {
             AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
             accessGrant.getAccessorIds().forEach(accessorIds ->
@@ -92,13 +95,17 @@ public class AccessManagementService {
                         .build())
                     .forEach(expAccessRecord -> {
                         if (nonNull(accessGrant.getRelationship())) {
+                            log.info("grantExplicitResourceAccess DB call non null, relation::");
                             dao.grantAccessManagementWithNotNullRelationship(expAccessRecord);
+                            log.info("grantExplicitResourceAccess DB call non null, relation ends::");
                         } else {
+                            log.info("grantExplicitResourceAccess DB call null, relation::");
                             //Avoid duplicate insertion on Null relationship
                             dao.grantAccessManagementWithNullRelationship(expAccessRecord);
                         }
                     }));
         });
+        log.info("grantExplicitResourceAccess call ends::");
     }
 
     /**

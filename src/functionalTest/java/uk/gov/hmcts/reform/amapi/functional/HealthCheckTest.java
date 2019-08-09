@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amapi.functional;
 
+import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.jupiter.api.Tag;
@@ -10,11 +11,13 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert"})
+@Slf4j
 public class HealthCheckTest extends FunctionalTestSuite {
 
     @Test
     @Tag("SmokeTest")
     public void healthcheckReturns200() {
+        log.info("healthcheckReturns200 starts::");
         amApiClient.buildRequest().get(amApiClient.getAccessUrl() + "health")
             .then().statusCode(200)
             .and().body("status", equalTo("UP"));

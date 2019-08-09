@@ -1,5 +1,6 @@
-package uk.gov.hmcts.reform.amapi.conf;
+package uk.gov.hmcts.reform.amapi.functional.conf;
 
+import lombok.extern.slf4j.Slf4j;
 import org.postgresql.ds.PGPoolingDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import static java.lang.System.getenv;
 
 @Configuration
 @SuppressWarnings({"PMD.ConfusingTernary"})
+@Slf4j
 public class SerenityBeanConfiguration {
 
     @Bean
@@ -21,6 +23,7 @@ public class SerenityBeanConfiguration {
 
     @SuppressWarnings({"deprecation"})
     public DataSource createDataSource() {
+        log.info("DB Host name::"+getValueOrDefault("DATABASE_HOST", "localhost"));
         PGPoolingDataSource dataSource = new PGPoolingDataSource();
         dataSource.setServerName(getValueOrDefault("DATABASE_HOST", "localhost"));
         dataSource.setPortNumber(Integer.parseInt(getValueOrDefault("DATABASE_PORT", "5433")));

@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
-import uk.gov.hmcts.reform.amapi.conf.SerenityBeanConfiguration;
+import uk.gov.hmcts.reform.amapi.functional.conf.SerenityBeanConfiguration;
 import uk.gov.hmcts.reform.amapi.functional.client.AmApiClient;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
@@ -36,6 +36,7 @@ public class FunctionalTestSuite {
             .serviceName("cmc-test").resourceType("case-test").resourceName("claim-test").build();
         importerService.addResourceDefinition(resourceDefinition);
         importerService.addRole("caseworker-test", RESOURCE, PUBLIC, EXPLICIT);
+        importerService.getService("cmc-test"); // verify service inserted or not
     }
 
 }

@@ -190,7 +190,7 @@ public class AccessManagementService {
     }
 
     public UserCaseRolesEnvelope returnUserCaseRoles(@NotBlank String caseId, @NotBlank String userId) {
-        Set<String> roles = jdbi.withExtension(AccessManagementRepository.class,
+        List<String> roles = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getUserCaseRoles(caseId, userId));
         return UserCaseRolesEnvelope.builder()
             .caseId(caseId)

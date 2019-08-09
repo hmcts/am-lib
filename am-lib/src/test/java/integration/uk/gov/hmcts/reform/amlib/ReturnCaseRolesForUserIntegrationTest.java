@@ -1,6 +1,7 @@
 package integration.uk.gov.hmcts.reform.amlib;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,8 +40,9 @@ public class ReturnCaseRolesForUserIntegrationTest extends PreconfiguredIntegrat
     void setUp() {
         resourceId = UUID.randomUUID().toString();
         accessorId = UUID.randomUUID().toString();
+        idamRoleWithExplicitAccess = "a" + UUID.randomUUID().toString();
 
-        importerService.addRole(idamRoleWithExplicitAccess = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
+        importerService.addRole(idamRoleWithExplicitAccess, IDAM, PUBLIC, EXPLICIT);
         importerService.addResourceDefinition(resourceDefinition =
             createResourceDefinition(serviceName, "case", UUID.randomUUID().toString()));
     }
@@ -57,7 +59,7 @@ public class ReturnCaseRolesForUserIntegrationTest extends PreconfiguredIntegrat
         assertThat(result).isEqualTo(UserCaseRolesEnvelope.builder()
             .caseId(resourceId)
             .userId(accessorId)
-            .roles(ImmutableSet.of())
+            .roles(ImmutableList.of())
             .build());
     }
 
@@ -71,7 +73,7 @@ public class ReturnCaseRolesForUserIntegrationTest extends PreconfiguredIntegrat
         assertThat(result).isEqualTo(UserCaseRolesEnvelope.builder()
             .caseId(resourceId)
             .userId(accessorId)
-            .roles(ImmutableSet.of())
+            .roles(ImmutableList.of())
             .build());
     }
 
@@ -86,7 +88,7 @@ public class ReturnCaseRolesForUserIntegrationTest extends PreconfiguredIntegrat
         assertThat(result).isEqualTo(UserCaseRolesEnvelope.builder()
             .caseId(resourceId)
             .userId(accessorId)
-            .roles(ImmutableSet.of())
+            .roles(ImmutableList.of())
             .build());
     }
 
@@ -100,14 +102,14 @@ public class ReturnCaseRolesForUserIntegrationTest extends PreconfiguredIntegrat
         assertThat(result).isEqualTo(UserCaseRolesEnvelope.builder()
             .caseId(resourceId)
             .userId(accessorId)
-            .roles(ImmutableSet.of())
+            .roles(ImmutableList.of())
             .build());
     }
 
     @Test
     void whenUserHasAccessToCaseWithSingleRelationshipShouldReturnListOfRolesWithSingleRole() {
-        String idamRoleWithExplicitAccess1;
-        importerService.addRole(idamRoleWithExplicitAccess1 = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
+        String idamRoleWithExplicitAccess1 = "b" + UUID.randomUUID().toString();
+        importerService.addRole(idamRoleWithExplicitAccess1, IDAM, PUBLIC, EXPLICIT);
 
         service.grantExplicitResourceAccess(createGrantForWholeDocument(
             resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition, ImmutableSet.of(READ)));
@@ -119,16 +121,16 @@ public class ReturnCaseRolesForUserIntegrationTest extends PreconfiguredIntegrat
         assertThat(result).isEqualTo(UserCaseRolesEnvelope.builder()
             .caseId(resourceId)
             .userId(accessorId)
-            .roles(ImmutableSet.of(idamRoleWithExplicitAccess))
+            .roles(ImmutableList.of(idamRoleWithExplicitAccess))
             .build());
     }
 
     @Test
     void whenUserHasAccessToCaseWithMultipleRelationshipsShouldReturnListOfRolesWithAllRoles() {
-        String idamRoleWithExplicitAccess1;
-        String idamRoleWithExplicitAccess2;
-        importerService.addRole(idamRoleWithExplicitAccess1 = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
-        importerService.addRole(idamRoleWithExplicitAccess2 = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
+        String idamRoleWithExplicitAccess1 = "b" + UUID.randomUUID().toString();
+        String idamRoleWithExplicitAccess2 = "c" + UUID.randomUUID().toString();
+        importerService.addRole(idamRoleWithExplicitAccess1, IDAM, PUBLIC, EXPLICIT);
+        importerService.addRole(idamRoleWithExplicitAccess2, IDAM, PUBLIC, EXPLICIT);
 
         service.grantExplicitResourceAccess(createGrantForWholeDocument(
             resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition, ImmutableSet.of(READ)));
@@ -142,14 +144,14 @@ public class ReturnCaseRolesForUserIntegrationTest extends PreconfiguredIntegrat
         assertThat(result).isEqualTo(UserCaseRolesEnvelope.builder()
             .caseId(resourceId)
             .userId(accessorId)
-            .roles(ImmutableSet.of(idamRoleWithExplicitAccess, idamRoleWithExplicitAccess1))
+            .roles(ImmutableList.of(idamRoleWithExplicitAccess, idamRoleWithExplicitAccess1))
             .build());
     }
 
     @Test
     void whenUserHasAccessToCaseWithMultipleRelationshipsIncludingNullShouldReturnListOfRolesWithAllRolesExceptNull() {
-        String idamRoleWithExplicitAccess1;
-        importerService.addRole(idamRoleWithExplicitAccess1 = UUID.randomUUID().toString(), IDAM, PUBLIC, EXPLICIT);
+        String idamRoleWithExplicitAccess1 = "b" + UUID.randomUUID().toString();
+        importerService.addRole(idamRoleWithExplicitAccess1, IDAM, PUBLIC, EXPLICIT);
 
         service.grantExplicitResourceAccess(createGrantForWholeDocument(
             resourceId, accessorId, idamRoleWithExplicitAccess, resourceDefinition, ImmutableSet.of(READ)));
@@ -163,7 +165,7 @@ public class ReturnCaseRolesForUserIntegrationTest extends PreconfiguredIntegrat
         assertThat(result).isEqualTo(UserCaseRolesEnvelope.builder()
             .caseId(resourceId)
             .userId(accessorId)
-            .roles(ImmutableSet.of(idamRoleWithExplicitAccess, idamRoleWithExplicitAccess1))
+            .roles(ImmutableList.of(idamRoleWithExplicitAccess, idamRoleWithExplicitAccess1))
             .build());
     }
 }

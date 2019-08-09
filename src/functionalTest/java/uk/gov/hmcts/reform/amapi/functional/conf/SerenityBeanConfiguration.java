@@ -24,7 +24,7 @@ public class SerenityBeanConfiguration {
     public DataSource createDataSource() {
         log.info("DB Host name::" + getValueOrDefault("AM_DB_HOST", "localhost"));
         PGPoolingDataSource dataSource = new PGPoolingDataSource();
-        dataSource.setServerName(getValueOrDefault("AM_DB_NAME", "localhost"));
+        dataSource.setServerName(getValueOrDefault("AM_DB_HOST", "localhost"));
         dataSource.setPortNumber(Integer.parseInt(getValueOrDefault("AM_DB_PORT", "5433")));
         dataSource.setDatabaseName(getValueOrThrow("AM_DB_NAME"));
         dataSource.setUser(getValueOrThrow("AM_DB_USERNAME"));

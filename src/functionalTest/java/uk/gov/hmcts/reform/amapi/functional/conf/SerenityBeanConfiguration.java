@@ -23,7 +23,7 @@ public class SerenityBeanConfiguration {
 
     @SuppressWarnings({"deprecation"})
     public DataSource createDataSource() {
-        log.info("DB Host name::"+getValueOrDefault("DATABASE_HOST", "localhost"));
+        log.info("DB Host name::" + getValueOrDefault("DATABASE_HOST", "localhost"));
         PGPoolingDataSource dataSource = new PGPoolingDataSource();
         dataSource.setServerName(getValueOrDefault("DATABASE_HOST", "localhost"));
         dataSource.setPortNumber(Integer.parseInt(getValueOrDefault("DATABASE_PORT", "5433")));

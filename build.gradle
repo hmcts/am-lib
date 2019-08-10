@@ -53,7 +53,6 @@ def ENVIRONMENT_NAME = project.properties['ENVIRONMENT'] ?: "local"
 def DATABASE_HOST = project.properties['DATABASE_HOST'] ?: "localhost"
 def DATABASE_PASSWORD = project.properties['DATABASE_PASSWORD'] ?: ""
 def DATABASE_PORT = project.properties['DATABASE_PORT'] ?: "5433"
-def SPRING_FLYWAY_LOCATIONS = System.env['SPRING_FLYWAY_LOCATIONS'] ?: ""
 
 project(":am-lib") {
   apply plugin: 'info.solidsoft.pitest'
@@ -281,7 +280,7 @@ flyway {
     user = 'amuser'
     password = 'ampass'
 
-    locations = ["filesystem:am-lib/src/main/resources/db/migration,${SPRING_FLYWAY_LOCATIONS}"]
+    locations = ["filesystem:am-lib/src/main/resources/db/migration"]
 }
 
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
@@ -289,6 +288,9 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     outOfOrder = true
     if (project.hasProperty("dburl")) {
         url = "jdbc:postgresql://${dburl}"
+    }
+    if(System.getenv('SPRING_FLYWAY_LOCATIONS')!=null){
+      locations = System.env['SPRING_FLYWAY_LOCATIONS']
     }
 }
 

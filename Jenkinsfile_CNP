@@ -39,7 +39,7 @@ config.vaultSecrets = secrets
 
 withPipeline(type, product, component) {
 
-  env.SPRING_FLYWAY_LOCATIONS = "filesystem:am-lib/src/main/resources/db/migration-functiontest-data"
+  env.SPRING_FLYWAY_LOCATIONS = "filesystem:am-lib/src/main/resources/db/migration,filesystem:am-lib/src/main/resources/db/migration-functiontest-data"
 
   setVaultName('am-lib-test')
   overrideVaultEnvironments(vaultOverrides)

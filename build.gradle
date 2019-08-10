@@ -294,7 +294,7 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     println "am db migration executed with flyway locations ${flywayLocation}"
     if("${flywayLocation}"!=null){
       println "am db migration executed with flyway locations in if block ${flywayLocation}"
-      locations = "[${flywayLocation}]"
+      locations = "${flywayLocation}"
     }
 }
 

@@ -284,13 +284,17 @@ flyway {
 }
 
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
+    println "am db migration executed"
     baselineOnMigrate = true
     outOfOrder = true
     if (project.hasProperty("dburl")) {
         url = "jdbc:postgresql://${dburl}"
     }
-    if(System.getenv('SPRING_FLYWAY_LOCATIONS')!=null){
-      locations = System.env['SPRING_FLYWAY_LOCATIONS']
+    def flywayLocation = System.getenv('SPRING_FLYWAY_LOCATIONS')
+    println "am db migration executed with flyway locations ${flywayLocation}"
+    if("${flywayLocation}"!=null){
+      println "am db migration executed with flyway locations in if block ${flywayLocation}"
+      locations = "[${flywayLocation}]"
     }
 }
 

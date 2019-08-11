@@ -1,5 +1,12 @@
 am-lib-test:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+  environment:
+    AM_DB_HOST: "{{ .Release.Name }}-postgresql"
+    AM_DB_NAME: am
+    AM_DB_PASSWORD: ampass
+    AM_DB_PORT: 5432
+    AM_DB_USERNAME: amuser
+    ENABLE_DB_MIGRATE_IN_SERVICE: true
 postgresql:
   enabled: true

@@ -275,9 +275,10 @@ task sonarqube(type: Exec) {
 }
 
 flyway {
-
-  user = 'amuser'
-  password = 'ampass'
+    url = 'jdbc:postgresql://localhost:5433/am'
+    user = 'amuser'
+    password = 'ampass'
+    locations = ["classpath:db/migration,classpath:db/migration-functiontest-data"]
 }
 
 //local flyway settings
@@ -285,17 +286,15 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     println "am db migration executed"
     baselineOnMigrate = true
     outOfOrder = true
-    locations = ["filesystem:am-lib/src/main/resources/db/migration"]
+
+    if(System.getenv("env_name") == "nonprod") {
+      locations = ["classpath:db/migration,classpath:db/migration-functiontest-data"]
+      println "am db migration executed with flyway locations executed::"
+    }
 
     if (project.hasProperty("dburl")) {
         url = "jdbc:postgresql://${dburl}"
-       // locations = ["classpath:db/migration,classpath:db/migration-functiontest-data"]
     }
-    def flywayLocation = System.getenv('SPRING_FLYWAY_LOCATIONS')
-    if("${flywayLocation}"!= null) {
-      locations = System.getenv('SPRING_FLYWAY_LOCATIONS')
-    }
-    println "am db migration executed with flyway locations ${flywayLocation}" 
 }
 
 task loadPerformanceTestData(type: Exec) {

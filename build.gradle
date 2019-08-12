@@ -275,13 +275,6 @@ task sonarqube(type: Exec) {
 }
 
 //local flyway settings
-flyway {
-    url = 'jdbc:postgresql://localhost:5433/am'
-    user = 'amuser'
-    password = 'ampass'
-
-}
-
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     println "am db migration executed"
     baselineOnMigrate = true

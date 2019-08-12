@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amapi.functional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 
 @TestPropertySource("classpath:application-functional.yaml")
 @Import(SerenityBeanConfiguration.class)
+@Slf4j
 public class FunctionalTestSuite {
 
 
@@ -29,6 +31,7 @@ public class FunctionalTestSuite {
 
     @Before
     public void setUp() {
+        log.info("Am api rest url::" + accessUrl);
         amApiClient = new AmApiClient(accessUrl);
         importerService.addService("cmc-test");
 

@@ -22,13 +22,13 @@ public class SerenityBeanConfiguration {
 
     @SuppressWarnings({"deprecation"})
     public DataSource createDataSource() {
-        log.info("DB Host name::" + getValueOrDefault("AM_DB_HOST", "localhost"));
+        log.info("DB Host name::" + getValueOrDefault("DATABASE_HOST", "localhost"));
         PGPoolingDataSource dataSource = new PGPoolingDataSource();
-        dataSource.setServerName(getValueOrDefault("AM_DB_HOST", "localhost"));
-        dataSource.setPortNumber(Integer.parseInt(getValueOrDefault("AM_DB_PORT", "5433")));
-        dataSource.setDatabaseName(getValueOrThrow("AM_DB_NAME"));
-        dataSource.setUser(getValueOrThrow("AM_DB_USERNAME"));
-        dataSource.setPassword(getValueOrThrow("AM_DB_PASSWORD"));
+        dataSource.setServerName(getValueOrDefault("DATABASE_HOST", "localhost"));
+        dataSource.setPortNumber(Integer.parseInt(getValueOrDefault("DATABASE_PORT", "5433")));
+        dataSource.setDatabaseName(getValueOrThrow("DATABASE_NAME"));
+        dataSource.setUser(getValueOrThrow("DATABASE_USER"));
+        dataSource.setPassword(getValueOrThrow("DATABASE_PASS"));
         dataSource.setMaxConnections(25);
         return dataSource;
     }

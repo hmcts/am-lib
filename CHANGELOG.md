@@ -1,3 +1,37 @@
+## [0.11.8](https://github.com/hmcts/am-lib/compare/0.11.7...0.11.8) (2019-08-07)
+
+
+
+## [0.11.7](https://github.com/hmcts/am-lib/compare/0.11.6...0.11.7) (2019-08-07)
+
+
+
+## [0.11.6](https://github.com/hmcts/am-lib/compare/0.11.5...0.11.6) (2019-08-07)
+
+
+
+## [0.11.5](https://github.com/hmcts/am-lib/compare/0.11.4...0.11.5) (2019-08-07)
+
+
+
+## [0.11.4](https://github.com/hmcts/am-lib/compare/0.10.4...0.11.4) (2019-08-07)
+
+
+### Bug Fixes
+
+* gatling fix initial data load Jenkins aat(Am-362) ([#245](https://github.com/hmcts/am-lib/issues/245)) ([9126500](https://github.com/hmcts/am-lib/commit/9126500))
+* Gatling test initial data load ([#268](https://github.com/hmcts/am-lib/issues/268)) ([5463456](https://github.com/hmcts/am-lib/commit/5463456))
+* initial test data load(AM-362) ([#249](https://github.com/hmcts/am-lib/issues/249)) ([cc99928](https://github.com/hmcts/am-lib/commit/cc99928))
+* terraform module subscription ([#243](https://github.com/hmcts/am-lib/issues/243)) ([ce99a94](https://github.com/hmcts/am-lib/commit/ce99a94))
+* Vulnerability Tomcat (Am 362 initial test data load) ([#247](https://github.com/hmcts/am-lib/issues/247)) ([93495f0](https://github.com/hmcts/am-lib/commit/93495f0))
+
+
+### Features
+
+* endpoint for returning resource accessors ([#252](https://github.com/hmcts/am-lib/issues/252)) ([5f88271](https://github.com/hmcts/am-lib/commit/5f88271))
+
+
+
 ## [0.10.4](https://github.com/hmcts/am-lib/compare/0.9.4...0.10.4) (2019-07-15)
 
 

@@ -280,7 +280,6 @@ flyway {
     user = 'amuser'
     password = 'ampass'
 
-    locations = ["filesystem:am-lib/src/main/resources/db/migration"]
 }
 
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
@@ -292,10 +291,6 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     }
     def flywayLocation = System.getenv('SPRING_FLYWAY_LOCATIONS')
     println "am db migration executed with flyway locations ${flywayLocation}"
-    if("${flywayLocation}"!=null){
-      println "am db migration executed with flyway locations in if block ${flywayLocation}"
-      locations = "${flywayLocation}"
-    }
 }
 
 task loadPerformanceTestData(type: Exec) {

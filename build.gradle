@@ -292,10 +292,10 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
        // locations = ["classpath:db/migration,classpath:db/migration-functiontest-data"]
     }
     def flywayLocation = System.getenv('SPRING_FLYWAY_LOCATIONS')
-    if(${flywayLocation}!= null) {
-      locations = ${flywayLocation}
+    if("${flywayLocation}"!= null) {
+      locations = System.getenv('SPRING_FLYWAY_LOCATIONS')
     }
-    println "am db migration executed with flyway locations ${flywayLocation}"
+    println "am db migration executed with flyway locations ${flywayLocation}" 
 }
 
 task loadPerformanceTestData(type: Exec) {

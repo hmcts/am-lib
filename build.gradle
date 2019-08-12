@@ -274,15 +274,27 @@ task sonarqube(type: Exec) {
     commandLine './gradlew', 'sonarqube', '--rerun-tasks'
 }
 
+flyway {
+
+  user = 'amuser'
+  password = 'ampass'
+}
+
 //local flyway settings
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     println "am db migration executed"
     baselineOnMigrate = true
     outOfOrder = true
+    locations = ["filesystem:am-lib/src/main/resources/db/migration"]
+
     if (project.hasProperty("dburl")) {
         url = "jdbc:postgresql://${dburl}"
+       // locations = ["classpath:db/migration,classpath:db/migration-functiontest-data"]
     }
     def flywayLocation = System.getenv('SPRING_FLYWAY_LOCATIONS')
+    if(${flywayLocation}!= null) {
+      locations = ${flywayLocation}
+    }
     println "am db migration executed with flyway locations ${flywayLocation}"
 }
 

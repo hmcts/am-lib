@@ -40,7 +40,7 @@ config.vaultSecrets = secrets
 withPipeline(type, product, component) {
 
   withAksClient('nonprod') {
-    env.SPRING_FLYWAY_LOCATIONS = "classpath:/db/migration,classpath:/db/migration-functiontest-data"
+    env.SPRING_FLYWAY_LOCATIONS = "classpath:db/migration,classpath:db/migration-functiontest-data"
   }
 
   setVaultName('am-lib-test')

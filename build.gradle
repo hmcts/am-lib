@@ -288,6 +288,10 @@ flyway {
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     baselineOnMigrate = true
     outOfOrder = true
+
+    if(System.getenv("flyway_locations") != null) {
+      locations = System.getenv("flyway_locations")
+    }
     if (project.hasProperty("dburl")) {
         url = "jdbc:postgresql://${dburl}"
     }

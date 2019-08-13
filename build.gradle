@@ -292,9 +292,9 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
 //      println "am db migration executed with flyway locations executed::"
 //    }
 //
-//    if (project.hasProperty("dburl")) {
-//        url = "jdbc:postgresql://${dburl}"
-//    }
+    if (project.hasProperty("dburl")) {
+        url = "jdbc:postgresql://${dburl}"
+    }
 }
 
 task loadPerformanceTestData(type: Exec) {

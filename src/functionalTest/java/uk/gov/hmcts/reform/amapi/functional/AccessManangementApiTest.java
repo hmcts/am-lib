@@ -61,9 +61,9 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
             assertThat(responseBody.get("attributePermissions").toString()).contains("READ");
             assertThat(responseBody.get("attributePermissions").toString()).contains("UPDATE");
             assertThat(responseBody.get("accessorType").toString()).isEqualTo(USER.toString());
+            response.then().log();
         } catch (Exception e) {
             log.error("verifyGrantExplicitAccessApi : " + e.toString());
-            //response.then().log();
         }
     }
 

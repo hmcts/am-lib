@@ -83,7 +83,7 @@ public class FunctionalTestSuite {
         dataSource.setDatabaseName(getValueOrThrow("DATABASE_NAME"));
         dataSource.setUser(getValueOrThrow("DATABASE_USER"));
         dataSource.setPassword(getValueOrThrow("DATABASE_PASS"));
-        dataSource.setMaxConnections(25);
+        dataSource.setMaxConnections(5);
         return dataSource;
     }
 

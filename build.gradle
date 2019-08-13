@@ -290,6 +290,7 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     outOfOrder = true
 
     if(System.getenv("flyway_locations") != null) {
+      print("flyway_locations::" + System.getenv("flyway_locations"))
       locations = System.getenv("flyway_locations")
     }
     if (project.hasProperty("dburl")) {

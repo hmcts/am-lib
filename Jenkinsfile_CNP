@@ -46,16 +46,15 @@ config.vaultSecrets = secrets
 
 withPipeline(type, product, component) {
 
-  env.TEST_URL =  params.URL_TO_TEST
 
+  if (env.CHANGE_TITLE && !env.CHANGE_TITLE.startsWith('[PREVIEW]')) {
+    enableDockerBuild()
+    installCharts()
+    enableDbMigration()
+  }
 
-  setVaultName('am-lib-test')
-  overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
-  enableDockerBuild()
-  installCharts()
-  enableDbMigration()
-
+  setVaultName('am-lib-test')
 
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'

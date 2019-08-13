@@ -88,7 +88,10 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 sourceSets {
-    functional {
+    test {
+      java.srcDir 'src/test/java'
+    }
+    functionalTest {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
@@ -120,8 +123,8 @@ tasks.withType(JavaCompile) {
 }
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
-    testClassesDirs = sourceSets.functional.output.classesDirs
-    classpath = sourceSets.functional.runtimeClasspath
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
     finalizedBy aggregate
 }
 
@@ -131,8 +134,8 @@ task integration(type: Test, description: 'Runs the integration tests.', group: 
 }
 
 configurations {
-    functionalCompile.extendsFrom testCompile
-    functionalRuntime.extendsFrom testRuntime
+    functionalTestCompile.extendsFrom testCompile
+    functionalTestRuntime.extendsFrom testRuntime
 }
 
 task smoke(type: Test) {
@@ -154,7 +157,7 @@ checkstyle {
 
 pmd {
     toolVersion = "6.13.0"
-    sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functional, sourceSets.integrationTest]
+    sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest]
     reportsDir = file("$project.buildDir/reports/pmd")
     ruleSetFiles = files("config/pmd/ruleset.xml")
     ruleSets = []
@@ -238,25 +241,25 @@ dependencies {
         exclude group: 'junit', module: 'junit'
     }
 
-    functionalCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
+    functionalTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
       force = true
     }
     integrationTestCompile sourceSets.main.runtimeClasspath
     integrationTestCompile sourceSets.test.runtimeClasspath
 
-    functionalCompile sourceSets.main.runtimeClasspath
-    functionalCompile sourceSets.test.runtimeClasspath
+    functionalTestCompile sourceSets.main.runtimeClasspath
+    functionalTestCompile sourceSets.test.runtimeClasspath
 
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-    functionalCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
-    functionalAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
-    functionalCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
-    functionalCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
-    functionalCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
-    functionalCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
-    functionalCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
+    functionalTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+    functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+    functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
+    functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
+    functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
+    functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
+    functionalTestCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 }
 
 mainClassName = 'uk.gov.hmcts.reform.amapi.Application'

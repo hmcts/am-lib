@@ -26,7 +26,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 @Slf4j
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert","PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert","PMD.AvoidDuplicateLiterals","PMD.Incremental Analysis"})
 public class AccessManangementApiTest extends FunctionalTestSuite {
 
     Response response;
@@ -34,10 +34,10 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
     String resourceId = "Siva1234";
     @NotEmpty Set<@NotBlank String> accessorIds;
     String accessorId = "Test1234";
-    String resourceName = "claim";
-    String resourceType = "case";
-    String seriviceName = "cmc";
-    String relationship = "caseworker";
+    String resourceName = "claim-test";
+    String resourceType = "case-test";
+    String seriviceName = "cmc-test";
+    String relationship = "caseworker-test";
     Map<JsonPointer, Set<Permission>> multipleAttributePermissions = ImmutableMap.of(
         JsonPointer.valueOf(""), ImmutableSet.of(CREATE, READ, UPDATE));
 
@@ -63,7 +63,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
             assertThat(responseBody.get("accessorType").toString()).isEqualTo(USER.toString());
         } catch (Exception e) {
             log.error("verifyGrantExplicitAccessApi : " + e.toString());
-            response.then().log();
+            //response.then().log();
         }
     }
 

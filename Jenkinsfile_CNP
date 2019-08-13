@@ -46,9 +46,7 @@ config.vaultSecrets = secrets
 
 withPipeline(type, product, component) {
 
-  withAksClient('nonprod') {
-    env.TEST_URL =  params.URL_TO_TEST
-  }
+  env.TEST_URL =  params.URL_TO_TEST
 
   setVaultName('am-lib-test')
   overrideVaultEnvironments(vaultOverrides)

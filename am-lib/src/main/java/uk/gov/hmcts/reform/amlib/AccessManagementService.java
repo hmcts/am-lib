@@ -189,6 +189,14 @@ public class AccessManagementService {
                 userRoles, SecurityClassifications.getVisibleSecurityClassifications(maxSecurityClassificationForRole)));
     }
 
+    /**
+     * Returns a list of roles that a user holds within a case.
+     *
+     * @param caseId a case id
+     * @param userId a user id
+     * @return a list of roles that the user holds within the case
+     */
+    @AuditLog("returned roles that user '{{userId}}' has within case '{{caseId}}': {{result}}")
     public UserCaseRolesEnvelope returnUserCaseRoles(@NotBlank String caseId, @NotBlank String userId) {
         List<String> roles = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getUserCaseRoles(caseId, userId));

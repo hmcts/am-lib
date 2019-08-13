@@ -207,8 +207,8 @@ public class AccessManagementControllerTest {
     @Test
     public void testReturnResourceAccessors() throws Exception {
 
-        String resourceType = "case";
-        String resourceName = "claim";
+        String resourceType = "case-test";
+        String resourceName = "claim-test";
         String resourceId = "0011";
 
         ResourceAccessorsEnvelope resourceAccessorsEnvelope = ResourceAccessorsEnvelope.builder()
@@ -216,7 +216,7 @@ public class AccessManagementControllerTest {
             .explicitAccessors(Collections.singletonList(ResourceAccessor.builder()
                 .accessorId("5511")
                 .accessorType(USER)
-                .relationships(ImmutableSet.of("caseworker"))
+                .relationships(ImmutableSet.of("caseworker-test"))
                 .permissions(Collections.singletonMap(JsonPointer.valueOf(""), ImmutableSet.of(READ, UPDATE, CREATE)))
                 .build()))
             .build();
@@ -232,7 +232,7 @@ public class AccessManagementControllerTest {
             .andExpect(jsonPath("$.explicitAccess").exists())
             .andExpect(jsonPath("$.explicitAccess[0].accessorId", is("5511")))
             .andExpect(jsonPath("$.explicitAccess[0].accessorType", is("USER")))
-            .andExpect(jsonPath("$.explicitAccess[0].relationships.*", containsInAnyOrder("caseworker")))
+            .andExpect(jsonPath("$.explicitAccess[0].relationships.*", containsInAnyOrder("caseworker-test")))
             .andExpect(jsonPath("$.explicitAccess[0].permissions.*",
                 hasItem(is(containsInAnyOrder("CREATE", "READ", "UPDATE")))));
     }

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.amlib.performance.http
 
+import java.util.UUID
+
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.http.request.builder.HttpRequestBuilder
@@ -7,7 +9,7 @@ import io.gatling.http.request.builder.HttpRequestBuilder
 object AccessManagement {
 
   private def getRequest(url: String): HttpRequestBuilder =
-    http(url)
+    http("/returnResourceAccessors")
       .get("/api" + url)
       .check(status.is(200))
 
@@ -33,6 +35,6 @@ object AccessManagement {
     deleteRequest("/access-resource", "revokeResourceAccess.json")
 
   def returnResourceAccessors: HttpRequestBuilder =
-    getRequest("/resource/resourceType/case/resourceName/claim/resourceId/${resourceId}")
+    getRequest("/resource/resourceType/case-test/resourceName/claim-test/resourceId/${resourceId}")
 
 }

@@ -34,7 +34,7 @@ object BasicScenarios {
 
   val returnResourceAccessors: ScenarioBuilder = scenario("Return Resource Accessors")
     .forever(
-      feed(ReturnResourceAccessors.feed)
+      feed(CreateResourceAccess.feed)
         .exec(AccessManagement.createResourceAssess)
         .exec(AccessManagement.returnResourceAccessors)
         .pause(1.second)

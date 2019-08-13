@@ -1,4 +1,4 @@
-insert into services (service_name, service_description) values ('cmc-test', null)
+insert into services (service_name, service_description) values ('cmc-test', null);
 
 insert into resources (service_name, resource_type, resource_name) values ('cmc-test', 'case-test', 'claim-test');
 

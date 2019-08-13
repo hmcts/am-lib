@@ -287,14 +287,14 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     baselineOnMigrate = true
     outOfOrder = true
 
-    if(System.getenv("env_name") == "nonprod") {
-      locations = ["classpath:db/migration,classpath:db/migration-functiontest-data"]
-      println "am db migration executed with flyway locations executed::"
-    }
-
-    if (project.hasProperty("dburl")) {
-        url = "jdbc:postgresql://${dburl}"
-    }
+//    if(System.getenv("env_name") == "nonprod") {
+//      locations = ["classpath:db/migration,classpath:db/migration-functiontest-data"]
+//      println "am db migration executed with flyway locations executed::"
+//    }
+//
+//    if (project.hasProperty("dburl")) {
+//        url = "jdbc:postgresql://${dburl}"
+//    }
 }
 
 task loadPerformanceTestData(type: Exec) {

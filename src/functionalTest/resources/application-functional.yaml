@@ -1,1 +1,1 @@
-targetInstance: ${TEST_URL:http://localhost:3704}/
+targetInstance: ${URL_TO_TEST:http://localhost:3704}/

@@ -39,16 +39,22 @@ def vaultOverrides = [
   'spreview': 'saat'
 ]
 
+def subscription = "nonprod"
 def config = new AppPipelineConfig()
 config.vaultSecrets = secrets
 
+
 withPipeline(type, product, component) {
+
+  env.TEST_URL =  params.URL_TO_TEST
+
   setVaultName('am-lib-test')
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
   enableDockerBuild()
   installCharts()
   enableDbMigration()
+
 
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'

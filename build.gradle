@@ -140,8 +140,8 @@ configurations {
 
 task smoke(type: Test) {
     description = "Runs Smoke Tests"
-    //testClassesDirs = sourceSets.smoke.output.classesDirs
-    //classpath = sourceSets.smoke.runtimeClasspath
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
 
     useJUnitPlatform {
         includeTags = ['SmokeTest']

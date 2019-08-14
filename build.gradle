@@ -116,6 +116,14 @@ sourceSets {
         }
         resources.srcDir file('src/integrationTest/resources')
     }
+    smokeTest {
+      java {
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+        srcDir file('src/smokeTest/java')
+      }
+      resources.srcDir file('src/smokeTest/resources')
+    }
 }
 
 tasks.withType(JavaCompile) {
@@ -140,8 +148,8 @@ configurations {
 
 task smoke(type: Test) {
     description = "Runs Smoke Tests"
-    testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
+    testClassesDirs = sourceSets.smokeTest.output.classesDirs
+    classpath = sourceSets.smokeTest.runtimeClasspath
 
     useJUnitPlatform {
         includeTags = ['SmokeTest']
@@ -157,7 +165,7 @@ checkstyle {
 
 pmd {
     toolVersion = "6.13.0"
-    sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest]
+    sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest, sourceSets.smokeTest]
     reportsDir = file("$project.buildDir/reports/pmd")
     ruleSetFiles = files("config/pmd/ruleset.xml")
     ruleSets = []
@@ -250,16 +258,31 @@ dependencies {
     functionalTestCompile sourceSets.main.runtimeClasspath
     functionalTestCompile sourceSets.test.runtimeClasspath
 
+    smokeTestCompile sourceSets.main.runtimeClasspath
+    smokeTestCompile sourceSets.test.runtimeClasspath
+
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
     functionalTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
     functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+    testCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
+    testCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
+    testCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
+    testCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
+    
     functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
     functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
     functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
     functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
     functionalTestCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
+
+    smokeTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    smokeTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
+
+
 }
 
 mainClassName = 'uk.gov.hmcts.reform.amapi.Application'

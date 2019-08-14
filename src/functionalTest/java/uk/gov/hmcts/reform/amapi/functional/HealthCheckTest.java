@@ -13,12 +13,11 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert"})
-@TestPropertySource("classpath:application-functional.yaml")
 public class HealthCheckTest {
 
     public AmApiClient amApiClient;
 
-    @Value("${targetInstance}")
+    @Value("${TEST_URL:http://localhost:3704/}")
     protected String accessUrl;
 
     @Test

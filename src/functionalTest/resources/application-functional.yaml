@@ -1,0 +1,1 @@
+targetInstance: ${URL_TO_TEST:http://localhost:3704}/

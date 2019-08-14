@@ -44,3 +44,6 @@ classes/
 
 # CCD migration data
 /migration/am-migration.csv
+
+#Serenity reports
+target

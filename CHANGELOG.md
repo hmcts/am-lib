@@ -1,3 +1,18 @@
+## [0.12.8](https://github.com/hmcts/am-lib/compare/0.11.8...0.12.8) (2019-08-15)
+
+
+### Bug Fixes
+
+* bump jackson databind version ([#289](https://github.com/hmcts/am-lib/issues/289)) ([577797f](https://github.com/hmcts/am-lib/commit/577797f))
+
+
+### Features
+
+* library method for returning user case roles (AM-383) ([#290](https://github.com/hmcts/am-lib/issues/290)) ([b024998](https://github.com/hmcts/am-lib/commit/b024998))
+* return user cases lib method (AM-382) ([#282](https://github.com/hmcts/am-lib/issues/282)) ([52acb4a](https://github.com/hmcts/am-lib/commit/52acb4a))
+
+
+
 ## [0.11.8](https://github.com/hmcts/am-lib/compare/0.11.7...0.11.8) (2019-08-07)
 
 

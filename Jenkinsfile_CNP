@@ -46,7 +46,7 @@ config.vaultSecrets = secrets
 
 withPipeline(type, product, component) {
 
-  //env.TEST_URL =  params.URL_TO_TEST
+
 
   setVaultName('am-lib-test')
   overrideVaultEnvironments(vaultOverrides)
@@ -65,6 +65,7 @@ withPipeline(type, product, component) {
   }
 
   onMaster {
+    env.TEST_URL =  params.URL_TO_TEST
     enableSlackNotifications('#am-master-builds')
 
     before('aat:promotion') {

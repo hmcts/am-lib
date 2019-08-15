@@ -5,11 +5,9 @@ import org.junit.Test;
 import org.junit.jupiter.api.Tag;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.amapi.functional.client.AmApiClient;
 
 import static org.hamcrest.core.IsEqual.equalTo;
-
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert"})

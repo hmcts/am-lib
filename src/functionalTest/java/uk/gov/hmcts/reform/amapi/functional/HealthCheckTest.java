@@ -6,12 +6,11 @@ import org.junit.jupiter.api.Test;
 import static io.restassured.RestAssured.get;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@SuppressWarnings("PMD")
 class HealthCheckTest extends RestAssuredTest {
 
     @Test
     @Tag("SmokeTest")
-    void healthcheck_returns_200() {
+    void healthCheckReturnsOK() {
         get("/health")
             .then().statusCode(200)
             .and().body("status", equalTo("UP"));

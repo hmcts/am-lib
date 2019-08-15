@@ -8,6 +8,15 @@ am-lib-test:
     AM_DB_USERNAME: amuser
     ENABLE_DB_MIGRATE_IN_SERVICE: true
   image: "https://hmcts.azurecr.io/hmcts/am-lib-test:latest"
+  keyVaults:
+    "s2s":
+      resourceGroup: rpe-service-auth-provider
+      secrets:
+        - microservicekey-am-accessmgmt-api
+    "am":
+      resourceGroup: am-shared-infrastructure
+      secrets:
+        - s2s-url
   postgresql:
     persistence:
       enabled: false

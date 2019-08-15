@@ -47,15 +47,26 @@ public class AmApiClient {
 
     private final String accessUrl;
 
-    public AmApiClient(String accessUrl) {
+    private final String s2sToken;
+
+    private static final String SERVICE_HEADER = "ServiceAuthorization";
+
+    public AmApiClient(String accessUrl,  String s2sToken) {
         this.accessUrl = accessUrl;
+        this.s2sToken = s2sToken;
     }
 
-    public RequestSpecification buildRequest() {
+    private RequestSpecification withUnauthenticatedRequest() {
         return SerenityRest.given()
             .relaxedHTTPSValidation()
+            //.baseUri(professionalApiUrl)
             .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)
             .header("Accepts", APPLICATION_JSON_UTF8_VALUE);
+    }
+
+    private RequestSpecification withAuthenticatedRequest() {
+        return withUnauthenticatedRequest()
+            .header(SERVICE_HEADER, "Bearer " + s2sToken);
     }
 
     public RequestSpecification createExplicitAccess() {
@@ -71,7 +82,7 @@ public class AmApiClient {
             .relationship(relationship)
             .build();
 
-        return buildRequest().body(requestBody);
+        return withAuthenticatedRequest().body(requestBody);
     }
 
     public RequestSpecification createRevokeAccess(String accessorId, String resourceId) {
@@ -86,7 +97,7 @@ public class AmApiClient {
             .relationship(relationship)
             .build();
 
-        return buildRequest().body(requestBody);
+        return withAuthenticatedRequest().body(requestBody);
     }
 
     public RequestSpecification createRevokeAccessWithoutOptionalParams(String accessorId, String resourceId) {
@@ -99,7 +110,7 @@ public class AmApiClient {
             .relationship(relationship)
             .build();
 
-        return buildRequest().body(requestBody);
+        return withAuthenticatedRequest().body(requestBody);
     }
 
     public RequestSpecification createFilterAccess(String resourceId, String accessorId) {
@@ -121,6 +132,6 @@ public class AmApiClient {
                 SecurityClassification.PUBLIC))
             .build();
 
-        return buildRequest().body(requestBody);
+        return withAuthenticatedRequest().body(requestBody);
     }
 }

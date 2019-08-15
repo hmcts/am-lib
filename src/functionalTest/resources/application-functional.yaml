@@ -1,1 +1,8 @@
 targetInstance: ${URL_TO_TEST:http://localhost:3704}/
+s2s-url: ${S2S_URL_FOR_TESTS:http://127.0.0.1:8502}
+s2s-name: rd_professional_api
+# Test key - not used in any deployed vaults or services
+s2s-secret: ${S2S_SECRET:GJNMFGFAAO4FCVD4}
+spring:
+  flyway:
+    enabled: false

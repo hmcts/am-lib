@@ -17,6 +17,9 @@ def component = "lib-test"
 
 def secretId = "am-lib-test-${params.ENVIRONMENT}"
 def secrets = [
+  's2s-${env}': [
+    secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
+  ],
   (secretId): [
     secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
     secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
@@ -55,6 +58,8 @@ withPipeline(type, product, component) {
   installCharts()
   enableDbMigration()
 
+  env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+  env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 
   before('functionalTest:preview') {
     env.URL_TO_TEST = "http://am-lib-test-aat.service.core-compute-aat.internal"

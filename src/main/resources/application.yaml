@@ -9,6 +9,13 @@ management:
     web:
       base-path: /
 
+auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8502}
+idam:
+  s2s-auth:
+    totp_secret: ${S2S_SECRET:AAAAAAAAAAAAAAAC}
+    microservice: am_accessmgmt_api
+    url: ${S2S_URL:http://127.0.0.1:8502}
+
 spring:
   application:
     name: Access Management
@@ -25,3 +32,6 @@ spring:
     add-mappings: false
   mvc:
     throw-exception-if-no-handler-found: true
+security:
+  authorisedServices:
+    - am_accessmgmt_api

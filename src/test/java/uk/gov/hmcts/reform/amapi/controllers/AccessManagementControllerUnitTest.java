@@ -8,17 +8,16 @@ import com.google.common.io.Resources;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.gov.hmcts.reform.amapi.exception.AccessManagementResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.amapi.models.FilterResource;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
-import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.FilterResourceService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
@@ -39,10 +38,8 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -54,31 +51,31 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports", "PMD.LawOfDemeter",
     "PMD.AvoidDuplicateLiterals"})
-public class AccessManagementControllerTest {
+public class AccessManagementControllerUnitTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @InjectMocks
+    private AccessManagementController accessManagementController;
 
-    @MockBean
-    private DefaultRoleSetupImportService importerService;
+    private MockMvc mvc;
 
-    @MockBean
+    @Mock
     private AccessManagementService accessManagementService;
 
-    @MockBean
+    @Mock
     private FilterResourceService filterResourceService;
 
+
     @BeforeEach
-    void init() {
-        doNothing().when(importerService).addService(anyString());
-        doNothing().when(importerService).addResourceDefinition(any());
-        doNothing().when(importerService).addRole(anyString(), any(), any(), any());
+    public void setUp() {
+
+        JacksonTester.initFields(this, new ObjectMapper());
+        // MockMvc standalone approach
+        mvc = MockMvcBuilders.standaloneSetup(accessManagementController)
+            .setControllerAdvice(new AccessManagementResponseEntityExceptionHandler())
+            .build();
     }
 
     @Test
@@ -89,36 +86,21 @@ public class AccessManagementControllerTest {
 
         doNothing().when(accessManagementService).grantExplicitResourceAccess(any());
 
-        this.mockMvc.perform(post("/api/access-resource")
+        this.mvc.perform(post("/api/access-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.resourceId", is("1234")))
-            .andExpect(jsonPath("$.resourceDefinition.serviceName", is("cmc")))
-            .andExpect(jsonPath("$.resourceDefinition.resourceType", is("case")))
-            .andExpect(jsonPath("$.resourceDefinition.resourceName", is("claim")))
+            .andExpect(jsonPath("$.resourceDefinition.serviceName", is("cmc-test")))
+            .andExpect(jsonPath("$.resourceDefinition.resourceType", is("case-test")))
+            .andExpect(jsonPath("$.resourceDefinition.resourceName", is("claim-test")))
             .andExpect(jsonPath("$.accessorIds").value("12345"))
             .andExpect(jsonPath("$.accessorType", is("USER")))
             .andExpect(jsonPath("$.attributePermissions").exists())
             .andExpect(jsonPath("$.attributePermissions.*",
                 hasItem(is(containsInAnyOrder("CREATE", "READ", "UPDATE")))))
-            .andExpect(jsonPath("$.relationship", is("caseworker")));
-    }
-
-    @Test
-    public void testRevokeResourceAccess() throws Exception {
-
-        String inputJson = Resources.toString(Resources
-            .getResource("input-data/revokeResourceAccess.json"), StandardCharsets.UTF_8);
-
-        doNothing().when(accessManagementService).revokeResourceAccess(any());
-
-        this.mockMvc.perform(delete("/api/access-resource")
-            .content(inputJson)
-            .header(CONTENT_TYPE, APPLICATION_JSON))
-            .andDo(print())
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.relationship", is("caseworker-test")));
     }
 
     @Test
@@ -151,7 +133,7 @@ public class AccessManagementControllerTest {
             filterResource.getAttributeSecurityClassification()))
             .thenReturn(filteredResourceEnvelope);
 
-        this.mockMvc.perform(post("/api/filter-resource")
+        this.mvc.perform(post("/api/filter-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
@@ -192,7 +174,7 @@ public class AccessManagementControllerTest {
             filterResource.getResource(), filterResource.getAttributeSecurityClassification()))
             .thenReturn(filteredResourceEnvelope);
 
-        this.mockMvc.perform(post("/api/filter-resource")
+        this.mvc.perform(post("/api/filter-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
@@ -207,8 +189,8 @@ public class AccessManagementControllerTest {
     @Test
     public void testReturnResourceAccessors() throws Exception {
 
-        String resourceType = "case-test";
-        String resourceName = "claim-test";
+        String resourceType = "case";
+        String resourceName = "claim";
         String resourceId = "0011";
 
         ResourceAccessorsEnvelope resourceAccessorsEnvelope = ResourceAccessorsEnvelope.builder()
@@ -216,7 +198,7 @@ public class AccessManagementControllerTest {
             .explicitAccessors(Collections.singletonList(ResourceAccessor.builder()
                 .accessorId("5511")
                 .accessorType(USER)
-                .relationships(ImmutableSet.of("caseworker-test"))
+                .relationships(ImmutableSet.of("caseworker"))
                 .permissions(Collections.singletonMap(JsonPointer.valueOf(""), ImmutableSet.of(READ, UPDATE, CREATE)))
                 .build()))
             .build();
@@ -224,7 +206,7 @@ public class AccessManagementControllerTest {
         Mockito.when(filterResourceService.returnResourceAccessors(resourceId, resourceName, resourceType))
             .thenReturn(resourceAccessorsEnvelope);
 
-        this.mockMvc.perform(get("/api/resource/resourceType/" + resourceType + "/resourceName/"
+        this.mvc.perform(get("/api/resource/resourceType/" + resourceType + "/resourceName/"
             + resourceName + "/resourceId/" + resourceId))
             .andDo(print())
             .andExpect(status().isOk())
@@ -232,7 +214,7 @@ public class AccessManagementControllerTest {
             .andExpect(jsonPath("$.explicitAccess").exists())
             .andExpect(jsonPath("$.explicitAccess[0].accessorId", is("5511")))
             .andExpect(jsonPath("$.explicitAccess[0].accessorType", is("USER")))
-            .andExpect(jsonPath("$.explicitAccess[0].relationships.*", containsInAnyOrder("caseworker-test")))
+            .andExpect(jsonPath("$.explicitAccess[0].relationships.*", containsInAnyOrder("caseworker")))
             .andExpect(jsonPath("$.explicitAccess[0].permissions.*",
                 hasItem(is(containsInAnyOrder("CREATE", "READ", "UPDATE")))));
     }

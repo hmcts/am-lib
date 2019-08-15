@@ -12,8 +12,6 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,18 +24,12 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 @Slf4j
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert","PMD.AvoidDuplicateLiterals","PMD.Incremental Analysis"})
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.AvoidDuplicateLiterals", "PMD.Incremental Analysis"})
 public class AccessManangementApiTest extends FunctionalTestSuite {
 
     Response response;
 
-    String resourceId = "Siva1234";
-    @NotEmpty Set<@NotBlank String> accessorIds;
-    String accessorId = "Test1234";
-    String resourceName = "claim-test";
-    String resourceType = "case-test";
-    String seriviceName = "cmc-test";
-    String relationship = "caseworker-test";
+
     Map<JsonPointer, Set<Permission>> multipleAttributePermissions = ImmutableMap.of(
         JsonPointer.valueOf(""), ImmutableSet.of(CREATE, READ, UPDATE));
 
@@ -71,7 +63,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
     public void verifyFilterResourceApi() {
         Response accessResponse = amApiClient.createExplicitAccess().post(amApiClient.getAccessUrl()
             + "api/access-resource");
-        JsonPath responseBody =  accessResponse.getBody().jsonPath();
+        JsonPath responseBody = accessResponse.getBody().jsonPath();
         Response response = amApiClient.createFilterAccess(responseBody.get("resourceId").toString(),
             amApiClient.getAccessorId()).post(amApiClient.getAccessUrl()
             + "api/filter-resource");
@@ -83,7 +75,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
     public void verifyRevokeExplicitAccessApi() {
         Response accessResponse = amApiClient.createExplicitAccess().post(amApiClient.getAccessUrl()
             + "api/access-resource");
-        JsonPath responseBody =  accessResponse.getBody().jsonPath();
+        JsonPath responseBody = accessResponse.getBody().jsonPath();
         Response response = amApiClient.createRevokeAccess(amApiClient.getAccessorId(),
             responseBody.get("resourceId").toString()).delete(amApiClient.getAccessUrl()
             + "api/access-resource");
@@ -95,7 +87,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
     public void verifyRevokeExplicitAccessApiWithoutResourcenameAndServicename() {
         Response accessResponse = amApiClient.createExplicitAccess().post(amApiClient.getAccessUrl()
             + "api/access-resource");
-        JsonPath responseBody =  accessResponse.getBody().jsonPath();
+        JsonPath responseBody = accessResponse.getBody().jsonPath();
         Response response = amApiClient.createRevokeAccessWithoutOptionalParams(amApiClient.getAccessorId(),
             responseBody.get("resourceId").toString()).delete(amApiClient.getAccessUrl()
             + "api/access-resource");

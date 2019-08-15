@@ -10,7 +10,7 @@ class HealthCheckTest extends RestAssuredTest {
 
     @Test
     @Tag("SmokeTest")
-    void healthcheck_returns_200() {
+    void healthCheckReturnsOK() {
         get("/health")
             .then().statusCode(200)
             .and().body("status", equalTo("UP"));

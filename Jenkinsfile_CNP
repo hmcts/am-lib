@@ -1,18 +1,75 @@
 #!groovy
 
+properties([
+
+  parameters([
+    string(name: 'URL_TO_TEST', defaultValue: 'http://am-lib-test-aat.service.core-compute-aat.internal', description: 'The URL you want to run these tests against')
+  ])
+])
+
 @Library("Infrastructure")
+
+import uk.gov.hmcts.contino.AppPipelineConfig
 
 def type = "java"
 def product = "am"
 def component = "lib-test"
 
+def secretId = "am-lib-test-${params.ENVIRONMENT}"
+def secrets = [
+  (secretId): [
+    secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
+    secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
+    secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
+    secret('am-lib-test-POSTGRES-USER', 'DATABASE_USER'),
+    secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASS')
+  ]
+]
+
+static Map<String, Object> secret(String secretName, String envVariable) {
+  [$class     : 'AzureKeyVaultSecret',
+   secretType : 'Secret',
+   name       : secretName,
+   envVariable: envVariable
+  ]
+}
+
+def vaultOverrides = [
+  'preview' : 'aat',
+  'spreview': 'saat'
+]
+
+def subscription = "nonprod"
+def config = new AppPipelineConfig()
+config.vaultSecrets = secrets
+
+
 withPipeline(type, product, component) {
-  setVaultName('am')
+
+
+
+  setVaultName('am-lib-test')
+  overrideVaultEnvironments(vaultOverrides)
+  loadVaultSecrets(secrets)
   enableDockerBuild()
   installCharts()
   enableDbMigration()
 
+
+  before('functionalTest:preview') {
+    env.URL_TO_TEST = "http://am-lib-test-aat.service.core-compute-aat.internal"
+  }
+
+  after('functionalTest:preview') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+  }
+
+  after('functionalTest:aat') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+  }
+
   onMaster {
+    env.TEST_URL =  params.URL_TO_TEST
     enableSlackNotifications('#am-master-builds')
 
     before('aat:promotion') {

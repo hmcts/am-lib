@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.RolePermissions;
+import uk.gov.hmcts.reform.amlib.models.UserCaseRolesEnvelope;
 import uk.gov.hmcts.reform.amlib.models.UserCasesEnvelope;
 
 import java.util.Collections;
@@ -187,6 +188,24 @@ public class AccessManagementService {
         return jdbi.withExtension(AccessManagementRepository.class, dao ->
             dao.getResourceDefinitionsWithRootCreatePermission(
                 userRoles, SecurityClassifications.getVisibleSecurityClassifications(maxSecurityClassificationForRole)));
+    }
+
+    /**
+     * Returns a list of roles that a user holds within a case.
+     *
+     * @param caseId a case id
+     * @param userId a user id
+     * @return a list of roles that the user holds within the case
+     */
+    @AuditLog("returned roles that user '{{userId}}' has within case '{{caseId}}': {{result}}")
+    public UserCaseRolesEnvelope returnUserCaseRoles(@NotBlank String caseId, @NotBlank String userId) {
+        List<String> roles = jdbi.withExtension(AccessManagementRepository.class,
+            dao -> dao.getUserCaseRoles(caseId, userId));
+        return UserCaseRolesEnvelope.builder()
+            .caseId(caseId)
+            .userId(userId)
+            .roles(roles)
+            .build();
     }
 
     /**

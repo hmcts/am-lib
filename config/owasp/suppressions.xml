@@ -88,25 +88,5 @@
     <gav regex="true">^org\.springframework\.security:spring-security-crypto:.*$</gav>
     <cpe>cpe:/a:pivotal_software:spring_security</cpe>
   </suppress>
-  <suppress>
-    <notes><![CDATA[
-   file name: jackson-databind-2.9.9.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
-    <cpe>cpe:/a:fasterxml:jackson</cpe>
-  </suppress>
-  <suppress>
-    <notes><![CDATA[
-   file name: jackson-databind-2.9.9.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
-    <cpe>cpe:/a:fasterxml:jackson-databind</cpe>
-  </suppress>
-  <suppress>
-    <notes><![CDATA[
-   file name: jackson-databind-2.9.9.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson-databind@.*$</packageUrl>
-    <cve>CVE-2019-12814</cve>
-  </suppress>
+
 </suppressions>

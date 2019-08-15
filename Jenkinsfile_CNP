@@ -64,6 +64,10 @@ withPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
   }
 
+  after('functionalTest:aat') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+  }
+
   onMaster {
     env.TEST_URL =  params.URL_TO_TEST
     enableSlackNotifications('#am-master-builds')

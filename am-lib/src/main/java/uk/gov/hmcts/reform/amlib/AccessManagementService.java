@@ -205,6 +205,8 @@ public class AccessManagementService {
             .caseId(caseId)
             .userId(userId)
             .roles(roles)
+            .build();
+    }
 
     /**
      * Returns a list of case ids that a given user has root level read permissions for.

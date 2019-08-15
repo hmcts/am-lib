@@ -14,20 +14,20 @@ buildscript {
 
 
 plugins {
-    id 'application'
-    id 'checkstyle'
-    id 'pmd'
-    id 'jacoco'
-    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
-    id 'org.springframework.boot' version '2.1.7.RELEASE'
-    id 'org.owasp.dependencycheck' version '5.2.1'
-    id 'com.github.ben-manes.versions' version '0.22.0'
-    id "org.flywaydb.flyway" version "5.2.4"
+  id 'application'
+  id 'checkstyle'
+  id 'pmd'
+  id 'jacoco'
+  id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+  id 'org.springframework.boot' version '2.1.7.RELEASE'
+  id 'org.owasp.dependencycheck' version '5.2.1'
+  id 'com.github.ben-manes.versions' version '0.22.0'
+  id "org.flywaydb.flyway" version "5.2.4"
 }
 
 subprojects {
-    apply plugin: 'org.owasp.dependencycheck'
-    apply plugin: 'com.github.ben-manes.versions'
+  apply plugin: 'org.owasp.dependencycheck'
+  apply plugin: 'com.github.ben-manes.versions'
 }
 
 apply plugin: 'net.serenity-bdd.aggregator'
@@ -88,209 +88,209 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 sourceSets {
-    test {
-      java.srcDir 'src/test/java'
+  test {
+    java.srcDir 'src/test/java'
+  }
+  functionalTest {
+    java {
+      compileClasspath += main.output + test.output
+      runtimeClasspath += main.output + test.output
+      srcDir file('src/functionalTest/java')
     }
-    functionalTest {
-        java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-            srcDir file('src/functionalTest/java')
-        }
-          resources.srcDir file('src/functionalTest/resources')
-    }
+    resources.srcDir file('src/functionalTest/resources')
+  }
 
-    test {
-        java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
-            srcDir file('src/test/java')
-        }
+  test {
+    java {
+      compileClasspath += main.output
+      runtimeClasspath += main.output
+      srcDir file('src/test/java')
     }
+  }
 
-    integrationTest {
-        java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
-            srcDir file('src/integrationTest/java')
-        }
-        resources.srcDir file('src/integrationTest/resources')
+  integrationTest {
+    java {
+      compileClasspath += main.output
+      runtimeClasspath += main.output
+      srcDir file('src/integrationTest/java')
     }
+    resources.srcDir file('src/integrationTest/resources')
+  }
 }
 
 tasks.withType(JavaCompile) {
-    options.compilerArgs << "-Xlint:unchecked" << "-Werror"
+  options.compilerArgs << "-Xlint:unchecked" << "-Werror"
 }
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
-    testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
-    finalizedBy aggregate
+  testClassesDirs = sourceSets.functionalTest.output.classesDirs
+  classpath = sourceSets.functionalTest.runtimeClasspath
+  finalizedBy aggregate
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
+  testClassesDirs = sourceSets.integrationTest.output.classesDirs
+  classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
 configurations {
-    functionalTestCompile.extendsFrom testCompile
-    functionalTestRuntime.extendsFrom testRuntime
+  functionalTestCompile.extendsFrom testCompile
+  functionalTestRuntime.extendsFrom testRuntime
 }
 
 task smoke(type: Test) {
-    description = "Runs Smoke Tests"
-    testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
+  description = "Runs Smoke Tests"
+  testClassesDirs = sourceSets.functionalTest.output.classesDirs
+  classpath = sourceSets.functionalTest.runtimeClasspath
 
-    useJUnitPlatform {
-        includeTags = ['SmokeTest']
-    }
+  useJUnitPlatform {
+    includeTags = ['SmokeTest']
+  }
 }
 
 checkstyle {
-    maxWarnings = 0
-    toolVersion = '8.19'
-    // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
-    configDir = new File(rootDir, 'config/checkstyle')
+  maxWarnings = 0
+  toolVersion = '8.19'
+  // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
+  configDir = new File(rootDir, 'config/checkstyle')
 }
 
 pmd {
-    toolVersion = "6.13.0"
-    sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest]
-    reportsDir = file("$project.buildDir/reports/pmd")
-    ruleSetFiles = files("config/pmd/ruleset.xml")
-    ruleSets = []
+  toolVersion = "6.13.0"
+  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest]
+  reportsDir = file("$project.buildDir/reports/pmd")
+  ruleSetFiles = files("config/pmd/ruleset.xml")
+  ruleSets = []
 }
 
 jacocoTestReport {
-    executionData(test, integration)
-    reports {
-        xml.enabled = true
-        csv.enabled = false
-        xml.destination = file("${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
-    }
+  executionData(test, integration)
+  reports {
+    xml.enabled = true
+    csv.enabled = false
+    xml.destination = file("${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+  }
 }
 
 dependencyUpdates.resolutionStrategy = {
-    componentSelection { rules ->
-        rules.all { ComponentSelection selection ->
-            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
-                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
-            }
-            if (rejected) {
-                selection.reject('Release candidate')
-            }
-        }
+  componentSelection { rules ->
+    rules.all { ComponentSelection selection ->
+      boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+        selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+      }
+      if (rejected) {
+        selection.reject('Release candidate')
+      }
     }
+  }
 }
 
 repositories {
-    jcenter()
-    maven {
-      url  "https://dl.bintray.com/hmcts/hmcts-maven"
-    }
+  jcenter()
+  maven {
+    url  "https://dl.bintray.com/hmcts/hmcts-maven"
+  }
 }
 
 // it is important to specify logback classic and core packages explicitly as libraries like spring boot
 // enforces it's own (older) version which is not recommended.
 def versions = [
-        reformLogging   : '5.0.1',
-        reformHealthStarter: '0.0.4',
-        springBoot      : springBoot.class.package.implementationVersion,
-        springfoxSwagger: '2.9.2',
-        flyway          : '5.2.4',
-        guava           : '28.0-jre',
-        serenity        : '2.0.52'
+  reformLogging   : '5.0.1',
+  reformHealthStarter: '0.0.4',
+  springBoot      : springBoot.class.package.implementationVersion,
+  springfoxSwagger: '2.9.2',
+  flyway          : '5.2.4',
+  guava           : '28.0-jre',
+  serenity        : '2.0.52'
 ]
 
 dependencies {
-    compile project(':am-lib')
+  compile project(':am-lib')
 
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9.3'
+  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+  compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
+  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9.3'
 
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: versions.springBoot
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: versions.springBoot
 
 
 
-    compile (group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger) {
-      exclude group: "com.google.guava", module: "guava"
-    }
+  compile (group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger) {
+    exclude group: "com.google.guava", module: "guava"
+  }
 
-    compile (group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger) {
-      exclude group: "com.google.guava", module: "guava"
-    }
+  compile (group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger) {
+    exclude group: "com.google.guava", module: "guava"
+  }
 
-    compile group: 'com.google.guava', name: 'guava', version: versions.guava
+  compile group: 'com.google.guava', name: 'guava', version: versions.guava
 
-    compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
-    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.reformLogging
-    compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: versions.reformHealthStarter
+  compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
+  compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.reformLogging
+  compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: versions.reformHealthStarter
 
-    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.6'
-    compile group: 'org.flywaydb', name: 'flyway-core', version: versions.flyway
+  compile group: 'org.postgresql', name: 'postgresql', version: '42.2.6'
+  compile group: 'org.flywaydb', name: 'flyway-core', version: versions.flyway
 
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
-    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
+  testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 
-    testCompile (group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot) {
-        exclude group: 'junit', module: 'junit'
-    }
+  testCompile (group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot) {
+    exclude group: 'junit', module: 'junit'
+  }
 
-    functionalTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
-      force = true
-    }
-    integrationTestCompile sourceSets.main.runtimeClasspath
-    integrationTestCompile sourceSets.test.runtimeClasspath
+  functionalTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
+    force = true
+  }
+  integrationTestCompile sourceSets.main.runtimeClasspath
+  integrationTestCompile sourceSets.test.runtimeClasspath
 
-    functionalTestCompile sourceSets.main.runtimeClasspath
-    functionalTestCompile sourceSets.test.runtimeClasspath
+  functionalTestCompile sourceSets.main.runtimeClasspath
+  functionalTestCompile sourceSets.test.runtimeClasspath
 
-    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-    functionalTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
-    functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
-    functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
-    functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
-    functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
-    functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
-    functionalTestCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
+  functionalTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+  functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+  functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
+  functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
+  functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
+  functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
+  functionalTestCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 }
 
 mainClassName = 'uk.gov.hmcts.reform.amapi.Application'
 
 bootJar {
-    archiveFileName = 'am-lib-testing-service.jar'
+  archiveFileName = 'am-lib-testing-service.jar'
 
-    manifest {
-        attributes('Implementation-Version': project.version.toString())
-    }
+  manifest {
+    attributes('Implementation-Version': project.version.toString())
+  }
 }
 
 task sonarqube(type: Exec) {
-    workingDir './am-lib'
-    commandLine './gradlew', 'sonarqube', '--rerun-tasks'
+  workingDir './am-lib'
+  commandLine './gradlew', 'sonarqube', '--rerun-tasks'
 }
 
 //local flyway settings
 flyway {
-    url = 'jdbc:postgresql://localhost:5433/am'
-    user = 'amuser'
-    password = 'ampass'
-    locations = ["filesystem:am-lib/src/main/resources/db/migration"]
+  url = 'jdbc:postgresql://localhost:5433/am'
+  user = 'amuser'
+  password = 'ampass'
+  locations = ["filesystem:am-lib/src/main/resources/db/migration"]
 }
 
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
-    baselineOnMigrate = true
-    outOfOrder = true
-    if (project.hasProperty("dburl")) {
-        url = "jdbc:postgresql://${dburl}"
-    }
+  baselineOnMigrate = true
+  outOfOrder = true
+  if (project.hasProperty("dburl")) {
+    url = "jdbc:postgresql://${dburl}"
+  }
 }
 
 task loadPerformanceTestData(type: Exec) {
@@ -314,11 +314,11 @@ task deletePerformanceTestData(type: Exec) {
 }
 
 test {
-    useJUnitPlatform()
+  useJUnitPlatform()
 }
 
 integration {
-    useJUnitPlatform()
+  useJUnitPlatform()
 }
 
 gradle.startParameter.continueOnFailure = true

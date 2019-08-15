@@ -5,7 +5,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.postgresql.ds.PGPoolingDataSource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.util.ResourceUtils;
 import uk.gov.hmcts.reform.amapi.functional.client.AmApiClient;
 
 import java.io.IOException;
@@ -24,6 +26,7 @@ import static java.lang.System.getenv;
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ConfusingTernary"})
+@Component
 public class FunctionalTestSuite {
 
     @Value("${targetInstance}")
@@ -36,10 +39,8 @@ public class FunctionalTestSuite {
         log.info("Am api rest url::" + accessUrl);
         amApiClient = new AmApiClient(accessUrl);
 
-        String loadFile = Thread.currentThread().getContextClassLoader()
-            .getResource("load-data-functional.sql").getPath();
-        String deleteFile = Thread.currentThread().getContextClassLoader()
-            .getResource("delete-data-functional.sql").getPath();
+        String loadFile = ResourceUtils.getFile("classpath:load-data-functional.sql").getCanonicalPath();
+        String deleteFile = ResourceUtils.getFile("classpath:delete-data-functional.sql").getCanonicalPath();
         List<Path> files = new ArrayList<>();
         files.add(Paths.get(deleteFile));
         files.add(Paths.get(loadFile));
@@ -66,8 +67,7 @@ public class FunctionalTestSuite {
     @After
     public void tearDown() throws Exception {
 
-        String deleteFile = Thread.currentThread().getContextClassLoader()
-            .getResource("delete-data-functional.sql").getPath();
+        String deleteFile = ResourceUtils.getFile("classpath:delete-data-functional.sql").getCanonicalPath();
         List<Path> files = new ArrayList<>();
         files.add(Paths.get(deleteFile));
         executeScript(files);

@@ -15,14 +15,14 @@ public class HealthCheckTest {
 
     public AmApiClient amApiClient;
 
-    @Value("${TEST_URL:http://localhost:3704/}")
+    @Value("${TEST_URL:http://localhost:3704}")
     protected String accessUrl;
 
     @Test
     @Tag("SmokeTest")
     public void healthcheckReturns200() {
         amApiClient = new AmApiClient(accessUrl);
-        amApiClient.buildRequest().get(amApiClient.getAccessUrl() + "health")
+        amApiClient.buildRequest().get(amApiClient.getAccessUrl() + "/health")
             .then().statusCode(200)
             .and().body("status", equalTo("UP"));
     }

@@ -73,4 +73,14 @@ class AccessManagementServiceValidationTest {
                 "userRoles\\[\\].<iterable element> - must not be blank"
             ));
     }
+
+    @ParameterizedTest
+    @ArgumentsSource(InvalidArgumentsProvider.class)
+    void returnUserCasesShouldRejectInvalidArguments(String userId) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.returnUserCases(userId))
+            .withMessageMatching(expectedValidationMessagesRegex(
+                "userId - must not be blank"
+            ));
+    }
 }

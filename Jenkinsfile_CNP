@@ -46,7 +46,7 @@ config.vaultSecrets = secrets
 
 withPipeline(type, product, component) {
 
-  env.TEST_URL =  params.URL_TO_TEST
+
 
   setVaultName('am-lib-test')
   overrideVaultEnvironments(vaultOverrides)
@@ -56,11 +56,20 @@ withPipeline(type, product, component) {
   enableDbMigration()
 
 
+  before('functionalTest:preview') {
+    env.URL_TO_TEST = "http://am-lib-test-aat.service.core-compute-aat.internal"
+  }
+
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
   }
 
+  after('functionalTest:aat') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+  }
+
   onMaster {
+    env.TEST_URL =  params.URL_TO_TEST
     enableSlackNotifications('#am-master-builds')
 
     before('aat:promotion') {

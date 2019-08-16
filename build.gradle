@@ -241,7 +241,7 @@ dependencies {
     exclude group: 'junit', module: 'junit'
   }
 
-  functionalTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
+  functionalTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.25') {
     force = true
   }
   integrationTestCompile sourceSets.main.runtimeClasspath

@@ -47,8 +47,12 @@ public interface AccessManagementRepository {
         + "and (access_management.attribute = :attributeAsString or access_management.attribute like concat(:attributeAsString, '/', '%'))")
     void removeAccessManagementRecord(@BindBean ExplicitAccessMetadata explicitAccessMetadata);
 
-    @SqlQuery("select * from access_management where resource_id = :resourceId and resource_type = :resourceType and "
-        + "((accessor_type = 'USER' and accessor_id = :accessorId) or (accessor_type = 'ROLE' and accessor_id in (<userRoles>)) or (accessor_type = 'DEFAULT' and accessor_id = '*'))")
+    @SqlQuery("select * from access_management as am where "
+        + "resource_id = :resourceId "
+        + "and resource_type = :resourceType "
+        + "and ((accessor_type = 'USER' and accessor_id = :accessorId) "
+        + "or (accessor_type = 'ROLE' and accessor_id in (<userRoles>) and exists (select role_name from roles as r where r.role_name = am.accessor_id and cast(role_type as text) = 'IDAM')) "
+        + "or (accessor_type = 'DEFAULT' and accessor_id = '*'))")
     @RegisterConstructorMapper(ExplicitAccessRecord.class)
     List<ExplicitAccessRecord> getExplicitAccess(String accessorId, @BindList Set<String> userRoles, String resourceId, String resourceType);
 

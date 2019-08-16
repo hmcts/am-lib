@@ -924,6 +924,32 @@ class FilterResourceIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .build());
     }
 
+    @Test
+    void whenFilteringResourceWithExplicitAccessByRoleNotInRolesTableThenShouldNotReturnRolePermissions() {
+        service.grantExplicitResourceAccess(createGrantForRole(resourceId, idamRoleWithExplicitAccess, null,
+            resourceDefinition, createPermissions("", ImmutableSet.of(READ))));
+        service.grantExplicitResourceAccess(createGrantForRole(resourceId, "some role", null,
+            resourceDefinition, createPermissions("", ImmutableSet.of(CREATE))));
+
+        FilteredResourceEnvelope result = filterResourceService.filterResource(
+            accessorId, ImmutableSet.of(idamRoleWithExplicitAccess, "some role"),
+            createResource(resourceId, resourceDefinition, createData()), null);
+
+        assertThat(result).isEqualTo(FilteredResourceEnvelope.builder()
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(resourceDefinition)
+                .data(createData())
+                .build())
+            .access(AccessEnvelope.builder()
+                .permissions(ImmutableMap.of(
+                    JsonPointer.valueOf(""), ImmutableSet.of(READ)))
+                .accessType(EXPLICIT)
+                .build())
+            .relationships(ImmutableSet.of())
+            .build());
+    }
+
     private DefaultPermissionGrant createDefaultPermissionGrant(String roleName,
                                                                 ResourceDefinition resourceDefinition,
                                                                 String attribute,

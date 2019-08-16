@@ -1,8 +1,16 @@
-targetInstance: ${URL_TO_TEST:http://localhost:3704}/
+targetInstance: ${TEST_URL:http://localhost:3704}
 s2s-url: ${S2S_URL_FOR_TESTS:http://127.0.0.1:8502}
 s2s-name: am_accessmgmt_api
 # Test key - not used in any deployed vaults or services
 s2s-secret: ${S2S_SECRET:GJNMFGFAAO4FCVD4}
 spring:
+  profiles: test
   flyway:
     enabled: false
+  resources:
+    add-mappings: false
+  mvc:
+    throw-exception-if-no-handler-found: true
+security:
+  authorisedServices:
+    - "am"

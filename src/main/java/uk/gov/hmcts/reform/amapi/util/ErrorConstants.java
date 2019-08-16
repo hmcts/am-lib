@@ -18,4 +18,6 @@ public class ErrorConstants {
     public static final String INVALID_REQUEST =  "There is a problem with your request. Please check and try again";
 
     public static final String SERVICE_FAILED = "The execution of the service failed";
+
+    public static final String ACCESS_DENIED =  "Access Denied";
 }

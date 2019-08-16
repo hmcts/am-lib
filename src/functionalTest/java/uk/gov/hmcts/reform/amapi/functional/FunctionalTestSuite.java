@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.util.ResourceUtils;
 import uk.gov.hmcts.reform.amapi.functional.client.AmApiClient;
+import uk.gov.hmcts.reform.amapi.functional.client.S2sClient;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,10 +35,26 @@ public class FunctionalTestSuite {
 
     public AmApiClient amApiClient;
 
+    @Value("${s2s-url}")
+    protected String s2sUrl;
+
+    @Value("${s2s-name}")
+    protected String s2sName;
+
+    @Value("${s2s-secret}")
+    protected String s2sSecret;
+
+
     @Before
     public void setUp() throws Exception {
         log.info("Am api rest url::" + accessUrl);
-        amApiClient = new AmApiClient(accessUrl);
+        log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
+        log.info("Configured S2S microservice: " + s2sName);
+        log.info("Configured S2S URL: " + s2sUrl);
+        log.info("access url::" + accessUrl);
+
+        String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
+        amApiClient = new AmApiClient(accessUrl, s2sToken);
 
         String loadFile = ResourceUtils.getFile("classpath:load-data-functional.sql").getCanonicalPath();
         String deleteFile = ResourceUtils.getFile("classpath:delete-data-functional.sql").getCanonicalPath();
@@ -86,7 +103,6 @@ public class FunctionalTestSuite {
         dataSource.setMaxConnections(5);
         return dataSource;
     }
-
 
     public static String getValueOrDefault(String name, String defaultValue) {
         String value = getenv(name);

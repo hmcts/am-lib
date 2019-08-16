@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.amapi.exception;
 
 import com.google.common.io.Resources;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.reform.amapi.controllers.SecurityAuthorizationTest;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 
 import java.nio.charset.StandardCharsets;
@@ -21,23 +23,26 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.MALFORMED_JSON;
-import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.RESOURCE_NOT_FOUND;
+
+//import static org.springframework.http.HttpStatus.FORBIDDEN;
+//import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.ACCESS_DENIED;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = MOCK)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert","PMD.AvoidDuplicateLiterals","PMD.ExcessiveImports"})
-public class AccessManagementResponseEntityExceptionHandlerTest {
+public class AccessManagementResponseEntityExceptionHandlerTest extends SecurityAuthorizationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,11 +50,19 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
     @MockBean
     private DefaultRoleSetupImportService importerService;
 
+    private String s2sToken;
+
     @BeforeEach
     void init() {
+        this.mockMvc = webAppContextSetup(webApplicationContext).build();
+
         doNothing().when(importerService).addService(anyString());
         doNothing().when(importerService).addResourceDefinition(any());
         doNothing().when(importerService).addRole(anyString(), any(), any(), any());
+
+        s2sToken = getS2sToken();
+        //s2sToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbV9hY2Nlc3NtZ210X2FwaSIsImV4cCI6MTU2NDc0MjcxN30.rIpRPLo3r"
+        //    + "XGex6iZcq1kG1732h53P744Fq5NTTKqw33jlMotC7jDuOffyCnerXyQxjTuN93F2Iuu7gY3NJ99Pw";
     }
 
     /**
@@ -65,7 +78,8 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
 
         this.mockMvc.perform(post("/api/filter-resource")
             .content(invalidJson)
-            .header(CONTENT_TYPE, APPLICATION_JSON))
+            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .header("ServiceAuthorization", s2sToken))
             .andDo(print())
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errorMessage", is(MALFORMED_JSON)))
@@ -74,6 +88,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
             .andExpect(jsonPath("$.timeStamp", notNullValue()))
             .andExpect(jsonPath("$.errorDescription", notNullValue()));
     }
+
 
     /**
      * Test Controller Exception Handler Message Not readable.
@@ -88,7 +103,8 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
 
         this.mockMvc.perform(post("/api/filter-resource")
             .content(invalidJson)
-            .header(CONTENT_TYPE, APPLICATION_JSON))
+            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .header("ServiceAuthorization", s2sToken))
             .andDo(print())
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errorMessage", is("filterResource.resource.id - must not be blank")))
@@ -111,7 +127,8 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
 
         this.mockMvc.perform(post("/api/filter-resource")
             .content(inputJson)
-            .header(CONTENT_TYPE, TEXT_HTML))
+            .header(CONTENT_TYPE, TEXT_HTML)
+            .header("ServiceAuthorization", s2sToken))
             .andDo(print())
             .andExpect(status().isUnsupportedMediaType());
     }
@@ -121,14 +138,15 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
      *
      * @throws Exception when exceptional condition happens
      */
-    @Test
+    /*@Test
     public void testHandleNoHandlerFoundException() throws Exception {
 
         String invalidJson = "";
 
         this.mockMvc.perform(post("/invalidUrl")
             .content(invalidJson)
-            .header(CONTENT_TYPE, APPLICATION_JSON))
+            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .header("ServiceAuthorization", s2sToken))
             .andDo(print())
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errorMessage", is(RESOURCE_NOT_FOUND)))
@@ -137,7 +155,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
             .andExpect(jsonPath("$.timeStamp", notNullValue()))
             .andExpect(jsonPath("$.errorDescription", is(RESOURCE_NOT_FOUND)));
 
-    }
+    }*/
 
 
     /**
@@ -153,7 +171,8 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
 
         this.mockMvc.perform(post("/api/filter-resource")
             .content(invalidJson)
-            .header(CONTENT_TYPE, APPLICATION_JSON))
+            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .header("ServiceAuthorization", s2sToken))
             .andDo(print())
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errorMessage", is(
@@ -162,5 +181,12 @@ public class AccessManagementResponseEntityExceptionHandlerTest {
             .andExpect(jsonPath("$.errorCode", is(BAD_REQUEST.value())))
             .andExpect(jsonPath("$.timeStamp", notNullValue()))
             .andExpect(jsonPath("$.errorDescription", notNullValue()));
+    }
+
+
+    @AfterEach
+    @Override
+    public void tearDown() {
+        //doNothing
     }
 }

@@ -18,7 +18,7 @@ def component = "lib-test"
 def secretId = "am-lib-test-${params.ENVIRONMENT}"
 def secrets = [
 
-  "s2s-${params.ENVIRONMENT}": [
+  "s2s-${env}": [
     secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
   ]
 ]

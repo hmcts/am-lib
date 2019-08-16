@@ -11,6 +11,13 @@ def component = "lib-test"
 def secretId = "am-lib-test-${params.ENVIRONMENT}"
 def secrets = [
 
+  (secretId): [
+    secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
+    secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
+    secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
+    secret('am-lib-test-POSTGRES-USER', 'DATABASE_USER'),
+    secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASS')
+  ],
   "s2s-demo": [
     secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
   ]
@@ -46,6 +53,10 @@ withPipeline(type, product, component) {
     env.URL_TO_TEST = "http://am-lib-test-aat.service.core-compute-aat.internal"
   }
 
+  before('functionalTest:aat') {
+    env.URL_TO_TEST = env.TEST_URL
+  }
+
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
   }
@@ -55,7 +66,7 @@ withPipeline(type, product, component) {
   }
 
   onMaster {
-    env.TEST_URL =  params.URL_TO_TEST
+    env.URL_TO_TEST =  env.TEST_URL
     enableSlackNotifications('#am-master-builds')
 
     before('aat:promotion') {

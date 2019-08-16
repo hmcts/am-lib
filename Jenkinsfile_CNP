@@ -11,7 +11,7 @@ def component = "lib-test"
 def secretId = "am-lib-test-${params.ENVIRONMENT}"
 def secrets = [
 
-  (secretId): [
+  "am-lib-test-aat": [
     secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
     secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
     secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),

@@ -28,20 +28,20 @@ object AccessManagement {
   private def getRequest(url: String): HttpRequestBuilder =
     http("/returnResourceAccessors")
       .get("/api" + url)
-      .header("${auth_Response}")
+      .header("ServiceAuthorization", ${auth_Response}")
       .check(status.is(200))
 
   private def postRequest(url: String, body: String, statusExpected: Int): HttpRequestBuilder =
     http(url)
       .post("/api" + url)
-      .header("${auth_Response}")
+      .header("ServiceAuthorization","${auth_Response}")
       .body(ElFileBody(body)).asJson
       .check(status.is(statusExpected))
 
   private def deleteRequest(url: String, body: String): HttpRequestBuilder =
     http(url)
       .delete("/api" + url)
-      .header("${auth_Response}")
+      .header("ServiceAuthorization","${auth_Response}")
       .body(ElFileBody(body)).asJson
       .check(status.is(204))
 

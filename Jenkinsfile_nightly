@@ -26,7 +26,11 @@ def secrets = [
     secret('am-lib-test-POSTGRES-USER', 'DATABASE_USER'),
     secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASS'),
     secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
+  ],
+  "s2s-aat": [
+    secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
   ]
+
 ]
 
 def subscription = "nonprod"
@@ -57,7 +61,7 @@ def loadOrDeletePerformanceDbData(String parameterLoadOrDelete) {
 }
 
 withNightlyPipeline(type, product, component) {
-  setVaultName('am-lib-test')
+  //setVaultName('am-lib-test')
   loadVaultSecrets(secrets)
 
   enableMutationTest()

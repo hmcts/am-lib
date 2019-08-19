@@ -12,11 +12,11 @@ object AccessManagement {
 
   val s2sSecret : String = scala.util.Properties.envOrElse(" s2s-secret","GJNMFGFAAO4FCVD4")
 
-  private val authenticator = new  GoogleAuthenticator
+  val authenticator = new  GoogleAuthenticator
 
   val params = Map("microservice" -> s2sname, "oneTimePassword" -> authenticator.getTotpPassword(s2sSecret))
 
-  http(s2sUrl)
+  private val responseS2S = http(s2sUrl)
     .post("/lease")
     .body(params)
     .check(bodyString.saveAs("auth_Response"))

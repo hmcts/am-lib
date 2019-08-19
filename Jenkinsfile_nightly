@@ -5,7 +5,10 @@ properties([
   pipelineTriggers([cron('H 05 * * *')]),
   parameters([
     string(name: 'ENVIRONMENT', defaultValue: 'aat', description: 'Environment to test'),
-    string(name: 'URL_TO_TEST', defaultValue: 'http://am-lib-test-aat.service.core-compute-aat.internal', description: 'The URL you want to run these tests against')
+    string(name: 'URL_TO_TEST', defaultValue: 'http://am-lib-test-aat.service.core-compute-aat.internal', description: 'The URL you want to run these tests against'),
+    string(name: 'SecurityRules',
+      defaultValue: 'https://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
+      description: 'The URL you want to run these tests against'),
   ])
 ])
 
@@ -68,6 +71,11 @@ def loadOrDeletePerformanceDbData(String parameterLoadOrDelete) {
 
 withNightlyPipeline(type, product, component) {
   //setVaultName('am-lib-test')
+
+  env.TEST_URL = "'http://am-lib-test-aat.service.core-compute-aat.internal"
+  env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+  env.Rules = params.SecurityRules
+
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
 

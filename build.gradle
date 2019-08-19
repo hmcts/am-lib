@@ -23,6 +23,7 @@ plugins {
   id 'org.owasp.dependencycheck' version '5.2.1'
   id 'com.github.ben-manes.versions' version '0.22.0'
   id "org.flywaydb.flyway" version "5.2.4"
+  id 'com.github.lkishalmi.gatling' version '3.0.2'
 }
 
 subprojects {
@@ -32,6 +33,7 @@ subprojects {
 
 apply plugin: 'net.serenity-bdd.aggregator'
 apply plugin: 'idea'
+
 
 allprojects {
   // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
@@ -148,6 +150,8 @@ task smoke(type: Test) {
   }
 }
 
+
+
 checkstyle {
   maxWarnings = 0
   toolVersion = '8.19'
@@ -217,6 +221,8 @@ dependencies {
   testCompile 'com.github.tomakehurst:wiremock:2.24.1'
 
 
+  compile group: 'org.scala-lang', name:'scala-library', version:'2.12.8'
+
   compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9.3'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
@@ -232,7 +238,7 @@ dependencies {
     exclude group: "com.google.guava", module: "guava"
   }
 
-  compile group: 'com.google.guava', name: 'guava', version: versions.guava
+  gatlingCompile group: 'com.google.guava', name: 'guava', version: versions.guava
 
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.reformLogging
@@ -248,7 +254,7 @@ dependencies {
   }
 
   testCompile group: 'com.warrenstrange', name: 'googleauth', version: '1.1.5'
-  
+
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
   testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 
@@ -300,6 +306,13 @@ flyway {
   user = 'amuser'
   password = 'ampass'
   locations = ["filesystem:am-lib/src/main/resources/db/migration"]
+}
+
+gatling {
+  toolVersion '3.2.0'
+  scalaVersion '2.12.8'
+  simulations = [ 'uk.gov.hmcts.reform.amlib.performance.simulations.PipelineSimulation'
+  ]
 }
 
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {

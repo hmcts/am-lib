@@ -28,7 +28,7 @@ object AccessManagement {
   private def getRequest(url: String): HttpRequestBuilder =
     http("/returnResourceAccessors")
       .get("/api" + url)
-      .header("ServiceAuthorization", ${auth_Response}")
+      .header("ServiceAuthorization", "${auth_Response}")
       .check(status.is(200))
 
   private def postRequest(url: String, body: String, statusExpected: Int): HttpRequestBuilder =

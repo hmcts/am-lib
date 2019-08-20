@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.amlib.performance.http
 
-import java.util.UUID
-
-import com.warrenstrange.googleauth.GoogleAuthenticator
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.http.request.builder.HttpRequestBuilder

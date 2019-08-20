@@ -22,25 +22,25 @@ object AccessManagement {
   private val responseS2S = http("${s2sUrl}")
     .post("/lease")
     .formParamMap(Map("microservice" -> s2sname, "oneTimePassword" -> authenticator.getTotpPassword(s2sSecret)))
-    .check(bodyString.saveAs("auth_Response"))
+    //.check(bodyString.saveAs("auth_Response"))
 
   private def getRequest(url: String): HttpRequestBuilder =
     http("/returnResourceAccessors")
       .get("/api" + url)
-      .header("ServiceAuthorization", "${auth_Response}")
+      .header("ServiceAuthorization", responseS2S.toString())
       .check(status.is(200))
 
   private def postRequest(url: String, body: String, statusExpected: Int): HttpRequestBuilder =
     http(url)
       .post("/api" + url)
-      .header("ServiceAuthorization","${auth_Response}")
+      .header("ServiceAuthorization",responseS2S.toString())
       .body(ElFileBody(body)).asJson
       .check(status.is(statusExpected))
 
   private def deleteRequest(url: String, body: String): HttpRequestBuilder =
     http(url)
       .delete("/api" + url)
-      .header("ServiceAuthorization","${auth_Response}")
+      .header("ServiceAuthorization",responseS2S.toString())
       .body(ElFileBody(body)).asJson
       .check(status.is(204))
 

@@ -3,37 +3,24 @@ package uk.gov.hmcts.reform.amlib.performance.http
 import java.util.UUID
 
 import com.warrenstrange.googleauth.GoogleAuthenticator
-
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.http.request.builder.HttpRequestBuilder
+import uk.gov.hmcts.reform.amlib.performance.utils.S2SHelper
 
 object AccessManagement {
 
-  val s2sUrl : String = scala.util.Properties.envOrElse("s2s-url","http://127.0.0.1:8502")
-
-  val s2sname : String = scala.util.Properties.envOrElse("s2s-name","am_accessmgmt_api")
-
-  val s2sSecret : String = scala.util.Properties.envOrElse("s2s-secret","GJNMFGFAAO4FCVD4")
-
-  val authenticator = new  GoogleAuthenticator
-
-
-  private val responseS2S = http("${s2sUrl}")
-    .post("/lease")
-    .formParamMap(Map("microservice" -> s2sname, "oneTimePassword" -> authenticator.getTotpPassword(s2sSecret)))
-    //.check(bodyString.saveAs("auth_token"))
 
   private def getRequest(url: String): HttpRequestBuilder =
     http("/returnResourceAccessors")
       .get("/api" + url)
-      .header("ServiceAuthorization", "Bearer " +responseS2S.check(bodyString).toString())
+      .header("ServiceAuthorization", "Bearer " + S2SHelper.S2SAuthToken)
       .check(status.is(200))
 
   private def postRequest(url: String, body: String, statusExpected: Int): HttpRequestBuilder =
     http(url)
       .post("/api" + url)
-      .header("ServiceAuthorization","Bearer " + responseS2S.check(bodyString).toString())
+      .header("ServiceAuthorization", "Bearer " + S2SHelper.S2SAuthToken)
       .body(ElFileBody(body)).asJson
       .check(status.is(statusExpected))
 
@@ -41,7 +28,7 @@ object AccessManagement {
   private def deleteRequest(url: String, body: String): HttpRequestBuilder =
     http(url)
       .delete("/api" + url)
-      .header("ServiceAuthorization","Bearer " +responseS2S.check(bodyString).toString())
+      .header("ServiceAuthorization", "Bearer " + S2SHelper.S2SAuthToken)
       .body(ElFileBody(body)).asJson
       .check(status.is(204))
 

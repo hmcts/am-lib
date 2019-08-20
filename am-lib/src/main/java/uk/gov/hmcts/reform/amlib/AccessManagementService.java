@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.RolePermissions;
+import uk.gov.hmcts.reform.amlib.models.RolePermissionsForCaseTypeEnvelope;
 import uk.gov.hmcts.reform.amlib.models.UserCaseRolesEnvelope;
 import uk.gov.hmcts.reform.amlib.models.UserCasesEnvelope;
 
@@ -220,6 +221,11 @@ public class AccessManagementService {
         return UserCasesEnvelope.builder()
             .userId(userId)
             .cases(cases)
+            .build();
+    }
+
+    public RolePermissionsForCaseTypeEnvelope returnRolePermissionsForCaseType(String caseTypeId) {
+        return RolePermissionsForCaseTypeEnvelope.builder()
             .build();
     }
 }

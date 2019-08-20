@@ -18,11 +18,10 @@ object AccessManagement {
 
   val authenticator = new  GoogleAuthenticator
 
-  val params = Map("microservice" -> s2sname, "oneTimePassword" -> authenticator.getTotpPassword(s2sSecret))
 
   private val responseS2S = http("${s2sUrl}")
     .post("/lease")
-    .body(params)
+    .formParamMap(Map("microservice" -> s2sname, "oneTimePassword" -> authenticator.getTotpPassword(s2sSecret)))
     .check(bodyString.saveAs("auth_Response"))
 
   private def getRequest(url: String): HttpRequestBuilder =

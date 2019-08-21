@@ -99,9 +99,9 @@ class AccessManagementServiceValidationTest {
     @ArgumentsSource(InvalidArgumentsProvider.class)
     void returnRolePermissionsForCaseTypeShouldRejectInvalidArguments(String caseTypeId) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.returnUserCases(caseTypeId))
+            .isThrownBy(() -> service.returnRolePermissionsForCaseType(caseTypeId))
             .withMessageMatching(expectedValidationMessagesRegex(
-                "userId - must not be blank"
+                "caseTypeId - must not be blank"
             ));
     }
 }

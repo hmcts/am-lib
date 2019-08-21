@@ -225,6 +225,13 @@ public class AccessManagementService {
             .build();
     }
 
+    /**
+     * Returns the access control list for a specified case type.
+     *
+     * @param caseTypeId a case type
+     * @return a set of permissions each role has for the specified case type
+     */
+    @AuditLog("returned role permissions for case type '{{caseTypeId}}': {{result}}")
     public RolePermissionsForCaseTypeEnvelope returnRolePermissionsForCaseType(@NotBlank String caseTypeId) {
         List<DefaultRolePermissions> defaultRolePermissions = jdbi.withExtension(AccessManagementRepository.class,
             dao -> dao.getRolePermissionsForCaseType(caseTypeId));

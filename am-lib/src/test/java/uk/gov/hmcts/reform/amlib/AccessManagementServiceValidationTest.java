@@ -94,4 +94,14 @@ class AccessManagementServiceValidationTest {
                 "userId - must not be blank"
             ));
     }
+
+    @ParameterizedTest
+    @ArgumentsSource(InvalidArgumentsProvider.class)
+    void returnRolePermissionsForCaseTypeShouldRejectInvalidArguments(String caseTypeId) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.returnUserCases(caseTypeId))
+            .withMessageMatching(expectedValidationMessagesRegex(
+                "userId - must not be blank"
+            ));
+    }
 }

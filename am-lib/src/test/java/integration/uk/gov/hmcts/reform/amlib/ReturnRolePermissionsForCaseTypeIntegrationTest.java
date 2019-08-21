@@ -82,7 +82,6 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
         importerService.addResourceDefinition(resourceDefinition1 =
             createResourceDefinition(serviceName, resourceType, UUID.randomUUID().toString()));
 
-
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedAccess,
             resourceDefinition, "", ImmutableSet.of(UPDATE, DELETE), PUBLIC));
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedAccess1,
@@ -95,7 +94,7 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
             .caseTypeId(resourceDefinition.getResourceName())
             .defaultRolePermissions(ImmutableList.of(DefaultRolePermissions.builder()
                 .role(idamRoleWithRoleBasedAccess)
-                .permissions(ImmutableList.of(UPDATE, DELETE))
+                .permissions(ImmutableSet.of(UPDATE, DELETE))
                 .build()))
             .build());
     }
@@ -125,11 +124,11 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
             .defaultRolePermissions(orderedImmutableListOf(
                 DefaultRolePermissions.builder()
                     .role(idamRoleWithRoleBasedAccess)
-                    .permissions(ImmutableList.of(UPDATE, DELETE))
+                    .permissions(ImmutableSet.of(UPDATE, DELETE))
                     .build(),
                 DefaultRolePermissions.builder()
                     .role(idamRoleWithRoleBasedAccess1)
-                    .permissions(ImmutableList.of(CREATE, READ))
+                    .permissions(ImmutableSet.of(CREATE, READ))
                     .build()
                 )
             )

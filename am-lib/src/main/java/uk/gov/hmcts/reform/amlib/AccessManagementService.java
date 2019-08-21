@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.query.AttributeData;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
 import uk.gov.hmcts.reform.amlib.internal.utils.SecurityClassifications;
+import uk.gov.hmcts.reform.amlib.models.DefaultRolePermissions;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
@@ -224,8 +225,12 @@ public class AccessManagementService {
             .build();
     }
 
-    public RolePermissionsForCaseTypeEnvelope returnRolePermissionsForCaseType(String caseTypeId) {
+    public RolePermissionsForCaseTypeEnvelope returnRolePermissionsForCaseType(@NotBlank String caseTypeId) {
+        List<DefaultRolePermissions> defaultRolePermissions = jdbi.withExtension(AccessManagementRepository.class,
+            dao -> dao.getRolePermissionsForCaseType(caseTypeId));
         return RolePermissionsForCaseTypeEnvelope.builder()
+            .caseTypeId(caseTypeId)
+            .defaultRolePermissions(defaultRolePermissions)
             .build();
     }
 }

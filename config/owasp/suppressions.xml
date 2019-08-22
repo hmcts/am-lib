@@ -88,5 +88,30 @@
     <gav regex="true">^org\.springframework\.security:spring-security-crypto:.*$</gav>
     <cpe>cpe:/a:pivotal_software:spring_security</cpe>
   </suppress>
+  <suppress>
+    <notes><![CDATA[file name: jackson-data-bind-2.9.9)]]></notes>
+    <sha1>d6eb9817d9c7289a91f043ac5ee02a6b3cc86238</sha1>
+    <cve>CVE-2019-12814</cve>
+    <cve>CVE-2019-14379</cve>
+    <cve>CVE-2019-14439</cve>
+  </suppress>
+
+  <suppress>
+    <notes><![CDATA[file name: scala-library-2.10.6.jar)]]></notes>
+    <sha1>421989aa8f95a05a4f894630aad96b8c7b828732</sha1>
+    <cve>CVE-2017-15288</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[file name: scala-reflect-2.10.6.jar)]]></notes>
+    <sha1>3259f3df0f166f017ef5b2d385445808398c316c</sha1>
+    <cve>CVE-2017-15288</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[file name: scala-compiler-2.10.6.jar)]]></notes>
+    <sha1>9b15174852f5b6bb1edbf303d5722286a0a54011</sha1>
+    <cve>CVE-2017-15288</cve>
+  </suppress>
+
+
 
 </suppressions>

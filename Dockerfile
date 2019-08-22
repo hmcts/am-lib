@@ -10,3 +10,5 @@ COPY build/libs/$APP /opt/app/
 HEALTHCHECK --interval=10s --timeout=10s --retries=10 CMD http_proxy="" wget -q --spider http://localhost:3703/health || exit 1
 
 EXPOSE 3703
+
+CMD ["am-lib-testing-service.jar"]

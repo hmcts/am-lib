@@ -41,10 +41,9 @@ withPipeline(type, product, component) {
 
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
-  //setVaultName('am-lib-test')
   enableDockerBuild()
-  installCharts()
   enableDbMigration()
+  installCharts()
   enableAksStagingDeployment()
 
   env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"

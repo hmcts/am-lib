@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.amlib.performance.feed.CreateResourceAccess
 import uk.gov.hmcts.reform.amlib.performance.http.AccessManagement
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
+import uk.gov.hmcts.reform.amlib.performance.utils.S2SHelper
 
 import scala.concurrent.duration._
 
@@ -16,9 +17,11 @@ object BasicScenarios {
   val createResourceAccess: ScenarioBuilder = scenario("Create Resource Access")
     .forever(
       feed(CreateResourceAccess.feed)
-        .exec(AccessManagement.createResourceAssess)
-        .pause(1.second)
-    )
+       .exec(s2sOtp)
+       .exec(s2sAuthToken)
+       .exec(AccessManagement.createResourceAssess)
+       .pause(1.second)
+  )
 
   val filterResource: ScenarioBuilder = scenario("Filter Resource")
     .forever(

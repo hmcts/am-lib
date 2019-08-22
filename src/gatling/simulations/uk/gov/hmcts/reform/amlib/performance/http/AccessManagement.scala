@@ -16,7 +16,7 @@ object AccessManagement {
   private def postRequest(url: String, body: String, statusExpected: Int): HttpRequestBuilder =
     http(url)
       .post("/api" + url)
-      .header("ServiceAuthorization", "Bearer " + S2SHelper.S2SAuthToken)
+      .header("ServiceAuthorization", "Bearer ${s2sToken}")
       .body(ElFileBody(body)).asJson
       .header("Content-Type", "application/json")
       .check(status.is(statusExpected))

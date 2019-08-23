@@ -9,4 +9,6 @@ ENV JAVA_OPTS ""
 COPY build/libs/$APP /opt/app/
 COPY lib/applicationinsights-agent-2.3.1.jar lib/AI-Agent.xml /opt/app/
 
+EXPOSE 3703
+
 CMD ["am-lib-testing-service.jar"]

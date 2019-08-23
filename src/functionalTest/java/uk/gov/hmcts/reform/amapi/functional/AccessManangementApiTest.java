@@ -41,7 +41,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
             + "}";
         try {
             Response response = amApiClient.createExplicitAccess().post(amApiClient.getAccessUrl()
-                + "api/access-resource");
+                + "api/v1/access-resource");
             response.then().statusCode(201);
             response.then().log();
             JsonPath responseBody = response.getBody().jsonPath();
@@ -62,11 +62,11 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
     @Test
     public void verifyFilterResourceApi() {
         Response accessResponse = amApiClient.createExplicitAccess().post(amApiClient.getAccessUrl()
-            + "api/access-resource");
+            + "api/v1/access-resource");
         JsonPath responseBody = accessResponse.getBody().jsonPath();
         Response response = amApiClient.createFilterAccess(responseBody.get("resourceId").toString(),
             amApiClient.getAccessorId()).post(amApiClient.getAccessUrl()
-            + "api/filter-resource");
+            + "api/v1/filter-resource");
         response.then().statusCode(200);
         response.then().log();
     }
@@ -74,11 +74,11 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
     @Test
     public void verifyRevokeExplicitAccessApi() {
         Response accessResponse = amApiClient.createExplicitAccess().post(amApiClient.getAccessUrl()
-            + "api/access-resource");
+            + "api/v1/access-resource");
         JsonPath responseBody = accessResponse.getBody().jsonPath();
         Response response = amApiClient.createRevokeAccess(amApiClient.getAccessorId(),
             responseBody.get("resourceId").toString()).delete(amApiClient.getAccessUrl()
-            + "api/access-resource");
+            + "api/v1/access-resource");
         response.then().statusCode(204);
         response.then().log();
     }
@@ -86,11 +86,11 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
     @Test
     public void verifyRevokeExplicitAccessApiWithoutResourcenameAndServicename() {
         Response accessResponse = amApiClient.createExplicitAccess().post(amApiClient.getAccessUrl()
-            + "api/access-resource");
+            + "api/v1/access-resource");
         JsonPath responseBody = accessResponse.getBody().jsonPath();
         Response response = amApiClient.createRevokeAccessWithoutOptionalParams(amApiClient.getAccessorId(),
             responseBody.get("resourceId").toString()).delete(amApiClient.getAccessUrl()
-            + "api/access-resource");
+            + "api/v1/access-resource");
         response.then().statusCode(204);
         response.then().log();
     }
@@ -100,7 +100,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
         try {
             Response response = amApiClient.createExplicitAccess()
                 .header("Content-Type", "application/xml")
-                .post(amApiClient.getAccessUrl() + "api/access-resource");
+                .post(amApiClient.getAccessUrl() + "api/v1/access-resource");
             response.then().statusCode(415);
         } catch (Exception e) {
             log.error("verifyGrantExplicitAccessApi : " + e.toString());
@@ -111,7 +111,7 @@ public class AccessManangementApiTest extends FunctionalTestSuite {
     @Test
     public void verifyGrantExplicitAccessErrorScenariosWrongEndpoint() {
         Response response = amApiClient.createExplicitAccess().post(amApiClient.getAccessUrl()
-            + "api/access-resource-test");
+            + "api/v1/access-resource-test");
         response.then().statusCode(404);
     }
 

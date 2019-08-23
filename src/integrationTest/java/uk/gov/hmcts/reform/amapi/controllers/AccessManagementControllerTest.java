@@ -99,7 +99,7 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
 
         doNothing().when(accessManagementService).grantExplicitResourceAccess(any());
 
-        this.mockMvc.perform(post("/api/access-resource")
+        this.mockMvc.perform(post("/api/v1/access-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header("ServiceAuthorization", s2sToken))
@@ -126,7 +126,7 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
 
         doNothing().when(accessManagementService).revokeResourceAccess(any());
 
-        this.mockMvc.perform(delete("/api/access-resource")
+        this.mockMvc.perform(delete("/api/v1/access-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header("ServiceAuthorization", s2sToken))
@@ -165,7 +165,7 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
             filterResource.getAttributeSecurityClassification()))
             .thenReturn(filteredResourceEnvelope);
 
-        this.mockMvc.perform(post("/api/filter-resource")
+        this.mockMvc.perform(post("/api/v1/filter-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header("ServiceAuthorization", s2sToken))
@@ -207,7 +207,7 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
             filterResource.getResource(), filterResource.getAttributeSecurityClassification()))
             .thenReturn(filteredResourceEnvelope);
 
-        this.mockMvc.perform(post("/api/filter-resource")
+        this.mockMvc.perform(post("/api/v1/filter-resource")
             .content(inputJson)
             .header("ServiceAuthorization", s2sToken)
             .header(CONTENT_TYPE, APPLICATION_JSON))
@@ -240,7 +240,7 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
         Mockito.when(filterResourceService.returnResourceAccessors(resourceId, resourceName, resourceType))
             .thenReturn(resourceAccessorsEnvelope);
 
-        this.mockMvc.perform(get("/api/resource/resourceType/" + resourceType + "/resourceName/"
+        this.mockMvc.perform(get("/api/v1/resource/resourceType/" + resourceType + "/resourceName/"
             + resourceName + "/resourceId/" + resourceId)
             .header("ServiceAuthorization", s2sToken)
             .header(CONTENT_TYPE, APPLICATION_JSON))

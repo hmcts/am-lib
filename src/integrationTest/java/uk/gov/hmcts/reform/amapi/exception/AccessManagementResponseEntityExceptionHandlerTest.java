@@ -76,7 +76,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
         String invalidJson = Resources.toString(Resources
             .getResource("exception-mapper-data/malformedInput.json"), StandardCharsets.UTF_8);
 
-        this.mockMvc.perform(post("/api/filter-resource")
+        this.mockMvc.perform(post("/api/v1/filter-resource")
             .content(invalidJson)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header("ServiceAuthorization", s2sToken))
@@ -101,7 +101,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
         String invalidJson = Resources.toString(Resources
             .getResource("exception-mapper-data/missingValidInputParameter.json"), StandardCharsets.UTF_8);
 
-        this.mockMvc.perform(post("/api/filter-resource")
+        this.mockMvc.perform(post("/api/v1/filter-resource")
             .content(invalidJson)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header("ServiceAuthorization", s2sToken))
@@ -125,7 +125,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
         String inputJson = Resources.toString(Resources
             .getResource("input-data/filterResourceWithSecurityClassification.json"), StandardCharsets.UTF_8);
 
-        this.mockMvc.perform(post("/api/filter-resource")
+        this.mockMvc.perform(post("/api/v1/filter-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, TEXT_HTML)
             .header("ServiceAuthorization", s2sToken))
@@ -169,7 +169,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
         String invalidJson = Resources.toString(Resources
             .getResource("exception-mapper-data/filterResourceWithMissingRoot.json"), StandardCharsets.UTF_8);
 
-        this.mockMvc.perform(post("/api/filter-resource")
+        this.mockMvc.perform(post("/api/v1/filter-resource")
             .content(invalidJson)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header("ServiceAuthorization", s2sToken))

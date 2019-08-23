@@ -86,7 +86,7 @@ public class AccessManagementControllerUnitTest {
 
         doNothing().when(accessManagementService).grantExplicitResourceAccess(any());
 
-        this.mvc.perform(post("/api/access-resource")
+        this.mvc.perform(post("/api/v1/access-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
@@ -133,7 +133,7 @@ public class AccessManagementControllerUnitTest {
             filterResource.getAttributeSecurityClassification()))
             .thenReturn(filteredResourceEnvelope);
 
-        this.mvc.perform(post("/api/filter-resource")
+        this.mvc.perform(post("/api/v1/filter-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
@@ -174,7 +174,7 @@ public class AccessManagementControllerUnitTest {
             filterResource.getResource(), filterResource.getAttributeSecurityClassification()))
             .thenReturn(filteredResourceEnvelope);
 
-        this.mvc.perform(post("/api/filter-resource")
+        this.mvc.perform(post("/api/v1/filter-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
@@ -206,7 +206,7 @@ public class AccessManagementControllerUnitTest {
         Mockito.when(filterResourceService.returnResourceAccessors(resourceId, resourceName, resourceType))
             .thenReturn(resourceAccessorsEnvelope);
 
-        this.mvc.perform(get("/api/resource/resourceType/" + resourceType + "/resourceName/"
+        this.mvc.perform(get("/api/v1/resource/resourceType/" + resourceType + "/resourceName/"
             + resourceName + "/resourceId/" + resourceId))
             .andDo(print())
             .andExpect(status().isOk())

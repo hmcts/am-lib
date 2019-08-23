@@ -17,9 +17,3 @@ am-lib-test:
       resourceGroup: am-shared-infrastructure
       secrets:
         - s2s-url
-  postgresql:
-    persistence:
-      enabled: false
-    postgresqlDatabase: am
-    postgresqlPassword: ampass
-    postgresqlUsername: amuser

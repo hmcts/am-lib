@@ -51,7 +51,7 @@ def DATABASE_USER = project.properties['DATABASE_USER'] ?: "amuser"
 def DATABASE_NAME = project.properties['DATABASE_NAME'] ?: "am"
 def ENVIRONMENT_NAME = project.properties['ENVIRONMENT'] ?: "local"
 def DATABASE_HOST = project.properties['DATABASE_HOST'] ?: "localhost"
-def DATABASE_PASSWORD = project.properties['DATABASE_PASSWORD'] ?: ""
+def DATABASE_PASSWORD = project.properties['DATABASE_PASSWORD'] ?: "ampass"
 def DATABASE_PORT = project.properties['DATABASE_PORT'] ?: "5433"
 
 project(":am-lib") {
@@ -246,7 +246,7 @@ dependencies {
     // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
   }
-  
+
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
   testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 

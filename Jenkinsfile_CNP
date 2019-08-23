@@ -1,16 +1,12 @@
 #!groovy
 
-
 @Library("Infrastructure")
-
 
 def type = "java"
 def product = "am"
 def component = "lib-test"
 
-def secretId = "am-lib-test-${params.ENVIRONMENT}"
 def secrets = [
-
   "am-lib-test-aat": [
     secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
     secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
@@ -36,7 +32,6 @@ def vaultOverrides = [
   'spreview': 'saat'
 ]
 
-
 withPipeline(type, product, component) {
 
   overrideVaultEnvironments(vaultOverrides)
@@ -44,7 +39,7 @@ withPipeline(type, product, component) {
   enableDockerBuild()
   enableDbMigration()
   installCharts()
-  enableAksStagingDeployment()
+  //enableAksStagingDeployment()
 
   env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
   env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"

@@ -6,7 +6,6 @@ import io.gatling.http.request.builder.HttpRequestBuilder
 
 object AccessManagement {
 
-
   private def getRequest(url: String): HttpRequestBuilder =
     http("/returnResourceAccessors")
       .get("/api" + url)
@@ -21,15 +20,12 @@ object AccessManagement {
       .header("Content-Type", "application/json")
       .check(status.is(statusExpected))
 
-
   private def deleteRequest(url: String, body: String): HttpRequestBuilder =
     http(url)
       .delete("/api" + url)
       .header("ServiceAuthorization", "Bearer ${s2sToken}")
       .body(ElFileBody(body)).asJson
       .check(status.is(204))
-
-
 
   def createResourceAssess: HttpRequestBuilder =
     postRequest("/access-resource","createResourceAccess.json", 201)

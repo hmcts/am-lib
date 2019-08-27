@@ -13,7 +13,6 @@ class PipelineSimulation extends Simulation {
 
   private val loadProfile = rampUsers(1) during 1.seconds
 
-
   /* load profile and assertions to be changed once NFRs are defined
       this is just an exemplary simulation*/
   //this is used in AAT environment

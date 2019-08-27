@@ -13,7 +13,6 @@ object BasicScenarios {
   val s2sOtp = S2SHelper.getOTP
   val s2sAuthToken = S2SHelper.S2SAuthToken
 
-
   val createResourceAccess: ScenarioBuilder = scenario("Create Resource Access")
     .forever(
       feed(CreateResourceAccess.feed)

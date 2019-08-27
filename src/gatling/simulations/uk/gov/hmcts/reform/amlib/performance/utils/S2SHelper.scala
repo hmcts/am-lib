@@ -6,7 +6,6 @@ import io.gatling.http.Predef._
 
 object  S2SHelper {
 
-
   val getOTP =
     exec(
       session => {
@@ -33,5 +32,4 @@ object  S2SHelper {
         .check(bodyString.saveAs("s2sToken"))
         .check(bodyString.saveAs("responseBody")))
   }
-
 }

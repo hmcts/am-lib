@@ -1,4 +1,4 @@
-                                  #!/usr/bin/env sh
+#!/usr/bin/env sh
 
 print_help() {
   echo "Script to run docker containers for Spring Boot Template API service

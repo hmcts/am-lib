@@ -8,7 +8,7 @@ properties([
     string(name: 'URL_TO_TEST', defaultValue: 'http://am-lib-test-aat.service.core-compute-aat.internal', description: 'The URL you want to run these tests against'),
     string(name: 'SecurityRules',
       defaultValue: 'https://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
-      description: 'The URL you want to run these tests against'),
+      description: 'Security rules for OWASP ZAP testing'),
   ])
 ])
 
@@ -18,17 +18,19 @@ def type = "java"
 def product = "am"
 def component = "lib-test"
 
-def secretId = "am-lib-test-${params.ENVIRONMENT}"
+def appVault = "am-lib-test-${params.ENVIRONMENT}"
+def s2sVault = "s2s-${params.ENVIRONMENT}"
+
 def secrets = [
-  "s2s-${params.ENVIRONMENT}": [
-    secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
-  ],
-  (secretId): [
+  (appVault): [
     secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
     secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
     secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
     secret('am-lib-test-POSTGRES-USER', 'DATABASE_USER'),
     secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASS')
+  ],
+  (s2sVault): [
+    secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
   ]
 ]
 
@@ -50,8 +52,6 @@ import uk.gov.hmcts.contino.AppPipelineConfig
 def subscription = "nonprod"
 def config = new AppPipelineConfig()
 config.vaultSecrets = secrets
-
-
 
 def loadOrDeletePerformanceDbData(String parameterLoadOrDelete) {
       withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${DATABASE_PASS} -v ${WORKSPACE}/nightlyperformancedata/:/nightlyperformancedata") {
@@ -79,7 +79,6 @@ withNightlyPipeline(type, product, component) {
   enableMutationTest()
   enablePerformanceTest()
   enableSlackNotifications('#am-master-builds')
-
 
   after('checkout') {
     sh '''

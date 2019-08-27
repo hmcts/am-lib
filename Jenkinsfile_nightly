@@ -69,7 +69,6 @@ def loadOrDeletePerformanceDbData(String parameterLoadOrDelete) {
 }
 
 withNightlyPipeline(type, product, component) {
-  //setVaultName('am-lib-test')
 
   env.TEST_URL = params.URL_TO_TEST
   env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
@@ -77,7 +76,6 @@ withNightlyPipeline(type, product, component) {
 
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
-
   enableMutationTest()
   enablePerformanceTest()
   enableSlackNotifications('#am-master-builds')

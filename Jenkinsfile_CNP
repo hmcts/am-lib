@@ -1,16 +1,12 @@
 #!groovy
 
-
 @Library("Infrastructure")
-
 
 def type = "java"
 def product = "am"
 def component = "lib-test"
 
-def secretId = "am-lib-test-${params.ENVIRONMENT}"
 def secrets = [
-
   "am-lib-test-aat": [
     secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
     secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
@@ -36,12 +32,10 @@ def vaultOverrides = [
   'spreview': 'saat'
 ]
 
-
 withPipeline(type, product, component) {
 
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
-  //setVaultName('am-lib-test')
   enableDockerBuild()
   installCharts()
   enableDbMigration()

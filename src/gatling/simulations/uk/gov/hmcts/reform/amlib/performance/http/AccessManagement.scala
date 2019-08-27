@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.amlib.performance.http
 
-import java.util.UUID
-
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.http.request.builder.HttpRequestBuilder
@@ -11,17 +9,21 @@ object AccessManagement {
   private def getRequest(url: String): HttpRequestBuilder =
     http("/returnResourceAccessors")
       .get("/api" + url)
+      .header("ServiceAuthorization", "Bearer ${s2sToken}")
       .check(status.is(200))
 
   private def postRequest(url: String, body: String, statusExpected: Int): HttpRequestBuilder =
     http(url)
       .post("/api" + url)
+      .header("ServiceAuthorization", "Bearer ${s2sToken}")
       .body(ElFileBody(body)).asJson
+      .header("Content-Type", "application/json")
       .check(status.is(statusExpected))
 
   private def deleteRequest(url: String, body: String): HttpRequestBuilder =
     http(url)
       .delete("/api" + url)
+      .header("ServiceAuthorization", "Bearer ${s2sToken}")
       .body(ElFileBody(body)).asJson
       .check(status.is(204))
 

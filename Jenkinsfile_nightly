@@ -57,9 +57,8 @@ def loadOrDeletePerformanceDbData(String parameterLoadOrDelete) {
 }
 
 withNightlyPipeline(type, product, component) {
-  setVaultName('am-lib-test')
-  loadVaultSecrets(secrets)
 
+  loadVaultSecrets(secrets)
   enableMutationTest()
   enablePerformanceTest()
   enableSlackNotifications('#am-master-builds')

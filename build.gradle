@@ -124,7 +124,6 @@ tasks.withType(JavaCompile) {
 }
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
-  systemProperty "db-url", System.getProperty('url')
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
   finalizedBy aggregate
@@ -317,9 +316,8 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
   outOfOrder = true
   if (project.hasProperty("dburl")) {
     url = "jdbc:postgresql://${dburl}"
+    systemProperty "db-url", System.getProperty('url')
   }
-
- 
 }
 
 task loadPerformanceTestData(type: Exec) {

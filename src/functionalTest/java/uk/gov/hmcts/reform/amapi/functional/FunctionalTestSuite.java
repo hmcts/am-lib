@@ -44,9 +44,6 @@ public class FunctionalTestSuite {
     @Value("${s2s-secret}")
     protected String s2sSecret;
 
-    @Value("${db-url:localhost:5433/am?user=amuser&password=ampass}")
-    protected String dbUrl;
-
 
     @Before
     public void setUp() throws Exception {
@@ -55,6 +52,7 @@ public class FunctionalTestSuite {
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
         log.info("access url::" + accessUrl);
+        log.info("environment script execution::" + getenv("environment-name"));
 
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
         amApiClient = new AmApiClient(accessUrl, s2sToken);
@@ -69,18 +67,20 @@ public class FunctionalTestSuite {
     }
 
     private void executeScript(List<Path> scriptFiles) throws SQLException, IOException {
-        try (Connection connection = createDataSource().getConnection()) {
-            try (Statement statement = connection.createStatement()) {
-                for (Path path : scriptFiles) {
-                    for (String scriptLine : Files.readAllLines(path)) {
-                        statement.addBatch(scriptLine);
+        if(!getenv("environment-name").equalsIgnoreCase("preview")) {
+            try (Connection connection = createDataSource().getConnection()) {
+                try (Statement statement = connection.createStatement()) {
+                    for (Path path : scriptFiles) {
+                        for (String scriptLine : Files.readAllLines(path)) {
+                            statement.addBatch(scriptLine);
+                        }
+                        statement.executeBatch();
                     }
-                    statement.executeBatch();
                 }
+            } catch (Exception exe) {
+                log.error("FunctionalTestSuite script execution error with script ::" + exe.toString());
+                throw exe;
             }
-        } catch (Exception exe) {
-            log.error("FunctionalTestSuite script execution error with script ::" + exe.toString());
-            throw exe;
         }
     }
 
@@ -96,9 +96,13 @@ public class FunctionalTestSuite {
 
     @SuppressWarnings({"deprecation"})
     public DataSource createDataSource() {
-        log.info("DB URL check::" + dbUrl);
+        log.info("DB Host name::" + getValueOrDefault("DATABASE_HOST", "localhost"));
         PGPoolingDataSource dataSource = new PGPoolingDataSource();
-        dataSource.setURL("jdbc:postgresql://" + dbUrl);
+        dataSource.setServerName(getValueOrDefault("DATABASE_HOST", "localhost"));
+        dataSource.setPortNumber(Integer.parseInt(getValueOrDefault("DATABASE_PORT", "5433")));
+        dataSource.setDatabaseName(getValueOrThrow("DATABASE_NAME"));
+        dataSource.setUser(getValueOrThrow("DATABASE_USER"));
+        dataSource.setPassword(getValueOrThrow("DATABASE_PASS"));
         dataSource.setMaxConnections(5);
         return dataSource;
     }

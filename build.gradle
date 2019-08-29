@@ -316,7 +316,7 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
   outOfOrder = true
   if (project.hasProperty("dburl")) {
     url = "jdbc:postgresql://${dburl}"
-    systemProperty "db-url", "${dburl}"
+    environment "db-url", "${dburl}"
   }
 }
 

@@ -22,7 +22,6 @@ def secrets = [
     secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
     secret('am-lib-test-POSTGRES-USER', 'DATABASE_USER'),
     secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASS'),
-    secret('${params.ENVIRONMENT}', 'environment-name')
   ],
   (s2sVault): [
     secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
@@ -49,6 +48,8 @@ withPipeline(type, product, component) {
   enableDockerBuild()
   installCharts()
   enableDbMigration()
+
+  env.environment_name ="${params.ENVIRONMENT}"
 
   env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
   env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"

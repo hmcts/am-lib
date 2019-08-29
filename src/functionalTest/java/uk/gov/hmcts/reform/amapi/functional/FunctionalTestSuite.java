@@ -96,9 +96,13 @@ public class FunctionalTestSuite {
 
     @SuppressWarnings({"deprecation"})
     public DataSource createDataSource() {
-        log.info("DB URL check::" + dbUrl);
+        log.info("DB Host name::" + getValueOrDefault("AM_DB_HOST", "localhost"));
         PGPoolingDataSource dataSource = new PGPoolingDataSource();
-        dataSource.setURL("jdbc:postgresql://" + dbUrl);
+        dataSource.setServerName(getValueOrDefault("AM_DB_HOST", "localhost"));
+        dataSource.setPortNumber(Integer.parseInt(getValueOrDefault("AM_DB_PORT", "5433")));
+        dataSource.setDatabaseName(getValueOrThrow("AM_DB_NAME"));
+        dataSource.setUser(getValueOrThrow("AM_DB_USERNAME"));
+        dataSource.setPassword(getValueOrThrow("AM_DB_PASSWORD"));
         dataSource.setMaxConnections(5);
         return dataSource;
     }

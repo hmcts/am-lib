@@ -8,7 +8,7 @@ plugins {
     id 'com.jfrog.bintray' version '1.8.4'
     id 'com.github.johnrengelman.shadow' version '5.1.0'
     id "io.freefair.aspectj.post-compile-weaving" version "3.2.1"
-    id "io.freefair.lombok" version "4.0.0"
+    id "io.freefair.lombok" version "4.0.1"
     id "io.morethan.jmhreport" version "0.9.0"
 }
 
@@ -98,7 +98,7 @@ dependencies {
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.13.2'
     testCompile group: 'org.flywaydb', name: 'flyway-core', version: '6.0.0'
     testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.12.0'
-    testCompile group: 'com.google.guava', name: 'guava', version: '28.0-jre'
+    testCompile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: '5.0.1'
 
@@ -108,7 +108,7 @@ dependencies {
     benchmarkCompile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
     benchmarkCompile sourceSets.main.runtimeClasspath
     benchmarkCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'
-    benchmarkCompile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
+    benchmarkCompile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
 }
 
 task codeCoverageReport(type: JacocoReport, dependsOn: test) {

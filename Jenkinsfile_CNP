@@ -47,7 +47,7 @@ withPipeline(type, product, component) {
   loadVaultSecrets(secrets)
   enableDockerBuild()
   installCharts()
-  enableDbMigration()
+  enableDbMigration('am-lib-test')
 
   env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
   env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"

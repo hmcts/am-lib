@@ -44,6 +44,9 @@ public class FunctionalTestSuite {
     @Value("${s2s-secret}")
     protected String s2sSecret;
 
+    @Value("${db-url:localhost:5433/am?user=amuser&password=ampass}")
+    protected String dbUrl;
+
 
     @Before
     public void setUp() throws Exception {
@@ -93,13 +96,9 @@ public class FunctionalTestSuite {
 
     @SuppressWarnings({"deprecation"})
     public DataSource createDataSource() {
-        log.info("DB Host name::" + getValueOrDefault("DATABASE_HOST", "localhost"));
+        log.info("DB URL check::" + dbUrl);
         PGPoolingDataSource dataSource = new PGPoolingDataSource();
-        dataSource.setServerName(getValueOrDefault("DATABASE_HOST", "localhost"));
-        dataSource.setPortNumber(Integer.parseInt(getValueOrDefault("DATABASE_PORT", "5433")));
-        dataSource.setDatabaseName(getValueOrThrow("DATABASE_NAME"));
-        dataSource.setUser(getValueOrThrow("DATABASE_USER"));
-        dataSource.setPassword(getValueOrThrow("DATABASE_PASS"));
+        dataSource.setURL("jdbc:postgresql://"+ dbUrl);
         dataSource.setMaxConnections(5);
         return dataSource;
     }

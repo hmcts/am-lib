@@ -49,12 +49,11 @@ withPipeline(type, product, component) {
   installCharts()
   enableDbMigration()
 
-  env.environment_name ="${params.ENVIRONMENT}"
-
   env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
   env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 
   before('functionalTest:preview') {
+    env.environment_name ="preview"
     env.URL_TO_TEST = "http://am-lib-test-aat.service.core-compute-aat.internal"
   }
 

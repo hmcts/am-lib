@@ -98,7 +98,7 @@ public class FunctionalTestSuite {
     public DataSource createDataSource() {
         log.info("DB URL check::" + dbUrl);
         PGPoolingDataSource dataSource = new PGPoolingDataSource();
-        dataSource.setURL("jdbc:postgresql://"+ dbUrl);
+        dataSource.setURL("jdbc:postgresql://" + dbUrl);
         dataSource.setMaxConnections(5);
         return dataSource;
     }

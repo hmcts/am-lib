@@ -57,7 +57,6 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
-
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = MOCK)
 @AutoConfigureMockMvc

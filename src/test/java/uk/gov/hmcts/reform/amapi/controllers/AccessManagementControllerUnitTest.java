@@ -67,6 +67,7 @@ public class AccessManagementControllerUnitTest {
     @Mock
     private FilterResourceService filterResourceService;
 
+    public static final String VERSION = "v1";
 
     @BeforeEach
     public void setUp() {
@@ -86,7 +87,7 @@ public class AccessManagementControllerUnitTest {
 
         doNothing().when(accessManagementService).grantExplicitResourceAccess(any());
 
-        this.mvc.perform(post("/api/v1/access-resource")
+        this.mvc.perform(post("/api/" + VERSION + "/access-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
@@ -133,7 +134,7 @@ public class AccessManagementControllerUnitTest {
             filterResource.getAttributeSecurityClassification()))
             .thenReturn(filteredResourceEnvelope);
 
-        this.mvc.perform(post("/api/v1/filter-resource")
+        this.mvc.perform(post("/api/" + VERSION + "/filter-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
@@ -174,7 +175,7 @@ public class AccessManagementControllerUnitTest {
             filterResource.getResource(), filterResource.getAttributeSecurityClassification()))
             .thenReturn(filteredResourceEnvelope);
 
-        this.mvc.perform(post("/api/v1/filter-resource")
+        this.mvc.perform(post("/api/" + VERSION + "/filter-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON))
             .andDo(print())
@@ -206,7 +207,7 @@ public class AccessManagementControllerUnitTest {
         Mockito.when(filterResourceService.returnResourceAccessors(resourceId, resourceName, resourceType))
             .thenReturn(resourceAccessorsEnvelope);
 
-        this.mvc.perform(get("/api/v1/resource/resourceType/" + resourceType + "/resourceName/"
+        this.mvc.perform(get("/api/" + VERSION + "/resource/resourceType/" + resourceType + "/resourceName/"
             + resourceName + "/resourceId/" + resourceId))
             .andDo(print())
             .andExpect(status().isOk())

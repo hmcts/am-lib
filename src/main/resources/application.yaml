@@ -26,8 +26,9 @@ spring:
     password: ${AM_DB_PASSWORD:ampass}
     properties:
       charSet: UTF-8
-  flyway:
-    enabled: ${ENABLE_DB_MIGRATE_IN_SERVICE:true}
+    flyway:
+      locations: classpath:db/migration,classpath:db/migrationAks
+      enabled: ${ENABLE_DB_MIGRATE_IN_SERVICE:true}
   resources:
     add-mappings: false
   mvc:

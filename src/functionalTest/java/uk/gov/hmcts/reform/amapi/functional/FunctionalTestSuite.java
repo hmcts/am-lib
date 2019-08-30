@@ -52,6 +52,7 @@ public class FunctionalTestSuite {
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
         log.info("access url::" + accessUrl);
+        log.info("environment script execution::" + getenv("environment_name"));
 
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
         amApiClient = new AmApiClient(accessUrl, s2sToken);
@@ -66,18 +67,22 @@ public class FunctionalTestSuite {
     }
 
     private void executeScript(List<Path> scriptFiles) throws SQLException, IOException {
-        try (Connection connection = createDataSource().getConnection()) {
-            try (Statement statement = connection.createStatement()) {
-                for (Path path : scriptFiles) {
-                    for (String scriptLine : Files.readAllLines(path)) {
-                        statement.addBatch(scriptLine);
+        if (!("preview").equalsIgnoreCase(getenv("environment_name"))) {
+            log.info("environment script execution started::");
+            try (Connection connection = createDataSource().getConnection()) {
+                try (Statement statement = connection.createStatement()) {
+                    for (Path path : scriptFiles) {
+                        for (String scriptLine : Files.readAllLines(path)) {
+                            statement.addBatch(scriptLine);
+                        }
+                        statement.executeBatch();
                     }
-                    statement.executeBatch();
                 }
+            } catch (Exception exe) {
+                log.error("FunctionalTestSuite script execution error with script ::" + exe.toString());
+                throw exe;
             }
-        } catch (Exception exe) {
-            log.error("FunctionalTestSuite script execution error with script ::" + exe.toString());
-            throw exe;
+            log.info("environment script execution completed::");
         }
     }
 

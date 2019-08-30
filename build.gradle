@@ -245,7 +245,7 @@ dependencies {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
   }
 
-  testCompile group: 'com.warrenstrange', name: 'googleauth', version: '1.1.5'
+  testCompile group: 'com.warrenstrange', name: 'googleauth', version: '1.2.0'
 
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
   testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'

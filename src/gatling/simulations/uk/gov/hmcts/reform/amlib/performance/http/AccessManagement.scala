@@ -6,17 +6,15 @@ import io.gatling.http.request.builder.HttpRequestBuilder
 
 object AccessManagement {
 
-  def version = "v1"
-
   private def getRequest(url: String): HttpRequestBuilder =
     http("/returnResourceAccessors")
-      .get("/api/" + version + "/" + url)
+      .get("/api" + url)
       .header("ServiceAuthorization", "Bearer ${s2sToken}")
       .check(status.is(200))
 
   private def postRequest(url: String, body: String, statusExpected: Int): HttpRequestBuilder =
     http(url)
-      .post("/api/" + version + "/" + url)
+      .post("/api" + url)
       .header("ServiceAuthorization", "Bearer ${s2sToken}")
       .body(ElFileBody(body)).asJson
       .header("Content-Type", "application/json")
@@ -24,7 +22,7 @@ object AccessManagement {
 
   private def deleteRequest(url: String, body: String): HttpRequestBuilder =
     http(url)
-      .delete("/api/" + version + "/" + url)
+      .delete("/api" + url)
       .header("ServiceAuthorization", "Bearer ${s2sToken}")
       .body(ElFileBody(body)).asJson
       .check(status.is(204))

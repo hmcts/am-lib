@@ -53,7 +53,11 @@ withPipeline(type, product, component) {
   env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 
   before('functionalTest:preview') {
-    env.environment_name ="preview"
+    env.URL_TO_TEST = "http://am-lib-test-aat.service.core-compute-aat.internal"
+  }
+
+  before('functionalTest:aat') {
+    env.URL_TO_TEST = env.TEST_URL
   }
 
   after('functionalTest:preview') {
@@ -65,7 +69,6 @@ withPipeline(type, product, component) {
   }
 
   onMaster {
-
     env.URL_TO_TEST =  env.TEST_URL
     enableSlackNotifications('#am-master-builds')
 

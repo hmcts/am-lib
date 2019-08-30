@@ -54,11 +54,6 @@ withPipeline(type, product, component) {
 
   before('functionalTest:preview') {
     env.environment_name ="preview"
-    env.URL_TO_TEST = "http://am-lib-test-aat.service.core-compute-aat.internal"
-  }
-
-  before('functionalTest:aat') {
-    env.URL_TO_TEST = env.TEST_URL
   }
 
   after('functionalTest:preview') {

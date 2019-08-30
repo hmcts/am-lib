@@ -1,19 +1,13 @@
 #!groovy
 
-properties([
-  parameters([
-    string(name: 'ENVIRONMENT', defaultValue: 'aat', description: 'Environment to test')
-  ])
-])
-
 @Library("Infrastructure")
 
 def type = "java"
 def product = "am"
 def component = "lib-test"
 
-def appVault = "am-lib-test-${params.ENVIRONMENT}"
-def s2sVault = "s2s-${params.ENVIRONMENT}"
+def appVault = "am-lib-test-${env}"
+def s2sVault = "s2s-${env}"
 
 def secrets = [
   (appVault): [

@@ -82,8 +82,8 @@ public class FunctionalTestSuite {
                 log.error("FunctionalTestSuite script execution error with script ::" + exe.toString());
                 throw exe;
             }
+            log.info("environment script execution completed::");
         }
-        log.info("environment script execution completed::");
     }
 
     @After

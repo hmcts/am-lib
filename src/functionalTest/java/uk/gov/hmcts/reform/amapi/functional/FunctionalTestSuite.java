@@ -57,9 +57,9 @@ public class FunctionalTestSuite {
         amApiClient = new AmApiClient(accessUrl, s2sToken);
 
         String loadFile = ResourceUtils.getFile("classpath:load-data-functional.sql").getCanonicalPath();
-        String deleteFile = ResourceUtils.getFile("classpath:delete-data-functional.sql").getCanonicalPath();
+        //String deleteFile = ResourceUtils.getFile("classpath:delete-data-functional.sql").getCanonicalPath();
         List<Path> files = new ArrayList<>();
-        files.add(Paths.get(deleteFile));
+        //files.add(Paths.get(deleteFile));
         files.add(Paths.get(loadFile));
 
         executeScript(files);
@@ -70,6 +70,7 @@ public class FunctionalTestSuite {
             try (Statement statement = connection.createStatement()) {
                 for (Path path : scriptFiles) {
                     for (String scriptLine : Files.readAllLines(path)) {
+                        System.out.println(scriptLine);
                         statement.addBatch(scriptLine);
                     }
                     statement.executeBatch();

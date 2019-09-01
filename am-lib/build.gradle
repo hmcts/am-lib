@@ -96,9 +96,9 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.0.0'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.13.2'
-    testCompile group: 'org.flywaydb', name: 'flyway-core', version: '6.0.0'
+    testCompile group: 'org.flywaydb', name: 'flyway-core', version: '6.0.1'
     testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.12.0'
-    testCompile group: 'com.google.guava', name: 'guava', version: '28.0-jre'
+    testCompile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: '5.0.1'
 
@@ -108,7 +108,7 @@ dependencies {
     benchmarkCompile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
     benchmarkCompile sourceSets.main.runtimeClasspath
     benchmarkCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'
-    benchmarkCompile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
+    benchmarkCompile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
 }
 
 task codeCoverageReport(type: JacocoReport, dependsOn: test) {

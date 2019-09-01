@@ -54,6 +54,11 @@ withPipeline(type, product, component) {
 
   before('functionalTest:preview') {
     env.URL_TO_TEST = env.TEST_URL
+    env.DATABASE_HOST = env.AM_DB_HOST
+    env.DATABASE_PORT = env.AM_DB_PORT
+    env.DATABASE_NAME = env.AM_DB_NAME
+    env.DATABASE_USER = env.AM_DB_USERNAME
+    env.DATABASE_PASS = env.AM_DB_PASSWORD
   }
 
   before('functionalTest:aat') {

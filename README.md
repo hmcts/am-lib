@@ -29,7 +29,7 @@ To build the project execute the following command:
 Run database service in Docker:
 
 ```bash
-  docker-compose up -d am-lib-testing-service-db
+  docker-compose up -d am-api-db
 ```
 
 Run application locally:

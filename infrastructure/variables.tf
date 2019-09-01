@@ -6,7 +6,7 @@ variable "product" {
 
 variable "component" {
   type = "string"
-  default = "lib-test"
+  default = "api"
 }
 
 variable "location_app" {

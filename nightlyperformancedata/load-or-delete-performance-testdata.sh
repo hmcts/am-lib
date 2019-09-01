@@ -21,7 +21,7 @@ if [ "$8" = "aat" ]; then
   psql "dbname=$DATABASE_NAME sslmode=require" -h $5 -U $DATABASE_USER -p $7 -f /nightlyperformancedata/sql/$FILE_NAME.sql
 else
   echo "executing for local"
-  docker cp $1 am-lib-testing-service-db:/tmp/
-  docker exec -i am-lib-testing-service-db psql -U $DATABASE_USER -d $DATABASE_NAME -f /tmp/sql/$FILE_NAME.sql
+  docker cp $1 am-api-db:/tmp/
+  docker exec -i am-api-db psql -U $DATABASE_USER -d $DATABASE_NAME -f /tmp/sql/$FILE_NAME.sql
 fi
 echo "completed data load"

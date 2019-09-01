@@ -21,7 +21,7 @@ locals {
 
 module "am-api" {
   source              = "git@github.com:hmcts/moj-module-webapp?ref=master"
-  product             = "${var.product}-${var.component}"
+  product             = "${local.app_full_name}"
   location            = "${var.location_app}"
   env                 = "${var.env}"
   ilbIp               = "${var.ilbIp}"
@@ -50,7 +50,7 @@ module "am-api" {
 
 module "postgres-am-api" {
   source              = "git@github.com:hmcts/moj-module-postgres?ref=master"
-  product             = "${var.product}-${var.component}"
+  product             = "${local.app_full_name}"
   env                 = "${var.env}"
   location            = "${var.location_app}"
   postgresql_user     = "${var.db_user}"
@@ -63,7 +63,7 @@ module "postgres-am-api" {
 # region save DB details to Azure Key Vault
 module "am-vault-api" {
   source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
-  name                = "${var.raw_product}-${var.component}-${local.shortEnv}"
+  name                = "${var.raw_product}-${local.envInUse}"
   product             = "${var.product}"
   env                 = "${var.env}"
   tenant_id           = "${var.tenant_id}"
@@ -74,31 +74,31 @@ module "am-vault-api" {
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
-  name      = "${var.product}-${var.component}-POSTGRES-USER"
+  name      = "${var.component}-POSTGRES-USER"
   value     = "${module.postgres-am-api.user_name}"
   vault_uri = "${module.am-vault-api.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
-  name      = "${var.product}-${var.component}-POSTGRES-PASS"
+  name      = "${var.component}-POSTGRES-PASS"
   value     = "${module.postgres-am-api.postgresql_password}"
   vault_uri = "${module.am-vault-api.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
-  name      = "${var.product}-${var.component}-POSTGRES-HOST"
+  name      = "${var.component}-POSTGRES-HOST"
   value     = "${module.postgres-am-api.host_name}"
   vault_uri = "${module.am-vault-api.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
-  name      = "${var.product}-${var.component}-POSTGRES-PORT"
+  name      = "${var.component}-POSTGRES-PORT"
   value     = "${module.postgres-am-api.postgresql_listen_port}"
   vault_uri = "${module.am-vault-api.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
-  name      = "${var.product}-${var.component}-POSTGRES-DATABASE"
+  name      = "${var.component}-POSTGRES-DATABASE"
   value     = "${module.postgres-am-api.postgresql_database}"
   vault_uri = "${module.am-vault-api.key_vault_uri}"
 }

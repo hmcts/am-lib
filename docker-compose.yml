@@ -1,30 +1,30 @@
 version: '2.1'
 
 services:
-  am-lib-testing-service-db:
-    container_name: am-lib-testing-service-db
-    build: ./docker/am-lib-testing-service-db
+  am-api-db:
+    container_name: am-api-db
+    build: ./docker/am-api-db
     tmpfs:
       - /var/lib/postgresql/data
     networks:
-      - am-lib-testing-service-network
+      - am-api-network
     ports:
       - "5433:5432"
     environment:
       - POSTGRES_USER=amuser
       - POSTGRES_PASSWORD=ampass
       - POSTGRES_DB=am
-  am-lib-testing-service:
+  am-api:
     build:
       context: .
       args:
         - http_proxy
         - https_proxy
         - no_proxy
-    image: hmcts/am-lib-testing-service
-    container_name: am-lib-testing-service
+    image: hmcts/am-api
+    container_name: am-api
     depends_on:
-      - am-lib-testing-service-db
+      - am-api-db
       - service-auth-provider-api
     environment:
       # these environment variables are used by java-logging library
@@ -39,7 +39,7 @@ services:
       - LOGBACK_REQUIRE_THREAD
       - LOGBACK_REQUIRE_ALERT_LEVEL=false
       - LOGBACK_REQUIRE_ERROR_CODE=false
-      - AM_DB_HOST=am-lib-testing-service-db
+      - AM_DB_HOST=am-api-db
       - AM_DB_PORT=5432
       - AM_DB_NAME=am
       - AM_DB_USERNAME=amuser
@@ -51,7 +51,7 @@ services:
       - 3704:3703
       - ${SERVER_PORT:-8090}:${SERVER_PORT:-8090}
     networks:
-      - am-lib-testing-service-network
+      - am-api-network
   service-auth-provider-api:
     image: hmcts/service-auth-provider-app
     container_name: service-auth-provider-api
@@ -67,7 +67,7 @@ services:
       MICROSERVICEKEYS_AM_ACCESSMGMT_API: "${S2S_SECRET}"
       TESTING_SUPPORT_ENABLED: "true"
     networks:
-      - am-lib-testing-service-network
+      - am-api-network
   service-token-provider:
     image: hmcts/service-token-provider
     container_name: service-token-provider
@@ -80,7 +80,7 @@ services:
     depends_on:
       - service-auth-provider-api
     networks:
-      - am-lib-testing-service-network
+      - am-api-network
 networks:
-  am-lib-testing-service-network:
+  am-api-network:
     driver: bridge

@@ -44,16 +44,16 @@ build_s2s_image() {
 }
 
 clean_old_docker_artifacts() {
-    docker stop am-lib-testing-service
-    docker stop am-lib-testing-service-db
+    docker stop am-api
+    docker stop am-api-db
     docker stop service-token-provider
 
-    docker rm am-lib-testing-service
-    docker rm am-lib-testing-service-db
+    docker rm am-api
+    docker rm am-api-db
     docker rm service-token-provider
 
-    docker rmi hmcts/am-lib-testing-service
-    docker rmi hmcts/am-lib-testing-service-db
+    docker rmi hmcts/am-api
+    docker rmi hmcts/am-api-db
     docker rmi hmcts/service-token-provider
 
 }

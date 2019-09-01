@@ -8,4 +8,4 @@ java:
     AM_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername }}"
     ENABLE_DB_MIGRATE_IN_SERVICE: true
     S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-  image: "https://hmcts.azurecr.io/hmcts/am-lib-test:latest"
+  image: "https://hmcts.azurecr.io/hmcts/am-api:latest"

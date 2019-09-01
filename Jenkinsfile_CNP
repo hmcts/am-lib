@@ -16,13 +16,13 @@ def appVault = "am-api-${params.ENVIRONMENT}"
 def s2sVault = "s2s-${params.ENVIRONMENT}"
 
 def secrets = [
-  (appVault): [
+  /*(appVault): [
     secret('am-api-POSTGRES-HOST', 'DATABASE_HOST'),
     secret('am-api-POSTGRES-PORT', 'DATABASE_PORT'),
     secret('am-api-POSTGRES-DATABASE', 'DATABASE_NAME'),
     secret('am-api-POSTGRES-USER', 'DATABASE_USER'),
     secret('am-api-POSTGRES-PASS', 'DATABASE_PASS')
-  ],
+  ],*/
   (s2sVault): [
     secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
   ]

@@ -205,6 +205,12 @@ def versions = [
   serenity        : '2.0.52'
 ]
 
+configurations.all {
+  resolutionStrategy {
+    force 'commons-beanutils:commons-beanutils:1.9.4'
+  }
+}
+
 dependencies {
   compile project(':am-lib')
 

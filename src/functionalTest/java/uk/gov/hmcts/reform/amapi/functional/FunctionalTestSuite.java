@@ -70,7 +70,7 @@ public class FunctionalTestSuite {
             try (Statement statement = connection.createStatement()) {
                 for (Path path : scriptFiles) {
                     for (String scriptLine : Files.readAllLines(path)) {
-                        System.out.println(scriptLine);
+                        log.info(scriptLine);
                         statement.addBatch(scriptLine);
                     }
                     statement.executeBatch();

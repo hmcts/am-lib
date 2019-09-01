@@ -53,7 +53,7 @@ withPipeline(type, product, component) {
   env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 
   before('functionalTest:preview') {
-    env.URL_TO_TEST = "http://am-lib-test-aat.service.core-compute-aat.internal"
+    env.URL_TO_TEST = env.TEST_URL
   }
 
   before('functionalTest:aat') {

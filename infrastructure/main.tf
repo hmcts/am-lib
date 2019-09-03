@@ -19,7 +19,7 @@ locals {
   s2s_vault_uri = "https://s2s-${local.envInUse}.vault.azure.net/"
 }
 
-module "am-api" {
+module "am-accessmgmt-api" {
   source              = "git@github.com:hmcts/moj-module-webapp?ref=master"
   product             = "${local.app_full_name}"
   location            = "${var.location_app}"

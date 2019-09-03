@@ -13,6 +13,6 @@ if "%2" == "load" (
 ) ELSE (
     set "FILE_NAME=delete-data"
 )
-docker cp %1  am-api-db:/tmp/
-docker exec -i am-api-db psql -U %DATABASE_USER% -d %DATABASE_NAME% -f /tmp/sql/%FILE_NAME%.sql
+docker cp %1  am-accessmgmt-api-db:/tmp/
+docker exec -i am-accessmgmt-api-db psql -U %DATABASE_USER% -d %DATABASE_NAME% -f /tmp/sql/%FILE_NAME%.sql
 echo done

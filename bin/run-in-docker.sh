@@ -44,16 +44,16 @@ build_s2s_image() {
 }
 
 clean_old_docker_artifacts() {
-    docker stop am-api
-    docker stop am-api-db
+    docker stop am-accessmgmt-api
+    docker stop am-accessmgmt-api-db
     docker stop service-token-provider
 
-    docker rm am-api
-    docker rm am-api-db
+    docker rm am-accessmgmt-api
+    docker rm am-accessmgmt-api-db
     docker rm service-token-provider
 
-    docker rmi hmcts/am-api
-    docker rmi hmcts/am-api-db
+    docker rmi hmcts/am-accessmgmt-api
+    docker rmi hmcts/am-accessmgmt-api-db
     docker rmi hmcts/service-token-provider
 
 }

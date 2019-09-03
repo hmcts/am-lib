@@ -4,6 +4,7 @@ services:
   am-lib-testing-service-db:
     container_name: am-lib-testing-service-db
     build: ./docker/am-lib-testing-service-db
+    image: hmcts/am-lib-testing-service-db
     tmpfs:
       - /var/lib/postgresql/data
     networks:
@@ -21,7 +22,7 @@ services:
         - http_proxy
         - https_proxy
         - no_proxy
-    image: hmctspublic.azurecr.io/am/lib-test:latest
+    image: hmcts/am-lib-testing-service
     container_name: am-lib-testing-service
     depends_on:
       - am-lib-testing-service-db
@@ -54,7 +55,7 @@ services:
     networks:
       - am-lib-testing-service-network
   service-auth-provider-api:
-    image: hmctspublic.azurecr.io/rpe/service-auth-provider:latest
+    image: hmcts/service-auth-provider-app
     container_name: service-auth-provider-api
     healthcheck:
       interval: 10s
@@ -70,7 +71,7 @@ services:
     networks:
       - am-lib-testing-service-network
   service-token-provider:
-    image: hmctspublic.azurecr.io/rpe/service-auth-provider:latest
+    image: hmcts/service-token-provider
     container_name: service-token-provider
     environment:
       - S2S_URL=http://service-auth-provider-api:8080

@@ -63,7 +63,7 @@ module "postgres-am-api" {
 # region save DB details to Azure Key Vault
 module "am-vault-api" {
   source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
-  name                = "${local.vaultName}"
+  name                = "${local.app_full_name}"
   product             = "${var.product}"
   env                 = "${var.env}"
   tenant_id           = "${var.tenant_id}"

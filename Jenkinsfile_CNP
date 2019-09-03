@@ -53,7 +53,11 @@ withPipeline(type, product, component) {
   env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 
   before('functionalTest:preview') {
-    env.environment_name ="preview"
+    env.DATABASE_HOST = env.AM_DB_HOST
+    env.DATABASE_PORT = env.AM_DB_PORT
+    env.DATABASE_NAME = env.AM_DB_NAME
+    env.DATABASE_USER = env.AM_DB_USERNAME
+    env.DATABASE_PASS = env.AM_DB_PASSWORD
   }
 
   after('functionalTest:preview') {

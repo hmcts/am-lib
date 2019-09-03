@@ -21,7 +21,7 @@ services:
         - http_proxy
         - https_proxy
         - no_proxy
-    image: hmcts/am-lib-testing-service
+    image: hmctspublic.azurecr.io/am/lib-test:latest
     container_name: am-lib-testing-service
     depends_on:
       - am-lib-testing-service-db
@@ -47,13 +47,14 @@ services:
       - ENABLE_DB_MIGRATE_IN_SERVICE=true
       - S2S_URL=http://service-auth-provider-api:8080
       - S2S_SECRET=${S2S_SECRET}
+      - APPINSIGHTS_INSTRUMENTATIONKEY=false
     ports:
       - 3704:3703
       - ${SERVER_PORT:-8090}:${SERVER_PORT:-8090}
     networks:
       - am-lib-testing-service-network
   service-auth-provider-api:
-    image: hmcts/service-auth-provider-app
+    image: hmctspublic.azurecr.io/rpe/service-auth-provider:latest
     container_name: service-auth-provider-api
     healthcheck:
       interval: 10s
@@ -69,12 +70,13 @@ services:
     networks:
       - am-lib-testing-service-network
   service-token-provider:
-    image: hmcts/service-token-provider
+    image: hmctspublic.azurecr.io/rpe/service-auth-provider:latest
     container_name: service-token-provider
     environment:
       - S2S_URL=http://service-auth-provider-api:8080
       - S2S_MICROSERVICE=am_accessmgmt_api
       - S2S_SECRET=${S2S_SECRET}
+      - APPINSIGHTS_INSTRUMENTATIONKEY=false
     ports:
       - 8089:${SERVER_PORT:-8090}
     depends_on:

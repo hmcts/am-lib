@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.amapi.functional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
-import org.postgresql.ds.PGPoolingDataSource;
+import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.TestPropertySource;
@@ -67,23 +67,21 @@ public class FunctionalTestSuite {
     }
 
     private void executeScript(List<Path> scriptFiles) throws SQLException, IOException {
-        if (!("preview").equalsIgnoreCase(getenv("environment_name"))) {
-            log.info("environment script execution started::");
-            try (Connection connection = createDataSource().getConnection()) {
-                try (Statement statement = connection.createStatement()) {
-                    for (Path path : scriptFiles) {
-                        for (String scriptLine : Files.readAllLines(path)) {
-                            statement.addBatch(scriptLine);
-                        }
-                        statement.executeBatch();
+        log.info("environment script execution started::");
+        try (Connection connection = createDataSource().getConnection()) {
+            try (Statement statement = connection.createStatement()) {
+                for (Path path : scriptFiles) {
+                    for (String scriptLine : Files.readAllLines(path)) {
+                        statement.addBatch(scriptLine);
                     }
+                    statement.executeBatch();
                 }
-            } catch (Exception exe) {
-                log.error("FunctionalTestSuite script execution error with script ::" + exe.toString());
-                throw exe;
             }
-            log.info("environment script execution completed::");
+        } catch (Exception exe) {
+            log.error("FunctionalTestSuite script execution error with script ::" + exe.toString());
+            throw exe;
         }
+        log.info("environment script execution completed::");
     }
 
     @After
@@ -95,17 +93,14 @@ public class FunctionalTestSuite {
         executeScript(files);
     }
 
-
-    @SuppressWarnings({"deprecation"})
     public DataSource createDataSource() {
         log.info("DB Host name::" + getValueOrDefault("DATABASE_HOST", "localhost"));
-        PGPoolingDataSource dataSource = new PGPoolingDataSource();
+        PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setServerName(getValueOrDefault("DATABASE_HOST", "localhost"));
         dataSource.setPortNumber(Integer.parseInt(getValueOrDefault("DATABASE_PORT", "5433")));
         dataSource.setDatabaseName(getValueOrThrow("DATABASE_NAME"));
         dataSource.setUser(getValueOrThrow("DATABASE_USER"));
         dataSource.setPassword(getValueOrThrow("DATABASE_PASS"));
-        dataSource.setMaxConnections(5);
         return dataSource;
     }
 
@@ -121,5 +116,4 @@ public class FunctionalTestSuite {
         }
         return value;
     }
-
 }

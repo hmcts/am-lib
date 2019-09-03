@@ -39,7 +39,7 @@ build_s2s_image() {
     cd s2s-test-tool
     git checkout allow-all-microservices
     ./gradlew build
-    docker build -t hmcts/service-token-provider .
+    docker build -t hmctspublic.azurecr.io/rpe/service-auth-provider:latest
     cd .. && rm -rf s2s-test-tool
 }
 
@@ -52,10 +52,9 @@ clean_old_docker_artifacts() {
     docker rm am-lib-testing-service-db
     docker rm service-token-provider
 
-    docker rmi hmcts/am-lib-testing-service
-    docker rmi hmcts/am-lib-testing-service-db
+    docker rmi hmctspublic/am-lib-testing-service
+    docker rmi hmctspublic/am-lib-testing-service-db
     docker rmi hmcts/service-token-provider
-
 }
 
 execute_script() {

@@ -52,14 +52,6 @@ withPipeline(type, product, component) {
   env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
   env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 
-  before('functionalTest:preview') {
-    env.DATABASE_HOST = env.AM_DB_HOST
-    env.DATABASE_PORT = env.AM_DB_PORT
-    env.DATABASE_NAME = env.AM_DB_NAME
-    env.DATABASE_USER = env.AM_DB_USERNAME
-    env.DATABASE_PASS = env.AM_DB_PASSWORD
-  }
-
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
   }
@@ -70,6 +62,7 @@ withPipeline(type, product, component) {
 
   onMaster {
 
+    env.environment_name = "aat"
     env.URL_TO_TEST =  env.TEST_URL
     enableSlackNotifications('#am-master-builds')
 

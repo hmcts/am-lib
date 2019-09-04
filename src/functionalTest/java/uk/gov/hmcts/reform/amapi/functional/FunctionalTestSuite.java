@@ -67,7 +67,7 @@ public class FunctionalTestSuite {
     }
 
     private void executeScript(List<Path> scriptFiles) throws SQLException, IOException {
-        if (!("aat").equalsIgnoreCase(getenv("environment_name"))) {
+        if (("aat").equalsIgnoreCase(getenv("environment_name"))) {
             log.info("environment script execution started::");
             try (Connection connection = createDataSource().getConnection()) {
                 try (Statement statement = connection.createStatement()) {

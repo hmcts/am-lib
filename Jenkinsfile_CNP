@@ -60,10 +60,6 @@ withPipeline(type, product, component) {
     env.URL_TO_TEST = env.TEST_URL
   }
 
-  before('functionalTest:sandbox') {
-    env.URL_TO_TEST = env.TEST_URL
-  }
-
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
   }

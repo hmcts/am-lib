@@ -303,6 +303,13 @@ task sonarqube(type: Exec) {
 }
 
 //local flyway settings
+flyway {
+  url = 'jdbc:postgresql://localhost:5433/am'
+  user = 'amuser'
+  password = 'ampass'
+  locations = ["filesystem:am-lib/src/main/resources/db/migration"]
+}
+
 gatling {
   toolVersion '3.2.0'
   scalaVersion '2.12.8'

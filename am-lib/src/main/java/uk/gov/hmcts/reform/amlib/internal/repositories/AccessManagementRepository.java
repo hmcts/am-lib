@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.query.AttributeData;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.JsonPointerMapper;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.PermissionSetMapper;
+import uk.gov.hmcts.reform.amlib.models.DefaultRolePermissions;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
@@ -87,4 +88,9 @@ public interface AccessManagementRepository {
     @SqlQuery("select resource_id from access_management where accessor_id = ? and cast(accessor_type as text) = 'USER' and resource_type = 'case' "
         + "and permissions & 2 = 2 and attribute = '' order by resource_id")
     List<String> getUserCases(String userId);
+
+    @SqlQuery("select role_name as role, permissions from default_permissions_for_roles where resource_type = 'case' and resource_name = :caseTypeId "
+        + "and attribute = '' order by role_name")
+    @RegisterConstructorMapper(DefaultRolePermissions.class)
+    List<DefaultRolePermissions> getRolePermissionsForCaseType(String caseTypeId);
 }

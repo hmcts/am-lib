@@ -18,16 +18,16 @@ def type = "java"
 def product = "am"
 def component = "accessmgmt-api"
 
-def appVault = "am-accessmgmt-api-${params.ENVIRONMENT}"
+def appVault = "am-lib-test-${params.ENVIRONMENT}"
 def s2sVault = "s2s-${params.ENVIRONMENT}"
 
 def secrets = [
   (appVault): [
-    secret('am-accessmgmt-api-POSTGRES-HOST', 'DATABASE_HOST'),
-    secret('am-accessmgmt-api-POSTGRES-PORT', 'DATABASE_PORT'),
-    secret('am-accessmgmt-api-POSTGRES-DATABASE', 'DATABASE_NAME'),
-    secret('am-accessmgmt-api-POSTGRES-USER', 'DATABASE_USER'),
-    secret('am-accessmgmt-api-POSTGRES-PASS', 'DATABASE_PASS')
+    secret('lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
+    secret('lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
+    secret('lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
+    secret('lib-test-POSTGRES-USER', 'DATABASE_USER'),
+    secret('lib-test-POSTGRES-PASS', 'DATABASE_PASS')
   ],
   (s2sVault): [
     secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')

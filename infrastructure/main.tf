@@ -2,7 +2,7 @@ provider "azurerm" {}
 
 locals {
   app_full_name = "${var.product}-${var.component}"
-  ase_name               = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
+  ase_name = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
   envInUse = "${(var.env == "preview" || var.env == "spreview") ? "aat" : var.env}"
   shortEnv = "${(var.env == "preview" || var.env == "spreview") ? var.deployment_namespace : var.env}"
 

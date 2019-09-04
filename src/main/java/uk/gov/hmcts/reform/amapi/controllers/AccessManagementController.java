@@ -29,7 +29,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * Default endpoints per application.
  */
 @RestController
-@RequestMapping("api")
+@RequestMapping("api/v1")
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals"})
 public class AccessManagementController {
 

@@ -34,6 +34,14 @@ GRADLE_INSTALL=true
 export S2S_SECRET=GJNMFGFAAO4FCVD4
 export S2S_MICROSERVICE=am_accessmgmt_api
 
+build_service_auth_app() {
+    git clone https://github.com/hmcts/service-auth-provider-app.git
+    cd service-auth-provider-app
+    ./gradlew build
+    docker build -t hmcts/service-token-provider .
+    cd .. && rm -rf service-auth-provider-app
+}
+
 build_s2s_image() {
     git clone git@github.com:hmcts/s2s-test-tool.git
     cd s2s-test-tool
@@ -63,6 +71,8 @@ execute_script() {
   clean_old_docker_artifacts
 
   build_s2s_image
+
+  build_service_auth_app
 
   cd $(dirname "$0")/..
 

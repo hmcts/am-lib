@@ -17,11 +17,11 @@ def s2sVault = "s2s-${params.ENVIRONMENT}"
 
 def secrets = [
   (appVault): [
-    secret('am-lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
-    secret('am-lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
-    secret('am-lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
-    secret('am-lib-test-POSTGRES-USER', 'DATABASE_USER'),
-    secret('am-lib-test-POSTGRES-PASS', 'DATABASE_PASS')
+    secret('lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
+    secret('lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
+    secret('lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
+    secret('lib-test-POSTGRES-USER', 'DATABASE_USER'),
+    secret('lib-test-POSTGRES-PASS', 'DATABASE_PASS')
   ],
   (s2sVault): [
     secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
@@ -57,6 +57,10 @@ withPipeline(type, product, component) {
   }
 
   before('functionalTest:aat') {
+    env.URL_TO_TEST = env.TEST_URL
+  }
+
+  before('functionalTest:sandbox') {
     env.URL_TO_TEST = env.TEST_URL
   }
 

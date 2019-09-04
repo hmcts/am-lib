@@ -49,8 +49,9 @@ withPipeline(type, product, component) {
   installCharts()
   enableDbMigration('am-lib-test')
 
-  env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-  env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+  env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-${params.ENVIRONMENT}.service.core-compute-${params.ENVIRONMENT}.internal"
+  env.S2S_URL = "http://rpe-service-auth-provider-${params.ENVIRONMENT}.service.core-compute-${params.ENVIRONMENT}.internal"
+
 
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'

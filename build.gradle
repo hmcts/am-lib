@@ -12,7 +12,6 @@ buildscript {
   }
 }
 
-
 plugins {
   id 'application'
   id 'checkstyle'
@@ -25,6 +24,8 @@ plugins {
   id "org.flywaydb.flyway" version "6.0.1"
   id 'com.github.lkishalmi.gatling' version '3.2.7'
 }
+
+ext['mockito.version'] = '3.0.0'
 
 subprojects {
   apply plugin: 'org.owasp.dependencycheck'

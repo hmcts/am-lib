@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createAccessManagementAudit;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForAccessorType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
@@ -124,6 +125,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .resourceDefinition(resourceDefinition)
             .attributePermissions(createPermissions("", ImmutableSet.of(READ)))
             .relationship(roleName)
+            .accessManagementAudit(createAccessManagementAudit())
             .build();
     }
 

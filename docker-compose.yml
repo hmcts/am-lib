@@ -4,6 +4,7 @@ services:
   am-lib-testing-service-db:
     container_name: am-lib-testing-service-db
     build: ./docker/am-lib-testing-service-db
+    image: hmcts/am-lib-testing-service-db
     tmpfs:
       - /var/lib/postgresql/data
     networks:
@@ -47,6 +48,7 @@ services:
       - ENABLE_DB_MIGRATE_IN_SERVICE=true
       - S2S_URL=http://service-auth-provider-api:8080
       - S2S_SECRET=${S2S_SECRET}
+      - APPINSIGHTS_INSTRUMENTATIONKEY=false
     ports:
       - 3704:3703
       - ${SERVER_PORT:-8090}:${SERVER_PORT:-8090}
@@ -75,6 +77,7 @@ services:
       - S2S_URL=http://service-auth-provider-api:8080
       - S2S_MICROSERVICE=am_accessmgmt_api
       - S2S_SECRET=${S2S_SECRET}
+      - APPINSIGHTS_INSTRUMENTATIONKEY=false
     ports:
       - 8089:${SERVER_PORT:-8090}
     depends_on:

@@ -52,17 +52,6 @@ withPipeline(type, product, component) {
   env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-${params.ENVIRONMENT}.service.core-compute-${params.ENVIRONMENT}.internal"
   env.S2S_URL = "http://rpe-service-auth-provider-${params.ENVIRONMENT}.service.core-compute-${params.ENVIRONMENT}.internal"
 
-  before('functionalTest:preview') {
-    env.URL_TO_TEST = "http://am-lib-test-aat.service.core-compute-aat.internal"
-  }
-
-  before('functionalTest:aat') {
-    env.URL_TO_TEST = env.TEST_URL
-  }
-
-  before('functionalTest:sandbox') {
-    env.URL_TO_TEST = env.TEST_URL
-  }
 
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
@@ -73,6 +62,8 @@ withPipeline(type, product, component) {
   }
 
   onMaster {
+
+    env.environment_name = "aat"
     env.URL_TO_TEST =  env.TEST_URL
     enableSlackNotifications('#am-master-builds')
 

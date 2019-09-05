@@ -29,7 +29,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * Default endpoints per application.
  */
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping("api/${version:v1}")
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals"})
 public class AccessManagementController {
 
@@ -38,6 +38,8 @@ public class AccessManagementController {
 
     @Autowired
     FilterResourceService filterResourceService;
+
+
 
     @ApiOperation(value = "Grant resource access to user", response = ExplicitAccessGrant.class)
     @ApiResponses(value = {

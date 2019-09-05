@@ -111,5 +111,10 @@
     <sha1>9b15174852f5b6bb1edbf303d5722286a0a54011</sha1>
     <cve>CVE-2017-15288</cve>
   </suppress>
-
+  <suppress>
+    <notes><![CDATA[file name: org.apache.sling.javax.activation-0.1.0.jar)]]></notes>
+    <sha1>606ef790ce33d9cd6b892c47cc2a9508efc57698</sha1>
+    <cve>CVE-2016-5394</cve>
+    <cve>CVE-2016-6798</cve>
+  </suppress>
 </suppressions>

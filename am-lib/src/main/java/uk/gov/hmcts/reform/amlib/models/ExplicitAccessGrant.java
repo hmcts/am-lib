@@ -40,6 +40,9 @@ public final class ExplicitAccessGrant {
 
     private final String relationship;
 
+    @NotNull
+    private final AccessManagementAudit accessManagementAudit;
+
     @JsonPOJOBuilder(withPrefix = "")
     public static class ExplicitAccessGrantBuilder {
         // Lombok will add constructor, setters, build method

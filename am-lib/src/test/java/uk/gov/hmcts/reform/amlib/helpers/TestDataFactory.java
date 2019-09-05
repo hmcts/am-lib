@@ -6,11 +6,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,6 +47,7 @@ public final class TestDataFactory {
             .resourceDefinition(resourceDefinition)
             .attributePermissions(attributePermissions)
             .relationship(relationship)
+            .accessManagementAudit(createAccessManagementAudit())
             .build();
     }
 
@@ -62,6 +65,7 @@ public final class TestDataFactory {
             .resourceDefinition(resourceDefinition)
             .attributePermissions(attributePermissions)
             .relationship(relationship)
+            .accessManagementAudit(createAccessManagementAudit())
             .build();
     }
 
@@ -77,6 +81,7 @@ public final class TestDataFactory {
             .resourceDefinition(resourceDefinition)
             .attributePermissions(attributePermissions)
             .relationship(relationship)
+            .accessManagementAudit(createAccessManagementAudit())
             .build();
     }
 
@@ -113,4 +118,11 @@ public final class TestDataFactory {
             .data(data)
             .build();
     }
+
+    public static AccessManagementAudit createAccessManagementAudit() {
+        return AccessManagementAudit.builder().build();
+//        return AccessManagementAudit.builder().lastUpdate(LocalDateTime.now())
+//            .callerService("integration-test").build();
+    }
+
 }

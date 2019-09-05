@@ -202,7 +202,7 @@ def versions = [
   springfoxSwagger: '2.9.2',
   flyway          : '5.2.4',
   guava           : '28.0-jre',
-  serenity        : '2.0.52'
+  serenity        : '2.0.70'
 ]
 
 configurations.all {

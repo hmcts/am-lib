@@ -39,7 +39,7 @@
 					],
 					"port": "3704",
 					"path": [
-						"api",
+						"api/v1",
 						"filter-resource"
 					],
 					"query": [
@@ -78,7 +78,7 @@
 					],
 					"port": "3704",
 					"path": [
-						"api",
+						"api/v1",
 						"access-resource"
 					]
 				}
@@ -110,7 +110,7 @@
 					],
 					"port": "3704",
 					"path": [
-						"api",
+						"api/v1",
 						"access-resource"
 					]
 				}
@@ -142,7 +142,7 @@
 					],
 					"port": "3704",
 					"path": [
-						"api",
+						"api/v1",
 						"access-resource"
 					]
 				}
@@ -161,7 +161,7 @@
 					],
 					"port": "3704",
 					"path": [
-						"api",
+						"api/v1",
 						"resource",
 						"resourceType",
 						"case-test",

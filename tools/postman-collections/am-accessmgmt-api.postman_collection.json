@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "757f88b8-2595-48a7-9f7e-5c4199397722",
-		"name": "am-lib-testing",
+		"name": "am-accessmgmt-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [

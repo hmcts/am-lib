@@ -19,9 +19,9 @@ locals {
   s2s_vault_uri = "https://s2s-${local.envInUse}.vault.azure.net/"
 }
 
-module "am-api" {
+module "am-accessmgmt-api" {
   source              = "git@github.com:hmcts/moj-module-webapp?ref=master"
-  product             = "${var.product}-${var.component}"
+  product             = "${local.app_full_name}"
   location            = "${var.location_app}"
   env                 = "${var.env}"
   ilbIp               = "${var.ilbIp}"
@@ -50,7 +50,7 @@ module "am-api" {
 
 module "postgres-am-api" {
   source              = "git@github.com:hmcts/moj-module-postgres?ref=master"
-  product             = "${var.product}-${var.component}"
+  product             = "${local.app_full_name}"
   env                 = "${var.env}"
   location            = "${var.location_app}"
   postgresql_user     = "${var.db_user}"
@@ -63,7 +63,7 @@ module "postgres-am-api" {
 # region save DB details to Azure Key Vault
 module "am-vault-api" {
   source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
-  name                = "${var.raw_product}-${var.component}-${local.shortEnv}"
+  name                = "${var.raw_product}-${local.envInUse}"
   product             = "${var.product}"
   env                 = "${var.env}"
   tenant_id           = "${var.tenant_id}"

@@ -291,7 +291,7 @@ dependencies {
 mainClassName = 'uk.gov.hmcts.reform.amapi.Application'
 
 bootJar {
-  archiveFileName = 'am-accessmgmt-api.jar'
+  archiveFileName = 'am-lib-testing-service.jar'
 
   manifest {
     attributes('Implementation-Version': project.version.toString())

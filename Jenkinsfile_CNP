@@ -10,7 +10,7 @@ properties([
 
 def type = "java"
 def product = "am"
-def component = "accessmgmt-api"
+def component = "lib-test"
 
 def appVault = "am-lib-test-${params.ENVIRONMENT}"
 def s2sVault = "s2s-${params.ENVIRONMENT}"
@@ -47,14 +47,11 @@ withPipeline(type, product, component) {
   loadVaultSecrets(secrets)
   enableDockerBuild()
   installCharts()
-  enableDbMigration('am')
+  enableDbMigration('am-lib-test')
 
   env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-${params.ENVIRONMENT}.service.core-compute-${params.ENVIRONMENT}.internal"
   env.S2S_URL = "http://rpe-service-auth-provider-${params.ENVIRONMENT}.service.core-compute-${params.ENVIRONMENT}.internal"
 
-  before('functionalTest:sandbox') {
-    env.URL_TO_TEST = env.TEST_URL
-  }
 
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'

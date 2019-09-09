@@ -36,3 +36,4 @@ spring:
 security:
   authorisedServices:
     - am_accessmgmt_api
+version: v1

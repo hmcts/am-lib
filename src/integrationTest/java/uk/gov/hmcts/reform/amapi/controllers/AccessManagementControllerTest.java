@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -57,7 +58,6 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
-
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = MOCK)
 @AutoConfigureMockMvc
@@ -80,6 +80,9 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
 
     private String s2sToken;
 
+    @Value("${version:v1}")
+    protected String version;
+
     @BeforeEach
     void init() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
@@ -99,7 +102,7 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
 
         doNothing().when(accessManagementService).grantExplicitResourceAccess(any());
 
-        this.mockMvc.perform(post("/api/access-resource")
+        this.mockMvc.perform(post("/api/" + version + "/access-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header("ServiceAuthorization", s2sToken))
@@ -126,7 +129,7 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
 
         doNothing().when(accessManagementService).revokeResourceAccess(any());
 
-        this.mockMvc.perform(delete("/api/access-resource")
+        this.mockMvc.perform(delete("/api/" + version + "/access-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header("ServiceAuthorization", s2sToken))
@@ -165,7 +168,7 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
             filterResource.getAttributeSecurityClassification()))
             .thenReturn(filteredResourceEnvelope);
 
-        this.mockMvc.perform(post("/api/filter-resource")
+        this.mockMvc.perform(post("/api/" + version + "/filter-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header("ServiceAuthorization", s2sToken))
@@ -207,7 +210,7 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
             filterResource.getResource(), filterResource.getAttributeSecurityClassification()))
             .thenReturn(filteredResourceEnvelope);
 
-        this.mockMvc.perform(post("/api/filter-resource")
+        this.mockMvc.perform(post("/api/" + version + "/filter-resource")
             .content(inputJson)
             .header("ServiceAuthorization", s2sToken)
             .header(CONTENT_TYPE, APPLICATION_JSON))
@@ -240,7 +243,7 @@ public class AccessManagementControllerTest extends SecurityAuthorizationTest {
         Mockito.when(filterResourceService.returnResourceAccessors(resourceId, resourceName, resourceType))
             .thenReturn(resourceAccessorsEnvelope);
 
-        this.mockMvc.perform(get("/api/resource/resourceType/" + resourceType + "/resourceName/"
+        this.mockMvc.perform(get("/api/" + version + "/resource/resourceType/" + resourceType + "/resourceName/"
             + resourceName + "/resourceId/" + resourceId)
             .header("ServiceAuthorization", s2sToken)
             .header(CONTENT_TYPE, APPLICATION_JSON))

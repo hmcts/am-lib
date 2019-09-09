@@ -6,7 +6,7 @@ variable "product" {
 
 variable "component" {
   type = "string"
-  default = "api"
+  default = "accessmgmt-api"
 }
 
 variable "location_app" {

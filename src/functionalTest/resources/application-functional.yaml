@@ -6,3 +6,4 @@ s2s-secret: ${S2S_SECRET:GJNMFGFAAO4FCVD4}
 spring:
   flyway:
     enabled: false
+version: v1

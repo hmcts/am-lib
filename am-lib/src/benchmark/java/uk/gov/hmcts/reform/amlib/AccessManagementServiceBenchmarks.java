@@ -24,7 +24,7 @@ public class AccessManagementServiceBenchmarks {
         ResourceDefinition resourceDefinition = data.randomResourceDefinition();
 
         String accessorId = "user-" + id;
-        String accessorRole = "caseworker";
+        String accessorRole = "caseworker-jmhtest";
         String resourceId = resourceDefinition.getServiceName() + "-resource-" + id;
 
         benchmark.service.filterResource(accessorId, ImmutableSet.of(accessorRole), Resource.builder()

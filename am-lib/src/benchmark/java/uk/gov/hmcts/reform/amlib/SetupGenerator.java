@@ -38,7 +38,7 @@ import static uk.gov.hmcts.reform.amlib.utils.DataSourceFactory.createDataSource
 public class SetupGenerator {
     private static final List<CaseDefinition> definitions = ImmutableList.of(
         new CaseDefinition(
-            "fpl",
+            "fpl-jmhtest",
             "application",
             ImmutableMap.<JsonPointer, Set<Permission>>builder()
                 .put(JsonPointer.valueOf(""), ImmutableSet.of(READ, CREATE))
@@ -54,7 +54,7 @@ public class SetupGenerator {
                 .build()
         ),
         new CaseDefinition(
-            "cmc",
+            "cmc-jmhtest",
             "claim",
             ImmutableMap.<JsonPointer, Set<Permission>>builder()
                 .put(JsonPointer.valueOf(""), ImmutableSet.of(READ, CREATE))
@@ -93,7 +93,7 @@ public class SetupGenerator {
                 .resourceType(resourceType)
                 .resourceName(definition.resourceName)
                 .build());
-            importerService.addRole("caseworker", IDAM, PUBLIC, ROLE_BASED);
+            importerService.addRole("caseworker-jmhtest", IDAM, PUBLIC, ROLE_BASED);
 
             // Role based permissions
             importerService.grantDefaultPermission(
@@ -103,7 +103,7 @@ public class SetupGenerator {
                         .resourceType(resourceType)
                         .resourceName(definition.resourceName)
                         .build())
-                    .roleName("caseworker")
+                    .roleName("caseworker-jmhtest")
                     .attributePermissions(definition.attributePermissions.entrySet().stream()
                         .collect(toDefaultAttributePermissions()))
                     .build()
@@ -121,7 +121,7 @@ public class SetupGenerator {
                     .accessorIds(ImmutableSet.of("user-" + number))
                     .accessorType(USER)
                     .attributePermissions(definition.attributePermissions)
-                    .relationship("caseworker")
+                    .relationship("caseworker-jmhtest")
                     .build()
             ));
         }

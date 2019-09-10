@@ -19,7 +19,6 @@ def product = "am"
 def component = "accessmgmt-api"
 
 def appVault = "am-${params.ENVIRONMENT}"
-def s2sVault = "s2s-${params.ENVIRONMENT}"
 
 def secrets = [
   (appVault): [
@@ -27,10 +26,8 @@ def secrets = [
     secret('accessmgmt-api-POSTGRES-PORT', 'DATABASE_PORT'),
     secret('accessmgmt-api-POSTGRES-DATABASE', 'DATABASE_NAME'),
     secret('accessmgmt-api-POSTGRES-USER', 'DATABASE_USER'),
-    secret('accessmgmt-api-POSTGRES-PASS', 'DATABASE_PASS')
-  ],
-  (s2sVault): [
-    secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
+    secret('accessmgmt-api-POSTGRES-PASS', 'DATABASE_PASS'),
+    secret('s2s-secret', 'S2S_SECRET')
   ]
 ]
 

@@ -30,7 +30,9 @@ class RoleIntegrationTest extends IntegrationBaseTest {
     void shouldAddNewEntryIntoDatabaseWhenNewRoleIsAdded() {
         service.addRole(roleName, IDAM, PUBLIC, ROLE_BASED);
 
-        assertThat(databaseHelper.getRole(roleName)).isNotNull();
+        Role role = databaseHelper.getRole(roleName);
+        assertThat(role).isNotNull();
+        assertThat(role.getLastUpdate()).isNotNull();
     }
 
     @Test
@@ -43,6 +45,7 @@ class RoleIntegrationTest extends IntegrationBaseTest {
         assertThat(role.getRoleType()).isEqualTo(RoleType.RESOURCE);
         assertThat(role.getSecurityClassification()).isEqualTo(SecurityClassification.PRIVATE);
         assertThat(role.getAccessType()).isEqualTo(AccessType.EXPLICIT);
+        assertThat(role.getLastUpdate()).isNotNull();
     }
 
     @Test

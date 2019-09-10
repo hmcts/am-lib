@@ -20,6 +20,8 @@ public final class ResourceDefinition {
     @NotBlank
     private final String resourceName;
 
+    private final String lastUpdate;
+
     @JsonPOJOBuilder(withPrefix = "")
     public static class ResourceDefinitionBuilder {
         // Lombok will add constructor, setters, build method

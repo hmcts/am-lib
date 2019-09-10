@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.UUID;
 
@@ -37,7 +38,10 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
         service.addService(serviceName);
         service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
 
-        assertThat(databaseHelper.getResourcesDefinition(serviceName, resourceType, resourceName)).isNotNull();
+        ResourceDefinition resourceDefinition = databaseHelper.getResourcesDefinition(serviceName, resourceType, resourceName);
+
+        assertThat(resourceDefinition).isNotNull();
+        assertThat(resourceDefinition.getLastUpdate());
     }
 
     @Test

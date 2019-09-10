@@ -38,7 +38,8 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
         service.addService(serviceName);
         service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
 
-        ResourceDefinition resourceDefinition = databaseHelper.getResourcesDefinition(serviceName, resourceType, resourceName);
+        ResourceDefinition resourceDefinition = databaseHelper.getResourcesDefinition(serviceName,
+            resourceType, resourceName);
 
         assertThat(resourceDefinition).isNotNull();
         assertThat(resourceDefinition.getLastUpdate());
@@ -49,8 +50,10 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
         service.addService(serviceName);
         service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
         service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
-
-        assertThat(databaseHelper.getResourcesDefinition(serviceName, resourceType, resourceName)).isNotNull();
+        ResourceDefinition resourceDefinition = databaseHelper.getResourcesDefinition(serviceName,
+            resourceType, resourceName);
+        assertThat(resourceDefinition).isNotNull();
+        assertThat(resourceDefinition.getLastUpdate());
     }
 
     @Test

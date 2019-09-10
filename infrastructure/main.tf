@@ -116,12 +116,12 @@ data "azurerm_key_vault" "s2s_key_vault" {
 
 data "azurerm_key_vault_secret" "s2s_microservice" {
   name = "s2s-microservice"
-  key_vault_id = "${data.azurerm_key_vault.am-shared-vault.id}"
+  key_vault_id = "${data.azurerm_key_vault.am_shared_vault.id}"
 }
 
 data "azurerm_key_vault_secret" "s2s_url" {
   name = "s2s-url"
-  key_vault_id = "${data.azurerm_key_vault.am-shared-vault.id}"
+  key_vault_id = "${data.azurerm_key_vault.am_shared_vault.id}"
 }
 
 data "azurerm_key_vault_secret" "s2s_secret" {

@@ -3,5 +3,5 @@ output "sharedResourceGroup" {
 }
 
 output "shared_vault_uri" {
-  value = "${data.azurerm_key_vault.am-shared-vault.vault_uri}"
+  value = "${data.azurerm_key_vault.am_shared_vault.vault_uri}"
 }

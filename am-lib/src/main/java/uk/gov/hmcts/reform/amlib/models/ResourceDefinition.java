@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -20,7 +21,7 @@ public final class ResourceDefinition {
     @NotBlank
     private final String resourceName;
 
-    private final String lastUpdate;
+    private final LocalDateTime lastUpdate;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class ResourceDefinitionBuilder {

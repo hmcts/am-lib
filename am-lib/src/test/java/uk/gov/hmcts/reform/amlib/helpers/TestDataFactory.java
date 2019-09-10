@@ -120,9 +120,8 @@ public final class TestDataFactory {
     }
 
     public static AccessManagementAudit createAccessManagementAudit() {
-        return AccessManagementAudit.builder().build();
-//        return AccessManagementAudit.builder().lastUpdate(LocalDateTime.now())
-//            .callerService("integration-test").build();
+        return AccessManagementAudit.builder().lastUpdate(LocalDateTime.now())
+            .callingServiceName("integration-test").build();
     }
 
 }

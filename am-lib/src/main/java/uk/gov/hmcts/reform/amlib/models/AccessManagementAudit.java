@@ -18,5 +18,5 @@ public class AccessManagementAudit {
     private final LocalDateTime lastUpdate;
 
     @NotBlank
-    private final String callerService;
+    private final String callingServiceName;
 }

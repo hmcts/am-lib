@@ -18,6 +18,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -191,6 +192,8 @@ public class InvalidArgumentsProvider implements ArgumentsProvider {
             return parameterType.getEnumConstants()[0];
         } else if (isComplexTypeSupported(parameterType)) {
             return generateComplexValue(parameterType);
+        } else if (parameterType.equals(LocalDateTime.class)) {
+            return LocalDateTime.now();
         }
         throw new IllegalArgumentException("Unsupported type: " + parameterType);
     }

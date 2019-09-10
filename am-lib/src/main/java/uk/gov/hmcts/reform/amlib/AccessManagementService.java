@@ -93,6 +93,7 @@ public class AccessManagementService {
                         .resourceName(accessGrant.getResourceDefinition().getResourceName())
                         .attribute(attributePermission.getKey())
                         .relationship(accessGrant.getRelationship())
+                        .accessManagementAudit(accessGrant.getAccessManagementAudit())
                         .build())
                     .forEach(expAccessRecord -> {
                         if (nonNull(accessGrant.getRelationship())) {

@@ -30,7 +30,8 @@ class AccessManagementServiceValidationTest {
                 "accessGrant.resourceDefinition.serviceName - must not be blank",
                 "accessGrant.resourceDefinition.resourceType - must not be blank",
                 "accessGrant.resourceDefinition.resourceName - must not be blank",
-                "accessGrant.attributePermissions - must not be empty"
+                "accessGrant.attributePermissions - must not be empty",
+                "accessGrant.accessManagementAudit - must not be null"
             ));
     }
 

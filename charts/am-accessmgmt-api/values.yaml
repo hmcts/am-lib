@@ -1,5 +1,10 @@
 java:
   applicationPort: 3703
+  keyVaults:
+    am:
+      resourceGroup: am-shared-infrastructure
+      secrets:
+        - s2s-secret
   environment:
     AM_DB_HOST: "{{ .Release.Name }}-postgresql"
     AM_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase }}"

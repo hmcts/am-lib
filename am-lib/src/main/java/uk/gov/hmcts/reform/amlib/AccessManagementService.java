@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.query.AttributeData;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
 import uk.gov.hmcts.reform.amlib.internal.utils.SecurityClassifications;
+import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.DefaultRolePermissions;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
@@ -24,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
@@ -93,7 +95,8 @@ public class AccessManagementService {
                         .resourceName(accessGrant.getResourceDefinition().getResourceName())
                         .attribute(attributePermission.getKey())
                         .relationship(accessGrant.getRelationship())
-                        .accessManagementAudit(accessGrant.getAccessManagementAudit())
+                        .accessManagementAudit(Optional.ofNullable(accessGrant.getAccessManagementAudit())
+                            .orElse(AccessManagementAudit.builder().build()))
                         .build())
                     .forEach(expAccessRecord -> {
                         if (nonNull(accessGrant.getRelationship())) {

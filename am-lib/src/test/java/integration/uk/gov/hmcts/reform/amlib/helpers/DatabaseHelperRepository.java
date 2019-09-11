@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
 import uk.gov.hmcts.reform.amlib.internal.models.Role;
+import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.Service;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.JsonPointerMapper;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.PermissionSetMapper;
@@ -84,4 +85,14 @@ public interface DatabaseHelperRepository {
         + "and role_name = :roleName "
         + "and permissions = :permissions")
     int countDefaultPermissions(@BindBean ResourceDefinition resourceDefinition, String attribute, String roleName, int permissions);
+
+    @SqlQuery("select * from default_permissions_for_roles "
+        + "where service_name = :serviceName "
+        + "and resource_type = :resourceType "
+        + "and resource_name = :resourceName "
+        + "and attribute = :attribute "
+        + "and role_name = :roleName "
+        + "and permissions = :permissions")
+    @RegisterConstructorMapper(RoleBasedAccessRecord.class)
+    RoleBasedAccessRecord getDefaultPermissionsForAudit(@BindBean ResourceDefinition resourceDefinition, String attribute, String roleName, int permissions);
 }

@@ -59,7 +59,7 @@ def loadOrDeletePerformanceDbData(String parameterLoadOrDelete) {
                         ${DATABASE_USER} \
                         ${DATABASE_NAME} \
                         ${DATABASE_HOST} \
-                        ${DATABASE_PASS} \
+                        \"${DATABASE_PASS}\" \
                         ${DATABASE_PORT} \
                         ${params.ENVIRONMENT}"
       }

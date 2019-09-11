@@ -31,12 +31,12 @@ public class DataState {
 
     private static ResourceDefinition[] definitions = new ResourceDefinition[]{
         ResourceDefinition.builder()
-            .serviceName("fpl")
+            .serviceName("fpl-jmhtest")
             .resourceType("case")
             .resourceName("application")
             .build(),
         ResourceDefinition.builder()
-            .serviceName("cmc")
+            .serviceName("cmc-jmhtest")
             .resourceType("case")
             .resourceName("claim")
             .build()

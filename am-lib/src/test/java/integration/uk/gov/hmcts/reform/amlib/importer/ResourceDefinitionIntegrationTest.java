@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,11 +50,15 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
     void shouldUpdateExistingEntryWhenDuplicateResourceDefinitionsAreAdded() {
         service.addService(serviceName);
         service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
+        ResourceDefinition  resourceDefinition = databaseHelper.getResourcesDefinition(serviceName,
+            resourceType, resourceName);
+        final LocalDateTime localDateTime = resourceDefinition.getLastUpdate();
         service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
-        ResourceDefinition resourceDefinition = databaseHelper.getResourcesDefinition(serviceName,
+        resourceDefinition = databaseHelper.getResourcesDefinition(serviceName,
             resourceType, resourceName);
         assertThat(resourceDefinition).isNotNull();
-        assertThat(resourceDefinition.getLastUpdate());
+        assertThat(resourceDefinition.getLastUpdate()).isNotNull();
+        assertThat(resourceDefinition.getLastUpdate()).isNotEqualTo(localDateTime);
     }
 
     @Test

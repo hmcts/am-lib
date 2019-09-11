@@ -1,5 +1,6 @@
 package integration.uk.gov.hmcts.reform.amlib.helpers;
 
+import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.config.RegisterColumnMapper;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
@@ -43,7 +44,7 @@ public interface DatabaseHelperRepository {
         + "where service_name = :serviceName "
         + "and resource_type = :resourceType "
         + "and resource_name = :resourceName")
-    @RegisterConstructorMapper(ResourceDefinition.class)
+    @RegisterBeanMapper(ResourceDefinition.class)
     ResourceDefinition getResourcesDefinition(String serviceName, String resourceType, String resourceName);
 
     @SqlQuery("select * from resource_attributes "

@@ -10,11 +10,11 @@ properties([
 
 def type = "java"
 def product = "am"
-def component = "lib-test"
+def component = "accessmgmt-api"
 
 def secrets = [
-  's2s-${env}': [
-    secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
+  'am-${env}': [
+    secret('s2s-secret', 'S2S_SECRET')
   ]
 ]
 

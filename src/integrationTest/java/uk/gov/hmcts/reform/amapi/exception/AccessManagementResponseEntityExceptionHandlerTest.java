@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -44,6 +45,9 @@ import static uk.gov.hmcts.reform.amapi.util.ErrorConstants.MALFORMED_JSON;
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert","PMD.AvoidDuplicateLiterals","PMD.ExcessiveImports"})
 public class AccessManagementResponseEntityExceptionHandlerTest extends SecurityAuthorizationTest {
 
+    @Value("${version:v1}")
+    protected String version;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -61,8 +65,6 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
         doNothing().when(importerService).addRole(anyString(), any(), any(), any());
 
         s2sToken = getS2sToken();
-        //s2sToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbV9hY2Nlc3NtZ210X2FwaSIsImV4cCI6MTU2NDc0MjcxN30.rIpRPLo3r"
-        //    + "XGex6iZcq1kG1732h53P744Fq5NTTKqw33jlMotC7jDuOffyCnerXyQxjTuN93F2Iuu7gY3NJ99Pw";
     }
 
     /**
@@ -76,7 +78,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
         String invalidJson = Resources.toString(Resources
             .getResource("exception-mapper-data/malformedInput.json"), StandardCharsets.UTF_8);
 
-        this.mockMvc.perform(post("/api/filter-resource")
+        this.mockMvc.perform(post("/api/" + version + "/filter-resource")
             .content(invalidJson)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header("ServiceAuthorization", s2sToken))
@@ -101,7 +103,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
         String invalidJson = Resources.toString(Resources
             .getResource("exception-mapper-data/missingValidInputParameter.json"), StandardCharsets.UTF_8);
 
-        this.mockMvc.perform(post("/api/filter-resource")
+        this.mockMvc.perform(post("/api/" + version + "/filter-resource")
             .content(invalidJson)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header("ServiceAuthorization", s2sToken))
@@ -125,7 +127,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
         String inputJson = Resources.toString(Resources
             .getResource("input-data/filterResourceWithSecurityClassification.json"), StandardCharsets.UTF_8);
 
-        this.mockMvc.perform(post("/api/filter-resource")
+        this.mockMvc.perform(post("/api/" + version + "/filter-resource")
             .content(inputJson)
             .header(CONTENT_TYPE, TEXT_HTML)
             .header("ServiceAuthorization", s2sToken))
@@ -169,7 +171,7 @@ public class AccessManagementResponseEntityExceptionHandlerTest extends Security
         String invalidJson = Resources.toString(Resources
             .getResource("exception-mapper-data/filterResourceWithMissingRoot.json"), StandardCharsets.UTF_8);
 
-        this.mockMvc.perform(post("/api/filter-resource")
+        this.mockMvc.perform(post("/api/" + version + "/filter-resource")
             .content(invalidJson)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header("ServiceAuthorization", s2sToken))

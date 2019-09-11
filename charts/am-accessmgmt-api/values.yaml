@@ -1,5 +1,10 @@
-am-lib-test:
+java:
   applicationPort: 3703
+  keyVaults:
+    am:
+      resourceGroup: am-shared-infrastructure
+      secrets:
+        - s2s-secret
   environment:
     AM_DB_HOST: "{{ .Release.Name }}-postgresql"
     AM_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase }}"
@@ -7,13 +12,5 @@ am-lib-test:
     AM_DB_PORT: 5432
     AM_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername }}"
     ENABLE_DB_MIGRATE_IN_SERVICE: true
-  image: "https://hmcts.azurecr.io/hmcts/am-lib-test:latest"
-  keyVaults:
-    "s2s":
-      resourceGroup: rpe-service-auth-provider
-      secrets:
-        - microservicekey-am-accessmgmt-api
-    "am":
-      resourceGroup: am-shared-infrastructure
-      secrets:
-        - s2s-url
+    S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+  image: "https://hmcts.azurecr.io/hmcts/am-accessmgmt-api:latest"

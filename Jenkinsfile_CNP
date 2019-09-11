@@ -10,21 +10,18 @@ properties([
 
 def type = "java"
 def product = "am"
-def component = "lib-test"
+def component = "accessmgmt-api"
 
-def appVault = "am-lib-test-${params.ENVIRONMENT}"
-def s2sVault = "s2s-${params.ENVIRONMENT}"
+def appVault = "am-${params.ENVIRONMENT}"
 
 def secrets = [
   (appVault): [
-    secret('lib-test-POSTGRES-HOST', 'DATABASE_HOST'),
-    secret('lib-test-POSTGRES-PORT', 'DATABASE_PORT'),
-    secret('lib-test-POSTGRES-DATABASE', 'DATABASE_NAME'),
-    secret('lib-test-POSTGRES-USER', 'DATABASE_USER'),
-    secret('lib-test-POSTGRES-PASS', 'DATABASE_PASS')
-  ],
-  (s2sVault): [
-    secret('microservicekey-am-accessmgmt-api', 'S2S_SECRET')
+    secret('accessmgmt-api-POSTGRES-HOST', 'DATABASE_HOST'),
+    secret('accessmgmt-api-POSTGRES-PORT', 'DATABASE_PORT'),
+    secret('accessmgmt-api-POSTGRES-DATABASE', 'DATABASE_NAME'),
+    secret('accessmgmt-api-POSTGRES-USER', 'DATABASE_USER'),
+    secret('accessmgmt-api-POSTGRES-PASS', 'DATABASE_PASS'),
+    secret('s2s-secret', 'S2S_SECRET')
   ]
 ]
 
@@ -47,11 +44,14 @@ withPipeline(type, product, component) {
   loadVaultSecrets(secrets)
   enableDockerBuild()
   installCharts()
-  enableDbMigration('am-lib-test')
+  enableDbMigration('am')
 
   env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-${params.ENVIRONMENT}.service.core-compute-${params.ENVIRONMENT}.internal"
   env.S2S_URL = "http://rpe-service-auth-provider-${params.ENVIRONMENT}.service.core-compute-${params.ENVIRONMENT}.internal"
 
+  before('functionalTest:sandbox') {
+    env.URL_TO_TEST = env.TEST_URL
+  }
 
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'

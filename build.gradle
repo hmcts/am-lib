@@ -12,7 +12,6 @@ buildscript {
   }
 }
 
-
 plugins {
   id 'application'
   id 'checkstyle'
@@ -21,10 +20,12 @@ plugins {
   id 'io.spring.dependency-management' version '1.0.8.RELEASE'
   id 'org.springframework.boot' version '2.1.7.RELEASE'
   id 'org.owasp.dependencycheck' version '5.2.1'
-  id 'com.github.ben-manes.versions' version '0.24.0'
-  id "org.flywaydb.flyway" version "6.0.1"
-  id 'com.github.lkishalmi.gatling' version '3.2.7'
+  id 'com.github.ben-manes.versions' version '0.25.0'
+  id "org.flywaydb.flyway" version "6.0.2"
+  id 'com.github.lkishalmi.gatling' version '3.2.8'
 }
+
+ext['mockito.version'] = '3.0.0'
 
 subprojects {
   apply plugin: 'org.owasp.dependencycheck'
@@ -241,8 +242,9 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.reformLogging
   compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: versions.reformHealthStarter
+  compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.0.4'
 
-  compile group: 'org.postgresql', name: 'postgresql', version: '42.2.6'
+  compile group: 'org.postgresql', name: 'postgresql', version: '42.2.7'
   compile group: 'org.flywaydb', name: 'flyway-core', version: versions.flyway
 
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
@@ -253,10 +255,10 @@ dependencies {
 
   testCompile group: 'com.warrenstrange', name: 'googleauth', version: '1.2.0'
 
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.2'
   testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 
-  testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.17.0'
+  testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.0.0'
 
   testCompile (group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot) {
     exclude group: 'junit', module: 'junit'
@@ -290,7 +292,7 @@ dependencies {
 mainClassName = 'uk.gov.hmcts.reform.amapi.Application'
 
 bootJar {
-  archiveFileName = 'am-lib-testing-service.jar'
+  archiveFileName = 'am-accessmgmt-api.jar'
 
   manifest {
     attributes('Implementation-Version': project.version.toString())

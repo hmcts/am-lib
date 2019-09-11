@@ -31,7 +31,7 @@ GRADLE_INSTALL=true
 #S2S_SECRET=secret
 
 # Test S2S key - not used in any HMCTS key vaults or services
-export S2S_SECRET=GJNMFGFAAO4FCVD4
+export S2S_SECRET=AAAAAAAAAAAAAAAB
 export S2S_MICROSERVICE=am_accessmgmt_api
 
 build_service_auth_app() {
@@ -52,16 +52,16 @@ build_s2s_image() {
 }
 
 clean_old_docker_artifacts() {
-    docker stop am-lib-testing-service
-    docker stop am-lib-testing-service-db
+    docker stop am-accessmgmt-api
+    docker stop am-accessmgmt-api-db
     docker stop service-token-provider
 
-    docker rm am-lib-testing-service
-    docker rm am-lib-testing-service-db
+    docker rm am-accessmgmt-api
+    docker rm am-accessmgmt-api-db
     docker rm service-token-provider
 
-    docker rmi hmcts/am-lib-testing-service
-    docker rmi hmcts/am-lib-testing-service-db
+    docker rmi hmcts/am-accessmgmt-api
+    docker rmi hmcts/am-accessmgmt-api-db
     docker rmi hmcts/service-token-provider
 
 }

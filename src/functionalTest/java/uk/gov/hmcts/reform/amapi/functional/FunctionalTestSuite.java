@@ -67,6 +67,8 @@ public class FunctionalTestSuite {
     }
 
     private void executeScript(List<Path> scriptFiles) throws SQLException, IOException {
+        //Functional initial data load for aat is added with DB secrets
+        //And for aks is added with flyway db/migrationAks
         if ("aat".equalsIgnoreCase(getenv("environment_name"))) {
             log.info("environment script execution started::");
             try (Connection connection = createDataSource().getConnection()) {

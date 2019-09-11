@@ -1,6 +1,6 @@
 spring:
   cloud:
     propertiesvolume:
+      paths: /mnt/secrets/am
       aliases:
-        s2s.microservicekey-am-accessmgmt-api: S2S_SECRET
-        am-api.s2s-url: S2S_URL
+        am.s2s-secret: S2S_SECRET

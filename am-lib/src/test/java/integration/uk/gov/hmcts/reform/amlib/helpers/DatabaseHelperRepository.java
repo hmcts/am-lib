@@ -65,6 +65,17 @@ public interface DatabaseHelperRepository {
     @RegisterConstructorMapper(ExplicitAccessRecord.class)
     List<ExplicitAccessRecord> findExplicitPermissions(String resourceId);
 
+    @SqlQuery("select * from access_management "
+        + "where service_name = :serviceName "
+        + "and resource_type = :resourceType "
+        + "and resource_name = :resourceName "
+        + "and attribute = :attribute "
+        + "and relationship = :relationship "
+        + "and permissions = :permissions")
+    @RegisterConstructorMapper(ExplicitAccessRecord.class)
+    ExplicitAccessRecord getExplicitAccessRecordsForAudit(@BindBean ResourceDefinition resourceDefinition, String attribute,
+                                                          String relationship, int permissions);
+
     @SqlQuery("select count(1) from default_permissions_for_roles "
         + "where service_name = :serviceName "
         + "and resource_type = :resourceType "

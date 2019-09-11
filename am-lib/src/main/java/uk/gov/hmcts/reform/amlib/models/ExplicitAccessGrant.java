@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amlib.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -41,6 +42,7 @@ public final class ExplicitAccessGrant {
     private final String relationship;
 
     @NotNull
+    @JsonIgnore
     private final AccessManagementAudit accessManagementAudit;
 
     @JsonPOJOBuilder(withPrefix = "")

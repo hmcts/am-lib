@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amlib.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.AllArgsConstructor;
@@ -8,7 +9,6 @@ import lombok.Data;
 import org.jdbi.v3.core.mapper.reflect.JdbiConstructor;
 
 import java.time.LocalDateTime;
-
 import javax.validation.constraints.NotBlank;
 
 @Data
@@ -17,17 +17,23 @@ import javax.validation.constraints.NotBlank;
 @JsonDeserialize(builder = ResourceDefinition.ResourceDefinitionBuilder.class)
 public final class ResourceDefinition {
     @NotBlank
-    private final String serviceName;
+    private String serviceName;
     @NotBlank
-    private final String resourceType;
+    private String resourceType;
     @NotBlank
-    private final String resourceName;
+    private String resourceName;
 
+    @JsonIgnore
     private LocalDateTime lastUpdate;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class ResourceDefinitionBuilder {
         // Lombok will add constructor, setters, build method
+    }
+
+    //Used For @BeanMapper forIntegrationTesting non @JdbiConstructor params
+    public ResourceDefinition() {
+        super();
     }
 
     @JdbiConstructor

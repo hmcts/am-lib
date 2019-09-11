@@ -15,15 +15,15 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 })
 public interface DefaultRoleSetupRepository {
     @SqlUpdate("insert into services (service_name, service_description) values (:serviceName, :serviceDescription)"
-        + " on conflict on constraint services_pkey do update set service_description = :serviceDescription")
+        + " on conflict on constraint services_pkey do update set service_description = :serviceDescription , last_update = now()")
     void addService(String serviceName, String serviceDescription);
 
     @SqlUpdate("insert into roles (role_name, role_type, security_classification, access_type) values (:roleName, cast(:roleType as role_type), cast(:securityClassification as security_classification), cast(:accessType as access_type))"
-        + " on conflict on constraint roles_pkey do update set role_type = cast(:roleType as role_type), security_classification = cast(:securityClassification as security_classification), access_type = cast(:accessType as access_type)")
+        + " on conflict on constraint roles_pkey do update set role_type = cast(:roleType as role_type), security_classification = cast(:securityClassification as security_classification), access_type = cast(:accessType as access_type), last_update = now()")
     void addRole(String roleName, RoleType roleType, SecurityClassification securityClassification, AccessType accessType);
 
     @SqlUpdate("insert into resources (service_name, resource_type, resource_name) values (:serviceName, :resourceType, :resourceName)"
-        + "on conflict on constraint resources_pkey do nothing")
+        + "on conflict on constraint resources_pkey do update set last_update = now()")
     void addResourceDefinition(@BindBean ResourceDefinition resourceDefinition);
 
     @SqlUpdate("insert into resource_attributes (service_name, resource_type, resource_name, attribute, default_security_classification)"

@@ -90,7 +90,8 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
-    void testAuditLogDetailsForGrantExplicitAccess() {
+    void whenAuditLogsForExplicitAccessThenShouldReturnsAuditDetails() {
+        //Add Audit
         AccessManagementAudit accessManagementAudit = AccessManagementAudit.builder().lastUpdate(LocalDateTime.now())
             .callingServiceName("integration-test").build();
         ExplicitAccessGrant explicitAccessGrant = createExplicitAccessGrantWithAudit(resourceId, accessorId, roleName,
@@ -98,13 +99,14 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         service.grantExplicitResourceAccess(explicitAccessGrant);
         ExplicitAccessRecord explicitAccessRecord = databaseHelper.getExplicitAccessRecordsForAudit(resourceDefinition,
             "", roleName, READ.getValue());
+        final LocalDateTime localDateTime = explicitAccessRecord.getAccessManagementAudit().getLastUpdate();
         assertThat(explicitAccessRecord).isNotNull();
         assertThat(explicitAccessRecord.getAccessManagementAudit().getCallingServiceName()).isNotNull();
-        assertThat(explicitAccessRecord.getAccessManagementAudit().getLastUpdate()).isNotNull();
+        assertThat(localDateTime).isNotNull();
         assertThat(explicitAccessRecord.getAccessManagementAudit().getCallingServiceName())
             .isEqualTo("integration-test");
-        final LocalDateTime localDateTime = explicitAccessRecord.getAccessManagementAudit().getLastUpdate();
 
+        //Update Audit
         accessManagementAudit = AccessManagementAudit.builder().lastUpdate(LocalDateTime.now())
             .callingServiceName("integration-test123").build();
         explicitAccessGrant = createExplicitAccessGrantWithAudit(resourceId, accessorId, roleName,

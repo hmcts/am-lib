@@ -31,25 +31,19 @@ class RoleIntegrationTest extends IntegrationBaseTest {
     void shouldAddNewEntryIntoDatabaseWhenNewRoleIsAdded() {
         service.addRole(roleName, IDAM, PUBLIC, ROLE_BASED);
 
-        Role role = databaseHelper.getRole(roleName);
-        assertThat(role).isNotNull();
-        assertThat(role.getLastUpdate()).isNotNull();
+        assertThat(databaseHelper.getRole(roleName)).isNotNull();
     }
 
     @Test
     void shouldUpdateExistingEntryWhenDuplicateRolesAreAdded() {
         service.addRole(roleName, IDAM, PUBLIC, ROLE_BASED);
-        Role role = databaseHelper.getRole(roleName);
-        final LocalDateTime dateTime = role.getLastUpdate();
         service.addRole(roleName, RoleType.RESOURCE, SecurityClassification.PRIVATE, AccessType.EXPLICIT);
 
-        role = databaseHelper.getRole(roleName);
+        Role role = databaseHelper.getRole(roleName);
         assertThat(role).isNotNull();
         assertThat(role.getRoleType()).isEqualTo(RoleType.RESOURCE);
         assertThat(role.getSecurityClassification()).isEqualTo(SecurityClassification.PRIVATE);
         assertThat(role.getAccessType()).isEqualTo(AccessType.EXPLICIT);
-        assertThat(role.getLastUpdate()).isNotNull();
-        assertThat(role.getLastUpdate()).isNotEqualTo(dateTime);
     }
 
     @Test
@@ -58,5 +52,24 @@ class RoleIntegrationTest extends IntegrationBaseTest {
         service.deleteRole(roleName);
 
         assertThat(databaseHelper.getRole(roleName)).isNull();
+    }
+
+    @Test
+    void whenAuditDetailsThenShouldReturnAuditDetails() {
+        //Add audit
+        service.addRole(roleName, IDAM, PUBLIC, ROLE_BASED);
+        Role role = databaseHelper.getRole(roleName);
+        final LocalDateTime dateTime = role.getLastUpdate();
+        service.addRole(roleName, RoleType.RESOURCE, SecurityClassification.PRIVATE, AccessType.EXPLICIT);
+        assertThat(dateTime).isNotNull();
+
+        //Update Audit
+        role = databaseHelper.getRole(roleName);
+        assertThat(role).isNotNull();
+        assertThat(role.getRoleType()).isEqualTo(RoleType.RESOURCE);
+        assertThat(role.getSecurityClassification()).isEqualTo(SecurityClassification.PRIVATE);
+        assertThat(role.getAccessType()).isEqualTo(AccessType.EXPLICIT);
+        assertThat(role.getLastUpdate()).isNotNull();
+        assertThat(role.getLastUpdate()).isNotEqualTo(dateTime);
     }
 }

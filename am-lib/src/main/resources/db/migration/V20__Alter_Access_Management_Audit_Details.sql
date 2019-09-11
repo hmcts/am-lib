@@ -18,3 +18,9 @@ ADD COLUMN last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
 ALTER TABLE default_permissions_for_roles
 ADD COLUMN calling_service_name  VARCHAR(100) DEFAULT NULL;
+
+ALTER TABLE resource_attributes
+ADD COLUMN last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE resource_attributes
+ADD COLUMN calling_service_name  VARCHAR(100) DEFAULT NULL;

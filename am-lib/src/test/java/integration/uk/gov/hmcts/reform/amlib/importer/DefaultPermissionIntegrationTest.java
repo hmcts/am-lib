@@ -87,6 +87,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
     @Test
     void whenAuditLogsForDefaultPermissionThenShouldReturnsAuditDetails() {
+        //Add Audit
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
         AccessManagementAudit audit = AccessManagementAudit.builder().lastUpdate(LocalDateTime.now())
             .callingServiceName("integration-test").build();
@@ -102,6 +103,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
             .isEqualTo("integration-test");
         assertThat(localDateTime).isNotNull();
 
+        //Update Audit
         audit = AccessManagementAudit.builder().lastUpdate(LocalDateTime.now())
             .callingServiceName("integration-test123").build();
         service.grantDefaultPermission(

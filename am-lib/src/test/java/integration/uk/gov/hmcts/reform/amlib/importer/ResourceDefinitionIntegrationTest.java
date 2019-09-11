@@ -39,26 +39,16 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
         service.addService(serviceName);
         service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
 
-        ResourceDefinition resourceDefinition = databaseHelper.getResourcesDefinition(serviceName,
-            resourceType, resourceName);
-
-        assertThat(resourceDefinition).isNotNull();
-        assertThat(resourceDefinition.getLastUpdate());
+        assertThat(databaseHelper.getResourcesDefinition(serviceName, resourceType, resourceName)).isNotNull();
     }
 
     @Test
     void shouldUpdateExistingEntryWhenDuplicateResourceDefinitionsAreAdded() {
         service.addService(serviceName);
         service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
-        ResourceDefinition  resourceDefinition = databaseHelper.getResourcesDefinition(serviceName,
-            resourceType, resourceName);
-        final LocalDateTime localDateTime = resourceDefinition.getLastUpdate();
         service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
-        resourceDefinition = databaseHelper.getResourcesDefinition(serviceName,
-            resourceType, resourceName);
-        assertThat(resourceDefinition).isNotNull();
-        assertThat(resourceDefinition.getLastUpdate()).isNotNull();
-        assertThat(resourceDefinition.getLastUpdate()).isNotEqualTo(localDateTime);
+
+        assertThat(databaseHelper.getResourcesDefinition(serviceName, resourceType, resourceName)).isNotNull();
     }
 
     @Test
@@ -68,5 +58,24 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
         service.deleteResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
 
         assertThat(databaseHelper.getResourcesDefinition(serviceName, resourceType, resourceName)).isNull();
+    }
+
+    @Test
+    void whenAuditDetailsThenShouldReturnAuditDetails() {
+        //Add Audit
+        service.addService(serviceName);
+        service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
+        ResourceDefinition  resourceDefinition = databaseHelper.getResourcesDefinition(serviceName,
+            resourceType, resourceName);
+        final LocalDateTime localDateTime = resourceDefinition.getLastUpdate();
+        assertThat(localDateTime).isNotNull();
+
+        //Update Audit
+        service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
+        resourceDefinition = databaseHelper.getResourcesDefinition(serviceName,
+            resourceType, resourceName);
+        assertThat(resourceDefinition).isNotNull();
+        assertThat(resourceDefinition.getLastUpdate()).isNotNull();
+        assertThat(resourceDefinition.getLastUpdate()).isNotEqualTo(localDateTime);
     }
 }

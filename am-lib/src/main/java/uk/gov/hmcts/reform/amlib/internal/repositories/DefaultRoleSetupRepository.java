@@ -26,9 +26,10 @@ public interface DefaultRoleSetupRepository {
         + "on conflict on constraint resources_pkey do update set last_update = now()")
     void addResourceDefinition(@BindBean ResourceDefinition resourceDefinition);
 
-    @SqlUpdate("insert into resource_attributes (service_name, resource_type, resource_name, attribute, default_security_classification)"
-        + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, cast(:defaultSecurityClassification as security_classification))"
-        + " on conflict on constraint resource_attributes_pkey do update set default_security_classification = cast(:defaultSecurityClassification as security_classification)")
+    @SqlUpdate("insert into resource_attributes (service_name, resource_type, resource_name, attribute, default_security_classification, last_update, calling_service_name)"
+        + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, cast(:defaultSecurityClassification as security_classification), CURRENT_TIMESTAMP, :accessManagementAudit.callingServiceName)"
+        + " on conflict on constraint resource_attributes_pkey do update set default_security_classification = cast(:defaultSecurityClassification as security_classification), "
+        + "last_update = CURRENT_TIMESTAMP, calling_service_name = :accessManagementAudit.callingServiceName")
     void createResourceAttribute(@BindBean ResourceAttribute resourceAttribute);
 
     @SqlUpdate("insert into default_permissions_for_roles (service_name, resource_type, resource_name, attribute, role_name, permissions, last_update, calling_service_name)"

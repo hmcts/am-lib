@@ -24,9 +24,8 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
     @Test
     void shouldPutNewRowInputIntoDatabaseWhenUniqueServiceNameIsGiven() {
         service.addService(serviceName);
-        Service service = databaseHelper.getService(serviceName);
-        assertThat(service).isNotNull();
-        assertThat(service.getLastUpdate()).isNotNull();
+
+        assertThat(databaseHelper.getService(serviceName)).isNotNull();
     }
 
     @Test
@@ -34,15 +33,11 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
         String newDescription = "Different description";
 
         service.addService(serviceName);
-        Service serviceDetails = databaseHelper.getService(serviceName);
-        final LocalDateTime dateTime = serviceDetails.getLastUpdate();
         service.addService(serviceName, newDescription);
 
-        serviceDetails = databaseHelper.getService(serviceName);
-        assertThat(serviceDetails).isNotNull();
-        assertThat(serviceDetails.getServiceDescription()).isEqualTo(newDescription);
-        assertThat(serviceDetails.getLastUpdate()).isNotNull();
-        assertThat(serviceDetails.getLastUpdate()).isNotEqualTo(dateTime);
+        Service service = databaseHelper.getService(serviceName);
+        assertThat(service).isNotNull();
+        assertThat(service.getServiceDescription()).isEqualTo(newDescription);
     }
 
     @Test
@@ -51,5 +46,24 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
         service.deleteService(serviceName);
 
         assertThat(databaseHelper.getService(serviceName)).isNull();
+    }
+
+    @Test
+    void whenAuditDetailsThenShouldReturnAuditDetails() {
+        String newDescription = "Different description";
+
+        //Add Audit
+        service.addService(serviceName);
+        Service serviceDetails = databaseHelper.getService(serviceName);
+        final LocalDateTime dateTime = serviceDetails.getLastUpdate();
+        service.addService(serviceName, newDescription);
+        assertThat(dateTime).isNotNull();
+
+        //Update Audit
+        serviceDetails = databaseHelper.getService(serviceName);
+        assertThat(serviceDetails).isNotNull();
+        assertThat(serviceDetails.getServiceDescription()).isEqualTo(newDescription);
+        assertThat(serviceDetails.getLastUpdate()).isNotNull();
+        assertThat(serviceDetails.getLastUpdate()).isNotEqualTo(dateTime);
     }
 }

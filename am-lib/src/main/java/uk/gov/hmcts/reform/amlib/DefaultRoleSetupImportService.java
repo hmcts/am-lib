@@ -124,6 +124,8 @@ public class DefaultRoleSetupImportService {
                     .resourceType(accessGrant.getResourceDefinition().getResourceType())
                     .attribute(attribute)
                     .defaultSecurityClassification(permissionAndClassification.getValue())
+                    .accessManagementAudit(Optional.ofNullable(accessGrant.getAccessManagementAudit())
+                    .orElse(AccessManagementAudit.builder().build()))
                     .build()
                 );
 

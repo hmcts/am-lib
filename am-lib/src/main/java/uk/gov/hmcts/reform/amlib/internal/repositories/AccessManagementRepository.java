@@ -29,16 +29,16 @@ public interface AccessManagementRepository {
 
     @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, accessor_type, service_name, resource_type, resource_name, attribute, relationship, last_update, calling_service_name) "
         + "values (:resourceId, :accessorId, :permissionsAsInt, cast(:accessorType as accessor_type), :serviceName, :resourceType, :resourceName, :attributeAsString, :relationship,"
-        + " :accessManagementAudit.lastUpdate, :accessManagementAudit.callingServiceName) "
+        + " CURRENT_TIMESTAMP, :accessManagementAudit.callingServiceName) "
         + "on conflict on constraint access_management_unique do update set permissions = :permissionsAsInt, "
-        + "last_update = :accessManagementAudit.lastUpdate, calling_service_name = :accessManagementAudit.callingServiceName")
+        + "last_update = CURRENT_TIMESTAMP, calling_service_name = :accessManagementAudit.callingServiceName")
     void grantAccessManagementWithNotNullRelationship(@BindBean ExplicitAccessRecord explicitAccessRecord);
 
     @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, accessor_type, service_name, resource_type, resource_name, attribute, relationship, last_update, calling_service_name) "
         + "values (:resourceId, :accessorId, :permissionsAsInt, cast(:accessorType as accessor_type), :serviceName, :resourceType, :resourceName, :attributeAsString, :relationship,"
-        + " :accessManagementAudit.lastUpdate, :accessManagementAudit.callingServiceName) "
+        + " CURRENT_TIMESTAMP, :accessManagementAudit.callingServiceName) "
         + "on conflict (resource_id, accessor_id, accessor_type, attribute, resource_type, service_name, resource_name) where relationship is null do update set permissions = :permissionsAsInt, "
-        + " last_update = :accessManagementAudit.lastUpdate, calling_service_name = :accessManagementAudit.callingServiceName")
+        + " last_update = CURRENT_TIMESTAMP, calling_service_name = :accessManagementAudit.callingServiceName")
     void grantAccessManagementWithNullRelationship(@BindBean ExplicitAccessRecord explicitAccessRecord);
 
     @SqlUpdate("delete from access_management where "

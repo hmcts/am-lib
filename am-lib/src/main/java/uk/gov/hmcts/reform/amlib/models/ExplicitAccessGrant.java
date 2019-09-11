@@ -41,7 +41,6 @@ public final class ExplicitAccessGrant {
 
     private final String relationship;
 
-    @NotNull
     @JsonIgnore
     private final AccessManagementAudit accessManagementAudit;
 

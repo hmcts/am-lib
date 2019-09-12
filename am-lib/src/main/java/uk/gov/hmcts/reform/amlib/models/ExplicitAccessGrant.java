@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
@@ -42,7 +43,8 @@ public final class ExplicitAccessGrant {
     private final String relationship;
 
     @JsonIgnore
-    private final AccessManagementAudit accessManagementAudit;
+    @Setter
+    private AccessManagementAudit accessManagementAudit;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class ExplicitAccessGrantBuilder {

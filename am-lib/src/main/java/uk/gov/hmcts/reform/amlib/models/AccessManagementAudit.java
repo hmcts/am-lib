@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import javax.validation.constraints.NotBlank;
@@ -17,5 +18,6 @@ public class AccessManagementAudit {
     @NotBlank
     private final LocalDateTime lastUpdate;
 
-    private final String callingServiceName;
+    @Setter
+    private String callingServiceName;
 }

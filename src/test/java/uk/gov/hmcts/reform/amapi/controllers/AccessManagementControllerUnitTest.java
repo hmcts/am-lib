@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.amapi.exception.AccessManagementResponseEntityExceptionHandler;
@@ -46,6 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
@@ -82,14 +84,18 @@ public class AccessManagementControllerUnitTest {
     @Test
     public void testCreateResourceAccess() throws Exception {
 
-        String inputJson = Resources.toString(Resources
+        final String inputJson = Resources.toString(Resources
             .getResource("input-data/createResourceAccess.json"), StandardCharsets.UTF_8);
 
         doNothing().when(accessManagementService).grantExplicitResourceAccess(any());
 
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
+        httpHeaders.add("callingServiceName", "unitTest");
+
         this.mvc.perform(post("/api/" + VERSION + "/access-resource")
             .content(inputJson)
-            .header(CONTENT_TYPE, APPLICATION_JSON))
+            .headers(httpHeaders))
             .andDo(print())
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.resourceId", is("1234")))

@@ -95,6 +95,12 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   key_vault_id = "${data.azurerm_key_vault.am_shared_vault.id}"
 }
 
+resource "azurerm_key_vault_secret" "S2S_SECRET" {
+  name = "s2s-secret"
+  value = "${data.azurerm_key_vault_secret.s2s_secret.value}"
+  key_vault_id = "${data.azurerm_key_vault.am_shared_vault.id}"
+}
+
 resource "azurerm_resource_group" "rg" {
   name     = "${var.product}-${var.component}-${var.env}"
   location = "${var.location_app}"

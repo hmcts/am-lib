@@ -120,16 +120,6 @@ data "azurerm_key_vault" "s2s_key_vault" {
   resource_group_name = "rpe-service-auth-provider-${local.envInUse}"
 }
 
-data "azurerm_key_vault_secret" "s2s_microservice" {
-  name = "s2s-microservice"
-  key_vault_id = "${data.azurerm_key_vault.am_shared_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "s2s_url" {
-  name = "s2s-url"
-  key_vault_id = "${data.azurerm_key_vault.am_shared_vault.id}"
-}
-
 data "azurerm_key_vault_secret" "s2s_secret" {
   name = "microservicekey-am-accessmgmt-api"
   key_vault_id = "${data.azurerm_key_vault.s2s_key_vault.id}"

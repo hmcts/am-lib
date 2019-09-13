@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.internal.models.Service;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,5 +46,24 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
         service.deleteService(serviceName);
 
         assertThat(databaseHelper.getService(serviceName)).isNull();
+    }
+
+    @Test
+    void whenAuditDetailsThenShouldReturnAuditDetails() {
+        String newDescription = "Different description";
+
+        //Add Audit
+        service.addService(serviceName);
+        Service serviceDetails = databaseHelper.getService(serviceName);
+        final Instant dateTime = serviceDetails.getLastUpdate();
+        service.addService(serviceName, newDescription);
+        assertThat(dateTime).isNotNull();
+
+        //Update Audit
+        serviceDetails = databaseHelper.getService(serviceName);
+        assertThat(serviceDetails).isNotNull();
+        assertThat(serviceDetails.getServiceDescription()).isEqualTo(newDescription);
+        assertThat(serviceDetails.getLastUpdate()).isNotNull();
+        assertThat(serviceDetails.getLastUpdate()).isNotEqualTo(dateTime);
     }
 }

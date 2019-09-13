@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amlib.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonPointer;
 import lombok.Builder;
 import lombok.Data;
@@ -26,4 +27,7 @@ public final class DefaultPermissionGrant {
     private final String roleName;
     @NotEmpty
     private final Map<@NotNull JsonPointer, @NotNull Entry<@NotEmpty Set<@NotNull Permission>, @NotNull SecurityClassification>> attributePermissions;
+
+    @JsonIgnore
+    private final AccessManagementAudit accessManagementAudit;
 }

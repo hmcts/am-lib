@@ -10,11 +10,16 @@ import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
+import uk.gov.hmcts.reform.amlib.internal.models.query.AttributeData;
+import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.Pair;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.RolePermissions;
 
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -31,6 +36,9 @@ import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.RESTRICTED;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
 
+@SuppressWarnings({
+    "PMD.TooManyMethods"
+})
 class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
@@ -155,17 +163,73 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         assertThat(rolePermissions).isNull();
     }
 
+    @Test
+    void whenAuditLogsForRolePermissionAttributesThenShouldReturnsAuditDetails() {
+
+        Map.Entry<Set<Permission>, SecurityClassification> publicReadPermission =
+            new Pair<>(ImmutableSet.of(READ), PUBLIC);
+
+
+        //Add Audit
+        AccessManagementAudit audit = AccessManagementAudit.builder().lastUpdate(Instant.now())
+            .callingServiceName("Integration-test").build();
+        addRoleWithSecurityClassification(roleName, PUBLIC);
+        grantDefaultPermissionForRoleWithAudit(roleName, ImmutableMap.of(
+            JsonPointer.valueOf(""), publicReadPermission), audit
+        );
+
+        RolePermissions rolePermissions = service.getRolePermissions(resourceDefinition, roleName);
+        rolePermissions.getPermissions();
+        Set<SecurityClassification> securityClassificationSet = new HashSet<>();
+        securityClassificationSet.add(PUBLIC);
+        List<AttributeData> attributeData = databaseHelper.getAttributeDataForResource(resourceDefinition,
+            roleName, securityClassificationSet);
+        assertThat(attributeData).isNotNull();
+        Instant dateTime = attributeData.get(0).getAccessManagementAudit().getLastUpdate();
+        assertThat(dateTime).isNotNull();
+        assertThat(attributeData.get(0).getAccessManagementAudit().getCallingServiceName())
+            .isEqualTo("Integration-test");
+
+        //Update Audit
+        audit = AccessManagementAudit.builder().lastUpdate(Instant.now())
+            .callingServiceName("Integration-test123").build();
+        addRoleWithSecurityClassification(roleName, PUBLIC);
+        grantDefaultPermissionForRoleWithAudit(roleName, ImmutableMap.of(
+            JsonPointer.valueOf(""), publicReadPermission), audit
+        );
+        attributeData = databaseHelper.getAttributeDataForResource(resourceDefinition, roleName,
+            securityClassificationSet);
+        assertThat(attributeData).isNotNull();
+        assertThat(attributeData.get(0).getAccessManagementAudit().getLastUpdate()).isNotNull();
+        assertThat(attributeData.get(0).getAccessManagementAudit().getCallingServiceName())
+            .isEqualTo("Integration-test123");
+        assertThat(dateTime).isNotEqualTo(attributeData.get(0).getAccessManagementAudit().getLastUpdate());
+    }
+
     private void addRoleWithSecurityClassification(String roleName, SecurityClassification securityClassification) {
         importerService.addRole(roleName, IDAM, securityClassification, ROLE_BASED);
     }
 
     @SuppressWarnings("LineLength")
     private void grantDefaultPermissionForRole(String roleName,
-                                               Map<JsonPointer, Map.Entry<Set<Permission>, SecurityClassification>> attributePermissions) {
+                                               Map<JsonPointer, Map.Entry<Set<Permission>,
+                                               SecurityClassification>> attributePermissions) {
         importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(roleName)
             .resourceDefinition(resourceDefinition)
             .attributePermissions(attributePermissions)
+            .build());
+    }
+
+    private void grantDefaultPermissionForRoleWithAudit(String roleName,
+                                                        Map<JsonPointer, Map.Entry<Set<Permission>,
+                                                        SecurityClassification>> attributePermissions,
+                                                        AccessManagementAudit accessManagementAudit) {
+        importerService.grantDefaultPermission(DefaultPermissionGrant.builder()
+            .roleName(roleName)
+            .resourceDefinition(resourceDefinition)
+            .attributePermissions(attributePermissions)
+            .accessManagementAudit(accessManagementAudit)
             .build());
     }
 }

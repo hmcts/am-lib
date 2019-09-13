@@ -5,17 +5,21 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import uk.gov.hmcts.reform.amapi.models.FilterResource;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.FilterResourceService;
+import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
@@ -30,7 +34,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  */
 @RestController
 @RequestMapping("api/${version:v1}")
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.ConfusingTernary"})
 public class AccessManagementController {
 
     @Autowired
@@ -38,7 +42,6 @@ public class AccessManagementController {
 
     @Autowired
     FilterResourceService filterResourceService;
-
 
 
     @ApiOperation(value = "Grant resource access to user", response = ExplicitAccessGrant.class)
@@ -53,10 +56,17 @@ public class AccessManagementController {
     @PostMapping(value = "/access-resource", consumes = (APPLICATION_JSON_VALUE))
     @ResponseStatus(CREATED)
     public ResponseEntity<ExplicitAccessGrant> createResourceAccess(@RequestBody ExplicitAccessGrant
-                                                                        explicitAccessGrantData) {
+                                                                        explicitAccessGrantData,
+                                                                    @RequestHeader(value = "callingServiceName",
+                                                                        required = false)
+                                                                        String callingServiceName) {
+        if (!StringUtils.isEmpty(callingServiceName)) {
+            explicitAccessGrantData.setAccessManagementAudit(AccessManagementAudit.builder()
+                .callingServiceName(callingServiceName).build());
+        }
+
         accessManagementService.grantExplicitResourceAccess(explicitAccessGrantData);
         return new ResponseEntity<>(explicitAccessGrantData, CREATED);
-
     }
 
     @ApiOperation("Revoke resource access to user")

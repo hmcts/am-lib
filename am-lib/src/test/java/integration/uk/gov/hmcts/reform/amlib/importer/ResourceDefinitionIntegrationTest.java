@@ -5,7 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,5 +58,24 @@ class ResourceDefinitionIntegrationTest extends IntegrationBaseTest {
         service.deleteResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
 
         assertThat(databaseHelper.getResourcesDefinition(serviceName, resourceType, resourceName)).isNull();
+    }
+
+    @Test
+    void whenAuditDetailsThenShouldReturnAuditDetails() {
+        //Add Audit
+        service.addService(serviceName);
+        service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
+        ResourceDefinition  resourceDefinition = databaseHelper.getResourcesDefinition(serviceName,
+            resourceType, resourceName);
+        final Instant localDateTime = resourceDefinition.getLastUpdate();
+        assertThat(localDateTime).isNotNull();
+
+        //Update Audit
+        service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, resourceName));
+        resourceDefinition = databaseHelper.getResourcesDefinition(serviceName,
+            resourceType, resourceName);
+        assertThat(resourceDefinition).isNotNull();
+        assertThat(resourceDefinition.getLastUpdate()).isNotNull();
+        assertThat(resourceDefinition.getLastUpdate()).isNotEqualTo(localDateTime);
     }
 }

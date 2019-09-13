@@ -10,9 +10,11 @@ import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.DefaultRoleSetupRepository;
+import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.util.Optional;
 import javax.sql.DataSource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -112,6 +114,7 @@ public class DefaultRoleSetupImportService {
         + "{{accessGrant.resourceDefinition.resourceName}}' for role '{{accessGrant.roleName}}': "
         + "{{accessGrant.attributePermissions}}")
     public void grantDefaultPermission(@NotNull @Valid DefaultPermissionGrant accessGrant) {
+
         jdbi.useTransaction(handle -> {
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
             accessGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
@@ -121,8 +124,11 @@ public class DefaultRoleSetupImportService {
                     .resourceType(accessGrant.getResourceDefinition().getResourceType())
                     .attribute(attribute)
                     .defaultSecurityClassification(permissionAndClassification.getValue())
+                    .accessManagementAudit(Optional.ofNullable(accessGrant.getAccessManagementAudit())
+                    .orElse(AccessManagementAudit.builder().build()))
                     .build()
                 );
+
 
                 dao.grantDefaultPermission(
                     RoleBasedAccessRecord.builder()
@@ -132,6 +138,8 @@ public class DefaultRoleSetupImportService {
                         .attribute(attribute)
                         .roleName(accessGrant.getRoleName())
                         .permissions(permissionAndClassification.getKey())
+                        .accessManagementAudit(Optional.ofNullable(accessGrant.getAccessManagementAudit())
+                            .orElse(AccessManagementAudit.builder().build()))
                         .build());
             });
         });

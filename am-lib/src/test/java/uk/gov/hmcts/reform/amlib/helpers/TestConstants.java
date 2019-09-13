@@ -11,6 +11,10 @@ public final class TestConstants {
         .set("address", JsonNodeFactory.instance.objectNode()
             .put("city", "London"));
 
+    public static final String CALLING_SERVICE_NAME_FOR_INSERTION = "integration-test-insert";
+
+    public static final String CALLING_SERVICE_NAME_FOR_UPDATES = "integration-test-update";
+
     private TestConstants() {
         //NO-OP
     }

@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
+import java.time.Instant;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -15,4 +17,5 @@ public final class Role {
     private final RoleType roleType;
     private final SecurityClassification securityClassification;
     private final AccessType accessType;
+    private Instant lastUpdate;
 }

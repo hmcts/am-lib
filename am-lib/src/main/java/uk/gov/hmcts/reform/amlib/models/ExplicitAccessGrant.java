@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.amlib.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
@@ -39,6 +41,10 @@ public final class ExplicitAccessGrant {
     private final Map<@NotNull JsonPointer, @NotEmpty Set<@NotNull Permission>> attributePermissions;
 
     private final String relationship;
+
+    @JsonIgnore
+    @Setter
+    private AccessManagementAudit accessManagementAudit;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class ExplicitAccessGrantBuilder {

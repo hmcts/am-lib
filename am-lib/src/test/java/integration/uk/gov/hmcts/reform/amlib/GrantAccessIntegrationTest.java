@@ -12,9 +12,11 @@ import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -30,11 +32,16 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CALLING_SERVICE_NAME_FOR_INSERTION;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CALLING_SERVICE_NAME_FOR_UPDATES;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createAccessManagementAudit;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createExplicitAccessGrantWithAudit;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForAccessorType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
 
+@SuppressWarnings("PMD.ExcessiveImports")
 class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
     private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
@@ -56,6 +63,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     @Test
     void whenCreatingResourceAccessResourceAccessAppearsInDatabase() {
+
         service.grantExplicitResourceAccess(createGrantForWholeDocument(
             resourceId, accessorId, roleName, resourceDefinition, ImmutableSet.of(READ)));
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
@@ -82,6 +90,39 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
     }
+
+    @Test
+    void whenAuditLogsForExplicitAccessThenShouldReturnsAuditDetails() {
+        //Add Audit
+        AccessManagementAudit accessManagementAudit = AccessManagementAudit.builder().lastUpdate(Instant.now())
+            .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION).build();
+        ExplicitAccessGrant explicitAccessGrant = createExplicitAccessGrantWithAudit(resourceId, accessorId, roleName,
+            resourceDefinition, accessManagementAudit);
+        service.grantExplicitResourceAccess(explicitAccessGrant);
+        ExplicitAccessRecord explicitAccessRecord = databaseHelper.getExplicitAccessRecordsForAudit(resourceDefinition,
+            "", roleName, READ.getValue());
+        final Instant localDateTime = explicitAccessRecord.getAccessManagementAudit().getLastUpdate();
+        assertThat(explicitAccessRecord).isNotNull();
+        assertThat(explicitAccessRecord.getAccessManagementAudit().getCallingServiceName()).isNotNull();
+        assertThat(localDateTime).isNotNull();
+        assertThat(explicitAccessRecord.getAccessManagementAudit().getCallingServiceName())
+            .isEqualTo(CALLING_SERVICE_NAME_FOR_INSERTION);
+
+        //Update Audit
+        accessManagementAudit = AccessManagementAudit.builder().lastUpdate(Instant.now())
+            .callingServiceName(CALLING_SERVICE_NAME_FOR_UPDATES).build();
+        explicitAccessGrant = createExplicitAccessGrantWithAudit(resourceId, accessorId, roleName,
+            resourceDefinition, accessManagementAudit);
+        service.grantExplicitResourceAccess(explicitAccessGrant);
+        explicitAccessRecord = databaseHelper.getExplicitAccessRecordsForAudit(resourceDefinition,
+            "", roleName, READ.getValue());
+        assertThat(explicitAccessRecord.getAccessManagementAudit().getLastUpdate()).isNotEqualTo(localDateTime);
+        assertThat(explicitAccessRecord.getAccessManagementAudit().getCallingServiceName())
+            .isEqualTo(CALLING_SERVICE_NAME_FOR_UPDATES);
+        assertThat(explicitAccessRecord.getAccessManagementAudit().getCallingServiceName()).isNotEqualTo(localDateTime);
+        assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
+    }
+
 
     @Test
     void createExplicitAccessWithWildCard() {
@@ -123,6 +164,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .resourceDefinition(resourceDefinition)
             .attributePermissions(createPermissions("", ImmutableSet.of(READ)))
             .relationship(roleName)
+            .accessManagementAudit(createAccessManagementAudit())
             .build();
     }
 

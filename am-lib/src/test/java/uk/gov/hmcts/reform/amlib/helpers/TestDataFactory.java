@@ -6,16 +6,20 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.ROLE;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
+import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CALLING_SERVICE_NAME_FOR_INSERTION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 
 public final class TestDataFactory {
@@ -45,6 +49,7 @@ public final class TestDataFactory {
             .resourceDefinition(resourceDefinition)
             .attributePermissions(attributePermissions)
             .relationship(relationship)
+            .accessManagementAudit(createAccessManagementAudit())
             .build();
     }
 
@@ -62,6 +67,7 @@ public final class TestDataFactory {
             .resourceDefinition(resourceDefinition)
             .attributePermissions(attributePermissions)
             .relationship(relationship)
+            .accessManagementAudit(createAccessManagementAudit())
             .build();
     }
 
@@ -77,6 +83,7 @@ public final class TestDataFactory {
             .resourceDefinition(resourceDefinition)
             .attributePermissions(attributePermissions)
             .relationship(relationship)
+            .accessManagementAudit(createAccessManagementAudit())
             .build();
     }
 
@@ -113,4 +120,26 @@ public final class TestDataFactory {
             .data(data)
             .build();
     }
+
+    public static AccessManagementAudit createAccessManagementAudit() {
+        return AccessManagementAudit.builder().lastUpdate(Instant.now())
+            .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION).build();
+    }
+
+    public static ExplicitAccessGrant createExplicitAccessGrantWithAudit(String resourceId,
+                                                                         String accessorId,
+                                                                         String relationship,
+                                                                         ResourceDefinition resourceDefinition,
+                                                                         AccessManagementAudit accessManagementAudit) {
+        return ExplicitAccessGrant.builder()
+            .resourceId(resourceId)
+            .accessorIds(ImmutableSet.of(accessorId))
+            .accessorType(USER)
+            .resourceDefinition(resourceDefinition)
+            .attributePermissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(READ)))
+            .relationship(relationship)
+            .accessManagementAudit(accessManagementAudit)
+            .build();
+    }
+
 }

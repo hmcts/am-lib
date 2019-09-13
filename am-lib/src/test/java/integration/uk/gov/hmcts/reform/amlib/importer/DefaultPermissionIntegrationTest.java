@@ -29,6 +29,8 @@ import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createPermissionsForAttribute;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CALLING_SERVICE_NAME_FOR_INSERTION;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CALLING_SERVICE_NAME_FOR_UPDATES;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 
 class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
@@ -90,7 +92,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         //Add Audit
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
         AccessManagementAudit audit = AccessManagementAudit.builder().lastUpdate(Instant.now())
-            .callingServiceName("integration-test").build();
+            .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION).build();
         service.grantDefaultPermission(
             grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ), audit));
         RoleBasedAccessRecord roleBasedAccessRecord = databaseHelper.getDefaultPermissionsForAudit(resourceDefinition,
@@ -100,12 +102,12 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         assertThat(roleBasedAccessRecord).isNotNull();
         assertThat(roleBasedAccessRecord.getAccessManagementAudit().getCallingServiceName()).isNotNull();
         assertThat(roleBasedAccessRecord.getAccessManagementAudit().getCallingServiceName())
-            .isEqualTo("integration-test");
+            .isEqualTo(CALLING_SERVICE_NAME_FOR_INSERTION);
         assertThat(localDateTime).isNotNull();
 
         //Update Audit
         audit = AccessManagementAudit.builder().lastUpdate(Instant.now())
-            .callingServiceName("integration-test-update").build();
+            .callingServiceName(CALLING_SERVICE_NAME_FOR_UPDATES).build();
         service.grantDefaultPermission(
             grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ), audit));
         roleBasedAccessRecord = databaseHelper.getDefaultPermissionsForAudit(resourceDefinition, "",
@@ -113,7 +115,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         assertThat(roleBasedAccessRecord).isNotNull();
         assertThat(roleBasedAccessRecord.getAccessManagementAudit().getCallingServiceName()).isNotNull();
         assertThat(roleBasedAccessRecord.getAccessManagementAudit().getCallingServiceName())
-            .isEqualTo("integration-test-update");
+            .isEqualTo(CALLING_SERVICE_NAME_FOR_UPDATES);
         assertThat(roleBasedAccessRecord.getAccessManagementAudit().getLastUpdate()).isNotNull();
         assertThat(roleBasedAccessRecord.getAccessManagementAudit().getLastUpdate()).isNotEqualTo(localDateTime);
     }

@@ -19,6 +19,7 @@ import java.util.Set;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.ROLE;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CALLING_SERVICE_NAME_FOR_INSERTION;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 
 public final class TestDataFactory {
@@ -122,7 +123,7 @@ public final class TestDataFactory {
 
     public static AccessManagementAudit createAccessManagementAudit() {
         return AccessManagementAudit.builder().lastUpdate(Instant.now())
-            .callingServiceName("integration-test").build();
+            .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION).build();
     }
 
     public static ExplicitAccessGrant createExplicitAccessGrantWithAudit(String resourceId,

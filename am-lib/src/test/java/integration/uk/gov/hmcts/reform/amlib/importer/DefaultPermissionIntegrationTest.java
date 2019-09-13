@@ -105,7 +105,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
         //Update Audit
         audit = AccessManagementAudit.builder().lastUpdate(Instant.now())
-            .callingServiceName("integration-test123").build();
+            .callingServiceName("integration-test-update").build();
         service.grantDefaultPermission(
             grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ), audit));
         roleBasedAccessRecord = databaseHelper.getDefaultPermissionsForAudit(resourceDefinition, "",
@@ -113,7 +113,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         assertThat(roleBasedAccessRecord).isNotNull();
         assertThat(roleBasedAccessRecord.getAccessManagementAudit().getCallingServiceName()).isNotNull();
         assertThat(roleBasedAccessRecord.getAccessManagementAudit().getCallingServiceName())
-            .isEqualTo("integration-test123");
+            .isEqualTo("integration-test-update");
         assertThat(roleBasedAccessRecord.getAccessManagementAudit().getLastUpdate()).isNotNull();
         assertThat(roleBasedAccessRecord.getAccessManagementAudit().getLastUpdate()).isNotEqualTo(localDateTime);
     }

@@ -108,7 +108,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         //Update Audit
         accessManagementAudit = AccessManagementAudit.builder().lastUpdate(Instant.now())
-            .callingServiceName("integration-test123").build();
+            .callingServiceName("integration-test-update").build();
         explicitAccessGrant = createExplicitAccessGrantWithAudit(resourceId, accessorId, roleName,
             resourceDefinition, accessManagementAudit);
         service.grantExplicitResourceAccess(explicitAccessGrant);
@@ -116,7 +116,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             "", roleName, READ.getValue());
         assertThat(explicitAccessRecord.getAccessManagementAudit().getLastUpdate()).isNotEqualTo(localDateTime);
         assertThat(explicitAccessRecord.getAccessManagementAudit().getCallingServiceName())
-            .isEqualTo("integration-test123");
+            .isEqualTo("integration-test-update");
         assertThat(explicitAccessRecord.getAccessManagementAudit().getCallingServiceName()).isNotEqualTo(localDateTime);
         assertThat(databaseHelper.countExplicitPermissions(resourceId)).isEqualTo(1);
     }

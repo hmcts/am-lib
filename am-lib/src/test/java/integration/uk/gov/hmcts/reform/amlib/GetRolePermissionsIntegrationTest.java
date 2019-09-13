@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.amlib.models.Pair;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.RolePermissions;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -171,7 +171,7 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
 
 
         //Add Audit
-        AccessManagementAudit audit = AccessManagementAudit.builder().lastUpdate(LocalDateTime.now())
+        AccessManagementAudit audit = AccessManagementAudit.builder().lastUpdate(Instant.now())
             .callingServiceName("Integration-test").build();
         addRoleWithSecurityClassification(roleName, PUBLIC);
         grantDefaultPermissionForRoleWithAudit(roleName, ImmutableMap.of(
@@ -185,13 +185,13 @@ class GetRolePermissionsIntegrationTest extends PreconfiguredIntegrationBaseTest
         List<AttributeData> attributeData = databaseHelper.getAttributeDataForResource(resourceDefinition,
             roleName, securityClassificationSet);
         assertThat(attributeData).isNotNull();
-        LocalDateTime dateTime = attributeData.get(0).getAccessManagementAudit().getLastUpdate();
+        Instant dateTime = attributeData.get(0).getAccessManagementAudit().getLastUpdate();
         assertThat(dateTime).isNotNull();
         assertThat(attributeData.get(0).getAccessManagementAudit().getCallingServiceName())
             .isEqualTo("Integration-test");
 
         //Update Audit
-        audit = AccessManagementAudit.builder().lastUpdate(LocalDateTime.now())
+        audit = AccessManagementAudit.builder().lastUpdate(Instant.now())
             .callingServiceName("Integration-test123").build();
         addRoleWithSecurityClassification(roleName, PUBLIC);
         grantDefaultPermissionForRoleWithAudit(roleName, ImmutableMap.of(

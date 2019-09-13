@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.internal.models.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,7 +55,7 @@ class ServiceIntegrationTest extends IntegrationBaseTest {
         //Add Audit
         service.addService(serviceName);
         Service serviceDetails = databaseHelper.getService(serviceName);
-        final LocalDateTime dateTime = serviceDetails.getLastUpdate();
+        final Instant dateTime = serviceDetails.getLastUpdate();
         service.addService(serviceName, newDescription);
         assertThat(dateTime).isNotNull();
 

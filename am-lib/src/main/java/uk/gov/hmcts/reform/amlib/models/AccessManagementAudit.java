@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import javax.validation.constraints.NotBlank;
 
 @Data
@@ -16,7 +16,7 @@ import javax.validation.constraints.NotBlank;
 public class AccessManagementAudit {
 
     @NotBlank
-    private final LocalDateTime lastUpdate;
+    private final Instant lastUpdate;
 
     @Setter
     private String callingServiceName;

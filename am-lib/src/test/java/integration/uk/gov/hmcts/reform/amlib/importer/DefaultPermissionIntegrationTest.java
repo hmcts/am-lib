@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
@@ -89,14 +89,14 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     void whenAuditLogsForDefaultPermissionThenShouldReturnsAuditDetails() {
         //Add Audit
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
-        AccessManagementAudit audit = AccessManagementAudit.builder().lastUpdate(LocalDateTime.now())
+        AccessManagementAudit audit = AccessManagementAudit.builder().lastUpdate(Instant.now())
             .callingServiceName("integration-test").build();
         service.grantDefaultPermission(
             grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ), audit));
         RoleBasedAccessRecord roleBasedAccessRecord = databaseHelper.getDefaultPermissionsForAudit(resourceDefinition,
             "", roleName, READ.getValue());
 
-        final LocalDateTime localDateTime = roleBasedAccessRecord.getAccessManagementAudit().getLastUpdate();
+        final Instant localDateTime = roleBasedAccessRecord.getAccessManagementAudit().getLastUpdate();
         assertThat(roleBasedAccessRecord).isNotNull();
         assertThat(roleBasedAccessRecord.getAccessManagementAudit().getCallingServiceName()).isNotNull();
         assertThat(roleBasedAccessRecord.getAccessManagementAudit().getCallingServiceName())
@@ -104,7 +104,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         assertThat(localDateTime).isNotNull();
 
         //Update Audit
-        audit = AccessManagementAudit.builder().lastUpdate(LocalDateTime.now())
+        audit = AccessManagementAudit.builder().lastUpdate(Instant.now())
             .callingServiceName("integration-test123").build();
         service.grantDefaultPermission(
             grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ), audit));

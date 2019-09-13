@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.jdbi.v3.core.mapper.reflect.JdbiConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import javax.validation.constraints.NotBlank;
 
 @Data
@@ -24,7 +24,7 @@ public final class ResourceDefinition {
     private String resourceName;
 
     @JsonIgnore
-    private LocalDateTime lastUpdate;
+    private Instant lastUpdate;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class ResourceDefinitionBuilder {

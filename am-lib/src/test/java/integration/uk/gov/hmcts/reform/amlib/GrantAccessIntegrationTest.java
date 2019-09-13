@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -92,14 +92,14 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     @Test
     void whenAuditLogsForExplicitAccessThenShouldReturnsAuditDetails() {
         //Add Audit
-        AccessManagementAudit accessManagementAudit = AccessManagementAudit.builder().lastUpdate(LocalDateTime.now())
+        AccessManagementAudit accessManagementAudit = AccessManagementAudit.builder().lastUpdate(Instant.now())
             .callingServiceName("integration-test").build();
         ExplicitAccessGrant explicitAccessGrant = createExplicitAccessGrantWithAudit(resourceId, accessorId, roleName,
             resourceDefinition, accessManagementAudit);
         service.grantExplicitResourceAccess(explicitAccessGrant);
         ExplicitAccessRecord explicitAccessRecord = databaseHelper.getExplicitAccessRecordsForAudit(resourceDefinition,
             "", roleName, READ.getValue());
-        final LocalDateTime localDateTime = explicitAccessRecord.getAccessManagementAudit().getLastUpdate();
+        final Instant localDateTime = explicitAccessRecord.getAccessManagementAudit().getLastUpdate();
         assertThat(explicitAccessRecord).isNotNull();
         assertThat(explicitAccessRecord.getAccessManagementAudit().getCallingServiceName()).isNotNull();
         assertThat(localDateTime).isNotNull();
@@ -107,7 +107,7 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             .isEqualTo("integration-test");
 
         //Update Audit
-        accessManagementAudit = AccessManagementAudit.builder().lastUpdate(LocalDateTime.now())
+        accessManagementAudit = AccessManagementAudit.builder().lastUpdate(Instant.now())
             .callingServiceName("integration-test123").build();
         explicitAccessGrant = createExplicitAccessGrantWithAudit(resourceId, accessorId, roleName,
             resourceDefinition, accessManagementAudit);

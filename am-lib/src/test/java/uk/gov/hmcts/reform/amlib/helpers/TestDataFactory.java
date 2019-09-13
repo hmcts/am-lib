@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 
@@ -121,7 +121,7 @@ public final class TestDataFactory {
     }
 
     public static AccessManagementAudit createAccessManagementAudit() {
-        return AccessManagementAudit.builder().lastUpdate(LocalDateTime.now())
+        return AccessManagementAudit.builder().lastUpdate(Instant.now())
             .callingServiceName("integration-test").build();
     }
 

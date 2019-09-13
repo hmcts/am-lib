@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.models.Role;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,7 +59,7 @@ class RoleIntegrationTest extends IntegrationBaseTest {
         //Add audit
         service.addRole(roleName, IDAM, PUBLIC, ROLE_BASED);
         Role role = databaseHelper.getRole(roleName);
-        final LocalDateTime dateTime = role.getLastUpdate();
+        final Instant dateTime = role.getLastUpdate();
         service.addRole(roleName, RoleType.RESOURCE, SecurityClassification.PRIVATE, AccessType.EXPLICIT);
         assertThat(dateTime).isNotNull();
 

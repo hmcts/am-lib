@@ -1,5 +1,6 @@
 java:
   applicationPort: 3703
+  aadIdentityName: am
   keyVaults:
     am:
       resourceGroup: am-shared-infrastructure

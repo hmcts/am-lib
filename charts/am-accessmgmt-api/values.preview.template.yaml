@@ -2,5 +2,9 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   aadIdentityName:
+  environment:
+    ENABLE_DB_MIGRATE_IN_SERVICE: true
 postgresql:
   enabled: true
+
+

@@ -13,5 +13,8 @@ java:
     AM_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword }}"
     AM_DB_PORT: "5432"
     AM_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername }}"
+    ENABLE_DB_MIGRATE_IN_SERVICE: true
 postgresql:
   enabled: true
+
+

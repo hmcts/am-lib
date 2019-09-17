@@ -12,6 +12,6 @@ java:
     AM_DB_NAME: "am"
     AM_DB_PORT: "5432"
     AM_DB_USERNAME: "amuser@am-accessmgmt-api-{{ .Values.global.environment }}"
-    ENABLE_DB_MIGRATE_IN_SERVICE: true
-    S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+    ENABLE_DB_MIGRATE_IN_SERVICE: false
+    S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   image: "https://hmcts.azurecr.io/hmcts/am-accessmgmt-api:latest"

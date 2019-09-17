@@ -1,5 +1,5 @@
 name: am-accessmgmt-api
-version: 0.0.3
+version: 0.0.4
 description: Helm chart for the HMCTS Access Management testing service
 home: https://github.com/hmcts/am-lib
 maintainers:

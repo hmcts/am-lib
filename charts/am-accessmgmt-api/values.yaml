@@ -6,12 +6,12 @@ java:
       resourceGroup: am-shared-infrastructure
       secrets:
         - s2s-secret
+        - accessmgmt-api-POSTGRES-PASS
   environment:
-    AM_DB_HOST: "{{ .Release.Name }}-postgresql"
-    AM_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase }}"
-    AM_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword }}"
-    AM_DB_PORT: 5432
-    AM_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername }}"
+    AM_DB_HOST: "am-accessmgmt-api-{{ .Values.global.environment }}.postgres.database.azure.com"
+    AM_DB_NAME: "am"
+    AM_DB_PORT: "5432"
+    AM_DB_USERNAME: "amuser@am-accessmgmt-api-{{ .Values.global.environment }}"
     ENABLE_DB_MIGRATE_IN_SERVICE: false
     S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   image: "https://hmcts.azurecr.io/hmcts/am-accessmgmt-api:latest"

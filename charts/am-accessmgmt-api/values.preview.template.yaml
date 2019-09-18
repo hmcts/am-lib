@@ -1,5 +1,19 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+  aadIdentityName:
+  keyVaults:
+    am:
+      resourceGroup: am-shared-infrastructure
+      secrets:
+        - s2s-secret
+  environment:
+    AM_DB_HOST: "{{ .Release.Name }}-postgresql"
+    AM_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase }}"
+    AM_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword }}"
+    AM_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername }}"
+    ENABLE_DB_MIGRATE_IN_SERVICE: true
 postgresql:
   enabled: true
+
+

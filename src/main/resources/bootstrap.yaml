@@ -4,3 +4,4 @@ spring:
       paths: /mnt/secrets/am
       aliases:
         am.s2s-secret: S2S_SECRET
+        am.accessmgmt-api-POSTGRES-PASS: AM_DB_PASSWORD

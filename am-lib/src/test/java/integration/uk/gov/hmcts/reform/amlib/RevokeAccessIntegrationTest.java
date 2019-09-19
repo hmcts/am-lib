@@ -9,9 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
+import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,6 +25,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createResourceDefinition;
+import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createExplicitAccessGrantWithAudit;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createMetadata;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
@@ -192,6 +198,34 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             assertThat(databaseHelper.findExplicitPermissions(resourceId)).hasSize(1)
                 .first().extracting(ExplicitAccessRecord::getAttributeAsString).isEqualTo("/claimantAddress");
         }
+    }
+
+    @Test
+    void whenRevokingExplicitAccessShouldAuditRevokedRecords() {
+
+        AccessManagementAudit accessManagementAudit = AccessManagementAudit.builder().lastUpdate(Instant.now())
+            .callingServiceName("revoke-check").build();
+        ExplicitAccessGrant explicitAccessGrant = createExplicitAccessGrantWithAudit(resourceId, accessorId, relationship,
+            resourceDefinition, accessManagementAudit);
+
+        service.grantExplicitResourceAccess(explicitAccessGrant);
+
+        service.revokeResourceAccess(
+            createMetadata(resourceId, accessorId, relationship, resourceDefinition, JsonPointer.valueOf(""))
+        );
+
+        List<ExplicitAccessAuditRecord> explicitAccessAuditRecord = databaseHelper
+            .getExplicitAccessAuditRecords(resourceDefinition,
+                "", relationship, READ.getValue());
+
+        assertThat(explicitAccessAuditRecord).isNotNull();
+        assertThat(explicitAccessAuditRecord.size()).isEqualTo(2);
+        assertThat(explicitAccessAuditRecord.get(0).getResourceId()).isEqualTo(resourceId);
+        assertThat(explicitAccessAuditRecord.get(0).getAttribute()).isEqualTo("");
+        assertThat(explicitAccessAuditRecord.get(0).getServiceName()).isEqualTo(serviceName);
+        assertThat(explicitAccessAuditRecord.get(0).getCallingServiceName())
+            .isEqualTo("revoke-check");
+        assertThat(explicitAccessAuditRecord.get(0).getAuditTimeStamp()).isNotNull();
     }
 
     private void grantExplicitResourceAccess(String resourceId, String relationship, String attribute) {

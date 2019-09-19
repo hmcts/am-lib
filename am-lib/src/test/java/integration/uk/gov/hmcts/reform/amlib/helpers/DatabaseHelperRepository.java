@@ -8,9 +8,12 @@ import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
+import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
+import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttributeAudit;
 import uk.gov.hmcts.reform.amlib.internal.models.Role;
+import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.Service;
 import uk.gov.hmcts.reform.amlib.internal.models.query.AttributeData;
@@ -104,5 +107,37 @@ public interface DatabaseHelperRepository {
         + " where d.service_name = :serviceName and d.resource_Type = :resourceType and d.resource_name = :resourceName and d.role_name = :roleName and cast(default_security_classification as text) in (<securityClassifications>)")
     @RegisterConstructorMapper(AttributeData.class)
     List<AttributeData> getAttributeDataForResource(@BindBean ResourceDefinition resourceDefinition, String roleName, @BindList Set<SecurityClassification> securityClassifications);
+
+    @SqlQuery("select * from access_management_audit "
+        + "where service_name = :serviceName "
+        + "and resource_type = :resourceType "
+        + "and resource_name = :resourceName "
+        + "and attribute = :attribute "
+        + "and relationship = :relationship "
+        + "and permissions = :permissions")
+    @RegisterConstructorMapper(ExplicitAccessAuditRecord.class)
+    List<ExplicitAccessAuditRecord> getExplicitAccessAuditRecords(@BindBean ResourceDefinition resourceDefinition, String attribute,
+                                                                  String relationship, int permissions);
+
+
+    @SqlQuery("select * from default_permissions_for_roles_audit "
+        + "where service_name = :serviceName "
+        + "and resource_type = :resourceType "
+        + "and resource_name = :resourceName "
+        + "and attribute = :attribute "
+        + "and role_name = :roleName "
+        + "and permissions = :permissions")
+    @RegisterConstructorMapper(RoleBasedAccessAuditRecord.class)
+    List<RoleBasedAccessAuditRecord> getDefaultPermissionsAuditRecords(@BindBean ResourceDefinition resourceDefinition, String attribute, String roleName, int permissions);
+
+
+    @SqlQuery("select * from resource_attributes_audit "
+        + "where service_name = :serviceName "
+        + "and resource_type = :resourceType "
+        + "and resource_name = :resourceName "
+        + "and attribute = :attribute "
+        + "and default_security_classification = cast(:securityClassification as security_classification)")
+    @RegisterConstructorMapper(ResourceAttributeAudit.class)
+    List<ResourceAttributeAudit> getResourceAttributeAuditRecords(@BindBean ResourceDefinition resourceDefinition, String attribute, SecurityClassification securityClassification);
 
 }

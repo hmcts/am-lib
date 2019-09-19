@@ -9,6 +9,8 @@ import org.slf4j.MDC;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
+import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttributeAudit;
+import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.utils.Permissions;
 import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
@@ -16,6 +18,7 @@ import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,6 +36,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CALLING_SERVICE_NA
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CALLING_SERVICE_NAME_FOR_UPDATES;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 
+@SuppressWarnings("PMD.TooManyMethods")
 class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportService.class);
     private String serviceName;
@@ -119,6 +123,121 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         assertThat(roleBasedAccessRecord.getAccessManagementAudit().getLastUpdate()).isNotNull();
         assertThat(roleBasedAccessRecord.getAccessManagementAudit().getLastUpdate()).isNotEqualTo(localDateTime);
     }
+
+    @Test
+    void whenAddedDefaultPermissionsShouldAuditDefaultPermissionsAndAttributesRecords() {
+        service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
+        AccessManagementAudit audit = AccessManagementAudit.builder().lastUpdate(Instant.now())
+            .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION).build();
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ), audit));
+        List<RoleBasedAccessAuditRecord> accessAuditRecords = databaseHelper.getDefaultPermissionsAuditRecords(
+            resourceDefinition, "", roleName, READ.getValue());
+
+        assertThat(accessAuditRecords).isNotNull();
+        assertThat(accessAuditRecords.size()).isEqualTo(1);
+
+        List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
+            resourceDefinition, "", PUBLIC);
+        assertThat(resourceAttributeAudits).isNotNull();
+        assertThat(resourceAttributeAudits.size()).isEqualTo(1);
+    }
+
+    @Test
+    void whenUpdatedDefaultPermissionsShouldAuditDefaultDefaultPermissionsAndAttributesRecords() {
+        service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
+        AccessManagementAudit audit = AccessManagementAudit.builder().lastUpdate(Instant.now())
+            .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION).build();
+
+        //Add permissions
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ), audit));
+
+        //Update Permissions
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ), audit));
+
+        List<RoleBasedAccessAuditRecord> accessAuditRecords = databaseHelper.getDefaultPermissionsAuditRecords(
+            resourceDefinition, "", roleName, READ.getValue());
+
+        assertThat(accessAuditRecords).isNotNull();
+        assertThat(accessAuditRecords.size()).isEqualTo(2);
+
+        List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
+            resourceDefinition, "", PUBLIC);
+
+        assertThat(resourceAttributeAudits).isNotNull();
+        assertThat(resourceAttributeAudits.size()).isEqualTo(2);
+    }
+
+    @Test
+    void whenTruncateDefaultPermissionsAndAttributesByServiceShouldAuditDefaultPermissionsAndAttributesRecords() {
+
+        service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
+        AccessManagementAudit audit = AccessManagementAudit.builder().lastUpdate(Instant.now())
+            .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION).build();
+
+        //Add permissions
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ), audit));
+
+        ResourceDefinition resourceDefinition1;
+
+        service.addResourceDefinition(
+            resourceDefinition1 = createResourceDefinition(serviceName, resourceType, UUID.randomUUID().toString()));
+
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition1, ImmutableSet.of(READ), audit));
+
+        //truncate Permissions & attributes
+        service.truncateDefaultPermissionsForService(serviceName, resourceType);
+
+        List<RoleBasedAccessAuditRecord> accessAuditRecords = databaseHelper.getDefaultPermissionsAuditRecords(
+            resourceDefinition, "", roleName, READ.getValue());
+
+        assertThat(accessAuditRecords).isNotNull();
+        assertThat(accessAuditRecords.size()).isEqualTo(2);
+
+        List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
+            resourceDefinition, "", PUBLIC);
+
+        assertThat(resourceAttributeAudits).isNotNull();
+        assertThat(resourceAttributeAudits.size()).isEqualTo(1);
+
+        resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
+            resourceDefinition1, "", PUBLIC);
+
+        assertThat(resourceAttributeAudits).isNotNull();
+        assertThat(resourceAttributeAudits.size()).isEqualTo(1);
+    }
+
+    @Test
+    void whenTruncateDefaultPermissionsAndAttributesByResourceDefinitionShouldAuditDefaultPermissionsAndAttrRecords() {
+
+        service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
+        AccessManagementAudit audit = AccessManagementAudit.builder().lastUpdate(Instant.now())
+            .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION).build();
+
+        //Add permissions
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ), audit));
+
+        //truncate Permissions & attributes
+        service.truncateDefaultPermissionsByResourceDefinition(resourceDefinition);
+
+        List<RoleBasedAccessAuditRecord> accessAuditRecords = databaseHelper.getDefaultPermissionsAuditRecords(
+            resourceDefinition, "", roleName, READ.getValue());
+
+        assertThat(accessAuditRecords).isNotNull();
+        assertThat(accessAuditRecords.size()).isEqualTo(1);
+
+        List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
+            resourceDefinition, "", PUBLIC);
+
+        assertThat(resourceAttributeAudits).isNotNull();
+        assertThat(resourceAttributeAudits.size()).isEqualTo(1);
+    }
+
 
     @Test
     void shouldRemoveAllEntriesFromTablesWhenValuesExist() {

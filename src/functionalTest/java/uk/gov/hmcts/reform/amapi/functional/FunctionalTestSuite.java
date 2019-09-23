@@ -11,6 +11,7 @@ import org.junit.BeforeClass;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.util.ResourceUtils;
 import uk.gov.hmcts.reform.amapi.functional.client.AmApiClient;
@@ -38,6 +39,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
+@ActiveProfiles("functional")
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ConfusingTernary", "PMD.JUnit4TestShouldUseTestAnnotation"})
 @Component
 public class FunctionalTestSuite {

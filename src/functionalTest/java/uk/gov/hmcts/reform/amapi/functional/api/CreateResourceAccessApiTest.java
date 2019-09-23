@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.amapi.functional.FunctionalTestSuite;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 
@@ -14,7 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @RunWith(SpringIntegrationSerenityRunner.class)
-@ActiveProfiles("functional")
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert"})
 public class CreateResourceAccessApiTest extends FunctionalTestSuite {
 

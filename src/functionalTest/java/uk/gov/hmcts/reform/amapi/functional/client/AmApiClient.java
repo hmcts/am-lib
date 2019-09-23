@@ -13,18 +13,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 @SuppressWarnings({"PMD.LawOfDemeter"})
 public class AmApiClient {
 
-    /*private long currentDateTime  = System.currentTimeMillis();
-    String resourceId = "resourceId" + currentDateTime;
-    @NotEmpty Set<@NotBlank String> accessorIds;
-    String accessorId = "accessorId" + currentDateTime;
-    String resourceName = "claim-test";
-    String resourceType = "case-test";
-    String seriviceName = "cmc-test";
-    String relationship = "caseworker-test";
-    Set<String> userRoles = new HashSet<>();
-    Map<JsonPointer, Set<Permission>> multipleAttributePermissions = ImmutableMap.of(
-        JsonPointer.valueOf(""), ImmutableSet.of(READ, CREATE, UPDATE));*/
-
     private final String accessUrl;
 
     private final String s2sToken;

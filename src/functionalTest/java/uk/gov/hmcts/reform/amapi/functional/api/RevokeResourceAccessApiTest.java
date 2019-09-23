@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.amapi.functional.FunctionalTestSuite;
 import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
@@ -21,7 +22,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
 @Slf4j
 @RunWith(SpringIntegrationSerenityRunner.class)
-@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert"})
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
 public class RevokeResourceAccessApiTest extends FunctionalTestSuite {
 
     @Test
@@ -40,8 +41,11 @@ public class RevokeResourceAccessApiTest extends FunctionalTestSuite {
             .build();
 
         Response response = createThenRevokeAccess(explicitAccessGrant, explicitAccessMetadata);
-        response.then().statusCode(204);
-        response.then().log();
+
+        response.then()
+            .assertThat()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+            .log();
     }
 
     @Test
@@ -58,8 +62,11 @@ public class RevokeResourceAccessApiTest extends FunctionalTestSuite {
             .build();
 
         Response response = createThenRevokeAccess(explicitAccessGrant, explicitAccessMetadata);
-        response.then().statusCode(204);
-        response.then().log();
+
+        response.then()
+            .assertThat()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+            .log();
     }
 
     @Test
@@ -78,8 +85,11 @@ public class RevokeResourceAccessApiTest extends FunctionalTestSuite {
             .build();
 
         Response response = createThenRevokeAccess(explicitAccessGrant, explicitAccessMetadata);
-        response.then().statusCode(204);
-        response.then().log();
+
+        response.then()
+            .assertThat()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+            .log();
     }
 
     @Test
@@ -113,8 +123,11 @@ public class RevokeResourceAccessApiTest extends FunctionalTestSuite {
             .build();
 
         Response response = createThenRevokeAccess(explicitAccessGrant, explicitAccessMetadata);
-        response.then().statusCode(204);
-        response.then().log();
+
+        response.then()
+            .assertThat()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+            .log();
     }
 
     @Test
@@ -146,8 +159,11 @@ public class RevokeResourceAccessApiTest extends FunctionalTestSuite {
             .build();
 
         Response response = createThenRevokeAccess(explicitAccessGrant, explicitAccessMetadata);
-        response.then().statusCode(204);
-        response.then().log();
+
+        response.then()
+            .assertThat()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+            .log();
     }
 
     private Response createThenRevokeAccess(ExplicitAccessGrant explicitAccessGrant,

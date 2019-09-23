@@ -1,39 +1,19 @@
 package uk.gov.hmcts.reform.amapi.functional.client;
 
-import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import io.restassured.specification.RequestSpecification;
 import lombok.Data;
 import net.serenitybdd.rest.SerenityRest;
 import uk.gov.hmcts.reform.amapi.models.FilterResource;
-import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
-import uk.gov.hmcts.reform.amlib.models.Resource;
-import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
-import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
-import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
-import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
 @Data
 @SuppressWarnings({"PMD.LawOfDemeter"})
 public class AmApiClient {
 
-    private long currentDateTime  = System.currentTimeMillis();
+    /*private long currentDateTime  = System.currentTimeMillis();
     String resourceId = "resourceId" + currentDateTime;
     @NotEmpty Set<@NotBlank String> accessorIds;
     String accessorId = "accessorId" + currentDateTime;
@@ -43,7 +23,7 @@ public class AmApiClient {
     String relationship = "caseworker-test";
     Set<String> userRoles = new HashSet<>();
     Map<JsonPointer, Set<Permission>> multipleAttributePermissions = ImmutableMap.of(
-        JsonPointer.valueOf(""), ImmutableSet.of(READ, CREATE, UPDATE));
+        JsonPointer.valueOf(""), ImmutableSet.of(READ, CREATE, UPDATE));*/
 
     private final String accessUrl;
 
@@ -59,7 +39,6 @@ public class AmApiClient {
     private RequestSpecification withUnauthenticatedRequest() {
         return SerenityRest.given()
             .relaxedHTTPSValidation()
-            //.baseUri(professionalApiUrl)
             .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)
             .header("Accepts", APPLICATION_JSON_UTF8_VALUE);
     }
@@ -69,7 +48,19 @@ public class AmApiClient {
             .header(SERVICE_HEADER, "Bearer " + s2sToken);
     }
 
-    public RequestSpecification createExplicitAccess() {
+    public RequestSpecification createResourceAccess(ExplicitAccessGrant explicitAccessGrant) {
+        return withAuthenticatedRequest().body(explicitAccessGrant);
+    }
+
+    public RequestSpecification revokeResourceAccess(ExplicitAccessMetadata explicitAccessMetadata) {
+        return withAuthenticatedRequest().body(explicitAccessMetadata);
+    }
+
+    public RequestSpecification filterResource(FilterResource filterResourceMetadata) {
+        return withAuthenticatedRequest().body(filterResourceMetadata);
+    }
+
+    /*public RequestSpecification createExplicitAccess() {
         accessorIds = new HashSet<>();
         accessorIds.add(accessorId);
         ExplicitAccessGrant requestBody = ExplicitAccessGrant.builder()
@@ -133,5 +124,5 @@ public class AmApiClient {
             .build();
 
         return withAuthenticatedRequest().body(requestBody);
-    }
+    }*/
 }

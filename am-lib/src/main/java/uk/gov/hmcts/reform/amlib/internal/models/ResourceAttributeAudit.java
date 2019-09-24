@@ -31,4 +31,8 @@ public final class ResourceAttributeAudit {
     private String changedBy;
 
     private final AuditAction action;
+
+    public String getAttributeAsString() {
+        return attribute.toString();
+    }
 }

@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.amlib.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 
 import javax.validation.constraints.NotBlank;
@@ -30,6 +32,14 @@ public final class ExplicitAccessMetadata {
     private final String relationship;
     private final String resourceName;
     private final String serviceName;
+
+    @JsonIgnore
+    @Setter
+    private String changedBy;
+
+    @JsonIgnore
+    @Setter
+    private String callingServiceName;
 
     @ApiModelProperty(hidden = true)
     public String getAttributeAsString() {

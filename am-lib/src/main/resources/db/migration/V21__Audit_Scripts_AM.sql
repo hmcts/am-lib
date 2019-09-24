@@ -2,7 +2,7 @@ CREATE TYPE ACTION AS ENUM ('grant', 'revoke');
 
 create table access_management_audit
 (
-    access_management_id    integer           not null,
+    access_management_id    BIGINT            not null,
     resource_id             VARCHAR(250)      not null,
     accessor_id             VARCHAR(100)      not null,
     permissions             integer  		      not null,

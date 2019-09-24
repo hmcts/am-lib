@@ -9,11 +9,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
+import uk.gov.hmcts.reform.amlib.enums.AuditAction;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -42,9 +43,20 @@ public final class ExplicitAccessGrant {
 
     private final String relationship;
 
+    //Auditing columns are marked @JsonIgnore
+    @JsonIgnore
+    private Instant lastUpdate;
+
+    @Setter
+    @JsonIgnore
+    private String callingServiceName;
+
     @JsonIgnore
     @Setter
-    private AccessManagementAudit accessManagementAudit;
+    private String changedBy;
+
+    @JsonIgnore
+    private AuditAction action;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class ExplicitAccessGrantBuilder {

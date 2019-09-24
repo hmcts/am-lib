@@ -17,7 +17,6 @@ import org.springframework.util.ResourceUtils;
 import uk.gov.hmcts.reform.amapi.functional.client.AmApiClient;
 import uk.gov.hmcts.reform.amapi.functional.client.S2sClient;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
-import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
@@ -158,9 +157,7 @@ public class FunctionalTestSuite {
             .accessorType(accessorType)
             .attributePermissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(READ)))
             .relationship(relationship)
-            .accessManagementAudit(AccessManagementAudit.builder()
-                .lastUpdate(Instant.now())
-                .build())
+            .lastUpdate(Instant.now())
             .build();
     }
 

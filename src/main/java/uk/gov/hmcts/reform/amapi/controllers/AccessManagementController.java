@@ -78,7 +78,12 @@ public class AccessManagementController {
     })
     @DeleteMapping(value = "/access-resource", consumes = (APPLICATION_JSON_VALUE))
     @ResponseStatus(NO_CONTENT)
-    public ResponseEntity<Void> revokeResourceAccess(@RequestBody ExplicitAccessMetadata request) {
+    public ResponseEntity<Void> revokeResourceAccess(@RequestBody ExplicitAccessMetadata request,
+                                                     @RequestHeader(value = "callingServiceName", required = false)
+                                                         String callingServiceName) {
+        if (!StringUtils.isEmpty(callingServiceName)) {
+            request.setCallingServiceName(callingServiceName);
+        }
 
         accessManagementService.revokeResourceAccess(request);
         return new ResponseEntity<>(NO_CONTENT);

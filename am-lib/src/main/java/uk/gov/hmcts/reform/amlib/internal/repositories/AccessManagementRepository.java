@@ -2,13 +2,16 @@ package uk.gov.hmcts.reform.amlib.internal.repositories;
 
 import org.jdbi.v3.sqlobject.config.RegisterColumnMapper;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
+import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
+import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
+import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
@@ -29,17 +32,19 @@ public interface AccessManagementRepository {
 
     @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, accessor_type, service_name, resource_type, resource_name, attribute, relationship, last_update, calling_service_name) "
         + "values (:resourceId, :accessorId, :permissionsAsInt, cast(:accessorType as accessor_type), :serviceName, :resourceType, :resourceName, :attributeAsString, :relationship,"
-        + " CURRENT_TIMESTAMP, :accessManagementAudit.callingServiceName) "
+        + " CURRENT_TIMESTAMP, :callingServiceName) "
         + "on conflict on constraint access_management_unique do update set permissions = :permissionsAsInt, "
-        + "last_update = CURRENT_TIMESTAMP, calling_service_name = :accessManagementAudit.callingServiceName")
-    void grantAccessManagementWithNotNullRelationship(@BindBean ExplicitAccessRecord explicitAccessRecord);
+        + "last_update = CURRENT_TIMESTAMP, calling_service_name = :callingServiceName")
+    @GetGeneratedKeys("access_management_id")
+    long grantAccessManagementWithNotNullRelationship(@BindBean ExplicitAccessRecord explicitAccessRecord);
 
     @SqlUpdate("insert into access_management (resource_id, accessor_id, permissions, accessor_type, service_name, resource_type, resource_name, attribute, relationship, last_update, calling_service_name) "
         + "values (:resourceId, :accessorId, :permissionsAsInt, cast(:accessorType as accessor_type), :serviceName, :resourceType, :resourceName, :attributeAsString, :relationship,"
-        + " CURRENT_TIMESTAMP, :accessManagementAudit.callingServiceName) "
+        + " CURRENT_TIMESTAMP, :callingServiceName) "
         + "on conflict (resource_id, accessor_id, accessor_type, attribute, resource_type, service_name, resource_name) where relationship is null do update set permissions = :permissionsAsInt, "
-        + " last_update = CURRENT_TIMESTAMP, calling_service_name = :accessManagementAudit.callingServiceName")
-    void grantAccessManagementWithNullRelationship(@BindBean ExplicitAccessRecord explicitAccessRecord);
+        + " last_update = CURRENT_TIMESTAMP, calling_service_name = :callingServiceName")
+    @GetGeneratedKeys("access_management_id")
+    long grantAccessManagementWithNullRelationship(@BindBean ExplicitAccessRecord explicitAccessRecord);
 
     @SqlUpdate("delete from access_management where "
         + "access_management.resource_id = :resourceId "
@@ -97,4 +102,22 @@ public interface AccessManagementRepository {
         + "and attribute = '' order by role_name")
     @RegisterConstructorMapper(DefaultRolePermissions.class)
     List<DefaultRolePermissions> getRolePermissionsForCaseType(String caseTypeId);
+
+    @SqlUpdate("insert into access_management_audit (access_management_id, resource_id, accessor_id, permissions, accessor_type, service_name, resource_type, resource_name, attribute, relationship, calling_service_name, audit_timestamp, changed_by, action) "
+        + "values (:access_management_id, :resourceId, :accessorId, :permissionsAsInt, cast(:accessorType as accessor_type), :serviceName, :resourceType, :resourceName, :attributeAsString, :relationship,"
+        + " :callingServiceName, CURRENT_TIMESTAMP, :changedBy, 'grant' ) ")
+    void grantAccessManagementForAudit(@Bind("access_management_id") long id, @BindBean ExplicitAccessAuditRecord explicitAccessAuditRecord);
+
+    @SqlUpdate("insert into access_management_audit (access_management_id, resource_id, accessor_id, permissions, accessor_type, service_name, resource_type, resource_name, attribute, relationship, calling_service_name, audit_timestamp, changed_by, action) "
+        + "select access_management_id, resource_id, accessor_id, permissions, accessor_type, service_name, resource_type, resource_name, attribute, relationship, :callingServiceName, CURRENT_TIMESTAMP, "
+        + " :changedBy, 'revoke' from access_management where "
+        + "access_management.resource_id = :resourceId "
+        + "and access_management.accessor_id = :accessorId "
+        + "and access_management.accessor_type = cast(:accessorType as accessor_type) "
+        + "and (:resourceName is null or access_management.resource_name = :resourceName) "
+        + "and (:serviceName is null or access_management.service_name = :serviceName) "
+        + "and access_management.resource_type = :resourceType "
+        + "and (:relationship is null or access_management.relationship = :relationship) "
+        + "and (access_management.attribute = :attributeAsString or access_management.attribute like concat(:attributeAsString, '/', '%'))")
+    void revokeAccessManagementForAudit(@BindBean ExplicitAccessMetadata explicitAccessMetadata);
 }

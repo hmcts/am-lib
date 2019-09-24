@@ -1,17 +1,21 @@
 package uk.gov.hmcts.reform.amlib;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
+import uk.gov.hmcts.reform.amlib.enums.AuditAction;
+import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
+import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.query.AttributeData;
 import uk.gov.hmcts.reform.amlib.internal.repositories.AccessManagementRepository;
+import uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader;
 import uk.gov.hmcts.reform.amlib.internal.utils.SecurityClassifications;
-import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.DefaultRolePermissions;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
@@ -25,7 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
@@ -34,16 +37,19 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import static java.lang.Boolean.TRUE;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.EXPLICIT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
+import static uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader.AUDIT_REQUIRED;
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class AccessManagementService {
 
     private final Jdbi jdbi;
+
 
     /**
      * This constructor has issues with performance due to requiring a new connection for every query.
@@ -83,30 +89,73 @@ public class AccessManagementService {
     public void grantExplicitResourceAccess(@NotNull @Valid ExplicitAccessGrant accessGrant) {
         jdbi.useTransaction(handle -> {
             AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
+
             accessGrant.getAccessorIds().forEach(accessorIds ->
-                accessGrant.getAttributePermissions().entrySet().stream().map(attributePermission ->
-                    ExplicitAccessRecord.builder()
-                        .resourceId(accessGrant.getResourceId())
-                        .accessorId(accessorIds)
-                        .permissions(attributePermission.getValue())
-                        .accessorType(accessGrant.getAccessorType())
-                        .serviceName(accessGrant.getResourceDefinition().getServiceName())
-                        .resourceType(accessGrant.getResourceDefinition().getResourceType())
-                        .resourceName(accessGrant.getResourceDefinition().getResourceName())
-                        .attribute(attributePermission.getKey())
-                        .relationship(accessGrant.getRelationship())
-                        .accessManagementAudit(Optional.ofNullable(accessGrant.getAccessManagementAudit())
-                            .orElse(AccessManagementAudit.builder().build()))
-                        .build())
-                    .forEach(expAccessRecord -> {
-                        if (nonNull(accessGrant.getRelationship())) {
-                            dao.grantAccessManagementWithNotNullRelationship(expAccessRecord);
-                        } else {
-                            //Avoid duplicate insertion on Null relationship
-                            dao.grantAccessManagementWithNullRelationship(expAccessRecord);
-                        }
-                    }));
+                accessGrant.getAttributePermissions().entrySet().stream().forEach(attributePermission -> {
+                    long accessManagementId;
+                    if (nonNull(accessGrant.getRelationship())) {
+                        accessManagementId = dao.grantAccessManagementWithNotNullRelationship(buildExplicitAccess(
+                            accessGrant, accessorIds, attributePermission));
+
+                    } else {
+                        //Avoid duplicate insertion on Null relationship
+                        accessManagementId = dao.grantAccessManagementWithNullRelationship(buildExplicitAccess(
+                            accessGrant, accessorIds, attributePermission));
+                    }
+
+                    //check if Audit flag enabled & Inserts Audit
+                    if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
+                        dao.grantAccessManagementForAudit(accessManagementId, buildExplicitAccessAudit(
+                            accessGrant, accessorIds, attributePermission));
+                    }
+                }));
         });
+    }
+
+    /**
+     * gets pair of ExplicitAccessRecord and ExplicitAccessAuditRecord.
+     *
+     * @param accessGrant         accessGrant
+     * @param accessorIds         accessorIds
+     * @param attributePermission attributePermission
+     * @return Pair
+     */
+    private ExplicitAccessRecord buildExplicitAccess(
+        @NotNull @Valid ExplicitAccessGrant accessGrant, @NotBlank String accessorIds, Map.Entry<@NotNull JsonPointer,
+        @NotEmpty Set<@NotNull Permission>> attributePermission) {
+
+        return ExplicitAccessRecord.builder()
+            .resourceId(accessGrant.getResourceId())
+            .accessorId(accessorIds)
+            .permissions(attributePermission.getValue())
+            .accessorType(accessGrant.getAccessorType())
+            .serviceName(accessGrant.getResourceDefinition().getServiceName())
+            .resourceType(accessGrant.getResourceDefinition().getResourceType())
+            .resourceName(accessGrant.getResourceDefinition().getResourceName())
+            .attribute(attributePermission.getKey())
+            .relationship(accessGrant.getRelationship())
+            .callingServiceName(accessGrant.getCallingServiceName())
+            .build();
+    }
+
+    private ExplicitAccessAuditRecord buildExplicitAccessAudit(
+        @NotNull @Valid ExplicitAccessGrant accessGrant, @NotBlank String accessorIds, Map.Entry<@NotNull JsonPointer,
+        @NotEmpty Set<@NotNull Permission>> attributePermission) {
+
+        return ExplicitAccessAuditRecord.builder()
+            .resourceId(accessGrant.getResourceId())
+            .accessorId(accessorIds)
+            .permissions(attributePermission.getValue())
+            .accessorType(accessGrant.getAccessorType())
+            .serviceName(accessGrant.getResourceDefinition().getServiceName())
+            .resourceType(accessGrant.getResourceDefinition().getResourceType())
+            .resourceName(accessGrant.getResourceDefinition().getResourceName())
+            .attribute(attributePermission.getKey())
+            .relationship(accessGrant.getRelationship())
+            .callingServiceName(accessGrant.getCallingServiceName())
+            .changedBy(accessGrant.getChangedBy())
+            .action(AuditAction.GRANT)
+            .build();
     }
 
     /**
@@ -123,8 +172,15 @@ public class AccessManagementService {
         + "from accessor '{{accessMetadata.accessorId}}' with relationship '{{accessMetadata.relationship}}': "
         + "{{accessMetadata.attribute}}")
     public void revokeResourceAccess(@NotNull @Valid ExplicitAccessMetadata accessMetadata) {
-        jdbi.useExtension(AccessManagementRepository.class,
-            dao -> dao.removeAccessManagementRecord(accessMetadata));
+        jdbi.useTransaction(handle -> {
+            AccessManagementRepository dao = handle.attach(AccessManagementRepository.class);
+            //check if Audit flag enabled & Audit Records For Revoke
+            if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
+                dao.revokeAccessManagementForAudit(accessMetadata);
+            }
+            //delete records
+            dao.removeAccessManagementRecord(accessMetadata);
+        });
     }
 
 

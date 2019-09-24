@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amapi.models.FilterResource;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.FilterResourceService;
-import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
@@ -61,8 +60,7 @@ public class AccessManagementController {
                                                                         required = false)
                                                                         String callingServiceName) {
         if (!StringUtils.isEmpty(callingServiceName)) {
-            explicitAccessGrantData.setAccessManagementAudit(AccessManagementAudit.builder()
-                .callingServiceName(callingServiceName).build());
+            explicitAccessGrantData.setCallingServiceName(callingServiceName);
         }
 
         accessManagementService.grantExplicitResourceAccess(explicitAccessGrantData);

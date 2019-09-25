@@ -271,6 +271,8 @@ class RevokeAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             assertThat(explicitAccessAuditRecord).isEqualTo(expectedResult);
             assertThat(explicitAccessAuditRecord.get(1).getAuditTimeStamp()).isNotEqualTo(
                 explicitAccessAuditRecord.get(0).getAuditTimeStamp());
+        } else {
+            assertThat(explicitAccessAuditRecord.size()).isLessThan(1);
         }
     }
 

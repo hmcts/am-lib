@@ -162,6 +162,8 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
                     .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
                     .action(GRANT).build());
             assertThat(explicitAccessAuditRecord).isEqualTo(expectedResult);
+        } else {
+            assertThat(explicitAccessAuditRecord.size()).isLessThan(1);
         }
     }
 
@@ -223,6 +225,8 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
             assertThat(explicitAccessAuditRecord.get(1).getAuditTimeStamp())
                 .isNotEqualTo(explicitAccessAuditRecord.get(0).getAuditTimeStamp());
             assertThat(explicitAccessAuditRecord).isEqualTo(expectedResult);
+        } else {
+            assertThat(explicitAccessAuditRecord.size()).isLessThan(1);
         }
     }
 

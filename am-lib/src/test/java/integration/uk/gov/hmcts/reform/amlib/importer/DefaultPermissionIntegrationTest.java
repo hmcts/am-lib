@@ -144,32 +144,32 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
         List<RoleBasedAccessAuditRecord> accessAuditRecords = databaseHelper.getDefaultPermissionsAuditRecords(
             resourceDefinition, "", roleName, READ.getValue());
-
         assertThat(accessAuditRecords).isNotNull();
-        assertThat(accessAuditRecords.size()).isEqualTo(1);
-        assertThat(accessAuditRecords.get(0).getAuditTimeStamp()).isNotNull();
 
-        List<RoleBasedAccessAuditRecord> expectedResult = ImmutableList.of(
-            RoleBasedAccessAuditRecord.builder()
-                .roleName(roleName)
-                .attribute(JsonPointer.valueOf(""))
-                .serviceName(serviceName)
-                .resourceName(resourceName)
-                .resourceType(resourceType)
-                .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
-                .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
-                .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
-                .action(GRANT)
-                .permissions(ImmutableSet.of(READ)).build());
-
-        assertThat(expectedResult).isEqualTo(accessAuditRecords);
-
-        List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
-            resourceDefinition, "", PUBLIC);
-
-        assertThat(resourceAttributeAudits).isNotNull();
         //Audit flag on
         if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
+            assertThat(accessAuditRecords.size()).isEqualTo(1);
+            assertThat(accessAuditRecords.get(0).getAuditTimeStamp()).isNotNull();
+
+            List<RoleBasedAccessAuditRecord> expectedResult = ImmutableList.of(
+                RoleBasedAccessAuditRecord.builder()
+                    .roleName(roleName)
+                    .attribute(JsonPointer.valueOf(""))
+                    .serviceName(serviceName)
+                    .resourceName(resourceName)
+                    .resourceType(resourceType)
+                    .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
+                    .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
+                    .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
+                    .action(GRANT)
+                    .permissions(ImmutableSet.of(READ)).build());
+
+            assertThat(expectedResult).isEqualTo(accessAuditRecords);
+
+            List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
+                resourceDefinition, "", PUBLIC);
+
+            assertThat(resourceAttributeAudits).isNotNull();
             assertThat(resourceAttributeAudits.size()).isEqualTo(1);
             assertThat(resourceAttributeAudits.get(0).getAuditTimeStamp()).isNotNull();
 
@@ -187,6 +187,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
                     .build());
 
             assertThat(expectedResourceAuditResult).isEqualTo(resourceAttributeAudits);
+        } else {
+            assertThat(accessAuditRecords.size()).isLessThan(1);
         }
     }
 
@@ -274,6 +276,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
                     .action(GRANT)
                     .build());
             assertThat(resourceAttributeAudits).isEqualTo(expectedResourceAuditResult);
+        } else {
+            assertThat(accessAuditRecords.size()).isLessThan(1);
         }
     }
 
@@ -356,6 +360,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
                     .action(REVOKE)
                     .build());
             assertThat(resourceAttributeAudits).isEqualTo(expectedResourceAuditResult);
+        } else {
+            assertThat(accessAuditRecords.size()).isLessThan(1);
         }
     }
 
@@ -439,6 +445,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
                     .action(REVOKE)
                     .build());
             assertThat(resourceAttributeAudits).isEqualTo(expectedResourceAuditResult);
+        } else {
+            assertThat(accessAuditRecords.size()).isLessThan(1);
         }
     }
 

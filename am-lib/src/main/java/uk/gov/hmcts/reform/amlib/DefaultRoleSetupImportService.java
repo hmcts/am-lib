@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttributeAudit;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.DefaultRoleSetupRepository;
+import uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
@@ -25,7 +26,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import static java.lang.Boolean.TRUE;
 import static uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog.Severity.DEBUG;
+import static uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader.AUDIT_REQUIRED;
 
 public class DefaultRoleSetupImportService {
     private final Jdbi jdbi;
@@ -128,11 +131,13 @@ public class DefaultRoleSetupImportService {
 
                 dao.grantDefaultPermission(getRoleAccess(accessGrant, attribute, permissionAndClassification));
 
-                //create Audit of attribute and permissions
-                dao.createResourceAttributeForAudit(getResourceAttributeAudit(accessGrant, attribute,
-                    permissionAndClassification));
-                dao.grantDefaultPermissionAudit(getRoleAccessAudit(accessGrant, attribute,
-                    permissionAndClassification));
+                //check if Audit flag enabled & create Audit of attribute and permissions
+                if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
+                    dao.createResourceAttributeForAudit(getResourceAttributeAudit(accessGrant, attribute,
+                        permissionAndClassification));
+                    dao.grantDefaultPermissionAudit(getRoleAccessAudit(accessGrant, attribute,
+                        permissionAndClassification));
+                }
             });
         });
     }
@@ -189,9 +194,10 @@ public class DefaultRoleSetupImportService {
     }
 
     private ResourceAttributeAudit getResourceAttributeAudit(@NotNull @Valid DefaultPermissionGrant accessGrant,
-                                                   @NotNull JsonPointer attribute,
-                                                   Map.@NotNull Entry<@NotEmpty Set<@NotNull Permission>,
-                                                       @NotNull SecurityClassification> permissionAndClassification) {
+                                                             @NotNull JsonPointer attribute,
+                                                             Map.@NotNull Entry<@NotEmpty Set<@NotNull Permission>,
+                                                                 @NotNull SecurityClassification>
+                                                                 permissionAndClassification) {
         return ResourceAttributeAudit.builder()
             .serviceName(accessGrant.getResourceDefinition().getServiceName())
             .resourceName(accessGrant.getResourceDefinition().getResourceName())
@@ -205,17 +211,15 @@ public class DefaultRoleSetupImportService {
     }
 
 
-
-
     /**
      * Deletes all default permissions within a service for a given resource type.
      *
      * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *
-     * @param serviceName  the name of the service to delete default permissions for
-     * @param resourceType the type of resource to delete default permissions for
+     * @param serviceName        the name of the service to delete default permissions for
+     * @param resourceType       the type of resource to delete default permissions for
      * @param callingServiceName calling service name for truncate
-     * @param changedBy changed by user
+     * @param changedBy          changed by user
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
     @AuditLog("default role access revoked by '{{mdc:caller}}' for service "
@@ -227,10 +231,11 @@ public class DefaultRoleSetupImportService {
 
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
 
-            //Audit attribute permissions and resource attributes
-            dao.revokeDefaultPermissionAudit(serviceName, resourceType, callingServiceName, changedBy);
-            dao.revokeResourceAttributeAudit(serviceName, resourceType, callingServiceName, changedBy);
-
+            //check if Audit flag enabled & Inserts Audit attribute permissions and resource attributes
+            if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
+                dao.revokeDefaultPermissionAudit(serviceName, resourceType, callingServiceName, changedBy);
+                dao.revokeResourceAttributeAudit(serviceName, resourceType, callingServiceName, changedBy);
+            }
             //Truncate
             dao.deleteDefaultPermissionsForRoles(serviceName, resourceType);
             dao.deleteResourceAttributes(serviceName, resourceType);
@@ -244,20 +249,23 @@ public class DefaultRoleSetupImportService {
      *
      * @param resourceDefinition {@link ResourceDefinition} the definition of resource to delete default permissions for
      * @param callingServiceName calling service name for truncate
-     * @param changedBy changed by user
+     * @param changedBy          changed by user
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
     @SuppressWarnings("LineLength")
     @AuditLog("default role access revoked by '{{mdc:caller}}' for resource defined as "
-        + "'{{resourceDefinition.serviceName}}|{{resourceDefinition.resourceType}}|{{resourceDefinition.resourceName}}'")
+        + "'{{resourceDefinition.serviceName}}|{{resourceDefinition.resourceType}}|{{resourceDefinition.resourceName}}'"
+    )
     public void truncateDefaultPermissionsByResourceDefinition(@NotNull @Valid ResourceDefinition resourceDefinition,
-                                                               String callingServiceName, String changedBy)  {
+                                                               String callingServiceName, String changedBy) {
         jdbi.useTransaction(handle -> {
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
 
-            //Audit attribute permissions and resource attributes
-            dao.revokeDefaultPermissionAudit(resourceDefinition, callingServiceName, changedBy);
-            dao.revokeResourceAttributeAudit(resourceDefinition, callingServiceName, changedBy);
+            //check if Audit flag enabled & Inserts Audit attribute permissions and resource attributes
+            if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
+                dao.revokeDefaultPermissionAudit(resourceDefinition, callingServiceName, changedBy);
+                dao.revokeResourceAttributeAudit(resourceDefinition, callingServiceName, changedBy);
+            }
 
             dao.deleteDefaultPermissionsForRoles(resourceDefinition);
             dao.deleteResourceAttributes(resourceDefinition);

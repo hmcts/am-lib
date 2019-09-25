@@ -1,27 +1,15 @@
 package uk.gov.hmcts.reform.amlib.internal.utils;
 
-import uk.gov.hmcts.reform.amlib.exceptions.AccessManagementException;
+import java.util.ResourceBundle;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-@SuppressWarnings({"checkstyle:HideUtilityClassConstructor"})
-public class PropertyReader {
-
-    private static Properties properties;
+public final class PropertyReader {
 
     public static final String AUDIT_REQUIRED = "audit.required";
 
-    private static void readProperties() {
-        properties = new Properties();
-        final InputStream stream = PropertyReader.class
-            .getResourceAsStream("/audit.properties");
-        try {
-            properties.load(stream);
-        } catch (final IOException ex) {
-            throw new AccessManagementException("Error in Reading Audit properties", ex);
-        }
+    private static ResourceBundle rb = ResourceBundle.getBundle("audit");
+
+    private PropertyReader() {
+        super();
     }
 
     /**
@@ -31,7 +19,6 @@ public class PropertyReader {
      * @return propertyValue
      */
     public static String getPropertyValue(String name) {
-        readProperties();
-        return properties.getProperty(name);
+        return rb.getString(name);
     }
 }

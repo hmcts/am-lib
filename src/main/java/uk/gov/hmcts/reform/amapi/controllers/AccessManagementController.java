@@ -5,8 +5,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,11 +56,12 @@ public class AccessManagementController {
                                                                         explicitAccessGrantData,
                                                                     @RequestHeader(value = "callingServiceName",
                                                                         required = false)
-                                                                        String callingServiceName) {
-        if (!StringUtils.isEmpty(callingServiceName)) {
-            explicitAccessGrantData.setCallingServiceName(callingServiceName);
-        }
+                                                                        String callingServiceName,
+                                                                    @RequestHeader(value = "changedBy",
+                                                                        required = false) String changedBy) {
 
+        explicitAccessGrantData.setCallingServiceName(callingServiceName);
+        explicitAccessGrantData.setChangedBy(changedBy);
         accessManagementService.grantExplicitResourceAccess(explicitAccessGrantData);
         return new ResponseEntity<>(explicitAccessGrantData, CREATED);
     }
@@ -80,11 +79,12 @@ public class AccessManagementController {
     @ResponseStatus(NO_CONTENT)
     public ResponseEntity<Void> revokeResourceAccess(@RequestBody ExplicitAccessMetadata request,
                                                      @RequestHeader(value = "callingServiceName", required = false)
-                                                         String callingServiceName) {
-        if (!StringUtils.isEmpty(callingServiceName)) {
-            request.setCallingServiceName(callingServiceName);
-        }
+                                                         String callingServiceName,
+                                                     @RequestHeader(value = "changedBy", required = false)
+                                                         String changedBy) {
 
+        request.setCallingServiceName(callingServiceName);
+        request.setChangedBy(changedBy);
         accessManagementService.revokeResourceAccess(request);
         return new ResponseEntity<>(NO_CONTENT);
     }

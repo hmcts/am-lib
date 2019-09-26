@@ -7,6 +7,7 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.amapi.functional.FunctionalTestSuite;
@@ -16,18 +17,23 @@ import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertNull;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.DEFAULT;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.ROLE;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
 @Slf4j
 @RunWith(SpringIntegrationSerenityRunner.class)
-@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert"})
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert","PMD.AvoidDuplicateLiterals",
+    "PMD.JUnitAssertionsShouldIncludeMessage"})
 public class CreateResourceAccessApiTest extends FunctionalTestSuite {
 
-    private final String expectedResourceDefinition = resourceDefinitionToString(serviceName, resourceName, resourceType);
+    private final String expectedResourceDefinition = resourceDefinitionToString(serviceName,
+        resourceName, resourceType);
 
     @Test
     public void verifyCreateExplicitAccessApi() {
@@ -77,67 +83,75 @@ public class CreateResourceAccessApiTest extends FunctionalTestSuite {
     @Test
     public void verifyGrantExplicitAccessForRole() {
 
-        ExplicitAccessGrant explicitAccessGrant = ExplicitAccessGrant.builder()
-            .resourceId(resourceId)
-            .resourceDefinition(ResourceDefinition.builder()
-                .serviceName(serviceName)
-                .resourceName(resourceName)
-                .resourceType(resourceType)
-                .lastUpdate(Instant.now())
-                .build())
-            .accessorIds(ImmutableSet.of(accessorId))
-            .accessorType(AccessorType.ROLE)
-            .attributePermissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(READ)))
-            .relationship(relationship)
-            .accessManagementAudit(AccessManagementAudit.builder()
-                .lastUpdate(Instant.now())
-                .build())
-            .build();
+        resourceId = UUID.randomUUID().toString();
+        ExplicitAccessGrant explicitAccessGrant = getExplicitAccessGrant(ROLE, relationship, accessorId);
 
-        Response response = amApiClient.createResourceAccess(explicitAccessGrant)
-            .post(amApiClient.getAccessUrl() + "api/" + version + "/access-resource");
-
-        JsonPath responseBody = response.getBody().jsonPath();
-
-        response.then().assertThat().statusCode(201).log();
+        JsonPath responseBody = verifyResponseCreated(explicitAccessGrant);
         assertThat(responseBody.get("accessorIds").toString()).isEqualTo("[" + accessorId + "]");
-        assertThat(responseBody.get("resourceId").toString()).isEqualTo(resourceId);
-        assertThat(responseBody.get("resourceDefinition").toString()).isEqualTo(expectedResourceDefinition);
         assertThat(responseBody.get("relationship").toString()).isEqualTo(relationship);
         assertThat(responseBody.get("attributePermissions").toString()).contains("READ");
-        assertThat(responseBody.get("accessorType").toString()).isEqualTo(AccessorType.ROLE.toString());
+        assertThat(responseBody.get("accessorType").toString()).isEqualTo(ROLE.toString());
+        assertThat(responseBody.get("resourceId").toString()).isEqualTo(resourceId);
+        assertThat(responseBody.get("resourceDefinition").toString()).isEqualTo(expectedResourceDefinition);
     }
+
 
     @Test
     public void verifyGrantExplicitAccessWithNullRelationship() {
 
-        ExplicitAccessGrant explicitAccessGrant = ExplicitAccessGrant.builder()
-            .resourceId(resourceId)
-            .resourceDefinition(ResourceDefinition.builder()
-                .serviceName(serviceName)
-                .resourceName(resourceName)
-                .resourceType(resourceType)
-                .lastUpdate(Instant.now())
-                .build())
-            .accessorIds(ImmutableSet.of(accessorId))
-            .accessorType(accessorType)
-            .attributePermissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(READ)))
-            .accessManagementAudit(AccessManagementAudit.builder()
-                .lastUpdate(Instant.now())
-                .build())
-            .build();
+        resourceId = UUID.randomUUID().toString();
+        ExplicitAccessGrant explicitAccessGrant = getExplicitAccessGrant(USER, null, accessorId);
 
-        Response response = amApiClient.createResourceAccess(explicitAccessGrant)
-            .post(amApiClient.getAccessUrl() + "api/" + version + "/access-resource");
-
-        JsonPath responseBody = response.getBody().jsonPath();
-
-        response.then().assertThat().statusCode(201).log();
+        JsonPath responseBody = verifyResponseCreated(explicitAccessGrant);
         assertThat(responseBody.get("accessorIds").toString()).isEqualTo("[" + accessorId + "]");
-        assertThat(responseBody.get("resourceId").toString()).isEqualTo(resourceId);
-        assertThat(responseBody.get("resourceDefinition").toString()).isEqualTo(expectedResourceDefinition);
         assertNull(responseBody.get("relationship"));
         assertThat(responseBody.get("attributePermissions").toString()).contains("READ");
         assertThat(responseBody.get("accessorType").toString()).isEqualTo(accessorType.toString());
+        assertThat(responseBody.get("resourceId").toString()).isEqualTo(resourceId);
+        assertThat(responseBody.get("resourceDefinition").toString()).isEqualTo(expectedResourceDefinition);
     }
+
+    @Test
+    public void verifyGrantExplicitAccessForWildcard() {
+        resourceId = UUID.randomUUID().toString();
+        ExplicitAccessGrant explicitAccessGrant = getExplicitAccessGrant(DEFAULT, null, "*");
+        JsonPath responseBody = verifyResponseCreated(explicitAccessGrant);
+        assertThat(responseBody.get("accessorIds").toString()).isEqualTo("[*]");
+        assertNull(responseBody.get("relationship"));
+        assertThat(responseBody.get("attributePermissions").toString()).contains("READ");
+        assertThat(responseBody.get("accessorType").toString()).isEqualTo(DEFAULT.toString());
+        assertThat(responseBody.get("resourceId").toString()).isEqualTo(resourceId);
+        assertThat(responseBody.get("resourceDefinition").toString()).isEqualTo(expectedResourceDefinition);
+    }
+
+    private ExplicitAccessGrant getExplicitAccessGrant(final AccessorType accessorType,
+                                                       final String relationship, final String accessorId) {
+        return ExplicitAccessGrant.builder()
+                .resourceId(resourceId)
+                .resourceDefinition(ResourceDefinition.builder()
+                    .serviceName(serviceName)
+                    .resourceName(resourceName)
+                    .resourceType(resourceType)
+                    .lastUpdate(Instant.now())
+                    .build())
+                .accessorIds(ImmutableSet.of(accessorId))
+                .accessorType(accessorType)
+                .relationship(relationship)
+                .attributePermissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(READ)))
+                .accessManagementAudit(AccessManagementAudit.builder()
+                    .lastUpdate(Instant.now())
+                    .build())
+                .build();
+    }
+
+
+    @NotNull
+    private JsonPath verifyResponseCreated(ExplicitAccessGrant explicitAccessGrant) {
+        Response response = amApiClient.createResourceAccess(explicitAccessGrant)
+            .post(amApiClient.getAccessUrl() + "api/" + version + "/access-resource");
+        JsonPath responseBody = response.getBody().jsonPath();
+        response.then().assertThat().statusCode(201).log();
+        return responseBody;
+    }
+
 }

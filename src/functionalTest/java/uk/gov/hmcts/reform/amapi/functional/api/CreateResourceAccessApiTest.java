@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.amapi.functional.FunctionalTestSuite;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
-import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
@@ -136,23 +135,20 @@ public class CreateResourceAccessApiTest extends FunctionalTestSuite {
     private ExplicitAccessGrant getExplicitAccessGrant(final AccessorType accessorType,
                                                        final String relationship, final String accessorId) {
         return ExplicitAccessGrant.builder()
-                .resourceId(resourceId)
-                .resourceDefinition(ResourceDefinition.builder()
-                    .serviceName(serviceName)
-                    .resourceName(resourceName)
-                    .resourceType(resourceType)
-                    .lastUpdate(Instant.now())
-                    .build())
-                .accessorIds(ImmutableSet.of(accessorId))
-                .accessorType(accessorType)
-                .relationship(relationship)
-                .attributePermissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(READ)))
-                .accessManagementAudit(AccessManagementAudit.builder()
-                    .lastUpdate(Instant.now())
-                    .build())
-                .build();
+            .resourceId(resourceId)
+            .resourceDefinition(ResourceDefinition.builder()
+                .serviceName(serviceName)
+                .resourceName(resourceName)
+                .resourceType(resourceType)
+                .lastUpdate(Instant.now())
+                .build())
+            .accessorIds(ImmutableSet.of(accessorId))
+            .accessorType(accessorType)
+            .relationship(relationship)
+            .attributePermissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(READ)))
+            .lastUpdate(Instant.now())
+            .build();
     }
-
 
     @NotNull
     private JsonPath verifyResponseCreated(ExplicitAccessGrant explicitAccessGrant) {

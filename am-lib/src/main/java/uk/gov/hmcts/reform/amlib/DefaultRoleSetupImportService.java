@@ -1,26 +1,34 @@
 package uk.gov.hmcts.reform.amlib;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
+import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
+import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttributeAudit;
+import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.DefaultRoleSetupRepository;
-import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
+import uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
-import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
 import javax.sql.DataSource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import static java.lang.Boolean.TRUE;
 import static uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog.Severity.DEBUG;
+import static uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader.AUDIT_REQUIRED;
 
 public class DefaultRoleSetupImportService {
     private final Jdbi jdbi;
@@ -118,47 +126,117 @@ public class DefaultRoleSetupImportService {
         jdbi.useTransaction(handle -> {
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
             accessGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
-                dao.createResourceAttribute(ResourceAttribute.builder()
-                    .serviceName(accessGrant.getResourceDefinition().getServiceName())
-                    .resourceName(accessGrant.getResourceDefinition().getResourceName())
-                    .resourceType(accessGrant.getResourceDefinition().getResourceType())
-                    .attribute(attribute)
-                    .defaultSecurityClassification(permissionAndClassification.getValue())
-                    .accessManagementAudit(Optional.ofNullable(accessGrant.getAccessManagementAudit())
-                    .orElse(AccessManagementAudit.builder().build()))
-                    .build()
-                );
 
+                dao.createResourceAttribute(getResourceAttribute(accessGrant, attribute, permissionAndClassification));
 
-                dao.grantDefaultPermission(
-                    RoleBasedAccessRecord.builder()
-                        .serviceName(accessGrant.getResourceDefinition().getServiceName())
-                        .resourceType(accessGrant.getResourceDefinition().getResourceType())
-                        .resourceName(accessGrant.getResourceDefinition().getResourceName())
-                        .attribute(attribute)
-                        .roleName(accessGrant.getRoleName())
-                        .permissions(permissionAndClassification.getKey())
-                        .accessManagementAudit(Optional.ofNullable(accessGrant.getAccessManagementAudit())
-                            .orElse(AccessManagementAudit.builder().build()))
-                        .build());
+                dao.grantDefaultPermission(getRoleAccess(accessGrant, attribute, permissionAndClassification));
+
+                //check if Audit flag enabled & create Audit of attribute and permissions
+                if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
+                    dao.createResourceAttributeForAudit(getResourceAttributeAudit(accessGrant, attribute,
+                        permissionAndClassification));
+                    dao.grantDefaultPermissionAudit(getRoleAccessAudit(accessGrant, attribute,
+                        permissionAndClassification));
+                }
             });
         });
     }
+
+    private RoleBasedAccessRecord getRoleAccess(
+        @NotNull @Valid DefaultPermissionGrant accessGrant,
+        @NotNull JsonPointer attribute,
+        Map.@NotNull Entry<@NotEmpty Set<@NotNull Permission>,
+            @NotNull SecurityClassification> permissionAndClassification) {
+
+        return RoleBasedAccessRecord.builder()
+            .serviceName(accessGrant.getResourceDefinition().getServiceName())
+            .resourceType(accessGrant.getResourceDefinition().getResourceType())
+            .resourceName(accessGrant.getResourceDefinition().getResourceName())
+            .attribute(attribute)
+            .roleName(accessGrant.getRoleName())
+            .permissions(permissionAndClassification.getKey())
+            .callingServiceName(accessGrant.getCallingServiceName())
+            .build();
+
+    }
+
+    private RoleBasedAccessAuditRecord getRoleAccessAudit(@NotNull @Valid DefaultPermissionGrant accessGrant,
+                                                          @NotNull JsonPointer attribute,
+                                                          Map.@NotNull Entry<@NotEmpty Set<@NotNull Permission>,
+                                                              @NotNull SecurityClassification>
+                                                              permissionAndClassification) {
+        return RoleBasedAccessAuditRecord.builder()
+            .serviceName(accessGrant.getResourceDefinition().getServiceName())
+            .resourceType(accessGrant.getResourceDefinition().getResourceType())
+            .resourceName(accessGrant.getResourceDefinition().getResourceName())
+            .attribute(attribute)
+            .roleName(accessGrant.getRoleName())
+            .permissions(permissionAndClassification.getKey())
+            .callingServiceName(accessGrant.getCallingServiceName())
+            .changedBy(accessGrant.getChangedBy())
+            .build();
+
+    }
+
+    private ResourceAttribute getResourceAttribute(@NotNull @Valid DefaultPermissionGrant accessGrant,
+                                                   @NotNull JsonPointer attribute,
+                                                   Map.@NotNull Entry<@NotEmpty Set<@NotNull Permission>,
+                                                       @NotNull SecurityClassification> permissionAndClassification) {
+        return ResourceAttribute.builder()
+            .serviceName(accessGrant.getResourceDefinition().getServiceName())
+            .resourceName(accessGrant.getResourceDefinition().getResourceName())
+            .resourceType(accessGrant.getResourceDefinition().getResourceType())
+            .attribute(attribute)
+            .defaultSecurityClassification(permissionAndClassification.getValue())
+            .callingServiceName(accessGrant.getCallingServiceName())
+            .build();
+
+    }
+
+    private ResourceAttributeAudit getResourceAttributeAudit(@NotNull @Valid DefaultPermissionGrant accessGrant,
+                                                             @NotNull JsonPointer attribute,
+                                                             Map.@NotNull Entry<@NotEmpty Set<@NotNull Permission>,
+                                                                 @NotNull SecurityClassification>
+                                                                 permissionAndClassification) {
+        return ResourceAttributeAudit.builder()
+            .serviceName(accessGrant.getResourceDefinition().getServiceName())
+            .resourceName(accessGrant.getResourceDefinition().getResourceName())
+            .resourceType(accessGrant.getResourceDefinition().getResourceType())
+            .attribute(attribute)
+            .defaultSecurityClassification(permissionAndClassification.getValue())
+            .callingServiceName(accessGrant.getCallingServiceName())
+            .changedBy(accessGrant.getChangedBy())
+            .build();
+
+    }
+
 
     /**
      * Deletes all default permissions within a service for a given resource type.
      *
      * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *
-     * @param serviceName  the name of the service to delete default permissions for
-     * @param resourceType the type of resource to delete default permissions for
+     * @param serviceName        the name of the service to delete default permissions for
+     * @param resourceType       the type of resource to delete default permissions for
+     * @param callingServiceName calling service name for truncate
+     * @param changedBy          changed by user
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
     @AuditLog("default role access revoked by '{{mdc:caller}}' for service "
         + "defined as '{{serviceName}}|{{resourceType}}'")
-    public void truncateDefaultPermissionsForService(@NotBlank String serviceName, @NotBlank String resourceType) {
+    public void truncateDefaultPermissionsForService(@NotBlank String serviceName, @NotBlank String resourceType,
+                                                     String callingServiceName, String changedBy) {
         jdbi.useTransaction(handle -> {
+
+
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
+
+            //check if Audit flag enabled & Inserts Audit attribute permissions and resource attributes
+            if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
+                dao.revokeDefaultPermissionAudit(serviceName, resourceType, callingServiceName, changedBy);
+                dao.revokeResourceAttributeAudit(serviceName, resourceType, callingServiceName, changedBy);
+            }
+            //Truncate
             dao.deleteDefaultPermissionsForRoles(serviceName, resourceType);
             dao.deleteResourceAttributes(serviceName, resourceType);
         });
@@ -170,14 +248,25 @@ public class DefaultRoleSetupImportService {
      * <p>Operation uses a transaction and will rollback if any errors are encountered whilst adding entries.
      *
      * @param resourceDefinition {@link ResourceDefinition} the definition of resource to delete default permissions for
+     * @param callingServiceName calling service name for truncate
+     * @param changedBy          changed by user
      * @throws PersistenceException if any persistence errors were encountered causing transaction rollback
      */
     @SuppressWarnings("LineLength")
     @AuditLog("default role access revoked by '{{mdc:caller}}' for resource defined as "
-        + "'{{resourceDefinition.serviceName}}|{{resourceDefinition.resourceType}}|{{resourceDefinition.resourceName}}'")
-    public void truncateDefaultPermissionsByResourceDefinition(@NotNull @Valid ResourceDefinition resourceDefinition) {
+        + "'{{resourceDefinition.serviceName}}|{{resourceDefinition.resourceType}}|{{resourceDefinition.resourceName}}'"
+    )
+    public void truncateDefaultPermissionsByResourceDefinition(@NotNull @Valid ResourceDefinition resourceDefinition,
+                                                               String callingServiceName, String changedBy) {
         jdbi.useTransaction(handle -> {
             DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
+
+            //check if Audit flag enabled & Inserts Audit attribute permissions and resource attributes
+            if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
+                dao.revokeDefaultPermissionAudit(resourceDefinition, callingServiceName, changedBy);
+                dao.revokeResourceAttributeAudit(resourceDefinition, callingServiceName, changedBy);
+            }
+
             dao.deleteDefaultPermissionsForRoles(resourceDefinition);
             dao.deleteResourceAttributes(resourceDefinition);
         });

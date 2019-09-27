@@ -5,17 +5,20 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
+import uk.gov.hmcts.reform.amlib.enums.AuditAction;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.internal.utils.Permissions;
 import uk.gov.hmcts.reform.amlib.models.AttributeAccessDefinition;
 
 import java.time.Instant;
 import java.util.Set;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @Builder
 @AllArgsConstructor
-public final class RoleBasedAccessRecord implements AttributeAccessDefinition {
+public class RoleBasedAccessAuditRecord implements AttributeAccessDefinition {
+
     private final String serviceName;
     private final String resourceType;
     private final String resourceName;
@@ -23,9 +26,16 @@ public final class RoleBasedAccessRecord implements AttributeAccessDefinition {
     private final JsonPointer attribute;
     private final Set<Permission> permissions;
 
-    private Instant lastUpdate;
     @Setter
     private String callingServiceName;
+
+    @NotBlank
+    private final Instant auditTimeStamp;
+
+    @Setter
+    private String changedBy;
+
+    private final AuditAction action;
 
     @Override
     public String getAttributeAsString() {
@@ -36,6 +46,4 @@ public final class RoleBasedAccessRecord implements AttributeAccessDefinition {
     public int getPermissionsAsInt() {
         return Permissions.sumOf(permissions);
     }
-
-
 }

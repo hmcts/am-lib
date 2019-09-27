@@ -5,22 +5,32 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
+import uk.gov.hmcts.reform.amlib.enums.AuditAction;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
 import java.time.Instant;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @Builder
 @AllArgsConstructor
-public final class ResourceAttribute {
+public final class ResourceAttributeAudit {
     private final String serviceName;
     private final String resourceType;
     private final String resourceName;
     private final JsonPointer attribute;
     private final SecurityClassification defaultSecurityClassification;
-    private Instant lastUpdate;
+
     @Setter
     private String callingServiceName;
+
+    @NotBlank
+    private final Instant auditTimeStamp;
+
+    @Setter
+    private String changedBy;
+
+    private final AuditAction action;
 
     public String getAttributeAsString() {
         return attribute.toString();

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.amapi.functional.api;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.restassured.response.Response;
@@ -10,15 +11,20 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.amapi.functional.FunctionalTestSuite;
+import uk.gov.hmcts.reform.amapi.models.FilterResource;
 import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
+import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.time.Instant;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.ROLE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 
 @Slf4j
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -46,6 +52,8 @@ public class RevokeResourceAccessApiTest extends FunctionalTestSuite {
             .assertThat()
             .statusCode(HttpStatus.NO_CONTENT.value())
             .log();
+
+        assertThatAccessRecordHasBeenRevoked();
     }
 
     @Test
@@ -67,6 +75,8 @@ public class RevokeResourceAccessApiTest extends FunctionalTestSuite {
             .assertThat()
             .statusCode(HttpStatus.NO_CONTENT.value())
             .log();
+
+        assertThatAccessRecordHasBeenRevoked();
     }
 
     @Test
@@ -89,6 +99,17 @@ public class RevokeResourceAccessApiTest extends FunctionalTestSuite {
         response.then()
             .assertThat()
             .statusCode(HttpStatus.NO_CONTENT.value())
+            .log();
+
+        FilterResource filterResourceMetadata = createFilterResourceMetadata();
+
+        response = amApiClient.filterResource(filterResourceMetadata)
+            .post(amApiClient.getAccessUrl() + "api/" + version + "/filter-resource");
+
+        response.then()
+            .assertThat()
+            .statusCode(HttpStatus.OK.value())
+            .body("resource.data.name", equalTo("John"))
             .log();
     }
 
@@ -128,10 +149,12 @@ public class RevokeResourceAccessApiTest extends FunctionalTestSuite {
             .assertThat()
             .statusCode(HttpStatus.NO_CONTENT.value())
             .log();
+
+        assertThatAccessRecordHasBeenRevoked();
     }
 
     @Test
-    public void verifyRevokeExplicitAccessApiForUserWithNullRelationship() {
+    public void verifyRevokeExplicitAccessApiForRoleWithNullRelationship() {
 
         ExplicitAccessGrant explicitAccessGrant = ExplicitAccessGrant.builder()
             .resourceId(resourceId)
@@ -142,7 +165,7 @@ public class RevokeResourceAccessApiTest extends FunctionalTestSuite {
                 .lastUpdate(Instant.now())
                 .build())
             .accessorIds(ImmutableSet.of(accessorId))
-            .accessorType(accessorType)
+            .accessorType(ROLE)
             .attributePermissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(READ)))
             .accessManagementAudit(AccessManagementAudit.builder()
                 .lastUpdate(Instant.now())
@@ -164,13 +187,63 @@ public class RevokeResourceAccessApiTest extends FunctionalTestSuite {
             .assertThat()
             .statusCode(HttpStatus.NO_CONTENT.value())
             .log();
+
+        FilterResource.builder()
+            .userId(accessorId)
+            .userRoles(ImmutableSet.of())
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(ResourceDefinition.builder()
+                    .serviceName(serviceName)
+                    .resourceName(resourceName)
+                    .resourceType(resourceType)
+                    .lastUpdate(Instant.now())
+                    .build())
+                .data(JsonNodeFactory.instance.objectNode()
+                    .put("name", "John"))
+                .build())
+            .attributeSecurityClassification(ImmutableMap.of(JsonPointer.valueOf(""), PUBLIC))
+            .build();
+
+        assertThatAccessRecordHasBeenRevoked();
     }
 
     private Response createThenRevokeAccess(ExplicitAccessGrant explicitAccessGrant,
                                             ExplicitAccessMetadata explicitAccessMetadata) {
         amApiClient.createResourceAccess(explicitAccessGrant)
             .post(amApiClient.getAccessUrl() + "api/" + version + "/access-resource");
-        return amApiClient.revokeResourceAccess(explicitAccessMetadata)
-            .delete(amApiClient.getAccessUrl() + "api/" + version + "/access-resource");
+        return amApiClient.revokeResourceAccess(explicitAccessMetadata);
+    }
+
+    private FilterResource createFilterResourceMetadata() {
+        return FilterResource.builder()
+            .userId(accessorId)
+            .userRoles(ImmutableSet.of(relationship))
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(ResourceDefinition.builder()
+                    .serviceName(serviceName)
+                    .resourceName(resourceName)
+                    .resourceType(resourceType)
+                    .lastUpdate(Instant.now())
+                    .build())
+                .data(JsonNodeFactory.instance.objectNode()
+                    .put("name", "John"))
+                .build())
+            .attributeSecurityClassification(ImmutableMap.of(JsonPointer.valueOf(""), PUBLIC))
+            .build();
+    }
+
+    private void assertThatAccessRecordHasBeenRevoked() {
+        FilterResource filterResourceMetadata = createFilterResourceMetadata();
+
+        Response response = amApiClient.filterResource(filterResourceMetadata)
+            .post(amApiClient.getAccessUrl() + "api/" + version + "/filter-resource");
+
+        response.then()
+            .assertThat()
+            .statusCode(HttpStatus.OK.value())
+            .contentType(isEmptyOrNullString())
+            .log();
     }
 }

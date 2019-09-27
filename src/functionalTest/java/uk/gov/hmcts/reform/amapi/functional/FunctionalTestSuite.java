@@ -93,7 +93,7 @@ public class FunctionalTestSuite {
         log.info("environment script execution::" + getenv("environment_name"));
 
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
-        amApiClient = new AmApiClient(accessUrl, s2sToken);
+        amApiClient = new AmApiClient(accessUrl, version, s2sToken);
 
         resourceId = UUID.randomUUID().toString();
         accessorId = UUID.randomUUID().toString();

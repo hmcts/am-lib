@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.amapi.functional.FunctionalTestSuite;
 import uk.gov.hmcts.reform.amapi.models.FilterResource;
-import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
@@ -128,9 +127,7 @@ public class RevokeResourceAccessApiTest extends FunctionalTestSuite {
             .accessorType(ROLE)
             .attributePermissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(READ)))
             .relationship(relationship)
-            .accessManagementAudit(AccessManagementAudit.builder()
-                .lastUpdate(Instant.now())
-                .build())
+            .lastUpdate(Instant.now())
             .build();
         ExplicitAccessMetadata explicitAccessMetadata = ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
@@ -167,9 +164,7 @@ public class RevokeResourceAccessApiTest extends FunctionalTestSuite {
             .accessorIds(ImmutableSet.of(accessorId))
             .accessorType(ROLE)
             .attributePermissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(READ)))
-            .accessManagementAudit(AccessManagementAudit.builder()
-                .lastUpdate(Instant.now())
-                .build())
+            .lastUpdate(Instant.now())
             .build();
         ExplicitAccessMetadata explicitAccessMetadata = ExplicitAccessMetadata.builder()
             .resourceId(resourceId)

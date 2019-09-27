@@ -6,13 +6,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
-import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
-import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,8 +18,12 @@ import static uk.gov.hmcts.reform.amlib.enums.AccessorType.ROLE;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CALLING_SERVICE_NAME_FOR_INSERTION;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CALLING_SERVICE_NAME_FOR_REVOKE;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CHANGED_BY_NAME_FOR_INSERTION;
+import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CHANGED_BY_NAME_FOR_REVOKE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.DATA;
 
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.UseObjectForClearerAPI"})
 public final class TestDataFactory {
 
     private TestDataFactory() {
@@ -49,7 +51,7 @@ public final class TestDataFactory {
             .resourceDefinition(resourceDefinition)
             .attributePermissions(attributePermissions)
             .relationship(relationship)
-            .accessManagementAudit(createAccessManagementAudit())
+            .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
             .build();
     }
 
@@ -67,7 +69,7 @@ public final class TestDataFactory {
             .resourceDefinition(resourceDefinition)
             .attributePermissions(attributePermissions)
             .relationship(relationship)
-            .accessManagementAudit(createAccessManagementAudit())
+            .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
             .build();
     }
 
@@ -83,7 +85,7 @@ public final class TestDataFactory {
             .resourceDefinition(resourceDefinition)
             .attributePermissions(attributePermissions)
             .relationship(relationship)
-            .accessManagementAudit(createAccessManagementAudit())
+            .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
             .build();
     }
 
@@ -121,16 +123,11 @@ public final class TestDataFactory {
             .build();
     }
 
-    public static AccessManagementAudit createAccessManagementAudit() {
-        return AccessManagementAudit.builder().lastUpdate(Instant.now())
-            .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION).build();
-    }
-
     public static ExplicitAccessGrant createExplicitAccessGrantWithAudit(String resourceId,
                                                                          String accessorId,
                                                                          String relationship,
                                                                          ResourceDefinition resourceDefinition,
-                                                                         AccessManagementAudit accessManagementAudit) {
+                                                                         String callingServiceName) {
         return ExplicitAccessGrant.builder()
             .resourceId(resourceId)
             .accessorIds(ImmutableSet.of(accessorId))
@@ -138,8 +135,28 @@ public final class TestDataFactory {
             .resourceDefinition(resourceDefinition)
             .attributePermissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(READ)))
             .relationship(relationship)
-            .accessManagementAudit(accessManagementAudit)
+            .callingServiceName(callingServiceName)
+            .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
             .build();
     }
 
+
+    public static ExplicitAccessMetadata createMetadataForAudit(String resourceId, String accessorId,
+                                                                String relationship,
+                                                                ResourceDefinition resourceDefinition,
+                                                                JsonPointer attribute) {
+
+        return ExplicitAccessMetadata.builder()
+            .resourceId(resourceId)
+            .accessorId(accessorId)
+            .accessorType(USER)
+            .resourceType(resourceDefinition.getResourceType())
+            .resourceName(resourceDefinition.getResourceName())
+            .serviceName(resourceDefinition.getServiceName())
+            .attribute(attribute)
+            .relationship(relationship)
+            .callingServiceName(CALLING_SERVICE_NAME_FOR_REVOKE)
+            .changedBy(CHANGED_BY_NAME_FOR_REVOKE)
+            .build();
+    }
 }

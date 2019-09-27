@@ -15,6 +15,14 @@ public final class TestConstants {
 
     public static final String CALLING_SERVICE_NAME_FOR_UPDATES = "integration-test-update";
 
+    public static final String CALLING_SERVICE_NAME_FOR_REVOKE = "integration-test-revoke";
+
+    public static final String CHANGED_BY_NAME_FOR_INSERTION = "insert-user";
+
+    public static final String CHANGED_BY_NAME_FOR_UPDATE = "update-user";
+
+    public static final String CHANGED_BY_NAME_FOR_REVOKE = "revoke-user";
+
     private TestConstants() {
         //NO-OP
     }

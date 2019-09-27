@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import java.time.Instant;
 import java.util.UUID;
 
+import static com.microsoft.applicationinsights.web.dependencies.http.HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.DEFAULT;
@@ -28,8 +30,7 @@ import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 
 @Slf4j
 @RunWith(SpringIntegrationSerenityRunner.class)
-@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert","PMD.AvoidDuplicateLiterals",
-    "PMD.JUnitAssertionsShouldIncludeMessage"})
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class CreateResourceAccessApiTest extends FunctionalTestSuite {
 
     private final String expectedResourceDefinition = resourceDefinitionToString(serviceName,
@@ -64,7 +65,11 @@ public class CreateResourceAccessApiTest extends FunctionalTestSuite {
             .header("Content-Type", "application/xml")
             .post(amApiClient.getAccessUrl() + "api/" + version + "/access-resource");
 
-        response.then().statusCode(415);
+
+        response.then()
+            .assertThat()
+            .statusCode(SC_UNSUPPORTED_MEDIA_TYPE);
+        assertThat(response).isNotNull();
         response.then().log();
     }
 
@@ -76,7 +81,11 @@ public class CreateResourceAccessApiTest extends FunctionalTestSuite {
         Response response = amApiClient.createResourceAccess(explicitAccessGrant)
             .post(amApiClient.getAccessUrl() + "api/" + version + "/access-resource-test");
 
-        response.then().statusCode(404);
+        response.then()
+            .assertThat()
+            .statusCode(SC_NOT_FOUND);
+
+        assertThat(response).isNotNull();
         response.then().log();
     }
 
@@ -104,7 +113,7 @@ public class CreateResourceAccessApiTest extends FunctionalTestSuite {
 
         JsonPath responseBody = verifyResponseCreated(explicitAccessGrant);
         assertThat(responseBody.get("accessorIds").toString()).isEqualTo("[" + accessorId + "]");
-        assertNull(responseBody.get("relationship"));
+        assertNull(responseBody.get("relationship"),null);
         assertThat(responseBody.get("attributePermissions").toString()).contains("READ");
         assertThat(responseBody.get("accessorType").toString()).isEqualTo(accessorType.toString());
         assertThat(responseBody.get("resourceId").toString()).isEqualTo(resourceId);
@@ -117,7 +126,7 @@ public class CreateResourceAccessApiTest extends FunctionalTestSuite {
         ExplicitAccessGrant explicitAccessGrant = getExplicitAccessGrant(DEFAULT, null, "*");
         JsonPath responseBody = verifyResponseCreated(explicitAccessGrant);
         assertThat(responseBody.get("accessorIds").toString()).isEqualTo("[*]");
-        assertNull(responseBody.get("relationship"));
+        assertNull(responseBody.get("relationship"),null);
         assertThat(responseBody.get("attributePermissions").toString()).contains("READ");
         assertThat(responseBody.get("accessorType").toString()).isEqualTo(DEFAULT.toString());
         assertThat(responseBody.get("resourceId").toString()).isEqualTo(resourceId);

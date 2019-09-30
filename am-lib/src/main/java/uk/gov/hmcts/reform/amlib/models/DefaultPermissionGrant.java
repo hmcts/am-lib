@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonPointer;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
+import uk.gov.hmcts.reform.amlib.enums.AuditAction;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -29,5 +32,15 @@ public final class DefaultPermissionGrant {
     private final Map<@NotNull JsonPointer, @NotNull Entry<@NotEmpty Set<@NotNull Permission>, @NotNull SecurityClassification>> attributePermissions;
 
     @JsonIgnore
-    private final AccessManagementAudit accessManagementAudit;
+    private Instant lastUpdate;
+    @Setter
+    @JsonIgnore
+    private String callingServiceName;
+
+    @JsonIgnore
+    @Setter
+    private String changedBy;
+
+    @JsonIgnore
+    private AuditAction action;
 }

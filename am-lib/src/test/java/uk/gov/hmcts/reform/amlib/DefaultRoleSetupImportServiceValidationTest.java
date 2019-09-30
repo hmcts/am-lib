@@ -76,7 +76,8 @@ class DefaultRoleSetupImportServiceValidationTest {
     void truncateDefaultPermissionsForServiceMethodShouldRejectInvalidArguments(String serviceName,
                                                                                 String resourceType) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.truncateDefaultPermissionsForService(serviceName, resourceType))
+            .isThrownBy(() -> service.truncateDefaultPermissionsForService(serviceName, resourceType,
+                null, null))
             .withMessageMatching(expectedValidationMessagesRegex(
                 "serviceName - must not be blank",
                 "resourceType - must not be blank"
@@ -88,7 +89,8 @@ class DefaultRoleSetupImportServiceValidationTest {
     @SuppressWarnings("LineLength")
     void truncateDefaultPermissionsByResourceDefinitionMethodShouldRejectInvalidArguments(ResourceDefinition resourceDefinition) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.truncateDefaultPermissionsByResourceDefinition(resourceDefinition))
+            .isThrownBy(() -> service.truncateDefaultPermissionsByResourceDefinition(resourceDefinition,
+                null, null))
             .withMessageMatching(expectedValidationMessagesRegex(
                 "resourceDefinition - must not be null",
                 "resourceDefinition.serviceName - must not be blank",

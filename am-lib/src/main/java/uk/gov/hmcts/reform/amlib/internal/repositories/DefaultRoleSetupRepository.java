@@ -6,12 +6,15 @@ import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
+import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttributeAudit;
+import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 @SuppressWarnings({
     "LineLength",
-    "PMD.TooManyMethods" // Repository class is specific and it makes sense to have all these methods here
+    "PMD.TooManyMethods", // Repository class is specific and it makes sense to have all these methods here
+    "PMD.UseObjectForClearerAPI"
 })
 public interface DefaultRoleSetupRepository {
     @SqlUpdate("insert into services (service_name, service_description) values (:serviceName, :serviceDescription)"
@@ -27,17 +30,17 @@ public interface DefaultRoleSetupRepository {
     void addResourceDefinition(@BindBean ResourceDefinition resourceDefinition);
 
     @SqlUpdate("insert into resource_attributes (service_name, resource_type, resource_name, attribute, default_security_classification, last_update, calling_service_name)"
-        + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, cast(:defaultSecurityClassification as security_classification), CURRENT_TIMESTAMP, :accessManagementAudit.callingServiceName)"
+        + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, cast(:defaultSecurityClassification as security_classification), CURRENT_TIMESTAMP, :callingServiceName)"
         + " on conflict on constraint resource_attributes_pkey do update set default_security_classification = cast(:defaultSecurityClassification as security_classification), "
-        + "last_update = CURRENT_TIMESTAMP, calling_service_name = :accessManagementAudit.callingServiceName")
+        + "last_update = CURRENT_TIMESTAMP, calling_service_name = :callingServiceName")
     void createResourceAttribute(@BindBean ResourceAttribute resourceAttribute);
 
     @SqlUpdate("insert into default_permissions_for_roles (service_name, resource_type, resource_name, attribute, role_name, permissions, last_update, calling_service_name)"
-        + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, :roleName, :permissionsAsInt, CURRENT_TIMESTAMP, :accessManagementAudit.callingServiceName)"
+        + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, :roleName, :permissionsAsInt, CURRENT_TIMESTAMP, :callingServiceName)"
         + " on conflict on constraint default_permissions_for_roles_service_name_resource_type_re_key do update "
         + "set service_name = :serviceName, resource_type = :resourceType, resource_name = :resourceName,"
         + " attribute = :attributeAsString, role_name = :roleName, permissions = :permissionsAsInt, "
-        + "last_update = CURRENT_TIMESTAMP, calling_service_name = :accessManagementAudit.callingServiceName")
+        + "last_update = CURRENT_TIMESTAMP, calling_service_name = :callingServiceName")
     void grantDefaultPermission(@BindBean RoleBasedAccessRecord roleBasedAccessRecord);
 
     @SqlUpdate("delete from default_permissions_for_roles where service_name = :serviceName and resource_type = :resourceType")
@@ -60,4 +63,38 @@ public interface DefaultRoleSetupRepository {
 
     @SqlUpdate("delete from services where service_name = :serviceName")
     void deleteService(String serviceName);
+
+    @SqlUpdate("insert into resource_attributes_audit (service_name, resource_type, resource_name, attribute, default_security_classification, calling_service_name, audit_timestamp, changed_by, action)"
+        + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, cast(:defaultSecurityClassification as security_classification), :callingServiceName, CURRENT_TIMESTAMP, :changedBy, 'grant')"
+      )
+    void createResourceAttributeForAudit(@BindBean ResourceAttributeAudit resourceAttributeAudit);
+
+    @SqlUpdate("insert into default_permissions_for_roles_audit (service_name, resource_type, resource_name, attribute, role_name, permissions, calling_service_name, audit_timestamp, changed_by, action)"
+        + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, :roleName, :permissionsAsInt, :callingServiceName, CURRENT_TIMESTAMP, :changedBy, 'grant' )"
+       )
+    void grantDefaultPermissionAudit(@BindBean RoleBasedAccessAuditRecord roleBasedAccessAuditRecord);
+
+    @SqlUpdate("insert into default_permissions_for_roles_audit (service_name, resource_type, resource_name, attribute, role_name, permissions, calling_service_name, audit_timestamp, changed_by, action) "
+        + "select service_name, resource_type, resource_name, attribute, role_name, permissions, :callingServiceName, CURRENT_TIMESTAMP, :changedBy, 'revoke' from default_permissions_for_roles where  service_name = :serviceName "
+        + "and resource_type = :resourceType and resource_name = :resourceName"
+    )
+    void revokeDefaultPermissionAudit(@BindBean ResourceDefinition resourceDefinition, String callingServiceName, String changedBy);
+
+    @SqlUpdate("insert into default_permissions_for_roles_audit (service_name, resource_type, resource_name, attribute, role_name, permissions, calling_service_name, audit_timestamp, changed_by, action) "
+        + "select service_name, resource_type, resource_name, attribute, role_name, permissions, :callingServiceName, CURRENT_TIMESTAMP, :changedBy, 'revoke' from default_permissions_for_roles where  service_name = :serviceName "
+        + "and resource_type = :resourceType "
+    )
+    void revokeDefaultPermissionAudit(String serviceName, String resourceType, String callingServiceName, String changedBy);
+
+    @SqlUpdate("insert into resource_attributes_audit (service_name, resource_type, resource_name, attribute, default_security_classification, calling_service_name, audit_timestamp, changed_by, action) "
+        + "select service_name, resource_type, resource_name, attribute, default_security_classification, :callingServiceName, CURRENT_TIMESTAMP, :changedBy, 'revoke' from resource_attributes where service_name = :serviceName "
+        + "and resource_type = :resourceType "
+    )
+    void revokeResourceAttributeAudit(String serviceName, String resourceType, String callingServiceName, String changedBy);
+
+    @SqlUpdate("insert into resource_attributes_audit (service_name, resource_type, resource_name, attribute, default_security_classification, calling_service_name, audit_timestamp, changed_by, action) "
+        + "select service_name, resource_type, resource_name, attribute, default_security_classification, :callingServiceName, CURRENT_TIMESTAMP, :changedBy, 'revoke' from resource_attributes where service_name = :serviceName "
+        + "and resource_type = :resourceType and resource_name = :resourceName"
+    )
+    void revokeResourceAttributeAudit(@BindBean ResourceDefinition resourceDefinition, String callingServiceName, String changedBy);
 }

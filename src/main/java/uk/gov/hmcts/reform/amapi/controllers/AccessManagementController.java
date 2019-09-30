@@ -5,8 +5,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.amapi.models.FilterResource;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.FilterResourceService;
-import uk.gov.hmcts.reform.amlib.models.AccessManagementAudit;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.FilteredResourceEnvelope;
@@ -59,12 +56,12 @@ public class AccessManagementController {
                                                                         explicitAccessGrantData,
                                                                     @RequestHeader(value = "callingServiceName",
                                                                         required = false)
-                                                                        String callingServiceName) {
-        if (!StringUtils.isEmpty(callingServiceName)) {
-            explicitAccessGrantData.setAccessManagementAudit(AccessManagementAudit.builder()
-                .callingServiceName(callingServiceName).build());
-        }
+                                                                        String callingServiceName,
+                                                                    @RequestHeader(value = "changedBy",
+                                                                        required = false) String changedBy) {
 
+        explicitAccessGrantData.setCallingServiceName(callingServiceName);
+        explicitAccessGrantData.setChangedBy(changedBy);
         accessManagementService.grantExplicitResourceAccess(explicitAccessGrantData);
         return new ResponseEntity<>(explicitAccessGrantData, CREATED);
     }
@@ -80,8 +77,14 @@ public class AccessManagementController {
     })
     @DeleteMapping(value = "/access-resource", consumes = (APPLICATION_JSON_VALUE))
     @ResponseStatus(NO_CONTENT)
-    public ResponseEntity<Void> revokeResourceAccess(@RequestBody ExplicitAccessMetadata request) {
+    public ResponseEntity<Void> revokeResourceAccess(@RequestBody ExplicitAccessMetadata request,
+                                                     @RequestHeader(value = "callingServiceName", required = false)
+                                                         String callingServiceName,
+                                                     @RequestHeader(value = "changedBy", required = false)
+                                                         String changedBy) {
 
+        request.setCallingServiceName(callingServiceName);
+        request.setChangedBy(changedBy);
         accessManagementService.revokeResourceAccess(request);
         return new ResponseEntity<>(NO_CONTENT);
     }

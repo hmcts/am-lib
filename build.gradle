@@ -8,7 +8,7 @@ buildscript {
   dependencies {
     classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
     pitest 'org.pitest:pitest-junit5-plugin:0.9'
-    classpath("net.serenity-bdd:serenity-gradle-plugin:2.0.71")
+    classpath("net.serenity-bdd:serenity-gradle-plugin:2.0.73")
   }
 }
 
@@ -19,9 +19,9 @@ plugins {
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.8.RELEASE'
   id 'org.springframework.boot' version '2.1.8.RELEASE'
-  id 'org.owasp.dependencycheck' version '5.2.1'
+  id 'org.owasp.dependencycheck' version '5.2.2'
   id 'com.github.ben-manes.versions' version '0.25.0'
-  id "org.flywaydb.flyway" version "6.0.3"
+  id "org.flywaydb.flyway" version "6.0.4"
   id 'com.github.lkishalmi.gatling' version '3.2.8'
 }
 
@@ -224,8 +224,8 @@ dependencies {
   integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
   testCompile 'com.github.tomakehurst:wiremock:2.24.1'
 
-  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0.pr3'
-  compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.0.pr3'
+  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0'
+  compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.0'
 
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot

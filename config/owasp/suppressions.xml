@@ -111,5 +111,29 @@
     <sha1>9b15174852f5b6bb1edbf303d5722286a0a54011</sha1>
     <cve>CVE-2017-15288</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[file name: gatling-netty-util-3.2.0.jar)]]></notes>
+    <sha1>d4c554a5c3dadc2b93cf39ff88b570191b4153b0</sha1>
+    <cve>CVE-2014-3488</cve>
+    <cve>CVE-2015-2156</cve>
+    <cve>CVE-2015-2156</cve>
+    <cve>CVE-2019-16869</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[file name: netty-tcnative-boringssl-static-2.0.25.Final.jar)]]></notes>
+    <sha1>185980556f9f083b5339825f19c9641c6c879417</sha1>
+    <cve>CVE-2014-3488</cve>
+    <cve>CVE-2015-2156</cve>
+    <cve>CVE-2015-2156</cve>
+    <cve>CVE-2019-16869</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[file name: applicationinsights-core-2.3.1.jar)]]></notes>
+    <packageUrl regex="true">^pkg:maven/io\.netty/netty*.*$</packageUrl>
+    <cve>CVE-2019-16869</cve>
+    <cve>CVE-2014-3488</cve>
+    <cve>CVE-2015-2156</cve>
+  </suppress>
 
 </suppressions>
+

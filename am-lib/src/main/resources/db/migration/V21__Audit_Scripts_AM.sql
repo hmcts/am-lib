@@ -13,7 +13,7 @@ create table access_management_audit
     attribute               VARCHAR(250)      not null,
     relationship            VARCHAR(100),
 	  calling_service_name    VARCHAR(100),
-    audit_timestamp		      TIMESTAMP 		    not null DEFAULT CURRENT_TIMESTAMP,
+    audit_timestamp		      TIMESTAMP 		    not null DEFAULT (now() at time zone 'utc'),
     changed_by              VARCHAR(100),
     action                  ACTION
 );
@@ -27,7 +27,7 @@ create table default_permissions_for_roles_audit
     role_name     			    VARCHAR(100)       not null,
     permissions   			    SMALLINT  		     not null,
 	  calling_service_name    VARCHAR(100),
-    audit_timestamp		      TIMESTAMP 		    not null DEFAULT CURRENT_TIMESTAMP,
+    audit_timestamp		      TIMESTAMP 		    not null DEFAULT (now() at time zone 'utc'),
     changed_by              VARCHAR(100),
     action                  ACTION
 );
@@ -40,7 +40,7 @@ create table resource_attributes_audit
     attribute                       VARCHAR(250)            not null,
     default_security_classification SECURITY_CLASSIFICATION not null,
 	  calling_service_name            VARCHAR(100),
-    audit_timestamp		              TIMESTAMP 		    not null DEFAULT CURRENT_TIMESTAMP,
+    audit_timestamp		              TIMESTAMP 		    not null DEFAULT (now() at time zone 'utc'),
     changed_by                      VARCHAR(100),
     action                          ACTION
 );

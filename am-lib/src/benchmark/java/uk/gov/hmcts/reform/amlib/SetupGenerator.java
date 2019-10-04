@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.Pair;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
+import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
 import java.util.List;
 import java.util.Map;
@@ -80,7 +81,7 @@ public class SetupGenerator {
         loggerContext.getLogger(AuditingAspect.class).setLevel(Level.ERROR);
 
         DataSource dataSource = createDataSource();
-        DefaultRoleSetupImportService importerService = new DefaultRoleSetupImportService(dataSource);
+        DefaultRoleSetupImportService importerService = new DefaultRoleSetupImportServiceImpl(dataSource);
         AccessManagementService service = new AccessManagementService(dataSource);
 
         for (CaseDefinition definition : definitions) {

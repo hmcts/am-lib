@@ -2,12 +2,13 @@ package integration.uk.gov.hmcts.reform.amlib.importer;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
-import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportServiceImpl;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttributeAudit;
@@ -17,9 +18,11 @@ import uk.gov.hmcts.reform.amlib.internal.utils.Permissions;
 import uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
+import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -47,7 +50,7 @@ import static uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader.AUDIT_REQU
 
 @SuppressWarnings({"PMD.TooManyMethods","PMD.ExcessiveImports"})
 class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
-    private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportService.class);
+    private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportServiceImpl.class);
     private String serviceName;
     private String resourceType;
     private String roleName;
@@ -78,7 +81,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     void shouldAddNewEntryIntoDatabaseWhenUniqueEntry() {
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
         service.grantDefaultPermission(
-            grantDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
+            getDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
 
         assertThat(databaseHelper.countDefaultPermissions(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), roleName, Permissions.sumOf(ImmutableSet.of(READ)))).isEqualTo(1);
@@ -91,9 +94,9 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     void shouldOverwriteExistingRecordWhenEntryIsAddedASecondTime() {
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
         service.grantDefaultPermission(
-            grantDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
+            getDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
         service.grantDefaultPermission(
-            grantDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(CREATE)));
+            getDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(CREATE)));
 
         assertThat(databaseHelper.countDefaultPermissions(resourceDefinition,
             ROOT_ATTRIBUTE.toString(), roleName, Permissions.sumOf(ImmutableSet.of(CREATE)))).isEqualTo(1);
@@ -459,7 +462,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         service.addResourceDefinition(createResourceDefinition(serviceName, resourceType, otherResourceName));
 
         service.grantDefaultPermission(
-            grantDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
+            getDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
         service.grantDefaultPermission(DefaultPermissionGrant.builder()
             .roleName(roleName)
             .resourceDefinition(ResourceDefinition.builder()
@@ -484,7 +487,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
         service.addResourceDefinition(resourceDefinition);
         service.grantDefaultPermission(
-            grantDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
+            getDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
 
         service.truncateDefaultPermissionsByResourceDefinition(resourceDefinition, null, null);
 
@@ -495,13 +498,74 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
             ROOT_ATTRIBUTE.toString(), PUBLIC)).isNull();
     }
 
-    private DefaultPermissionGrant grantDefaultPermissionForResource(String roleName,
-                                                                     ResourceDefinition resourceDefinition,
-                                                                     Set<Permission> permissions) {
+
+    @Test
+    void grantResourceDefaultPermissionsShouldInsertPermissionsForCaseTypes() {
+
+        service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
+        service.addResourceDefinition(resourceDefinition);
+
+        String roleName1 = UUID.randomUUID().toString();
+        service.addRole(roleName1, RESOURCE, PUBLIC, ROLE_BASED);
+
+        ResourceDefinition resourceDefinition1;
+
+        String serviceName1 = UUID.randomUUID().toString();
+        String resourceType1 = UUID.randomUUID().toString();
+        String resourceName1 = UUID.randomUUID().toString();
+        service.addService(serviceName1);
+
+        service.addResourceDefinition(
+            resourceDefinition1 = createResourceDefinition(serviceName1, resourceType1, resourceName1));
+
+        service.grantDefaultPermission(
+            getDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
+
+
+        List<DefaultPermissionGrant> defaultPermissionGrants = ImmutableList.of(
+            getDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)),
+            getDefaultPermissionForResourceForAttribute(roleName, resourceDefinition, ImmutableSet.of(READ),
+                "child"));
+
+        List<DefaultPermissionGrant> defaultPermissionGrants1 = ImmutableList.of(
+            getDefaultPermissionForResource(roleName1, resourceDefinition1, ImmutableSet.of(READ)),
+            getDefaultPermissionForResourceForAttribute(roleName1, resourceDefinition1, ImmutableSet.of(READ),
+                "child"));
+
+        Map<String, List<DefaultPermissionGrant>> mapAccessGrant = ImmutableMap.of(resourceName,
+            defaultPermissionGrants, resourceName1, defaultPermissionGrants1);
+        service.grantResourceDefaultPermissions(mapAccessGrant);
+
+        assertThat(databaseHelper.countDefaultPermissionsForBatch(resourceDefinition)).isEqualTo(2);
+        assertThat(databaseHelper.countDefaultPermissionsForBatch(resourceDefinition1)).isEqualTo(2);
+        assertThat(databaseHelper.countResourceAttributeForBatch(resourceDefinition)).isEqualTo(2);
+        assertThat(databaseHelper.countResourceAttributeForBatch(resourceDefinition1)).isEqualTo(2);
+
+        assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition)).isEqualTo(4);
+        assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition1)).isEqualTo(2);
+        assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition)).isEqualTo(4);
+        assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition1)).isEqualTo(2);
+    }
+
+    private DefaultPermissionGrant getDefaultPermissionForResource(String roleName,
+                                                                   ResourceDefinition resourceDefinition,
+                                                                   Set<Permission> permissions) {
         return DefaultPermissionGrant.builder()
             .roleName(roleName)
             .resourceDefinition(resourceDefinition)
             .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf(""), permissions, PUBLIC))
+            .build();
+    }
+
+    private DefaultPermissionGrant getDefaultPermissionForResourceForAttribute(String roleName,
+                                                                               ResourceDefinition resourceDefinition,
+                                                                               Set<Permission> permissions,
+                                                                               String attribute) {
+        return DefaultPermissionGrant.builder()
+            .roleName(roleName)
+            .resourceDefinition(resourceDefinition)
+            .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf("/" + attribute), permissions,
+                PUBLIC))
             .build();
     }
 

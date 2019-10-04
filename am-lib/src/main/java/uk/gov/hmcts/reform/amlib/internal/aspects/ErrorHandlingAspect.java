@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 @Aspect
 public class ErrorHandlingAspect {
 
-    @Around("execution(public * uk.gov.hmcts.reform.amlib.*Service.*(..))")
+    @Around("execution(public * uk.gov.hmcts.reform.amlib.*.*(..))")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         try {
             return joinPoint.proceed();

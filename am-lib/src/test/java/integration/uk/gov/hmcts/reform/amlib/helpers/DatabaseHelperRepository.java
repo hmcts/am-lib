@@ -140,4 +140,32 @@ public interface DatabaseHelperRepository {
     @RegisterConstructorMapper(ResourceAttributeAudit.class)
     List<ResourceAttributeAudit> getResourceAttributeAuditRecords(@BindBean ResourceDefinition resourceDefinition, String attribute, SecurityClassification securityClassification);
 
+    @SqlQuery("select count(1) from default_permissions_for_roles "
+        + "where service_name = :serviceName "
+        + "and resource_type = :resourceType "
+        + "and resource_name = :resourceName "
+       )
+    int countDefaultPermissionsForBatch(@BindBean ResourceDefinition resourceDefinition);
+
+    @SqlQuery("select count(1) from resource_attributes "
+        + "where service_name = :serviceName "
+        + "and resource_type = :resourceType "
+        + "and resource_name = :resourceName "
+    )
+    int countResourceAttributeForBatch(@BindBean ResourceDefinition resourceDefinition);
+
+    @SqlQuery("select count(1) from default_permissions_for_roles_audit "
+        + "where service_name = :serviceName "
+        + "and resource_type = :resourceType "
+        + "and resource_name = :resourceName "
+    )
+    int countDefaultPermissionsAuditForBatch(@BindBean ResourceDefinition resourceDefinition);
+
+    @SqlQuery("select count(1) from resource_attributes_audit "
+        + "where service_name = :serviceName "
+        + "and resource_type = :resourceType "
+        + "and resource_name = :resourceName "
+    )
+    int countResourceAttributeAuditForBatch(@BindBean ResourceDefinition resourceDefinition);
+
 }

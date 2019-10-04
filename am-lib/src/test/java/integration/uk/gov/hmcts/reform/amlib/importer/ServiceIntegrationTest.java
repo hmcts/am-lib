@@ -3,8 +3,9 @@ package integration.uk.gov.hmcts.reform.amlib.importer;
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportServiceImpl;
 import uk.gov.hmcts.reform.amlib.internal.models.Service;
+import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -12,7 +13,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ServiceIntegrationTest extends IntegrationBaseTest {
-    private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportService.class);
+    private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportServiceImpl.class);
     private String serviceName;
 
     @BeforeEach

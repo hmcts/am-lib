@@ -6,10 +6,11 @@ import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTe
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
-import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportServiceImpl;
 import uk.gov.hmcts.reform.amlib.models.DefaultRolePermissions;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.RolePermissionsForCaseTypeEnvelope;
+import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -30,7 +31,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.crea
 public class ReturnRolePermissionsForCaseTypeIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
     private static AccessManagementService service = initService(AccessManagementService.class);
-    private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
+    private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportServiceImpl.class);
     private static String resourceType = "case";
 
     private String idamRoleWithRoleBasedAccess;

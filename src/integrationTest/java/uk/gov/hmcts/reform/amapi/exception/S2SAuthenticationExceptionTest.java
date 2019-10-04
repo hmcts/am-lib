@@ -12,7 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
-import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
 import java.nio.charset.StandardCharsets;
 
@@ -47,7 +47,6 @@ public class S2SAuthenticationExceptionTest {
         doNothing().when(importerService).addService(anyString());
         doNothing().when(importerService).addResourceDefinition(any());
         doNothing().when(importerService).addRole(anyString(), any(), any(), any());
-
     }
 
     /**

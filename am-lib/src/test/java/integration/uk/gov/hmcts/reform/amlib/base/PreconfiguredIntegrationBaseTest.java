@@ -1,7 +1,8 @@
 package integration.uk.gov.hmcts.reform.amlib.base;
 
 import org.junit.jupiter.api.BeforeEach;
-import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportServiceImpl;
+import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ public abstract class PreconfiguredIntegrationBaseTest extends IntegrationBaseTe
     void populateDatabaseWithBasicDefinitions() {
         this.serviceName = UUID.randomUUID().toString();
 
-        DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
+        DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportServiceImpl.class);
         importerService.addService(serviceName);
     }
 }

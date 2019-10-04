@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.amapi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportServiceImpl;
 
 import javax.sql.DataSource;
 
@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 public class DefaultRoleSetupImportServiceConfiguration {
 
     @Bean
-    public DefaultRoleSetupImportService getDefaultRoleSetupImportService(DataSource dataSource) {
-        return new DefaultRoleSetupImportService(dataSource);
+    public DefaultRoleSetupImportServiceImpl getDefaultRoleSetupImportService(DataSource dataSource) {
+        return new DefaultRoleSetupImportServiceImpl(dataSource);
     }
 }

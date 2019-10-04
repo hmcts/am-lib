@@ -17,9 +17,15 @@ import uk.gov.hmcts.reform.amlib.internal.repositories.DefaultRoleSetupRepositor
 import uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
+import uk.gov.hmcts.reform.amlib.models.RolePermissionsForCaseTypeEnvelope;
+import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -30,7 +36,7 @@ import static java.lang.Boolean.TRUE;
 import static uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog.Severity.DEBUG;
 import static uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader.AUDIT_REQUIRED;
 
-public class DefaultRoleSetupImportService {
+public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImportService {
     private final Jdbi jdbi;
 
     /**
@@ -40,7 +46,7 @@ public class DefaultRoleSetupImportService {
      * @param username the username for the database
      * @param password the password for the database
      */
-    public DefaultRoleSetupImportService(String url, String username, String password) {
+    public DefaultRoleSetupImportServiceImpl(String url, String username, String password) {
         this.jdbi = Jdbi.create(url, username, password)
             .installPlugin(new SqlObjectPlugin());
     }
@@ -50,7 +56,7 @@ public class DefaultRoleSetupImportService {
      *
      * @param dataSource the datasource for the database
      */
-    public DefaultRoleSetupImportService(DataSource dataSource) {
+    public DefaultRoleSetupImportServiceImpl(DataSource dataSource) {
         this.jdbi = Jdbi.create(dataSource)
             .installPlugin(new SqlObjectPlugin());
     }
@@ -239,6 +245,8 @@ public class DefaultRoleSetupImportService {
             //Truncate
             dao.deleteDefaultPermissionsForRoles(serviceName, resourceType);
             dao.deleteResourceAttributes(serviceName, resourceType);
+
+
         });
     }
 
@@ -305,5 +313,87 @@ public class DefaultRoleSetupImportService {
     @AuditLog(value = "deleted service '{{serviceName}}'", severity = DEBUG)
     public void deleteService(@NotBlank String serviceName) {
         jdbi.useExtension(DefaultRoleSetupRepository.class, dao -> dao.deleteService(serviceName));
+    }
+
+    @Override
+    @AuditLog(value = "grantResourceDefaultPermissions for role '{{mapAccessGrant}}'")
+    public void grantResourceDefaultPermissions(Map<@NotNull String, @NotEmpty
+        List<@NotNull @Valid DefaultPermissionGrant>> mapAccessGrant) {
+
+        final List<DefaultPermissionGrant> defaultPermissionGrants = mapAccessGrant.values().stream()
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
+
+        final List<ResourceDefinition> resourceDefinitions = defaultPermissionGrants.stream().map(
+            defaultPermissionGrant -> defaultPermissionGrant.getResourceDefinition()).distinct()
+            .collect(Collectors.toList());
+
+        List<ResourceAttribute> resourceAttributeList = new ArrayList<>();
+        List<RoleBasedAccessRecord> roleBasedAccessRecords = new ArrayList<>();
+
+
+        defaultPermissionGrants.stream().forEach(accessGrant ->
+            accessGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
+                resourceAttributeList.add(getResourceAttribute(accessGrant, attribute,
+                    permissionAndClassification));
+                roleBasedAccessRecords.add(getRoleAccess(accessGrant, attribute, permissionAndClassification));
+            }));
+
+        String callingServiceName = "";
+        String changedBy = "";
+
+        if (Objects.nonNull(defaultPermissionGrants) && defaultPermissionGrants.size() > 0) {
+            callingServiceName = defaultPermissionGrants.get(0).getCallingServiceName() == null ? ""
+                : defaultPermissionGrants.get(0).getCallingServiceName();
+            changedBy = defaultPermissionGrants.get(0).getChangedBy() == null ? ""
+                : defaultPermissionGrants.get(0).getChangedBy();
+        }
+
+        batchGrantPermissionAndResource(resourceDefinitions, resourceAttributeList, roleBasedAccessRecords,
+            callingServiceName, changedBy);
+    }
+
+    private void batchGrantPermissionAndResource(List<ResourceDefinition> resourceDefinitions,
+                                                 List<ResourceAttribute> resourceAttributes,
+                                                 List<RoleBasedAccessRecord> roleBasedAccessRecords,
+                                                 final String callingServiceName, final String changedBy) {
+
+
+        jdbi.useTransaction(handle -> {
+
+            DefaultRoleSetupRepository dao = handle.attach(DefaultRoleSetupRepository.class);
+
+            //check if Audit flag enabled & batch audit with revoke for deleted records
+            if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
+                dao.defaultPermissionAuditBatchRevoke(resourceDefinitions, callingServiceName, changedBy);
+
+                dao.resourceAttributeAuditBatchRevoke(resourceDefinitions, callingServiceName, changedBy);
+            }
+
+            //Actual batch delete
+            dao.deleteBatchDefaultPermissions(resourceDefinitions);
+            dao.deleteBatchResourceAttributes(resourceAttributes);
+
+            //Insert new batch records
+            dao.createResourceAttributeBatch(resourceAttributes);
+            dao.grantDefaultPermissionBatch(roleBasedAccessRecords);
+
+            //Audit for newly inserted batch
+            if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
+                dao.createResourceAttributeForAuditBatch(resourceAttributes, callingServiceName, changedBy);
+                dao.grantDefaultPermissionAuditBatch(roleBasedAccessRecords, callingServiceName, changedBy);
+            }
+
+        });
+    }
+
+    @Override
+    public RolePermissionsForCaseTypeEnvelope getRolePermissionsForCaseType(@NotBlank String caseTypeId) {
+        return null;
+    }
+
+    @Override
+    public List<RolePermissionsForCaseTypeEnvelope> getRolePermissionsForCaseType(@NotEmpty List<String> caseTypeId) {
+        return null;
     }
 }

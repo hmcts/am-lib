@@ -316,6 +316,7 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
     }
 
     @Override
+    @AuditLog(value = "grantResourceDefaultPermissions for role '{{mapAccessGrant}}'")
     public void grantResourceDefaultPermissions(Map<@NotNull String, @NotEmpty
         List<@NotNull @Valid DefaultPermissionGrant>> mapAccessGrant) {
 
@@ -329,8 +330,7 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
 
         List<ResourceAttribute> resourceAttributeList = new ArrayList<>();
         List<RoleBasedAccessRecord> roleBasedAccessRecords = new ArrayList<>();
-        List<ResourceAttributeAudit> resourceAttributeAudits = new ArrayList<>();
-        List<RoleBasedAccessAuditRecord> roleBasedAccessAuditRecords = new ArrayList<>();
+
 
         defaultPermissionGrants.stream().forEach(accessGrant ->
             accessGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
@@ -338,17 +338,6 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
                     permissionAndClassification));
                 roleBasedAccessRecords.add(getRoleAccess(accessGrant, attribute, permissionAndClassification));
             }));
-
-        if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
-
-            defaultPermissionGrants.stream().forEach(accessGrant ->
-                accessGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
-                    resourceAttributeAudits.add(getResourceAttributeAudit(accessGrant, attribute,
-                        permissionAndClassification));
-                    roleBasedAccessAuditRecords.add(getRoleAccessAudit(accessGrant, attribute,
-                        permissionAndClassification));
-                }));
-        }
 
         String callingServiceName = "";
         String changedBy = "";
@@ -361,14 +350,12 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
         }
 
         batchGrantPermissionAndResource(resourceDefinitions, resourceAttributeList, roleBasedAccessRecords,
-            resourceAttributeAudits, roleBasedAccessAuditRecords, callingServiceName, changedBy);
+            callingServiceName, changedBy);
     }
 
     private void batchGrantPermissionAndResource(List<ResourceDefinition> resourceDefinitions,
                                                  List<ResourceAttribute> resourceAttributes,
                                                  List<RoleBasedAccessRecord> roleBasedAccessRecords,
-                                                 List<ResourceAttributeAudit> resourceAttributeAudits,
-                                                 List<RoleBasedAccessAuditRecord> roleBasedAccessAuditRecords,
                                                  final String callingServiceName, final String changedBy) {
 
 
@@ -393,8 +380,8 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
 
             //Audit for newly inserted batch
             if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
-                dao.createResourceAttributeForAuditBatch(resourceAttributeAudits);
-                dao.grantDefaultPermissionAuditBatch(roleBasedAccessAuditRecords);
+                dao.createResourceAttributeForAuditBatch(resourceAttributes, callingServiceName, changedBy);
+                dao.grantDefaultPermissionAuditBatch(roleBasedAccessRecords, callingServiceName, changedBy);
             }
 
         });

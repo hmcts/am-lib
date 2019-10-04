@@ -140,12 +140,12 @@ public interface DefaultRoleSetupRepository {
     @SqlBatch("insert into resource_attributes_audit (service_name, resource_type, resource_name, attribute, default_security_classification, calling_service_name, audit_timestamp, changed_by, action)"
         + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, cast(:defaultSecurityClassification as security_classification), :callingServiceName, CURRENT_TIMESTAMP, :changedBy, 'grant')"
     )
-    void createResourceAttributeForAuditBatch(@BindBean List<ResourceAttributeAudit> resourceAttributeAudit);
+    void createResourceAttributeForAuditBatch(@BindBean List<ResourceAttribute> resourceAttributeAudit, String callingServiceName, String changedBy);
 
     @SqlBatch("insert into default_permissions_for_roles_audit (service_name, resource_type, resource_name, attribute, role_name, permissions, calling_service_name, audit_timestamp, changed_by, action)"
         + " values (:serviceName, :resourceType, :resourceName, :attributeAsString, :roleName, :permissionsAsInt, :callingServiceName, CURRENT_TIMESTAMP, :changedBy, 'grant' )"
     )
-    void grantDefaultPermissionAuditBatch(@BindBean List<RoleBasedAccessAuditRecord> roleBasedAccessAuditRecord);
+    void grantDefaultPermissionAuditBatch(@BindBean List<RoleBasedAccessRecord> roleBasedAccessAuditRecord, String callingServiceName, String changedBy);
 
 
 }

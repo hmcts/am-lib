@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.DefaultRoleSetupRepository;
 import uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
+import uk.gov.hmcts.reform.amlib.models.DefaultRolePermissions;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.RolePermissionsForCaseTypeEnvelope;
 import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
@@ -388,12 +389,23 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
     }
 
     @Override
-    public RolePermissionsForCaseTypeEnvelope getRolePermissionsForCaseType(@NotBlank String caseTypeId) {
+    public List<RolePermissionsForCaseTypeEnvelope> getRolePermissionsForCaseType(@NotEmpty List<String> caseTypeId) {
         return null;
     }
 
-    @Override
-    public List<RolePermissionsForCaseTypeEnvelope> getRolePermissionsForCaseType(@NotEmpty List<String> caseTypeId) {
-        return null;
+    /**
+     * Returns the access control list for a specified case type.
+     *
+     * @param caseTypeId a case type
+     * @return a set of permissions each role has for the specified case type
+     */
+    @AuditLog("returned role permissions for case type '{{caseTypeId}}': {{result}}")
+    public RolePermissionsForCaseTypeEnvelope getRolePermissionsForCaseType(@NotBlank String caseTypeId) {
+        List<DefaultRolePermissions> defaultRolePermissions = jdbi.withExtension(DefaultRoleSetupRepository.class,
+            dao -> dao.getRolePermissionsForCaseType(caseTypeId));
+        return RolePermissionsForCaseTypeEnvelope.builder()
+            .caseTypeId(caseTypeId)
+            .defaultRolePermissions(defaultRolePermissions)
+            .build();
     }
 }

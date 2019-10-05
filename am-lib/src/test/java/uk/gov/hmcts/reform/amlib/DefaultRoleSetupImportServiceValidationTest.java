@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.amlib;
 
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
@@ -134,4 +135,13 @@ class DefaultRoleSetupImportServiceValidationTest {
             ));
     }
 
+    @ParameterizedTest
+    @ArgumentsSource(InvalidArgumentsProvider.class)
+    void returnRolePermissionsForCaseTypeShouldRejectInvalidArguments(String caseTypeId) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.getRolePermissionsForCaseType(caseTypeId))
+            .withMessageMatching(expectedValidationMessagesRegex(
+                "caseTypeId - must not be blank"
+            ));
+    }
 }

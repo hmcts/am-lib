@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.amlib.models;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.jdbi.v3.core.mapper.reflect.JdbiConstructor;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.internal.utils.Permissions;
@@ -12,6 +13,7 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor //required for JBI Bean Mapper RolePermissionsForCaseTypeEnvelopeReducer
 public class DefaultRolePermissions {
     private String role;
     private Set<Permission> permissions;

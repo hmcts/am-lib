@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.amlib.internal.repositories;
 
+import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.config.RegisterColumnMapper;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -8,6 +9,7 @@ import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import org.jdbi.v3.sqlobject.statement.UseRowReducer;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
@@ -18,9 +20,11 @@ import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.query.AttributeData;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.JsonPointerMapper;
 import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.PermissionSetMapper;
+import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.RolePermissionsForCaseTypeEnvelopeReducer;
 import uk.gov.hmcts.reform.amlib.models.DefaultRolePermissions;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
+import uk.gov.hmcts.reform.amlib.models.RolePermissionsForCaseTypeEnvelope;
 
 import java.util.List;
 import java.util.Set;
@@ -120,4 +124,12 @@ public interface AccessManagementRepository {
         + "and (:relationship is null or access_management.relationship = :relationship) "
         + "and (access_management.attribute = :attributeAsString or access_management.attribute like concat(:attributeAsString, '/', '%'))")
     void revokeAccessManagementForAudit(@BindBean ExplicitAccessMetadata explicitAccessMetadata);
+
+    @SqlQuery("select resource_name as caseTypeId, role_name as role, permissions from default_permissions_for_roles "
+        + "where resource_type = 'case' and resource_name in (<caseTypeIds>) "
+        + "and attribute = '' order by resource_name, role_name")
+    @RegisterBeanMapper(RolePermissionsForCaseTypeEnvelope.class)
+    @RegisterBeanMapper(DefaultRolePermissions.class)
+    @UseRowReducer(RolePermissionsForCaseTypeEnvelopeReducer.class)
+    List<RolePermissionsForCaseTypeEnvelope> getRolePermissionsForMultipleCaseTypes(@BindList List<String> caseTypeIds);
 }

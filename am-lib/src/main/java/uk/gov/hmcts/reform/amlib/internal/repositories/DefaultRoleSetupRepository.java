@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.amlib.internal.repositories;
 
+import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
+import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
@@ -10,6 +12,7 @@ import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttributeAudit;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
+import uk.gov.hmcts.reform.amlib.models.DefaultRolePermissions;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.util.List;
@@ -147,5 +150,9 @@ public interface DefaultRoleSetupRepository {
     )
     void grantDefaultPermissionAuditBatch(@BindBean List<RoleBasedAccessRecord> roleBasedAccessAuditRecord, String callingServiceName, String changedBy);
 
+    @SqlQuery("select role_name as role, permissions from default_permissions_for_roles where resource_type = 'case' and resource_name = :caseTypeId "
+        + "and attribute = '' order by role_name")
+    @RegisterConstructorMapper(DefaultRolePermissions.class)
+    List<DefaultRolePermissions> getRolePermissionsForCaseType(String caseTypeId);
 
 }

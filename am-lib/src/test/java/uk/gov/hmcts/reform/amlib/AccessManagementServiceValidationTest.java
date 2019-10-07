@@ -95,13 +95,4 @@ class AccessManagementServiceValidationTest {
             ));
     }
 
-    @ParameterizedTest
-    @ArgumentsSource(InvalidArgumentsProvider.class)
-    void returnRolePermissionsForCaseTypeShouldRejectInvalidArguments(String caseTypeId) {
-        assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> service.returnRolePermissionsForCaseType(caseTypeId))
-            .withMessageMatching(expectedValidationMessagesRegex(
-                "caseTypeId - must not be blank"
-            ));
-    }
 }

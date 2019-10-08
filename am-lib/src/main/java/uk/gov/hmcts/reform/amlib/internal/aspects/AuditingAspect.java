@@ -31,7 +31,7 @@ public class AuditingAspect {
 
     private final Map<MethodSignature, Metadata> cache = new ConcurrentHashMap<>();
 
-    @AfterReturning(pointcut = "execution(@AuditLog public * uk.gov.hmcts.reform.amlib.*Service.*(..))",
+    @AfterReturning(pointcut = "execution(@AuditLog public * uk.gov.hmcts.reform.amlib.*Service*.*(..))",
         returning = "result")
     public void after(JoinPoint joinPoint, Object result) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();

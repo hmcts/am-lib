@@ -13,7 +13,7 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor //required for JBI Bean Mapper RolePermissionsForCaseTypeEnvelopeReducer
+@NoArgsConstructor //required for JDBI Bean Mapper RolePermissionsForCaseTypeEnvelopeReducer
 public class DefaultRolePermissions {
     private String role;
     private Set<Permission> permissions;

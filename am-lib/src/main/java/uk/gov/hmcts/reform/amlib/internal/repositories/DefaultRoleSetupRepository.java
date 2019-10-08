@@ -1,10 +1,14 @@
 package uk.gov.hmcts.reform.amlib.internal.repositories;
 
+import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
+import org.jdbi.v3.sqlobject.config.RegisterColumnMapper;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
+import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import org.jdbi.v3.sqlobject.statement.UseRowReducer;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
@@ -12,8 +16,11 @@ import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttributeAudit;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
+import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.PermissionSetMapper;
+import uk.gov.hmcts.reform.amlib.internal.repositories.mappers.RolePermissionsForCaseTypeEnvelopeReducer;
 import uk.gov.hmcts.reform.amlib.models.DefaultRolePermissions;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
+import uk.gov.hmcts.reform.amlib.models.RolePermissionsForCaseTypeEnvelope;
 
 import java.util.List;
 
@@ -23,6 +30,7 @@ import java.util.List;
     "PMD.UseObjectForClearerAPI",
     "PMD.AvoidDuplicateLiterals"
 })
+@RegisterColumnMapper(PermissionSetMapper.class)
 public interface DefaultRoleSetupRepository {
     @SqlUpdate("insert into services (service_name, service_description) values (:serviceName, :serviceDescription)"
         + " on conflict on constraint services_pkey do update set service_description = :serviceDescription , last_update = CURRENT_TIMESTAMP")
@@ -154,5 +162,13 @@ public interface DefaultRoleSetupRepository {
         + "and attribute = '' order by role_name")
     @RegisterConstructorMapper(DefaultRolePermissions.class)
     List<DefaultRolePermissions> getRolePermissionsForCaseType(String caseTypeId);
+
+    @SqlQuery("select resource_name as caseTypeId, role_name as role, permissions from default_permissions_for_roles "
+        + "where resource_type = 'case' and resource_name in (<caseTypeIds>) "
+        + "and attribute = '' order by resource_name, role_name")
+    @RegisterBeanMapper(RolePermissionsForCaseTypeEnvelope.class)
+    @RegisterBeanMapper(DefaultRolePermissions.class)
+    @UseRowReducer(RolePermissionsForCaseTypeEnvelopeReducer.class)
+    List<RolePermissionsForCaseTypeEnvelope> getRolePermissionsForMultipleCaseTypes(@BindList List<String> caseTypeIds);
 
 }

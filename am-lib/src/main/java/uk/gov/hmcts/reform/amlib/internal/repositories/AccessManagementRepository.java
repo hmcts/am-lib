@@ -115,4 +115,5 @@ public interface AccessManagementRepository {
         + "and (:relationship is null or access_management.relationship = :relationship) "
         + "and (access_management.attribute = :attributeAsString or access_management.attribute like concat(:attributeAsString, '/', '%'))")
     void revokeAccessManagementForAudit(@BindBean ExplicitAccessMetadata explicitAccessMetadata);
+
 }

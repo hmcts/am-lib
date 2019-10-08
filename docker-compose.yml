@@ -49,7 +49,7 @@ services:
       - S2S_SECRET=${S2S_SECRET}
       - APPINSIGHTS_INSTRUMENTATIONKEY=false
     ports:
-      - 3704:3703
+      - 3703:3703
       - ${SERVER_PORT:-8090}:${SERVER_PORT:-8090}
     networks:
       - am-accessmgmt-api-network

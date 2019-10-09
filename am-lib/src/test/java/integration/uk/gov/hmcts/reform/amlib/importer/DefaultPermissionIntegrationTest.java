@@ -17,9 +17,7 @@ import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.utils.Permissions;
 import uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
-import uk.gov.hmcts.reform.amlib.models.DefaultRolePermissions;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
-import uk.gov.hmcts.reform.amlib.models.RolePermissionsForCaseTypeEnvelope;
 import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
 import java.time.Instant;
@@ -29,18 +27,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import static java.lang.Boolean.TRUE;
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 import static uk.gov.hmcts.reform.amlib.enums.AuditAction.GRANT;
 import static uk.gov.hmcts.reform.amlib.enums.AuditAction.REVOKE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.CREATE;
-import static uk.gov.hmcts.reform.amlib.enums.Permission.DELETE;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
-import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
-import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.RoleType.RESOURCE;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.createDefaultPermissionGrant;
@@ -552,46 +545,6 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition1)).isEqualTo(2);
         assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition)).isEqualTo(4);
         assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition1)).isEqualTo(2);
-    }
-
-    @Test
-    public void whenRolePermissionsForCaseTypeListThenReturnResourceWithPermissions() {
-        String idamRoleWithRoleBasedAccess;
-        String idamRoleWithRoleBasedAccess1;
-        ResourceDefinition resourceDefinition1;
-        service.addRole(idamRoleWithRoleBasedAccess = UUID.randomUUID().toString(), IDAM, PUBLIC, ROLE_BASED);
-        service.addRole(idamRoleWithRoleBasedAccess1 = UUID.randomUUID().toString(), IDAM, PUBLIC, ROLE_BASED);
-        service.addResourceDefinition(
-            resourceDefinition = createResourceDefinition(serviceName, "case", resourceName));
-        String resourceName1;
-        Set<Permission> permissions = ImmutableSet.of(UPDATE, DELETE);
-        Set<Permission> permissions1 = ImmutableSet.of(CREATE, READ);
-        service.addResourceDefinition(resourceDefinition1 =
-            createResourceDefinition(serviceName, "case", resourceName1 = UUID.randomUUID().toString()));
-        service.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedAccess,
-            resourceDefinition, "", permissions, PUBLIC));
-        service.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedAccess1,
-            resourceDefinition1, "", permissions1, PUBLIC));
-        List caseTypeIds = ImmutableList.of(
-            resourceDefinition.getResourceName(), resourceDefinition1.getResourceName());
-        List<RolePermissionsForCaseTypeEnvelope> result = service.getRolePermissionsForCaseType(
-            caseTypeIds);
-
-        result.sort(comparing(RolePermissionsForCaseTypeEnvelope::getCaseTypeId));
-
-        assertThat(result.size()).isEqualTo(2);
-
-        List<RolePermissionsForCaseTypeEnvelope> expectedResourceAuditResult = ImmutableList.of(
-            RolePermissionsForCaseTypeEnvelope.builder().caseTypeId(resourceName)
-                .defaultRolePermissions(ImmutableList.of(DefaultRolePermissions.builder()
-                    .role(idamRoleWithRoleBasedAccess).permissions(permissions).build())).build(),
-            RolePermissionsForCaseTypeEnvelope.builder().caseTypeId(resourceName1)
-                .defaultRolePermissions(ImmutableList.of(DefaultRolePermissions.builder()
-                    .role(idamRoleWithRoleBasedAccess1).permissions(permissions1).build())).build());
-
-        assertThat(result).isEqualTo(expectedResourceAuditResult.stream()
-            .sorted(comparing(RolePermissionsForCaseTypeEnvelope::getCaseTypeId))
-            .collect(toList()));
     }
 
     private DefaultPermissionGrant getDefaultPermissionForResource(String roleName,

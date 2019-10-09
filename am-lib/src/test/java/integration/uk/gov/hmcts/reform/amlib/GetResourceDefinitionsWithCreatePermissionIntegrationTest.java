@@ -5,11 +5,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
-import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportServiceImpl;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
+import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
 import java.util.Collections;
 import java.util.Set;
@@ -32,7 +33,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
 @SuppressWarnings({"PMD.TooManyMethods", "LineLength"})
 class GetResourceDefinitionsWithCreatePermissionIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
-    private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
+    private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportServiceImpl.class);
     private ResourceDefinition resourceDefinition;
     private ResourceDefinition otherResource;
     private String roleName;

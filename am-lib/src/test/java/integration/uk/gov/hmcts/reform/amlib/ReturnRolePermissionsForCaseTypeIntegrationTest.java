@@ -5,11 +5,11 @@ import com.google.common.collect.ImmutableSet;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.amlib.AccessManagementService;
-import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportServiceImpl;
 import uk.gov.hmcts.reform.amlib.models.DefaultRolePermissions;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.RolePermissionsForCaseTypeEnvelope;
+import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -29,8 +29,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.DefaultRoleSetupDataFactory.crea
 
 public class ReturnRolePermissionsForCaseTypeIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
-    private static AccessManagementService service = initService(AccessManagementService.class);
-    private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
+    private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportServiceImpl.class);
     private static String resourceType = "case";
 
     private String idamRoleWithRoleBasedAccess;
@@ -51,7 +50,7 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedAccess,
             resourceDefinition1, "", ImmutableSet.of(CREATE), PUBLIC));
 
-        RolePermissionsForCaseTypeEnvelope result = service.returnRolePermissionsForCaseType(
+        RolePermissionsForCaseTypeEnvelope result = importerService.getRolePermissionsForCaseType(
             resourceDefinition.getResourceName());
 
         assertThat(result).isEqualTo(RolePermissionsForCaseTypeEnvelope.builder()
@@ -65,7 +64,7 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedAccess,
             resourceDefinition, "/attribute", ImmutableSet.of(CREATE, DELETE), PUBLIC));
 
-        RolePermissionsForCaseTypeEnvelope result = service.returnRolePermissionsForCaseType(
+        RolePermissionsForCaseTypeEnvelope result = importerService.getRolePermissionsForCaseType(
             resourceDefinition.getResourceName());
 
         assertThat(result).isEqualTo(RolePermissionsForCaseTypeEnvelope.builder()
@@ -87,7 +86,7 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedAccess1,
             resourceDefinition1, "", ImmutableSet.of(CREATE, READ), PUBLIC));
 
-        RolePermissionsForCaseTypeEnvelope result = service.returnRolePermissionsForCaseType(
+        RolePermissionsForCaseTypeEnvelope result = importerService.getRolePermissionsForCaseType(
             resourceDefinition.getResourceName());
 
         assertThat(result).isEqualTo(RolePermissionsForCaseTypeEnvelope.builder()
@@ -116,7 +115,7 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedAccess2,
             resourceDefinition1, "", ImmutableSet.of(READ), PUBLIC));
 
-        RolePermissionsForCaseTypeEnvelope result = service.returnRolePermissionsForCaseType(
+        RolePermissionsForCaseTypeEnvelope result = importerService.getRolePermissionsForCaseType(
             resourceDefinition.getResourceName());
 
         assertThat(result).isEqualTo(RolePermissionsForCaseTypeEnvelope.builder()

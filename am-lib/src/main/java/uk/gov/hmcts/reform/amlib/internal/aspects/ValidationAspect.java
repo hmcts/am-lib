@@ -26,7 +26,7 @@ public class ValidationAspect {
         .getValidator()
         .forExecutables();
 
-    @Around("execution(public * uk.gov.hmcts.reform.amlib.*Service.*(..))")
+    @Around("execution(public * uk.gov.hmcts.reform.amlib.*Service*.*(..))")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         Set<ConstraintViolation<Object>> violations = validate(joinPoint);
 

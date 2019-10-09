@@ -3,11 +3,12 @@ package integration.uk.gov.hmcts.reform.amlib.importer;
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportServiceImpl;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.internal.models.Role;
+import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -18,7 +19,7 @@ import static uk.gov.hmcts.reform.amlib.enums.RoleType.IDAM;
 import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 
 class RoleIntegrationTest extends IntegrationBaseTest {
-    private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportService.class);
+    private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportServiceImpl.class);
 
     private String roleName;
 

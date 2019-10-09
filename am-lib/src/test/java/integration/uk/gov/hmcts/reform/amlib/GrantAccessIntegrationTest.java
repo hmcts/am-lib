@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.MDC;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
-import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportService;
+import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportServiceImpl;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessAuditRecord;
@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.amlib.internal.utils.AuditEnabled;
 import uk.gov.hmcts.reform.amlib.internal.utils.AuditFlagValidate;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
+import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
 import java.time.Instant;
 import java.util.List;
@@ -50,7 +51,7 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermission
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     private static AccessManagementService service = initService(AccessManagementService.class);
-    private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportService.class);
+    private static DefaultRoleSetupImportService importerService = initService(DefaultRoleSetupImportServiceImpl.class);
     private String resourceId;
     private String accessorId;
     private String roleName;

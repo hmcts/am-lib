@@ -8,13 +8,14 @@ import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.helpers.InvalidArgumentsProvider;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
+import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.ValidationMessageRegexFactory.expectedValidationMessagesRegex;
 
 @SuppressWarnings({"PMD.LinguisticNaming", "PMD.AvoidDuplicateLiterals"})
 class DefaultRoleSetupImportServiceValidationTest {
-    private final DefaultRoleSetupImportService service = new DefaultRoleSetupImportService("", "", "");
+    private final DefaultRoleSetupImportService service = new DefaultRoleSetupImportServiceImpl("", "", "");
 
     @ParameterizedTest
     @ArgumentsSource(InvalidArgumentsProvider.class)
@@ -132,4 +133,13 @@ class DefaultRoleSetupImportServiceValidationTest {
             ));
     }
 
+    @ParameterizedTest
+    @ArgumentsSource(InvalidArgumentsProvider.class)
+    void returnRolePermissionsForCaseTypeShouldRejectInvalidArguments(String caseTypeId) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.getRolePermissionsForCaseType(caseTypeId))
+            .withMessageMatching(expectedValidationMessagesRegex(
+                "caseTypeId - must not be blank"
+            ));
+    }
 }

@@ -1,3 +1,47 @@
+## [0.13.12](https://github.com/hmcts/am-lib/compare/0.13.10...0.13.12) (2019-10-05)
+
+
+
+## [0.13.11](https://github.com/hmcts/am-lib/compare/0.13.10...0.13.11) (2019-10-05)
+
+
+
+## [0.13.10](https://github.com/hmcts/am-lib/compare/0.13.9...0.13.10) (2019-10-04)
+
+
+
+## [0.13.9](https://github.com/hmcts/am-lib/compare/0.13.8...0.13.9) (2019-10-04)
+
+
+
+## [0.13.8](https://github.com/hmcts/am-lib/compare/0.12.8...0.13.8) (2019-10-02)
+
+
+### Bug Fixes
+
+* filter resource method no longer returns role that doesn't exist ([#302](https://github.com/hmcts/am-lib/issues/302)) ([61d4132](https://github.com/hmcts/am-lib/commit/61d4132))
+* jackson databind version bump ([#384](https://github.com/hmcts/am-lib/issues/384)) ([fa91ddc](https://github.com/hmcts/am-lib/commit/fa91ddc))
+* update secret names in jenkinsfile ([#339](https://github.com/hmcts/am-lib/issues/339)) ([da45d57](https://github.com/hmcts/am-lib/commit/da45d57))
+
+
+### Features
+
+* aks migration readiness ([#325](https://github.com/hmcts/am-lib/issues/325)) ([3939e70](https://github.com/hmcts/am-lib/commit/3939e70))
+* aks migration readiness ([#355](https://github.com/hmcts/am-lib/issues/355)) ([80d428e](https://github.com/hmcts/am-lib/commit/80d428e))
+* AM add auditing functionality (AM-376) ([#366](https://github.com/hmcts/am-lib/issues/366)) ([84eee59](https://github.com/hmcts/am-lib/commit/84eee59))
+* charts db creds in env variables ([#382](https://github.com/hmcts/am-lib/issues/382)) ([a4fc6f3](https://github.com/hmcts/am-lib/commit/a4fc6f3))
+* Create Access Management Audit (AM-418) ([#391](https://github.com/hmcts/am-lib/issues/391)) ([3a93cb3](https://github.com/hmcts/am-lib/commit/3a93cb3))
+* functional tests for grant access endpoint ([#396](https://github.com/hmcts/am-lib/issues/396)) ([6449e49](https://github.com/hmcts/am-lib/commit/6449e49))
+* library method to return role permissions for case type (AM-391) ([#311](https://github.com/hmcts/am-lib/issues/311)) ([70384d9](https://github.com/hmcts/am-lib/commit/70384d9))
+* OWASP ZAP security scan ([#318](https://github.com/hmcts/am-lib/issues/318)) ([5c9f26d](https://github.com/hmcts/am-lib/commit/5c9f26d))
+* remove deprecated method ([#317](https://github.com/hmcts/am-lib/issues/317)) ([ed3966a](https://github.com/hmcts/am-lib/commit/ed3966a))
+* revoke functional tests (AM-384) ([#387](https://github.com/hmcts/am-lib/issues/387)) ([2574ff4](https://github.com/hmcts/am-lib/commit/2574ff4))
+* test url for sandbox ([#338](https://github.com/hmcts/am-lib/issues/338)) ([f8512d2](https://github.com/hmcts/am-lib/commit/f8512d2))
+* Versioning Api AM-381 ([#326](https://github.com/hmcts/am-lib/issues/326)) ([43fc22e](https://github.com/hmcts/am-lib/commit/43fc22e))
+* Versioning Api changes AM-381 ([#345](https://github.com/hmcts/am-lib/issues/345)) ([e3d27b8](https://github.com/hmcts/am-lib/commit/e3d27b8))
+
+
+
 ## [0.12.8](https://github.com/hmcts/am-lib/compare/0.11.8...0.12.8) (2019-08-15)
 
 

@@ -74,7 +74,7 @@ withNightlyPipeline(type, product, component) {
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
   enableMutationTest()
-  enablePerformanceTest()
+//  enablePerformanceTest()
   enableSecurityScan()
   enableSlackNotifications('#am-master-builds')
 
@@ -93,25 +93,25 @@ withNightlyPipeline(type, product, component) {
     '''
   }
 
-  before('PerformanceTest') {
-    sh "echo 'Benchmark is about to start'"
-    sh "./gradlew benchmark --info --rerun-tasks && ./gradlew jmhReport --info --rerun-tasks"
-    print "calling loadPerformanceTestData gatling"
-    withSubscription(subscription) {
-      withTeamSecrets(config, params.ENVIRONMENT) {
-        loadOrDeletePerformanceDbData('load')
-      }
-    }
-    print "done loadPerformanceTestData gatling"
-  }
-
-  after('PerformanceTest') {
-    print "calling deletePerformanceTestData gatling"
-    withSubscription(subscription) {
-      withTeamSecrets(config, params.ENVIRONMENT) {
-        loadOrDeletePerformanceDbData('delete')
-      }
-    }
+//  before('PerformanceTest') {
+//    sh "echo 'Benchmark is about to start'"
+//    sh "./gradlew benchmark --info --rerun-tasks && ./gradlew jmhReport --info --rerun-tasks"
+//    print "calling loadPerformanceTestData gatling"
+//    withSubscription(subscription) {
+//      withTeamSecrets(config, params.ENVIRONMENT) {
+//        loadOrDeletePerformanceDbData('load')
+//      }
+//    }
+//    print "done loadPerformanceTestData gatling"
+//  }
+//
+//  after('PerformanceTest') {
+//    print "calling deletePerformanceTestData gatling"
+//    withSubscription(subscription) {
+//      withTeamSecrets(config, params.ENVIRONMENT) {
+//        loadOrDeletePerformanceDbData('delete')
+//      }
+//    }
     print "done deletePerformanceTestData gatling"
     archiveArtifacts allowEmptyArchive: true, artifacts: 'am-lib/build/reports/jmh/result.json'
     publishHTML([

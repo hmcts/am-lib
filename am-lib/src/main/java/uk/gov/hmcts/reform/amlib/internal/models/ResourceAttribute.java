@@ -12,7 +12,6 @@ import java.time.Instant;
 @Data
 @Builder
 @AllArgsConstructor
-//Class is only used for testing audit records validations
 public final class ResourceAttribute {
     private final String serviceName;
     private final String resourceType;

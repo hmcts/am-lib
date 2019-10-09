@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.models.RolePermissionsForCaseTypeEnvelope;
 import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -247,8 +248,6 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
         List<RolePermissionsForCaseTypeEnvelope> result = importerService.getRolePermissionsForCaseType(
             caseTypeIds);
 
-        //result.sort(comparing(RolePermissionsForCaseTypeEnvelope::getCaseTypeId));
-
         assertThat(result.size()).isEqualTo(1);
 
         List<RolePermissionsForCaseTypeEnvelope> expectedResourceAuditResult = ImmutableList.of(
@@ -256,9 +255,7 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
                 .defaultRolePermissions(ImmutableList.of(DefaultRolePermissions.builder()
                     .role(idamRoleWithRoleBasedAccess1).permissions(permissions1).build())).build());
 
-        assertThat(result).isEqualTo(expectedResourceAuditResult.stream()
-            .sorted(comparing(RolePermissionsForCaseTypeEnvelope::getCaseTypeId))
-            .collect(toList()));
+        assertThat(result).isEqualTo(expectedResourceAuditResult);
     }
 
     @Test
@@ -290,13 +287,16 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
         });
         result.sort(comparing(RolePermissionsForCaseTypeEnvelope::getCaseTypeId));
 
+        List defaultRolePermissionsList = new ArrayList<>(Arrays.asList(DefaultRolePermissions.builder()
+                .role(idamRoleWithRoleBasedAccess).permissions(permissions).build(),
+            DefaultRolePermissions.builder()
+                .role(idamRoleWithRoleBasedAccess2).permissions(permissions).build()));
+        defaultRolePermissionsList.sort(comparing(DefaultRolePermissions::getRole));
+
         String resourceName = resourceDefinition.getResourceName();
         List<RolePermissionsForCaseTypeEnvelope> expectedResourceAuditResult = ImmutableList.of(
             RolePermissionsForCaseTypeEnvelope.builder().caseTypeId(resourceName)
-                .defaultRolePermissions(ImmutableList.of(DefaultRolePermissions.builder()
-                        .role(idamRoleWithRoleBasedAccess).permissions(permissions).build(),
-                    DefaultRolePermissions.builder()
-                        .role(idamRoleWithRoleBasedAccess2).permissions(permissions).build())).build(),
+                .defaultRolePermissions(defaultRolePermissionsList).build(),
             RolePermissionsForCaseTypeEnvelope.builder().caseTypeId(resourceName1)
                 .defaultRolePermissions(ImmutableList.of(DefaultRolePermissions.builder()
                     .role(idamRoleWithRoleBasedAccess1).permissions(permissions1).build())).build());

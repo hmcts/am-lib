@@ -24,9 +24,9 @@ import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import javax.sql.DataSource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -34,6 +34,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import static java.lang.Boolean.TRUE;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog.Severity.DEBUG;
 import static uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader.AUDIT_REQUIRED;
 
@@ -332,7 +333,6 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
         List<ResourceAttribute> resourceAttributeList = new ArrayList<>();
         List<RoleBasedAccessRecord> roleBasedAccessRecords = new ArrayList<>();
 
-
         defaultPermissionGrants.stream().forEach(accessGrant ->
             accessGrant.getAttributePermissions().forEach((attribute, permissionAndClassification) -> {
                 resourceAttributeList.add(getResourceAttribute(accessGrant, attribute,
@@ -343,7 +343,7 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
         String callingServiceName = "";
         String changedBy = "";
 
-        if (Objects.nonNull(defaultPermissionGrants) && defaultPermissionGrants.size() > 0) {
+        if (nonNull(defaultPermissionGrants) && defaultPermissionGrants.size() > 0) {
             callingServiceName = defaultPermissionGrants.get(0).getCallingServiceName() == null ? ""
                 : defaultPermissionGrants.get(0).getCallingServiceName();
             changedBy = defaultPermissionGrants.get(0).getChangedBy() == null ? ""
@@ -388,9 +388,17 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
         });
     }
 
-    @Override
-    public List<RolePermissionsForCaseTypeEnvelope> getRolePermissionsForCaseType(@NotEmpty List<String> caseTypeId) {
-        return null;
+    /**
+     * Returns the access control list for a specified case type.
+     *
+     * @param caseTypeIds a case type
+     * @return a set of permissions RolePermissionsForCaseTypeEnvelope
+     */
+    public List<RolePermissionsForCaseTypeEnvelope> getRolePermissionsForCaseType(@NotEmpty List<String> caseTypeIds) {
+        List<RolePermissionsForCaseTypeEnvelope> rolePermissionsForCaseType =
+            jdbi.withExtension(DefaultRoleSetupRepository.class,
+                dao -> dao.getRolePermissionsForMultipleCaseTypes(caseTypeIds));
+        return rolePermissionsForCaseType;
     }
 
     /**

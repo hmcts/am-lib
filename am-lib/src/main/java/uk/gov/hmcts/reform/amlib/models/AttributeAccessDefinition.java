@@ -2,17 +2,23 @@ package uk.gov.hmcts.reform.amlib.models;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
+import uk.gov.hmcts.reform.amlib.internal.utils.Permissions;
 
 import java.util.Set;
 
-public interface AttributeAccessDefinition {
+public abstract class AttributeAccessDefinition {
 
-    JsonPointer getAttribute();
+    public abstract JsonPointer getAttribute();
 
-    String getAttributeAsString();
+    public abstract Set<Permission> getPermissions();
 
-    Set<Permission> getPermissions();
+    public String getAttributeAsString() {
+        return getAttribute().toString();
+    }
 
-    int getPermissionsAsInt();
+    public int getPermissionsAsInt() {
+        return Permissions.sumOf(getPermissions());
+    }
+
 
 }

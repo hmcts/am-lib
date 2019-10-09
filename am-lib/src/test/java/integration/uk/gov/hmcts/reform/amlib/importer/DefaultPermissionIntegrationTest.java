@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static java.lang.Boolean.TRUE;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,7 +54,6 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CHANGED_BY_NAME_FO
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CHANGED_BY_NAME_FOR_REVOKE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CHANGED_BY_NAME_FOR_UPDATE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
-import static uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader.AUDIT_REQUIRED;
 
 @SuppressWarnings({"PMD.TooManyMethods","PMD.ExcessiveImports","PMD.AvoidDuplicateLiterals"})
 class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
@@ -593,8 +591,26 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
 
     @Test
-    void grantResourceDefaultPermissionsShouldInsertPermissionsForCaseTypes() {
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("true")
+    void grantResourceDefaultPermissionsShouldInsertPermissionsForCaseTypesWithAudit() {
 
+        ResourceDefinition resourceDefinition1 = grantBatchPermissionsAndRoles();
+        assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition)).isEqualTo(4);
+        assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition1)).isEqualTo(2);
+        assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition)).isEqualTo(4);
+        assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition1)).isEqualTo(2);
+    }
+
+    @Test
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("false")
+    void grantResourceDefaultPermissionsShouldInsertPermissionsForCaseTypesWithoutAudit() {
+        ResourceDefinition resourceDefinition1 = grantBatchPermissionsAndRoles();
+        assertThat(resourceDefinition1).isNotNull();
+    }
+
+    private ResourceDefinition grantBatchPermissionsAndRoles() {
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
         service.addResourceDefinition(resourceDefinition);
 
@@ -633,11 +649,7 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         assertThat(databaseHelper.countDefaultPermissionsForBatch(resourceDefinition1)).isEqualTo(2);
         assertThat(databaseHelper.countResourceAttributeForBatch(resourceDefinition)).isEqualTo(2);
         assertThat(databaseHelper.countResourceAttributeForBatch(resourceDefinition1)).isEqualTo(2);
-
-        assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition)).isEqualTo(4);
-        assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition1)).isEqualTo(2);
-        assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition)).isEqualTo(4);
-        assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition1)).isEqualTo(2);
+        return resourceDefinition1;
     }
 
     @Test

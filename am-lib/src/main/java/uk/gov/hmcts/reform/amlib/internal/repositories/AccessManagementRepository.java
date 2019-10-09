@@ -11,7 +11,6 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
-import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
@@ -101,7 +100,7 @@ public interface AccessManagementRepository {
     @SqlUpdate("insert into access_management_audit (access_management_id, resource_id, accessor_id, permissions, accessor_type, service_name, resource_type, resource_name, attribute, relationship, calling_service_name, audit_timestamp, changed_by, action) "
         + "values (:access_management_id, :resourceId, :accessorId, :permissionsAsInt, cast(:accessorType as accessor_type), :serviceName, :resourceType, :resourceName, :attributeAsString, :relationship,"
         + " :callingServiceName, now() at time zone 'utc', :changedBy, 'grant' ) ")
-    void grantAccessManagementForAudit(@Bind("access_management_id") long id, @BindBean ExplicitAccessAuditRecord explicitAccessAuditRecord);
+    void grantAccessManagementForAudit(@Bind("access_management_id") long id, @BindBean ExplicitAccessRecord explicitAccessRecord, String callingServiceName, String changedBy);
 
     @SqlUpdate("insert into access_management_audit (access_management_id, resource_id, accessor_id, permissions, accessor_type, service_name, resource_type, resource_name, attribute, relationship, calling_service_name, audit_timestamp, changed_by, action) "
         + "select access_management_id, resource_id, accessor_id, permissions, accessor_type, service_name, resource_type, resource_name, attribute, relationship, :callingServiceName, now() at time zone 'utc', "

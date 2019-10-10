@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.internal.utils.Permissions;
@@ -16,7 +15,6 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public final class RoleBasedAccessRecord implements AttributeAccessDefinition {
     private final String serviceName;
     private final String resourceType;

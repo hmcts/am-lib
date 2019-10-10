@@ -10,9 +10,9 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.amapi.functional.FunctionalTestSuite;
 import uk.gov.hmcts.reform.amapi.models.FilterResource;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
+import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
 
-import static uk.gov.hmcts.reform.amlib.enums.AccessorType.ROLE;
-import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.*;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
@@ -106,6 +106,75 @@ public class FilterResourceApiTest extends FunctionalTestSuite {
             .body("access.permissions.values()[0][0]", Matchers.equalTo("UPDATE"))
             .body("access.permissions.values()[0][1]", Matchers.equalTo("READ"))
             .body("resource.id", Matchers.equalTo(resourceIdNullNotNull))
+            .log();
+    }
+
+    @Test
+    public void verifyFilterResourceWithWildCardPermission() {
+//        Given When User wants Filter for Resource
+        createExplicitGrantForFilterCase(resourceId, "*", DEFAULT, null, READ);
+
+//        When I call Filter Resource API
+        FilterResource filterResourceMetadata = createGenericFilterResourceMetadata(accessorId, resourceId, relationship);
+        Response response = amApiClient.filterResource(filterResourceMetadata)
+            .post(amApiClient.getAccessUrl() + api + version + filterResouce);
+
+//        Then I can get Filter Envelope with wild card
+        response.then()
+            .assertThat()
+            .statusCode(HttpStatus.OK.value())
+            .body("resource.data.name", Matchers.equalTo("test"))
+            .body("access.permissions.values()[0][0]", Matchers.equalTo("READ"))
+            .log();
+    }
+
+    @Test
+    public void verifyFilterResourceWithWildCardAndExplicitPermission() {
+//        Given When User wants Filter for Resource
+        createExplicitGrantForFilterCase(resourceId, "*", DEFAULT, null, READ);
+        createExplicitGrantForFilterCase(resourceId, accessorId, USER, relationship, UPDATE);
+
+//        When I call Filter Resource API
+        FilterResource filterResourceMetadata = createGenericFilterResourceMetadata(accessorId, resourceId, relationship);
+        Response response = amApiClient.filterResource(filterResourceMetadata)
+            .post(amApiClient.getAccessUrl() + api + version + filterResouce);
+
+//        Then I can get Filter Envelope with wild card & Explicit permissions merged
+        response.then()
+            .assertThat()
+            .statusCode(HttpStatus.OK.value())
+            .body("resource.data.name", Matchers.equalTo("test"))
+            .body("access.permissions.values()[0].size()", Matchers.equalTo(2))
+            .body("access.permissions.values()[0][0]", Matchers.equalTo("UPDATE"))
+            .body("access.permissions.values()[0][1]", Matchers.equalTo("READ"))
+            .log();
+    }
+
+    @Test
+    public void verifyFilterResourceWhenWildCardPermissionRevoked() {
+//        Given When User wants Filter wild card access to resource but wildcard access revoked
+        createExplicitGrantForFilterCase(resourceId, "*", DEFAULT, null, READ);
+        ExplicitAccessMetadata explicitAccessMetadata = ExplicitAccessMetadata.builder()
+            .resourceId(resourceId)
+            .accessorId("*")
+            .accessorType(DEFAULT)
+            .attribute(attribute)
+            .serviceName(serviceName)
+            .resourceName(resourceName)
+            .resourceType(resourceType)
+            .build();
+        amApiClient.revokeResourceAccess(explicitAccessMetadata);
+
+//        When I call Get access Filter API
+        FilterResource filterResourceMetadata = createGenericFilterResourceMetadata(accessorId, resourceId, relationship);
+        Response response = amApiClient.filterResource(filterResourceMetadata)
+            .post(amApiClient.getAccessUrl() + api + version + filterResouce);
+
+//        Then I can get Filter Envelope should be empty
+        response.then()
+            .assertThat()
+            .statusCode(HttpStatus.OK.value())
+            .contentType(Matchers.isEmptyOrNullString())
             .log();
     }
 

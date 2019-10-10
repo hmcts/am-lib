@@ -168,11 +168,11 @@ public class FunctionalTestSuite {
     }
 
     protected FilterResource createGenericFilterResourceMetadata(
-        String accessorIdCustom, String resourcdeIdCustom, String relationshipCustom) {
+        String accessorIdCustom, String resourceIdCustom, String relationshipCustom) {
         if (accessorIdCustom != null) {
             accessorId = accessorIdCustom;
             relationship = relationshipCustom;
-            resourceId = resourcdeIdCustom;
+            resourceId = resourceIdCustom;
         }
         return FilterResource.builder()
             .userId(accessorId)
@@ -185,7 +185,7 @@ public class FunctionalTestSuite {
                     .resourceType(resourceType)
                     .lastUpdate(Instant.now())
                     .build())
-                .data(JsonNodeFactory.instance.objectNode())
+                .data(JsonNodeFactory.instance.objectNode().put("name", "test"))
                 .build())
             .attributeSecurityClassification(ImmutableMap.of(JsonPointer.valueOf(""), PUBLIC))
             .build();

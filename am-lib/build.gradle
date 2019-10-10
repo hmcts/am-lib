@@ -98,7 +98,7 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.2'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.1.0'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.13.2'
-    testCompile group: 'org.flywaydb', name: 'flyway-core', version: '6.0.4'
+    testCompile group: 'org.flywaydb', name: 'flyway-core', version: '6.0.6'
     testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.12.2'
     testCompile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'

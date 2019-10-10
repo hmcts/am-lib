@@ -24,6 +24,7 @@ public class FilterResourceApiTest extends FunctionalTestSuite {
     String api =  "api/";
     String filterResouce = "/filter-resource";
     String resourceIdNullNotNull = "resourceId-null-notnull";
+    String relationships = "relationships";
 
     @Test
     public void verifyFilterResourceApi() {
@@ -56,7 +57,7 @@ public class FilterResourceApiTest extends FunctionalTestSuite {
         response.then()
             .assertThat()
             .statusCode(HttpStatus.OK.value())
-            .body("relationships", Matchers.hasSize(0))
+            .body(relationships, Matchers.hasSize(0))
             .body("resource.id", Matchers.equalTo(resourceId))
             .log();
     }
@@ -75,7 +76,7 @@ public class FilterResourceApiTest extends FunctionalTestSuite {
         response.then()
             .assertThat()
             .statusCode(HttpStatus.OK.value())
-            .body("relationships", Matchers.hasSize(0))
+            .body(relationships, Matchers.hasSize(0))
             .body("resource.id", Matchers.equalTo(resourceId))
             .log();
     }
@@ -99,11 +100,11 @@ public class FilterResourceApiTest extends FunctionalTestSuite {
         response.then()
             .assertThat()
             .statusCode(HttpStatus.OK.value())
-            .body("relationships", Matchers.hasSize(1))
-            .body("relationships", Matchers.contains("caseworker-test"))
+            .body(relationships, Matchers.hasSize(1))
+            .body(relationships, Matchers.contains("caseworker-test"))
             .body("access.permissions.values()[0].size()", Matchers.equalTo(2))
-            .body("access.permissions.values()[0][0]", Matchers.equalTo( "UPDATE" ))
-            .body("access.permissions.values()[0][1]", Matchers.equalTo( "READ" ))
+            .body("access.permissions.values()[0][0]", Matchers.equalTo("UPDATE"))
+            .body("access.permissions.values()[0][1]", Matchers.equalTo("READ"))
             .body("resource.id", Matchers.equalTo(resourceIdNullNotNull))
             .log();
     }

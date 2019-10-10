@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.amapi.functional;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -16,10 +17,14 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.util.ResourceUtils;
 import uk.gov.hmcts.reform.amapi.functional.client.AmApiClient;
 import uk.gov.hmcts.reform.amapi.functional.client.S2sClient;
+import uk.gov.hmcts.reform.amapi.models.FilterResource;
 import uk.gov.hmcts.reform.amlib.enums.AccessorType;
+import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
+import uk.gov.hmcts.reform.amlib.models.Resource;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,16 +35,17 @@ import java.sql.Statement;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import javax.sql.DataSource;
 
 import static java.lang.System.getenv;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
+import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
 @ActiveProfiles("functional")
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ConfusingTernary", "PMD.JUnit4TestShouldUseTestAnnotation"})
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ConfusingTernary", "PMD.JUnit4TestShouldUseTestAnnotation",
+                   "PMD.ExcessiveImports", "PMD.LawOfDemeter"})
 @Component
 public class FunctionalTestSuite {
 
@@ -161,8 +167,53 @@ public class FunctionalTestSuite {
             .build();
     }
 
+    protected FilterResource createGenericFilterResourceMetadata(
+        String accessorIdCustom, String resourcdeIdCustom, String relationshipCustom) {
+        if (accessorIdCustom != null) {
+            accessorId = accessorIdCustom;
+            relationship = relationshipCustom;
+            resourceId = resourcdeIdCustom;
+        }
+        return FilterResource.builder()
+            .userId(accessorId)
+            .userRoles(ImmutableSet.of(relationship))
+            .resource(Resource.builder()
+                .id(resourceId)
+                .definition(ResourceDefinition.builder()
+                    .serviceName(serviceName)
+                    .resourceName(resourceName)
+                    .resourceType(resourceType)
+                    .lastUpdate(Instant.now())
+                    .build())
+                .data(JsonNodeFactory.instance.objectNode())
+                .build())
+            .attributeSecurityClassification(ImmutableMap.of(JsonPointer.valueOf(""), PUBLIC))
+            .build();
+    }
+
     protected String resourceDefinitionToString(String serviceName, String resourceName, String resourceType) {
         return "{resourceName=" + resourceName + ", serviceName=" + serviceName + ", resourceType="
             + resourceType + "}";
+    }
+
+    protected void createExplicitGrantForFilterCase(String resourceId, String accessorId, AccessorType accessorType,
+                                                    String relationship, Permission permission) {
+        ExplicitAccessGrant explicitAccessGrant = ExplicitAccessGrant.builder()
+            .resourceId(resourceId)
+            .resourceDefinition(ResourceDefinition.builder()
+                .serviceName(serviceName)
+                .resourceName(resourceName)
+                .resourceType(resourceType)
+                .lastUpdate(Instant.now())
+                .build())
+            .accessorIds(ImmutableSet.of(accessorId))
+            .accessorType(accessorType)
+            .relationship(relationship)
+            .attributePermissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(permission)))
+            .lastUpdate(Instant.now())
+            .build();
+
+        amApiClient.createResourceAccess(explicitAccessGrant).post(
+            amApiClient.getAccessUrl() + "api/" + version + "/access-resource");
     }
 }

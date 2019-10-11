@@ -35,7 +35,7 @@ public final class ExplicitAccessRecord implements AttributeAccessDefinition {
 
     @Override
     public String getAttributeAsString() {
-        return getAttribute().toString();
+        return attribute.toString();
     }
 
     @Override

@@ -37,5 +37,4 @@ public final class RoleBasedAccessRecord implements AttributeAccessDefinition {
         return Permissions.sumOf(permissions);
     }
 
-
 }

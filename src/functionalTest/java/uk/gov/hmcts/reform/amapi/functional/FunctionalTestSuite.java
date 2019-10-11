@@ -72,6 +72,7 @@ public class FunctionalTestSuite {
     protected final JsonPointer attribute = JsonPointer.valueOf("");
     protected static String resourceName = "claim-test";
     protected static String resourceType = "case-test";
+    protected static String otherResourceType = "other-case-test";
     protected static String serviceName = "cmc-test";
     protected static String relationship = "caseworker-test";
 

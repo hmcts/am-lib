@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.amapi.functional.api;
 
+import com.fasterxml.jackson.core.JsonPointer;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -11,6 +14,9 @@ import uk.gov.hmcts.reform.amapi.functional.FunctionalTestSuite;
 import uk.gov.hmcts.reform.amapi.models.FilterResource;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
+import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
+
+import java.time.Instant;
 
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.*;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
@@ -175,6 +181,41 @@ public class FilterResourceApiTest extends FunctionalTestSuite {
             .assertThat()
             .statusCode(HttpStatus.OK.value())
             .contentType(Matchers.isEmptyOrNullString())
+            .log();
+    }
+
+    @Test
+    public void verifyFilterResourceChecksBothResourceIdAndResourceType() {
+
+//        GIVEN there is an explicit access record for a resource
+        createExplicitGrantForFilterCase(resourceId, accessorId, accessorType, relationship, READ);
+        ExplicitAccessGrant.builder()
+            .resourceId(resourceId)
+            .resourceDefinition(ResourceDefinition.builder()
+                .serviceName(serviceName)
+                .resourceName(resourceName)
+                .resourceType(otherResourceType)
+                .lastUpdate(Instant.now())
+                .build())
+            .accessorIds(ImmutableSet.of(accessorId))
+            .accessorType(accessorType)
+            .relationship(relationship)
+            .attributePermissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(UPDATE)))
+            .lastUpdate(Instant.now())
+            .build();
+
+//        WHEN filterResource method or equivalent API is called
+        FilterResource filterResourceMetadata = createGenericFilterResourceMetadata(accessorId, resourceId, relationship);
+        Response response = amApiClient.filterResource(filterResourceMetadata)
+            .post(amApiClient.getAccessUrl() + api + version + filterResouce);
+
+//        THEN for the explicit access record used to provide access to the resource, both the resourceId and resourceType must match, in addition to the accessor
+        response.then()
+            .assertThat()
+            .statusCode(HttpStatus.OK.value())
+            .body("resource.data.name", Matchers.equalTo("test"))
+            .body("access.permissions.values()[0].size()", Matchers.equalTo(1))
+            .body("access.permissions.values()[0][0]", Matchers.equalTo("READ"))
             .log();
     }
 

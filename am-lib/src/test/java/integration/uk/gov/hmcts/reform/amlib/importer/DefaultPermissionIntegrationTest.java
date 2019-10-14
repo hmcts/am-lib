@@ -655,17 +655,6 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
             .build();
     }
 
-    private DefaultPermissionGrant getDefaultPermissionForResourceForAttribute(String roleName,
-                                                                               ResourceDefinition resourceDefinition,
-                                                                               Set<Permission> permissions,
-                                                                               String attribute) {
-        return DefaultPermissionGrant.builder()
-            .roleName(roleName)
-            .resourceDefinition(resourceDefinition)
-            .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf("/" + attribute), permissions,
-                PUBLIC))
-            .build();
-    }
 
     private DefaultPermissionGrant grantDefaultPermissionForResourceWithAudit(String roleName,
                                                                               ResourceDefinition resourceDefinition,

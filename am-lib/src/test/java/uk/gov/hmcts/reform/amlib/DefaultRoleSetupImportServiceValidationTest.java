@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.ValidationMessageRegexFactory.expectedValidationMessagesRegex;
 
-@SuppressWarnings({"PMD.LinguisticNaming", "PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"PMD.LinguisticNaming", "PMD.AvoidDuplicateLiterals","PMD.TooManyMethods"})
 class DefaultRoleSetupImportServiceValidationTest {
     private final DefaultRoleSetupImportService service = new DefaultRoleSetupImportServiceImpl("", "", "");
 

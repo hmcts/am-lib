@@ -17,6 +17,7 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor
+//Class is only used for testing audit records validations in Integration test cases
 public class ExplicitAccessAuditRecord implements AttributeAccessDefinition {
 
     private final String resourceId;
@@ -41,11 +42,12 @@ public class ExplicitAccessAuditRecord implements AttributeAccessDefinition {
 
     @Override
     public String getAttributeAsString() {
-        return getAttribute().toString();
+        return attribute.toString();
     }
 
     @Override
     public int getPermissionsAsInt() {
         return Permissions.sumOf(permissions);
     }
+
 }

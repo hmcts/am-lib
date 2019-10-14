@@ -183,7 +183,7 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
             resourceDefinition, "", permissions, PUBLIC));
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedAccess1,
             resourceDefinition1, "", permissions1, PUBLIC));
-        List caseTypeIds = ImmutableList.of(
+        List<String> caseTypeIds = ImmutableList.of(
             resourceDefinition.getResourceName(), resourceDefinition1.getResourceName());
         List<RolePermissionsForCaseTypeEnvelope> result = importerService.getRolePermissionsForCaseType(
             caseTypeIds);
@@ -220,7 +220,7 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedAccess1,
             resourceDefinition1, "", permissions1, PUBLIC));
 
-        List caseTypeIds = ImmutableList.of(
+        List<String> caseTypeIds = ImmutableList.of(
             UUID.randomUUID().toString(), UUID.randomUUID().toString());
 
         List<RolePermissionsForCaseTypeEnvelope> result = importerService.getRolePermissionsForCaseType(
@@ -243,7 +243,7 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
             resourceDefinition, "/test", permissions, PUBLIC));
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedAccess1,
             resourceDefinition1, "", permissions1, PUBLIC));
-        List caseTypeIds = ImmutableList.of(
+        List<String> caseTypeIds = ImmutableList.of(
             resourceDefinition.getResourceName(), resourceDefinition1.getResourceName());
         List<RolePermissionsForCaseTypeEnvelope> result = importerService.getRolePermissionsForCaseType(
             caseTypeIds);
@@ -276,7 +276,7 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
             resourceDefinition, "", permissions, PUBLIC));
         importerService.grantDefaultPermission(createDefaultPermissionGrant(idamRoleWithRoleBasedAccess1,
             resourceDefinition1, "", permissions1, PUBLIC));
-        List caseTypeIds = ImmutableList.of(
+        List<String> caseTypeIds = ImmutableList.of(
             resourceDefinition.getResourceName(), resourceDefinition1.getResourceName());
         List<RolePermissionsForCaseTypeEnvelope> result = importerService.getRolePermissionsForCaseType(
             caseTypeIds);
@@ -287,7 +287,8 @@ public class ReturnRolePermissionsForCaseTypeIntegrationTest extends Preconfigur
         });
         result.sort(comparing(RolePermissionsForCaseTypeEnvelope::getCaseTypeId));
 
-        List defaultRolePermissionsList = new ArrayList<>(Arrays.asList(DefaultRolePermissions.builder()
+        List<DefaultRolePermissions> defaultRolePermissionsList =
+            new ArrayList<>(Arrays.asList(DefaultRolePermissions.builder()
                 .role(idamRoleWithRoleBasedAccess).permissions(permissions).build(),
             DefaultRolePermissions.builder()
                 .role(idamRoleWithRoleBasedAccess2).permissions(permissions).build()));

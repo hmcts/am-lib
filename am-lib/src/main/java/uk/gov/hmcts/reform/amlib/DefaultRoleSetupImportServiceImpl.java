@@ -11,8 +11,6 @@ import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttribute;
-import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttributeAudit;
-import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.repositories.DefaultRoleSetupRepository;
 import uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader;
@@ -27,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.sql.DataSource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -152,10 +149,10 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
 
                 //check if Audit flag enabled & create Audit of attribute and permissions
                 if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
-                    dao.createResourceAttributeForAudit(getResourceAttributeAudit(accessGrant, attribute,
-                        permissionAndClassification));
-                    dao.grantDefaultPermissionAudit(getRoleAccessAudit(accessGrant, attribute,
-                        permissionAndClassification));
+                    dao.createResourceAttributeForAudit(getResourceAttribute(accessGrant, attribute,
+                        permissionAndClassification), accessGrant.getCallingServiceName(), accessGrant.getChangedBy());
+                    dao.grantDefaultPermissionAudit(getRoleAccess(accessGrant, attribute,
+                        permissionAndClassification), accessGrant.getCallingServiceName(), accessGrant.getChangedBy());
                 }
             });
         });
@@ -179,23 +176,7 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
 
     }
 
-    private RoleBasedAccessAuditRecord getRoleAccessAudit(@NotNull @Valid DefaultPermissionGrant accessGrant,
-                                                          @NotNull JsonPointer attribute,
-                                                          Map.@NotNull Entry<@NotEmpty Set<@NotNull Permission>,
-                                                              @NotNull SecurityClassification>
-                                                              permissionAndClassification) {
-        return RoleBasedAccessAuditRecord.builder()
-            .serviceName(accessGrant.getResourceDefinition().getServiceName())
-            .resourceType(accessGrant.getResourceDefinition().getResourceType())
-            .resourceName(accessGrant.getResourceDefinition().getResourceName())
-            .attribute(attribute)
-            .roleName(accessGrant.getRoleName())
-            .permissions(permissionAndClassification.getKey())
-            .callingServiceName(accessGrant.getCallingServiceName())
-            .changedBy(accessGrant.getChangedBy())
-            .build();
 
-    }
 
     private ResourceAttribute getResourceAttribute(@NotNull @Valid DefaultPermissionGrant accessGrant,
                                                    @NotNull JsonPointer attribute,
@@ -211,24 +192,6 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
             .build();
 
     }
-
-    private ResourceAttributeAudit getResourceAttributeAudit(@NotNull @Valid DefaultPermissionGrant accessGrant,
-                                                             @NotNull JsonPointer attribute,
-                                                             Map.@NotNull Entry<@NotEmpty Set<@NotNull Permission>,
-                                                                 @NotNull SecurityClassification>
-                                                                 permissionAndClassification) {
-        return ResourceAttributeAudit.builder()
-            .serviceName(accessGrant.getResourceDefinition().getServiceName())
-            .resourceName(accessGrant.getResourceDefinition().getResourceName())
-            .resourceType(accessGrant.getResourceDefinition().getResourceType())
-            .attribute(attribute)
-            .defaultSecurityClassification(permissionAndClassification.getValue())
-            .callingServiceName(accessGrant.getCallingServiceName())
-            .changedBy(accessGrant.getChangedBy())
-            .build();
-
-    }
-
 
     /**
      * Deletes all default permissions within a service for a given resource type.

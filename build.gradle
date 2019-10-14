@@ -8,7 +8,7 @@ buildscript {
   dependencies {
     classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
     pitest 'org.pitest:pitest-junit5-plugin:0.9'
-    classpath("net.serenity-bdd:serenity-gradle-plugin:2.0.80")
+    classpath("net.serenity-bdd:serenity-gradle-plugin:2.0.81")
   }
 }
 
@@ -324,15 +324,6 @@ gatling {
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
   baselineOnMigrate = true
 
-  outOfOrder = true
-  if (project.hasProperty("dburl")) {
-    url = "jdbc:postgresql://${dburl}"
-  }
-}
-
-task migratePostgresDatabaseRepair(type: org.flywaydb.gradle.task.FlywayRepairTask) {
-  validateOnMigrate = false
-  baselineOnMigrate = true
   outOfOrder = true
   if (project.hasProperty("dburl")) {
     url = "jdbc:postgresql://${dburl}"

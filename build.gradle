@@ -330,15 +330,6 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
   }
 }
 
-task migratePostgresDatabaseRepair(type: org.flywaydb.gradle.task.FlywayRepairTask) {
-  validateOnMigrate = false
-  baselineOnMigrate = true
-  outOfOrder = true
-  if (project.hasProperty("dburl")) {
-    url = "jdbc:postgresql://${dburl}"
-  }
-}
-
 task loadPerformanceTestData(type: Exec) {
   if (Os.isFamily(Os.FAMILY_WINDOWS)) {
     commandLine 'cmd', '/c', file("${project.projectDir}/nightlyperformancedata/load-or-delete-performance-testdata-win.bat"),

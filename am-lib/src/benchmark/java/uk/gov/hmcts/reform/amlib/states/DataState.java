@@ -65,7 +65,8 @@ public class DataState {
                     Path resourceSecurityClassificationPath = resourceDataLocation
                         .resolve(definition.getServiceName() + "-securityclassification" + ".json");
                     try (Reader dataReader = Files.newBufferedReader(resourceSecurityClassificationPath)) {
-                        Map<JsonPointer, SecurityClassification> securityClassificationMap = new HashMap<>();
+                        Map<JsonPointer, SecurityClassification> securityClassificationMap =
+                            new HashMap<JsonPointer, SecurityClassification>();
                         new ObjectMapper().readValue(dataReader, HashMap.class)
                             .forEach((jsonPointer,securityClassification) ->  securityClassificationMap
                                 .put(JsonPointer.valueOf((String)jsonPointer),

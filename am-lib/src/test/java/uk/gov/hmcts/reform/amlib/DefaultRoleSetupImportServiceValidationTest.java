@@ -10,6 +10,9 @@ import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.helpers.ValidationMessageRegexFactory.expectedValidationMessagesRegex;
 
@@ -140,6 +143,17 @@ class DefaultRoleSetupImportServiceValidationTest {
             .isThrownBy(() -> service.getRolePermissionsForCaseType(caseTypeId))
             .withMessageMatching(expectedValidationMessagesRegex(
                 "caseTypeId - must not be blank"
+            ));
+    }
+
+
+    @ParameterizedTest
+    @ArgumentsSource(InvalidArgumentsProvider.class)
+    void grantResourceDefaultPermissionsInvalidArguments(Map<String, List<DefaultPermissionGrant>> mapAccessGrant) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> service.grantResourceDefaultPermissions(mapAccessGrant))
+            .withMessageMatching(expectedValidationMessagesRegex(
+                "mapAccessGrant - must not be empty"
             ));
     }
 }

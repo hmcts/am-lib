@@ -30,6 +30,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 import static uk.gov.hmcts.reform.amlib.enums.AuditAction.GRANT;
 import static uk.gov.hmcts.reform.amlib.enums.AuditAction.REVOKE;
@@ -589,10 +590,10 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     void grantResourceDefaultPermissionsShouldInsertPermissionsForCaseTypesWithAudit() {
 
         ResourceDefinition resourceDefinition1 = grantBatchPermissionsAndRoles();
-        assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition)).isEqualTo(4);
-        assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition1)).isEqualTo(2);
-        assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition)).isEqualTo(4);
-        assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition1)).isEqualTo(2);
+        assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition)).isEqualTo(3);
+        assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition1)).isEqualTo(1);
+        assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition)).isEqualTo(3);
+        assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition1)).isEqualTo(1);
     }
 
     @Test
@@ -625,24 +626,35 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
 
         List<DefaultPermissionGrant> defaultPermissionGrants = ImmutableList.of(
-            getDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)),
-            getDefaultPermissionForResourceForAttribute(roleName, resourceDefinition, ImmutableSet.of(READ),
-                "child"));
+            getDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
 
         List<DefaultPermissionGrant> defaultPermissionGrants1 = ImmutableList.of(
-            getDefaultPermissionForResource(roleName1, resourceDefinition1, ImmutableSet.of(READ)),
-            getDefaultPermissionForResourceForAttribute(roleName1, resourceDefinition1, ImmutableSet.of(READ),
-                "child"));
+            getDefaultPermissionForResource(roleName1, resourceDefinition1, ImmutableSet.of(READ)));
 
         Map<String, List<DefaultPermissionGrant>> mapAccessGrant = ImmutableMap.of(resourceName,
             defaultPermissionGrants, resourceName1, defaultPermissionGrants1);
         service.grantResourceDefaultPermissions(mapAccessGrant);
 
-        assertThat(databaseHelper.countDefaultPermissionsForBatch(resourceDefinition)).isEqualTo(2);
-        assertThat(databaseHelper.countDefaultPermissionsForBatch(resourceDefinition1)).isEqualTo(2);
-        assertThat(databaseHelper.countResourceAttributeForBatch(resourceDefinition)).isEqualTo(2);
-        assertThat(databaseHelper.countResourceAttributeForBatch(resourceDefinition1)).isEqualTo(2);
+        assertThat(databaseHelper.countDefaultPermissionsForBatch(resourceDefinition)).isEqualTo(1);
+        assertThat(databaseHelper.countDefaultPermissionsForBatch(resourceDefinition1)).isEqualTo(1);
+        assertThat(databaseHelper.countResourceAttributeForBatch(resourceDefinition)).isEqualTo(1);
+        assertThat(databaseHelper.countResourceAttributeForBatch(resourceDefinition1)).isEqualTo(1);
         return resourceDefinition1;
+    }
+
+    @Test
+    public void grantResourceDefaultPermissionsShouldInsertPermissionsForCaseTypesException() {
+
+        //role not exists in DB
+        List<DefaultPermissionGrant> defaultPermissionGrants = ImmutableList.of(
+            getDefaultPermissionForResource(UUID.randomUUID().toString(), resourceDefinition, ImmutableSet.of(READ)));
+
+        Map<String, List<DefaultPermissionGrant>> mapAccessGrant = ImmutableMap.of(resourceName,
+            defaultPermissionGrants);
+
+        assertThrows(PersistenceException.class, () -> {
+            service.grantResourceDefaultPermissions(mapAccessGrant);
+        });
     }
 
     private DefaultPermissionGrant getDefaultPermissionForResource(String roleName,

@@ -323,6 +323,16 @@ gatling {
 
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
   baselineOnMigrate = true
+
+  outOfOrder = true
+  if (project.hasProperty("dburl")) {
+    url = "jdbc:postgresql://${dburl}"
+  }
+}
+
+task migratePostgresDatabaseRepair(type: org.flywaydb.gradle.task.FlywayRepairTask) {
+  validateOnMigrate = false
+  baselineOnMigrate = true
   outOfOrder = true
   if (project.hasProperty("dburl")) {
     url = "jdbc:postgresql://${dburl}"

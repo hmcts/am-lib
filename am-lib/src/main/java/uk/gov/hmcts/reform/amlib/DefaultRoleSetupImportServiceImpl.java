@@ -64,6 +64,11 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
             .installPlugin(new SqlObjectPlugin());
     }
 
+    /**
+     * This constructor is recommended when you want to use existing transaction and not to span new transaction.
+     *
+     * @param transactionAwareDataSourceProxy TransactionAwareDataSourceProxy
+     */
     public DefaultRoleSetupImportServiceImpl(TransactionAwareDataSourceProxy transactionAwareDataSourceProxy) {
         this.jdbi = Jdbi.create(transactionAwareDataSourceProxy)
             .installPlugin(new SqlObjectPlugin());

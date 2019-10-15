@@ -44,7 +44,7 @@ public interface DefaultRoleSetupImportService {
 
     //takes input a map of  CaseTypeId as key and the list of object of type DefaultPermissionGrant as the value
     //object of type DefaultPermissionGrant identifies one record in the case definition file for a CaseTypeId
-    void grantResourceDefaultPermissions(Map<@NotNull String,
+    void grantResourceDefaultPermissions(@NotEmpty Map<@NotNull String,
         @NotEmpty List<@NotNull @Valid DefaultPermissionGrant>> mapAccessGrant);
 
 

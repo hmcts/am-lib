@@ -294,7 +294,7 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
 
     @Override
     @AuditLog(value = "grantResourceDefaultPermissions for role '{{mapAccessGrant}}'")
-    public void grantResourceDefaultPermissions(Map<@NotNull String, @NotEmpty
+    public void grantResourceDefaultPermissions(@NotEmpty Map<@NotNull String, @NotEmpty
         List<@NotNull @Valid DefaultPermissionGrant>> mapAccessGrant) {
 
         final List<DefaultPermissionGrant> defaultPermissionGrants = mapAccessGrant.values().stream()

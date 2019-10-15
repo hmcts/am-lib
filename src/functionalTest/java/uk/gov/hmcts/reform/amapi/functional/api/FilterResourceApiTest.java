@@ -18,7 +18,9 @@ import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 
 import java.time.Instant;
 
-import static uk.gov.hmcts.reform.amlib.enums.AccessorType.*;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.DEFAULT;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.ROLE;
+import static uk.gov.hmcts.reform.amlib.enums.AccessorType.USER;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.READ;
 import static uk.gov.hmcts.reform.amlib.enums.Permission.UPDATE;
 
@@ -31,6 +33,9 @@ public class FilterResourceApiTest extends FunctionalTestSuite {
     String filterResouce = "/filter-resource";
     String resourceIdNullNotNull = "resourceId-null-notnull";
     String relationships = "relationships";
+    String read = "READ";
+    String update = "UPDATE";
+    String firstElement = "access.permissions.values()[0][0]";
 
     @Test
     public void verifyFilterResourceApi() {
@@ -109,56 +114,56 @@ public class FilterResourceApiTest extends FunctionalTestSuite {
             .body(relationships, Matchers.hasSize(1))
             .body(relationships, Matchers.contains("caseworker-test"))
             .body("access.permissions.values()[0].size()", Matchers.equalTo(2))
-            .body("access.permissions.values()[0][0]", Matchers.equalTo("UPDATE"))
-            .body("access.permissions.values()[0][1]", Matchers.equalTo("READ"))
+            .body("access.permissions.values()[0]", Matchers.containsInAnyOrder(read, update))
             .body("resource.id", Matchers.equalTo(resourceIdNullNotNull))
             .log();
     }
 
     @Test
     public void verifyFilterResourceWithWildCardPermission() {
-//        Given When User wants Filter for Resource
+        //Given When User wants Filter for Resource
         createExplicitGrantForFilterCase(resourceId, "*", DEFAULT, null, READ);
 
-//        When I call Filter Resource API
-        FilterResource filterResourceMetadata = createGenericFilterResourceMetadata(accessorId, resourceId, relationship);
+        //When I call Filter Resource API
+        FilterResource filterResourceMetadata = createGenericFilterResourceMetadata(
+            accessorId, resourceId, relationship);
         Response response = amApiClient.filterResource(filterResourceMetadata)
             .post(amApiClient.getAccessUrl() + api + version + filterResouce);
 
-//        Then I can get Filter Envelope with wild card
+        //Then I can get Filter Envelope with wild card
         response.then()
             .assertThat()
             .statusCode(HttpStatus.OK.value())
             .body("resource.data.name", Matchers.equalTo("test"))
-            .body("access.permissions.values()[0][0]", Matchers.equalTo("READ"))
+            .body(firstElement, Matchers.equalTo(read))
             .log();
     }
 
     @Test
     public void verifyFilterResourceWithWildCardAndExplicitPermission() {
-//        Given When User wants Filter for Resource
+        //Given When User wants Filter for Resource
         createExplicitGrantForFilterCase(resourceId, "*", DEFAULT, null, READ);
         createExplicitGrantForFilterCase(resourceId, accessorId, USER, relationship, UPDATE);
 
-//        When I call Filter Resource API
-        FilterResource filterResourceMetadata = createGenericFilterResourceMetadata(accessorId, resourceId, relationship);
+        //When I call Filter Resource API
+        FilterResource filterResourceMetadata = createGenericFilterResourceMetadata(
+            accessorId, resourceId, relationship);
         Response response = amApiClient.filterResource(filterResourceMetadata)
             .post(amApiClient.getAccessUrl() + api + version + filterResouce);
 
-//        Then I can get Filter Envelope with wild card & Explicit permissions merged
+        //Then I can get Filter Envelope with wild card & Explicit permissions merged
         response.then()
             .assertThat()
             .statusCode(HttpStatus.OK.value())
             .body("resource.data.name", Matchers.equalTo("test"))
             .body("access.permissions.values()[0].size()", Matchers.equalTo(2))
-            .body("access.permissions.values()[0][0]", Matchers.equalTo("UPDATE"))
-            .body("access.permissions.values()[0][1]", Matchers.equalTo("READ"))
+            .body("access.permissions.values()[0]", Matchers.containsInAnyOrder(read, update))
             .log();
     }
 
     @Test
     public void verifyFilterResourceWhenWildCardPermissionRevoked() {
-//        Given When User wants Filter wild card access to resource but wildcard access revoked
+        //Given When User wants Filter wild card access to resource but wildcard access revoked
         createExplicitGrantForFilterCase(resourceId, "*", DEFAULT, null, READ);
         ExplicitAccessMetadata explicitAccessMetadata = ExplicitAccessMetadata.builder()
             .resourceId(resourceId)
@@ -171,12 +176,13 @@ public class FilterResourceApiTest extends FunctionalTestSuite {
             .build();
         amApiClient.revokeResourceAccess(explicitAccessMetadata);
 
-//        When I call Get access Filter API
-        FilterResource filterResourceMetadata = createGenericFilterResourceMetadata(accessorId, resourceId, relationship);
+        //When I call Get access Filter API
+        FilterResource filterResourceMetadata = createGenericFilterResourceMetadata(
+            accessorId, resourceId, relationship);
         Response response = amApiClient.filterResource(filterResourceMetadata)
             .post(amApiClient.getAccessUrl() + api + version + filterResouce);
 
-//        Then I can get Filter Envelope should be empty
+        //Then I can get Filter Envelope should be empty
         response.then()
             .assertThat()
             .statusCode(HttpStatus.OK.value())
@@ -187,7 +193,7 @@ public class FilterResourceApiTest extends FunctionalTestSuite {
     @Test
     public void verifyFilterResourceChecksBothResourceIdAndResourceType() {
 
-//        GIVEN there is an explicit access record for a resource
+        //GIVEN there is an explicit access record for a resource
         createExplicitGrantForFilterCase(resourceId, accessorId, accessorType, relationship, READ);
         ExplicitAccessGrant.builder()
             .resourceId(resourceId)
@@ -204,18 +210,20 @@ public class FilterResourceApiTest extends FunctionalTestSuite {
             .lastUpdate(Instant.now())
             .build();
 
-//        WHEN filterResource method or equivalent API is called
-        FilterResource filterResourceMetadata = createGenericFilterResourceMetadata(accessorId, resourceId, relationship);
+        //WHEN filterResource method or equivalent API is called
+        FilterResource filterResourceMetadata = createGenericFilterResourceMetadata(
+            accessorId, resourceId, relationship);
         Response response = amApiClient.filterResource(filterResourceMetadata)
             .post(amApiClient.getAccessUrl() + api + version + filterResouce);
 
-//        THEN for the explicit access record used to provide access to the resource, both the resourceId and resourceType must match, in addition to the accessor
+        //THEN for the explicit access record used to provide access to the resource,
+        // both the resourceId and resourceType must match, in addition to the accessor
         response.then()
             .assertThat()
             .statusCode(HttpStatus.OK.value())
             .body("resource.data.name", Matchers.equalTo("test"))
             .body("access.permissions.values()[0].size()", Matchers.equalTo(1))
-            .body("access.permissions.values()[0][0]", Matchers.equalTo("READ"))
+            .body(firstElement, Matchers.equalTo(read))
             .log();
     }
 

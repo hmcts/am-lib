@@ -4,12 +4,10 @@ import com.fasterxml.jackson.core.JsonPointer;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
-import uk.gov.hmcts.reform.amlib.enums.AuditAction;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.aspects.AuditLog;
-import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.Role;
 import uk.gov.hmcts.reform.amlib.internal.models.query.AttributeData;
@@ -103,8 +101,9 @@ public class AccessManagementService {
 
                     //check if Audit flag enabled & Inserts Audit
                     if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
-                        dao.grantAccessManagementForAudit(accessManagementId, buildExplicitAccessAudit(
-                            accessGrant, accessorIds, attributePermission));
+                        dao.grantAccessManagementForAudit(accessManagementId, buildExplicitAccess(
+                            accessGrant, accessorIds, attributePermission), accessGrant.getCallingServiceName(),
+                            accessGrant.getChangedBy());
                     }
                 }));
         });
@@ -136,25 +135,6 @@ public class AccessManagementService {
             .build();
     }
 
-    private ExplicitAccessAuditRecord buildExplicitAccessAudit(
-        @NotNull @Valid ExplicitAccessGrant accessGrant, @NotBlank String accessorIds, Map.Entry<@NotNull JsonPointer,
-        @NotEmpty Set<@NotNull Permission>> attributePermission) {
-
-        return ExplicitAccessAuditRecord.builder()
-            .resourceId(accessGrant.getResourceId())
-            .accessorId(accessorIds)
-            .permissions(attributePermission.getValue())
-            .accessorType(accessGrant.getAccessorType())
-            .serviceName(accessGrant.getResourceDefinition().getServiceName())
-            .resourceType(accessGrant.getResourceDefinition().getResourceType())
-            .resourceName(accessGrant.getResourceDefinition().getResourceName())
-            .attribute(attributePermission.getKey())
-            .relationship(accessGrant.getRelationship())
-            .callingServiceName(accessGrant.getCallingServiceName())
-            .changedBy(accessGrant.getChangedBy())
-            .action(AuditAction.GRANT)
-            .build();
-    }
 
     /**
      * Removes explicit access to resource accordingly to record configuration.

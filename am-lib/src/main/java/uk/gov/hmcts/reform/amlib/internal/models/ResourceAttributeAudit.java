@@ -11,9 +11,11 @@ import uk.gov.hmcts.reform.amlib.enums.SecurityClassification;
 import java.time.Instant;
 import javax.validation.constraints.NotBlank;
 
+
 @Data
 @Builder
 @AllArgsConstructor
+//Class is only used for testing audit records validations in Integration test cases
 public final class ResourceAttributeAudit {
     private final String serviceName;
     private final String resourceType;

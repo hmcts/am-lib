@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableSet;
 import integration.uk.gov.hmcts.reform.amlib.base.PreconfiguredIntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.MDC;
 import uk.gov.hmcts.reform.amlib.AccessManagementService;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportServiceImpl;
@@ -14,7 +15,8 @@ import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.ExplicitAccessRecord;
-import uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader;
+import uk.gov.hmcts.reform.amlib.internal.utils.AuditEnabled;
+import uk.gov.hmcts.reform.amlib.internal.utils.AuditFlagValidate;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
@@ -25,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static java.lang.Boolean.TRUE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
@@ -46,7 +47,6 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrant;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForAccessorType;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createGrantForWholeDocument;
 import static uk.gov.hmcts.reform.amlib.helpers.TestDataFactory.createPermissions;
-import static uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader.AUDIT_REQUIRED;
 
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
@@ -131,6 +131,8 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
     }
 
     @Test
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("true")
     void whenGrantExplicitAccessShouldAuditGrantedRecords() {
 
         ExplicitAccessGrant explicitAccessGrant = createExplicitAccessGrantWithAudit(resourceId, accessorId, roleName,
@@ -144,31 +146,44 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
 
         assertThat(explicitAccessAuditRecord).isNotNull();
 
-        //Audit flag on
-        if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
-            assertThat(explicitAccessAuditRecord.size()).isEqualTo(1);
-            List<ExplicitAccessAuditRecord> expectedResult = ImmutableList.of(
-                ExplicitAccessAuditRecord.builder()
-                    .resourceId(resourceId)
-                    .attribute(JsonPointer.valueOf(""))
-                    .accessorId(accessorId)
-                    .accessorType(USER)
-                    .serviceName(serviceName)
-                    .relationship(roleName)
-                    .resourceName(resourceName)
-                    .resourceType(resourceType)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
-                    .permissions(ImmutableSet.of(READ))
-                    .auditTimeStamp(explicitAccessAuditRecord.get(0).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
-                    .action(GRANT).build());
-            assertThat(explicitAccessAuditRecord).isEqualTo(expectedResult);
-        } else {
-            assertThat(explicitAccessAuditRecord.size()).isLessThan(1);
-        }
+        List<ExplicitAccessAuditRecord> expectedResult = ImmutableList.of(
+            ExplicitAccessAuditRecord.builder()
+                .resourceId(resourceId)
+                .attribute(JsonPointer.valueOf(""))
+                .accessorId(accessorId)
+                .accessorType(USER)
+                .serviceName(serviceName)
+                .relationship(roleName)
+                .resourceName(resourceName)
+                .resourceType(resourceType)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
+                .permissions(ImmutableSet.of(READ))
+                .auditTimeStamp(explicitAccessAuditRecord.get(0).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
+                .action(GRANT).build());
+        assertThat(explicitAccessAuditRecord).isEqualTo(expectedResult);
     }
 
     @Test
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("false")
+    void whenGrantExplicitAccessGrantedRecordsWithAuditDisabled() {
+        ExplicitAccessGrant explicitAccessGrant = createExplicitAccessGrantWithAudit(resourceId, accessorId, roleName,
+            resourceDefinition, CALLING_SERVICE_NAME_FOR_INSERTION);
+
+        service.grantExplicitResourceAccess(explicitAccessGrant);
+
+        List<ExplicitAccessAuditRecord> explicitAccessAuditRecord = databaseHelper
+            .getExplicitAccessAuditRecords(resourceDefinition,
+                "", roleName, READ.getValue());
+
+        assertThat(explicitAccessAuditRecord).isNotNull();
+        assertThat(explicitAccessAuditRecord.size()).isLessThan(1);
+    }
+
+    @Test
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("true")
     void whenGrantExplicitAccessWithUpdatesShouldAuditUpdatedRecords() {
 
         ExplicitAccessGrant explicitAccessGrant = createExplicitAccessGrantWithAudit(resourceId, accessorId, roleName,
@@ -188,47 +203,64 @@ class GrantAccessIntegrationTest extends PreconfiguredIntegrationBaseTest {
         assertThat(explicitAccessAuditRecord).isNotNull();
 
         //Audit flag on
-        if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
+        List<ExplicitAccessAuditRecord> expectedResult = ImmutableList.of(
+            ExplicitAccessAuditRecord.builder()
+                .resourceId(resourceId)
+                .attribute(JsonPointer.valueOf(""))
+                .accessorId(accessorId)
+                .accessorType(USER)
+                .serviceName(serviceName)
+                .relationship(roleName)
+                .resourceName(resourceName)
+                .resourceType(resourceType)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
+                .permissions(ImmutableSet.of(READ))
+                .auditTimeStamp(explicitAccessAuditRecord.get(0).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
+                .action(GRANT).build(),
+            ExplicitAccessAuditRecord.builder()
+                .resourceId(resourceId)
+                .accessorId(accessorId)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .relationship(roleName)
+                .resourceName(resourceName)
+                .resourceType(resourceType)
+                .accessorType(USER)
+                .permissions(ImmutableSet.of(READ))
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_UPDATES)
+                .auditTimeStamp(explicitAccessAuditRecord.get(1).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
+                .action(GRANT).build());
 
-            List<ExplicitAccessAuditRecord> expectedResult = ImmutableList.of(
-                ExplicitAccessAuditRecord.builder()
-                    .resourceId(resourceId)
-                    .attribute(JsonPointer.valueOf(""))
-                    .accessorId(accessorId)
-                    .accessorType(USER)
-                    .serviceName(serviceName)
-                    .relationship(roleName)
-                    .resourceName(resourceName)
-                    .resourceType(resourceType)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
-                    .permissions(ImmutableSet.of(READ))
-                    .auditTimeStamp(explicitAccessAuditRecord.get(0).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
-                    .action(GRANT).build(),
-                ExplicitAccessAuditRecord.builder()
-                    .resourceId(resourceId)
-                    .accessorId(accessorId)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .relationship(roleName)
-                    .resourceName(resourceName)
-                    .resourceType(resourceType)
-                    .accessorType(USER)
-                    .permissions(ImmutableSet.of(READ))
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_UPDATES)
-                    .auditTimeStamp(explicitAccessAuditRecord.get(1).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
-                    .action(GRANT).build());
+        assertThat(explicitAccessAuditRecord.get(0).getAuditTimeStamp()).isNotNull();
+        assertThat(explicitAccessAuditRecord.get(1).getAuditTimeStamp()).isNotNull();
+        assertThat(explicitAccessAuditRecord.get(1).getAuditTimeStamp())
+            .isNotEqualTo(explicitAccessAuditRecord.get(0).getAuditTimeStamp());
+        assertThat(explicitAccessAuditRecord).isEqualTo(expectedResult);
+    }
 
-            assertThat(explicitAccessAuditRecord.size()).isEqualTo(2);
-            assertThat(explicitAccessAuditRecord.get(0).getAuditTimeStamp()).isNotNull();
-            assertThat(explicitAccessAuditRecord.get(1).getAuditTimeStamp()).isNotNull();
-            assertThat(explicitAccessAuditRecord.get(1).getAuditTimeStamp())
-                .isNotEqualTo(explicitAccessAuditRecord.get(0).getAuditTimeStamp());
-            assertThat(explicitAccessAuditRecord).isEqualTo(expectedResult);
-        } else {
-            assertThat(explicitAccessAuditRecord.size()).isLessThan(1);
-        }
+    @Test
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("false")
+    void whenGrantExplicitAccessWithUpdateWithoutAudit() {
+
+        ExplicitAccessGrant explicitAccessGrant = createExplicitAccessGrantWithAudit(resourceId, accessorId, roleName,
+            resourceDefinition, CALLING_SERVICE_NAME_FOR_INSERTION);
+
+        service.grantExplicitResourceAccess(explicitAccessGrant);
+
+        explicitAccessGrant = createExplicitAccessGrantWithAudit(resourceId, accessorId, roleName,
+            resourceDefinition, CALLING_SERVICE_NAME_FOR_UPDATES);
+
+        service.grantExplicitResourceAccess(explicitAccessGrant);
+
+        List<ExplicitAccessAuditRecord> explicitAccessAuditRecord = databaseHelper
+            .getExplicitAccessAuditRecords(resourceDefinition,
+                "", roleName, READ.getValue());
+
+        assertThat(explicitAccessAuditRecord).isNotNull();
+        assertThat(explicitAccessAuditRecord.size()).isLessThan(1);
     }
 
     @Test

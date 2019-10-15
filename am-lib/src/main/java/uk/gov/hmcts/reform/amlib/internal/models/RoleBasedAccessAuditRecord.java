@@ -17,6 +17,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 @Builder
 @AllArgsConstructor
+//Class is only used for testing audit records validations in Integration test cases
 public class RoleBasedAccessAuditRecord implements AttributeAccessDefinition {
 
     private final String serviceName;

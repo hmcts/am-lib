@@ -6,7 +6,7 @@ public final class PropertyReader {
 
     public static final String AUDIT_REQUIRED = "audit.required";
 
-    private static ResourceBundle rb = ResourceBundle.getBundle("audit");
+    private static ResourceBundle rb = ResourceBundle.getBundle("application");
 
     private PropertyReader() {
         super();

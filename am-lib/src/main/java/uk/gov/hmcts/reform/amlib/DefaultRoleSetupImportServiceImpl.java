@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.amlib;
 import com.fasterxml.jackson.core.JsonPointer;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import uk.gov.hmcts.reform.amlib.enums.AccessType;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
 import uk.gov.hmcts.reform.amlib.enums.RoleType;
@@ -57,6 +58,17 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
      */
     public DefaultRoleSetupImportServiceImpl(DataSource dataSource) {
         this.jdbi = Jdbi.create(dataSource)
+            .installPlugin(new SqlObjectPlugin());
+    }
+
+    /**
+     * This constructor is recommended when you want to use existing transaction from the calling service such
+     * as CCD and do not want to span a new transaction with in AM scope.
+     *
+     * @param transactionAwareDataSourceProxy TransactionAwareDataSourceProxy
+     */
+    public DefaultRoleSetupImportServiceImpl(TransactionAwareDataSourceProxy transactionAwareDataSourceProxy) {
+        this.jdbi = Jdbi.create(transactionAwareDataSourceProxy)
             .installPlugin(new SqlObjectPlugin());
     }
 

@@ -62,7 +62,8 @@ public class DefaultRoleSetupImportServiceImpl implements DefaultRoleSetupImport
     }
 
     /**
-     * This constructor is recommended when you want to use existing transaction and not to span new transaction.
+     * This constructor is recommended when you want to use existing transaction from the calling service such
+     * as CCD and do not want to span a new transaction with in AM scope.
      *
      * @param transactionAwareDataSourceProxy TransactionAwareDataSourceProxy
      */

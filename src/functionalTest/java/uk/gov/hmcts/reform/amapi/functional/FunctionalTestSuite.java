@@ -44,7 +44,7 @@ import static uk.gov.hmcts.reform.amlib.enums.SecurityClassification.PUBLIC;
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
 @ActiveProfiles("functional")
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ConfusingTernary", "PMD.JUnit4TestShouldUseTestAnnotation",
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.JUnit4TestShouldUseTestAnnotation",
                    "PMD.ExcessiveImports", "PMD.LawOfDemeter"})
 @Component
 public class FunctionalTestSuite {
@@ -140,7 +140,10 @@ public class FunctionalTestSuite {
 
     private static String getValueOrDefault(String name, String defaultValue) {
         String value = getenv(name);
-        return value != null ? value : defaultValue;
+        if (value == null) {
+            value = defaultValue;
+        }
+        return value;
     }
 
     private static String getValueOrThrow(String name) {

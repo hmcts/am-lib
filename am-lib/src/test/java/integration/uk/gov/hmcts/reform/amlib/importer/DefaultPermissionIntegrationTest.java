@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableSet;
 import integration.uk.gov.hmcts.reform.amlib.base.IntegrationBaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.MDC;
 import uk.gov.hmcts.reform.amlib.DefaultRoleSetupImportServiceImpl;
 import uk.gov.hmcts.reform.amlib.enums.Permission;
@@ -14,8 +15,9 @@ import uk.gov.hmcts.reform.amlib.exceptions.PersistenceException;
 import uk.gov.hmcts.reform.amlib.internal.models.ResourceAttributeAudit;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessAuditRecord;
 import uk.gov.hmcts.reform.amlib.internal.models.RoleBasedAccessRecord;
+import uk.gov.hmcts.reform.amlib.internal.utils.AuditEnabled;
+import uk.gov.hmcts.reform.amlib.internal.utils.AuditFlagValidate;
 import uk.gov.hmcts.reform.amlib.internal.utils.Permissions;
-import uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader;
 import uk.gov.hmcts.reform.amlib.models.DefaultPermissionGrant;
 import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
 import uk.gov.hmcts.reform.amlib.service.DefaultRoleSetupImportService;
@@ -26,9 +28,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static java.lang.Boolean.TRUE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.amlib.enums.AccessType.ROLE_BASED;
 import static uk.gov.hmcts.reform.amlib.enums.AuditAction.GRANT;
 import static uk.gov.hmcts.reform.amlib.enums.AuditAction.REVOKE;
@@ -46,9 +48,8 @@ import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CHANGED_BY_NAME_FO
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CHANGED_BY_NAME_FOR_REVOKE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.CHANGED_BY_NAME_FOR_UPDATE;
 import static uk.gov.hmcts.reform.amlib.helpers.TestConstants.ROOT_ATTRIBUTE;
-import static uk.gov.hmcts.reform.amlib.internal.utils.PropertyReader.AUDIT_REQUIRED;
 
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.TooManyMethods","PMD.ExcessiveImports","PMD.AvoidDuplicateLiterals"})
 class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     private static DefaultRoleSetupImportService service = initService(DefaultRoleSetupImportServiceImpl.class);
     private String serviceName;
@@ -139,6 +140,8 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("true")
     void whenAddedDefaultPermissionsShouldAuditDefaultPermissionsAndAttributesRecords() {
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
         service.grantDefaultPermission(
@@ -148,55 +151,69 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
         List<RoleBasedAccessAuditRecord> accessAuditRecords = databaseHelper.getDefaultPermissionsAuditRecords(
             resourceDefinition, "", roleName, READ.getValue());
         assertThat(accessAuditRecords).isNotNull();
+        assertThat(accessAuditRecords.size()).isEqualTo(1);
+        assertThat(accessAuditRecords.get(0).getAuditTimeStamp()).isNotNull();
 
-        //Audit flag on
-        if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
-            assertThat(accessAuditRecords.size()).isEqualTo(1);
-            assertThat(accessAuditRecords.get(0).getAuditTimeStamp()).isNotNull();
+        List<RoleBasedAccessAuditRecord> expectedResult = ImmutableList.of(
+            RoleBasedAccessAuditRecord.builder()
+                .roleName(roleName)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .resourceName(resourceName)
+                .resourceType(resourceType)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
+                .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
+                .action(GRANT)
+                .permissions(ImmutableSet.of(READ)).build());
 
-            List<RoleBasedAccessAuditRecord> expectedResult = ImmutableList.of(
-                RoleBasedAccessAuditRecord.builder()
-                    .roleName(roleName)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .resourceName(resourceName)
-                    .resourceType(resourceType)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
-                    .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
-                    .action(GRANT)
-                    .permissions(ImmutableSet.of(READ)).build());
+        assertThat(expectedResult).isEqualTo(accessAuditRecords);
+        List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
+            resourceDefinition, "", PUBLIC);
+        assertThat(resourceAttributeAudits).isNotNull();
+        assertThat(resourceAttributeAudits.size()).isEqualTo(1);
+        assertThat(resourceAttributeAudits.get(0).getAuditTimeStamp()).isNotNull();
 
-            assertThat(expectedResult).isEqualTo(accessAuditRecords);
+        List<ResourceAttributeAudit> expectedResourceAuditResult = ImmutableList.of(
+            ResourceAttributeAudit.builder()
+                .resourceName(resourceName)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .resourceType(resourceType)
+                .defaultSecurityClassification(PUBLIC)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
+                .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
+                .action(GRANT)
+                .build());
 
-            List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
-                resourceDefinition, "", PUBLIC);
+        assertThat(expectedResourceAuditResult).isEqualTo(resourceAttributeAudits);
+    }
 
-            assertThat(resourceAttributeAudits).isNotNull();
-            assertThat(resourceAttributeAudits.size()).isEqualTo(1);
-            assertThat(resourceAttributeAudits.get(0).getAuditTimeStamp()).isNotNull();
 
-            List<ResourceAttributeAudit> expectedResourceAuditResult = ImmutableList.of(
-                ResourceAttributeAudit.builder()
-                    .resourceName(resourceName)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .resourceType(resourceType)
-                    .defaultSecurityClassification(PUBLIC)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
-                    .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
-                    .action(GRANT)
-                    .build());
+    @Test
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("false")
+    void whenAddedDefaultPermissionsWithoutAuditShouldNotAuditDefaultPermissionsAndAttributesRecords() {
+        service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ),
+                CALLING_SERVICE_NAME_FOR_INSERTION, CHANGED_BY_NAME_FOR_INSERTION));
 
-            assertThat(expectedResourceAuditResult).isEqualTo(resourceAttributeAudits);
-        } else {
-            assertThat(accessAuditRecords.size()).isLessThan(1);
-        }
+        List<RoleBasedAccessAuditRecord> accessAuditRecords = databaseHelper.getDefaultPermissionsAuditRecords(
+            resourceDefinition, "", roleName, READ.getValue());
+        assertThat(accessAuditRecords).isNotNull();
+        assertThat(accessAuditRecords.size()).isLessThan(1);
+        List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
+            resourceDefinition, "", PUBLIC);
+        assertThat(resourceAttributeAudits).isNotNull();
+        assertThat(resourceAttributeAudits.size()).isLessThan(1);
     }
 
     @Test
-    void whenUpdatedDefaultPermissionsShouldAuditDefaultDefaultPermissionsAndAttributesRecords() {
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("true")
+    void whenUpdatedDefaultPermissionsShouldAuditDefaultPermissionsAndAttributesRecords() {
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
 
         //Add permissions
@@ -213,78 +230,101 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
             resourceDefinition, "", roleName, READ.getValue());
 
         assertThat(accessAuditRecords).isNotNull();
+        assertThat(accessAuditRecords.size()).isEqualTo(2);
+        assertThat(accessAuditRecords).isNotNull();
+        assertThat(accessAuditRecords.size()).isEqualTo(2);
+        assertThat(accessAuditRecords.get(0).getAuditTimeStamp()).isNotNull();
+        assertThat(accessAuditRecords.get(1).getAuditTimeStamp()).isNotNull();
 
-        //Audit flag on
-        if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
-            assertThat(accessAuditRecords.size()).isEqualTo(2);
+        List<RoleBasedAccessAuditRecord> expectedResult = ImmutableList.of(
+            RoleBasedAccessAuditRecord.builder()
+                .roleName(roleName)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .resourceName(resourceName)
+                .resourceType(resourceType)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
+                .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
+                .action(GRANT)
+                .permissions(ImmutableSet.of(READ)).build(),
+            RoleBasedAccessAuditRecord.builder()
+                .roleName(roleName)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .resourceName(resourceName)
+                .resourceType(resourceType)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_UPDATES)
+                .auditTimeStamp(accessAuditRecords.get(1).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_UPDATE)
+                .action(GRANT)
+                .permissions(ImmutableSet.of(READ)).build());
+        assertThat(accessAuditRecords).isEqualTo(expectedResult);
 
-            assertThat(accessAuditRecords).isNotNull();
-            assertThat(accessAuditRecords.size()).isEqualTo(2);
-            assertThat(accessAuditRecords.get(0).getAuditTimeStamp()).isNotNull();
-            assertThat(accessAuditRecords.get(1).getAuditTimeStamp()).isNotNull();
+        List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
+            resourceDefinition, "", PUBLIC);
 
-            List<RoleBasedAccessAuditRecord> expectedResult = ImmutableList.of(
-                RoleBasedAccessAuditRecord.builder()
-                    .roleName(roleName)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .resourceName(resourceName)
-                    .resourceType(resourceType)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
-                    .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
-                    .action(GRANT)
-                    .permissions(ImmutableSet.of(READ)).build(),
-                RoleBasedAccessAuditRecord.builder()
-                    .roleName(roleName)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .resourceName(resourceName)
-                    .resourceType(resourceType)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_UPDATES)
-                    .auditTimeStamp(accessAuditRecords.get(1).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_UPDATE)
-                    .action(GRANT)
-                    .permissions(ImmutableSet.of(READ)).build());
-            assertThat(accessAuditRecords).isEqualTo(expectedResult);
+        assertThat(resourceAttributeAudits).isNotNull();
+        assertThat(resourceAttributeAudits.size()).isEqualTo(2);
+        assertThat(resourceAttributeAudits.get(0).getAuditTimeStamp()).isNotNull();
+        assertThat(resourceAttributeAudits.get(1).getAuditTimeStamp()).isNotNull();
 
-            List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
-                resourceDefinition, "", PUBLIC);
-
-            assertThat(resourceAttributeAudits).isNotNull();
-            assertThat(resourceAttributeAudits.size()).isEqualTo(2);
-            assertThat(resourceAttributeAudits.get(0).getAuditTimeStamp()).isNotNull();
-            assertThat(resourceAttributeAudits.get(1).getAuditTimeStamp()).isNotNull();
-
-            List<ResourceAttributeAudit> expectedResourceAuditResult = ImmutableList.of(
-                ResourceAttributeAudit.builder()
-                    .resourceName(resourceName)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .resourceType(resourceType)
-                    .defaultSecurityClassification(PUBLIC)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
-                    .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
-                    .action(GRANT)
-                    .build(),
-                ResourceAttributeAudit.builder().resourceName(resourceName)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .resourceType(resourceType)
-                    .defaultSecurityClassification(PUBLIC)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_UPDATES)
-                    .auditTimeStamp(accessAuditRecords.get(1).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_UPDATE)
-                    .action(GRANT)
-                    .build());
-            assertThat(resourceAttributeAudits).isEqualTo(expectedResourceAuditResult);
-        } else {
-            assertThat(accessAuditRecords.size()).isLessThan(1);
-        }
+        List<ResourceAttributeAudit> expectedResourceAuditResult = ImmutableList.of(
+            ResourceAttributeAudit.builder()
+                .resourceName(resourceName)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .resourceType(resourceType)
+                .defaultSecurityClassification(PUBLIC)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
+                .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
+                .action(GRANT)
+                .build(),
+            ResourceAttributeAudit.builder().resourceName(resourceName)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .resourceType(resourceType)
+                .defaultSecurityClassification(PUBLIC)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_UPDATES)
+                .auditTimeStamp(accessAuditRecords.get(1).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_UPDATE)
+                .action(GRANT)
+                .build());
+        assertThat(resourceAttributeAudits).isEqualTo(expectedResourceAuditResult);
     }
 
     @Test
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("false")
+    void whenUpdatedDefaultPermissionsWithoutAuditShouldNotAuditDefaultPermissionsAndAttributesRecords() {
+        service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
+
+        //Add permissions
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ),
+                CALLING_SERVICE_NAME_FOR_INSERTION, CHANGED_BY_NAME_FOR_INSERTION));
+
+        //Update Permissions
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ),
+                CALLING_SERVICE_NAME_FOR_UPDATES, CHANGED_BY_NAME_FOR_UPDATE));
+
+        List<RoleBasedAccessAuditRecord> accessAuditRecords = databaseHelper.getDefaultPermissionsAuditRecords(
+            resourceDefinition, "", roleName, READ.getValue());
+
+        assertThat(accessAuditRecords).isNotNull();
+        assertThat(accessAuditRecords.size()).isLessThan(1);
+
+        List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
+            resourceDefinition, "", PUBLIC);
+        assertThat(resourceAttributeAudits).isNotNull();
+        assertThat(resourceAttributeAudits.size()).isLessThan(1);
+    }
+
+    @Test
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("true")
     void whenTruncateDefaultPermissionsAndAttributesByServiceShouldAuditDefaultPermissionsAndAttributesRecords() {
 
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
@@ -301,74 +341,96 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
             resourceDefinition, "", roleName, READ.getValue());
 
         assertThat(accessAuditRecords).isNotNull();
-        //Audit flag on
-        if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
-            assertThat(accessAuditRecords.size()).isEqualTo(2);
-            assertThat(accessAuditRecords.get(0).getAuditTimeStamp()).isNotNull();
-            assertThat(accessAuditRecords.get(1).getAuditTimeStamp()).isNotNull();
+        assertThat(accessAuditRecords.size()).isEqualTo(2);
+        assertThat(accessAuditRecords.get(0).getAuditTimeStamp()).isNotNull();
+        assertThat(accessAuditRecords.get(1).getAuditTimeStamp()).isNotNull();
 
-            List<RoleBasedAccessAuditRecord> expectedResult = ImmutableList.of(
-                RoleBasedAccessAuditRecord.builder()
-                    .roleName(roleName)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .resourceName(resourceName)
-                    .resourceType(resourceType)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
-                    .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
-                    .action(GRANT)
-                    .permissions(ImmutableSet.of(READ)).build(),
-                RoleBasedAccessAuditRecord.builder()
-                    .roleName(roleName)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .resourceName(resourceName)
-                    .resourceType(resourceType)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_REVOKE)
-                    .auditTimeStamp(accessAuditRecords.get(1).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_REVOKE)
-                    .action(REVOKE)
-                    .permissions(ImmutableSet.of(READ)).build());
-            assertThat(accessAuditRecords).isEqualTo(expectedResult);
+        List<RoleBasedAccessAuditRecord> expectedResult = ImmutableList.of(
+            RoleBasedAccessAuditRecord.builder()
+                .roleName(roleName)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .resourceName(resourceName)
+                .resourceType(resourceType)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
+                .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
+                .action(GRANT)
+                .permissions(ImmutableSet.of(READ)).build(),
+            RoleBasedAccessAuditRecord.builder()
+                .roleName(roleName)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .resourceName(resourceName)
+                .resourceType(resourceType)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_REVOKE)
+                .auditTimeStamp(accessAuditRecords.get(1).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_REVOKE)
+                .action(REVOKE)
+                .permissions(ImmutableSet.of(READ)).build());
+        assertThat(accessAuditRecords).isEqualTo(expectedResult);
 
-            List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
-                resourceDefinition, "", PUBLIC);
+        List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
+            resourceDefinition, "", PUBLIC);
 
-            assertThat(resourceAttributeAudits).isNotNull();
-            assertThat(resourceAttributeAudits.size()).isEqualTo(2);
-            assertThat(resourceAttributeAudits.get(0).getAuditTimeStamp()).isNotNull();
-            assertThat(resourceAttributeAudits.get(1).getAuditTimeStamp()).isNotNull();
+        assertThat(resourceAttributeAudits).isNotNull();
+        assertThat(resourceAttributeAudits.size()).isEqualTo(2);
+        assertThat(resourceAttributeAudits.get(0).getAuditTimeStamp()).isNotNull();
+        assertThat(resourceAttributeAudits.get(1).getAuditTimeStamp()).isNotNull();
 
-            List<ResourceAttributeAudit> expectedResourceAuditResult = ImmutableList.of(
-                ResourceAttributeAudit.builder()
-                    .resourceName(resourceName)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .resourceType(resourceType)
-                    .defaultSecurityClassification(PUBLIC)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
-                    .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
-                    .action(GRANT)
-                    .build(),
-                ResourceAttributeAudit.builder().resourceName(resourceName)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .resourceType(resourceType)
-                    .defaultSecurityClassification(PUBLIC)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_REVOKE)
-                    .auditTimeStamp(accessAuditRecords.get(1).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_REVOKE)
-                    .action(REVOKE)
-                    .build());
-            assertThat(resourceAttributeAudits).isEqualTo(expectedResourceAuditResult);
-        } else {
-            assertThat(accessAuditRecords.size()).isLessThan(1);
-        }
+        List<ResourceAttributeAudit> expectedResourceAuditResult = ImmutableList.of(
+            ResourceAttributeAudit.builder()
+                .resourceName(resourceName)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .resourceType(resourceType)
+                .defaultSecurityClassification(PUBLIC)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
+                .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
+                .action(GRANT)
+                .build(),
+            ResourceAttributeAudit.builder().resourceName(resourceName)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .resourceType(resourceType)
+                .defaultSecurityClassification(PUBLIC)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_REVOKE)
+                .auditTimeStamp(accessAuditRecords.get(1).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_REVOKE)
+                .action(REVOKE)
+                .build());
+        assertThat(resourceAttributeAudits).isEqualTo(expectedResourceAuditResult);
     }
 
     @Test
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("false")
+    void whenTruncateDefaultPermissionsAndAttributesByServiceShouldWithoutAuditShouldNotAudit() {
+        service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
+        //Add permissions
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ),
+                CALLING_SERVICE_NAME_FOR_INSERTION, CHANGED_BY_NAME_FOR_INSERTION));
+
+        //truncate Permissions & attributes
+        service.truncateDefaultPermissionsForService(serviceName, resourceType, CALLING_SERVICE_NAME_FOR_REVOKE,
+            CHANGED_BY_NAME_FOR_REVOKE);
+
+        List<RoleBasedAccessAuditRecord> accessAuditRecords = databaseHelper.getDefaultPermissionsAuditRecords(
+            resourceDefinition, "", roleName, READ.getValue());
+
+        assertThat(accessAuditRecords).isNotNull();
+        assertThat(accessAuditRecords.size()).isLessThan(1);
+        List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
+            resourceDefinition, "", PUBLIC);
+        assertThat(resourceAttributeAudits).isNotNull();
+        assertThat(resourceAttributeAudits.size()).isLessThan(1);
+    }
+
+    @Test
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("true")
     void whenTruncateDefaultPermissionsAndAttributesByResourceDefinitionShouldAuditDefaultPermissionsAndAttrRecords() {
 
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
@@ -386,71 +448,94 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
             resourceDefinition, "", roleName, READ.getValue());
 
         assertThat(accessAuditRecords).isNotNull();
-        //Audit flag on
-        if (TRUE.toString().equalsIgnoreCase(PropertyReader.getPropertyValue(AUDIT_REQUIRED))) {
-            assertThat(accessAuditRecords.size()).isEqualTo(2);
-            assertThat(accessAuditRecords.get(0).getAuditTimeStamp()).isNotNull();
-            assertThat(accessAuditRecords.get(1).getAuditTimeStamp()).isNotNull();
 
-            List<RoleBasedAccessAuditRecord> expectedResult = ImmutableList.of(
-                RoleBasedAccessAuditRecord.builder()
-                    .roleName(roleName)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .resourceName(resourceName)
-                    .resourceType(resourceType)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
-                    .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
-                    .action(GRANT)
-                    .permissions(ImmutableSet.of(READ)).build(),
-                RoleBasedAccessAuditRecord.builder()
-                    .roleName(roleName)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .resourceName(resourceName)
-                    .resourceType(resourceType)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_REVOKE)
-                    .auditTimeStamp(accessAuditRecords.get(1).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_REVOKE)
-                    .action(REVOKE)
-                    .permissions(ImmutableSet.of(READ)).build());
-            assertThat(accessAuditRecords).isEqualTo(expectedResult);
+        assertThat(accessAuditRecords.size()).isEqualTo(2);
+        assertThat(accessAuditRecords.get(0).getAuditTimeStamp()).isNotNull();
+        assertThat(accessAuditRecords.get(1).getAuditTimeStamp()).isNotNull();
 
-            List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
-                resourceDefinition, "", PUBLIC);
+        List<RoleBasedAccessAuditRecord> expectedResult = ImmutableList.of(
+            RoleBasedAccessAuditRecord.builder()
+                .roleName(roleName)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .resourceName(resourceName)
+                .resourceType(resourceType)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
+                .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
+                .action(GRANT)
+                .permissions(ImmutableSet.of(READ)).build(),
+            RoleBasedAccessAuditRecord.builder()
+                .roleName(roleName)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .resourceName(resourceName)
+                .resourceType(resourceType)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_REVOKE)
+                .auditTimeStamp(accessAuditRecords.get(1).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_REVOKE)
+                .action(REVOKE)
+                .permissions(ImmutableSet.of(READ)).build());
+        assertThat(accessAuditRecords).isEqualTo(expectedResult);
 
-            assertThat(resourceAttributeAudits).isNotNull();
-            assertThat(resourceAttributeAudits.size()).isEqualTo(2);
-            assertThat(resourceAttributeAudits.get(0).getAuditTimeStamp()).isNotNull();
-            assertThat(resourceAttributeAudits.get(1).getAuditTimeStamp()).isNotNull();
+        List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
+            resourceDefinition, "", PUBLIC);
 
-            List<ResourceAttributeAudit> expectedResourceAuditResult = ImmutableList.of(
-                ResourceAttributeAudit.builder()
-                    .resourceName(resourceName)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .resourceType(resourceType)
-                    .defaultSecurityClassification(PUBLIC)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
-                    .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
-                    .action(GRANT)
-                    .build(),
-                ResourceAttributeAudit.builder().resourceName(resourceName)
-                    .attribute(JsonPointer.valueOf(""))
-                    .serviceName(serviceName)
-                    .resourceType(resourceType)
-                    .defaultSecurityClassification(PUBLIC)
-                    .callingServiceName(CALLING_SERVICE_NAME_FOR_REVOKE)
-                    .auditTimeStamp(accessAuditRecords.get(1).getAuditTimeStamp())
-                    .changedBy(CHANGED_BY_NAME_FOR_REVOKE)
-                    .action(REVOKE)
-                    .build());
-            assertThat(resourceAttributeAudits).isEqualTo(expectedResourceAuditResult);
-        } else {
-            assertThat(accessAuditRecords.size()).isLessThan(1);
-        }
+        assertThat(resourceAttributeAudits).isNotNull();
+        assertThat(resourceAttributeAudits.size()).isEqualTo(2);
+        assertThat(resourceAttributeAudits.get(0).getAuditTimeStamp()).isNotNull();
+        assertThat(resourceAttributeAudits.get(1).getAuditTimeStamp()).isNotNull();
+
+        List<ResourceAttributeAudit> expectedResourceAuditResult = ImmutableList.of(
+            ResourceAttributeAudit.builder()
+                .resourceName(resourceName)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .resourceType(resourceType)
+                .defaultSecurityClassification(PUBLIC)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_INSERTION)
+                .auditTimeStamp(accessAuditRecords.get(0).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_INSERTION)
+                .action(GRANT)
+                .build(),
+            ResourceAttributeAudit.builder().resourceName(resourceName)
+                .attribute(JsonPointer.valueOf(""))
+                .serviceName(serviceName)
+                .resourceType(resourceType)
+                .defaultSecurityClassification(PUBLIC)
+                .callingServiceName(CALLING_SERVICE_NAME_FOR_REVOKE)
+                .auditTimeStamp(accessAuditRecords.get(1).getAuditTimeStamp())
+                .changedBy(CHANGED_BY_NAME_FOR_REVOKE)
+                .action(REVOKE)
+                .build());
+        assertThat(resourceAttributeAudits).isEqualTo(expectedResourceAuditResult);
+    }
+
+    @Test
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("false")
+    void whenTruncateDefaultPermissionsAndAttributesByResourceDefinitionWithoutAuditShouldNotAudit() {
+
+        service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
+        //Add permissions
+        service.grantDefaultPermission(
+            grantDefaultPermissionForResourceWithAudit(roleName, resourceDefinition, ImmutableSet.of(READ),
+                CALLING_SERVICE_NAME_FOR_INSERTION, CHANGED_BY_NAME_FOR_INSERTION));
+
+        //truncate Permissions & attributes
+        service.truncateDefaultPermissionsByResourceDefinition(resourceDefinition, CALLING_SERVICE_NAME_FOR_REVOKE,
+            CHANGED_BY_NAME_FOR_REVOKE);
+
+
+        List<RoleBasedAccessAuditRecord> accessAuditRecords = databaseHelper.getDefaultPermissionsAuditRecords(
+            resourceDefinition, "", roleName, READ.getValue());
+
+        assertThat(accessAuditRecords).isNotNull();
+        assertThat(accessAuditRecords.size()).isLessThan(1);
+        List<ResourceAttributeAudit> resourceAttributeAudits = databaseHelper.getResourceAttributeAuditRecords(
+            resourceDefinition, "", PUBLIC);
+        assertThat(resourceAttributeAudits).isNotNull();
+        assertThat(resourceAttributeAudits.size()).isLessThan(1);
     }
 
 
@@ -500,8 +585,26 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
 
     @Test
-    void grantResourceDefaultPermissionsShouldInsertPermissionsForCaseTypes() {
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("true")
+    void grantResourceDefaultPermissionsShouldInsertPermissionsForCaseTypesWithAudit() {
 
+        ResourceDefinition resourceDefinition1 = grantBatchPermissionsAndRoles();
+        assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition)).isEqualTo(3);
+        assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition1)).isEqualTo(1);
+        assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition)).isEqualTo(3);
+        assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition1)).isEqualTo(1);
+    }
+
+    @Test
+    @ExtendWith(AuditFlagValidate.class)
+    @AuditEnabled("false")
+    void grantResourceDefaultPermissionsShouldInsertPermissionsForCaseTypesWithoutAudit() {
+        ResourceDefinition resourceDefinition1 = grantBatchPermissionsAndRoles();
+        assertThat(resourceDefinition1).isNotNull();
+    }
+
+    private ResourceDefinition grantBatchPermissionsAndRoles() {
         service.addRole(roleName, RESOURCE, PUBLIC, ROLE_BASED);
         service.addResourceDefinition(resourceDefinition);
 
@@ -523,28 +626,35 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
 
 
         List<DefaultPermissionGrant> defaultPermissionGrants = ImmutableList.of(
-            getDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)),
-            getDefaultPermissionForResourceForAttribute(roleName, resourceDefinition, ImmutableSet.of(READ),
-                "child"));
+            getDefaultPermissionForResource(roleName, resourceDefinition, ImmutableSet.of(READ)));
 
         List<DefaultPermissionGrant> defaultPermissionGrants1 = ImmutableList.of(
-            getDefaultPermissionForResource(roleName1, resourceDefinition1, ImmutableSet.of(READ)),
-            getDefaultPermissionForResourceForAttribute(roleName1, resourceDefinition1, ImmutableSet.of(READ),
-                "child"));
+            getDefaultPermissionForResource(roleName1, resourceDefinition1, ImmutableSet.of(READ)));
 
         Map<String, List<DefaultPermissionGrant>> mapAccessGrant = ImmutableMap.of(resourceName,
             defaultPermissionGrants, resourceName1, defaultPermissionGrants1);
         service.grantResourceDefaultPermissions(mapAccessGrant);
 
-        assertThat(databaseHelper.countDefaultPermissionsForBatch(resourceDefinition)).isEqualTo(2);
-        assertThat(databaseHelper.countDefaultPermissionsForBatch(resourceDefinition1)).isEqualTo(2);
-        assertThat(databaseHelper.countResourceAttributeForBatch(resourceDefinition)).isEqualTo(2);
-        assertThat(databaseHelper.countResourceAttributeForBatch(resourceDefinition1)).isEqualTo(2);
+        assertThat(databaseHelper.countDefaultPermissionsForBatch(resourceDefinition)).isEqualTo(1);
+        assertThat(databaseHelper.countDefaultPermissionsForBatch(resourceDefinition1)).isEqualTo(1);
+        assertThat(databaseHelper.countResourceAttributeForBatch(resourceDefinition)).isEqualTo(1);
+        assertThat(databaseHelper.countResourceAttributeForBatch(resourceDefinition1)).isEqualTo(1);
+        return resourceDefinition1;
+    }
 
-        assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition)).isEqualTo(4);
-        assertThat(databaseHelper.countDefaultPermissionsAuditForBatch(resourceDefinition1)).isEqualTo(2);
-        assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition)).isEqualTo(4);
-        assertThat(databaseHelper.countResourceAttributeAuditForBatch(resourceDefinition1)).isEqualTo(2);
+    @Test
+    public void grantResourceDefaultPermissionsShouldInsertPermissionsForCaseTypesException() {
+
+        //role not exists in DB
+        List<DefaultPermissionGrant> defaultPermissionGrants = ImmutableList.of(
+            getDefaultPermissionForResource(UUID.randomUUID().toString(), resourceDefinition, ImmutableSet.of(READ)));
+
+        Map<String, List<DefaultPermissionGrant>> mapAccessGrant = ImmutableMap.of(resourceName,
+            defaultPermissionGrants);
+
+        assertThrows(PersistenceException.class, () -> {
+            service.grantResourceDefaultPermissions(mapAccessGrant);
+        });
     }
 
     private DefaultPermissionGrant getDefaultPermissionForResource(String roleName,
@@ -557,17 +667,6 @@ class DefaultPermissionIntegrationTest extends IntegrationBaseTest {
             .build();
     }
 
-    private DefaultPermissionGrant getDefaultPermissionForResourceForAttribute(String roleName,
-                                                                               ResourceDefinition resourceDefinition,
-                                                                               Set<Permission> permissions,
-                                                                               String attribute) {
-        return DefaultPermissionGrant.builder()
-            .roleName(roleName)
-            .resourceDefinition(resourceDefinition)
-            .attributePermissions(createPermissionsForAttribute(JsonPointer.valueOf("/" + attribute), permissions,
-                PUBLIC))
-            .build();
-    }
 
     private DefaultPermissionGrant grantDefaultPermissionForResourceWithAudit(String roleName,
                                                                               ResourceDefinition resourceDefinition,

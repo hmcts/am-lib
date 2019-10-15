@@ -12,8 +12,8 @@ create table access_management_audit
     resource_name           VARCHAR(100)      not null,
     attribute               VARCHAR(250)      not null,
     relationship            VARCHAR(100),
-	  calling_service_name    VARCHAR(100),
-    audit_timestamp		      TIMESTAMP 		    not null DEFAULT CURRENT_TIMESTAMP,
+	calling_service_name    VARCHAR(100),
+    audit_timestamp		    TIMESTAMP 		  not null DEFAULT (now() at time zone 'utc'),
     changed_by              VARCHAR(100),
     action                  ACTION
 );
@@ -25,11 +25,11 @@ create table default_permissions_for_roles_audit
     resource_name 			    VARCHAR(100)       not null,
     attribute     			    VARCHAR(250)       not null,
     role_name     			    VARCHAR(100)       not null,
-    permissions   			    SMALLINT  		     not null,
-	  calling_service_name    VARCHAR(100),
-    audit_timestamp		      TIMESTAMP 		    not null DEFAULT CURRENT_TIMESTAMP,
-    changed_by              VARCHAR(100),
-    action                  ACTION
+    permissions   			    SMALLINT  		   not null,
+	calling_service_name        VARCHAR(100),
+    audit_timestamp		        TIMESTAMP 		   not null DEFAULT (now() at time zone 'utc'),
+    changed_by                  VARCHAR(100),
+    action                      ACTION
 );
 
 create table resource_attributes_audit
@@ -39,8 +39,8 @@ create table resource_attributes_audit
     resource_name                   VARCHAR(100)            not null,
     attribute                       VARCHAR(250)            not null,
     default_security_classification SECURITY_CLASSIFICATION not null,
-	  calling_service_name            VARCHAR(100),
-    audit_timestamp		              TIMESTAMP 		    not null DEFAULT CURRENT_TIMESTAMP,
+	calling_service_name            VARCHAR(100),
+    audit_timestamp		            TIMESTAMP 		        not null DEFAULT (now() at time zone 'utc'),
     changed_by                      VARCHAR(100),
     action                          ACTION
 );

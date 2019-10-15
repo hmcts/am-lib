@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.amapi.functional.api;
 
-import com.fasterxml.jackson.core.JsonPointer;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -14,9 +11,6 @@ import uk.gov.hmcts.reform.amapi.functional.FunctionalTestSuite;
 import uk.gov.hmcts.reform.amapi.models.FilterResource;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessGrant;
 import uk.gov.hmcts.reform.amlib.models.ExplicitAccessMetadata;
-import uk.gov.hmcts.reform.amlib.models.ResourceDefinition;
-
-import java.time.Instant;
 
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.DEFAULT;
 import static uk.gov.hmcts.reform.amlib.enums.AccessorType.ROLE;
@@ -195,20 +189,6 @@ public class FilterResourceApiTest extends FunctionalTestSuite {
 
         //GIVEN there is an explicit access record for a resource
         createExplicitGrantForFilterCase(resourceId, accessorId, accessorType, relationship, READ);
-        ExplicitAccessGrant.builder()
-            .resourceId(resourceId)
-            .resourceDefinition(ResourceDefinition.builder()
-                .serviceName(serviceName)
-                .resourceName(resourceName)
-                .resourceType(otherResourceType)
-                .lastUpdate(Instant.now())
-                .build())
-            .accessorIds(ImmutableSet.of(accessorId))
-            .accessorType(accessorType)
-            .relationship(relationship)
-            .attributePermissions(ImmutableMap.of(JsonPointer.valueOf(""), ImmutableSet.of(UPDATE)))
-            .lastUpdate(Instant.now())
-            .build();
 
         //WHEN filterResource method or equivalent API is called
         FilterResource filterResourceMetadata = createGenericFilterResourceMetadata(

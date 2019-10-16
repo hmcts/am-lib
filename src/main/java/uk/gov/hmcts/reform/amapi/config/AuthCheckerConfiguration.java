@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.collect.ImmutableSet;
+import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.security.web.firewall.HttpFirewall;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,6 +45,13 @@ public class AuthCheckerConfiguration {
     @Bean
     public Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor() {
         return any -> ImmutableSet.copyOf(authorisedRoles);
+    }
+
+    @Bean
+    public HttpFirewall allowUrlEncodedSlashHttpFirewall() {
+        DefaultHttpFirewall firewall = new DefaultHttpFirewall();
+        firewall.setAllowUrlEncodedSlash(true);
+        return firewall;
     }
 
     @Bean

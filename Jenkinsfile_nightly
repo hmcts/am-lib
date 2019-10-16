@@ -75,7 +75,7 @@ withNightlyPipeline(type, product, component) {
   loadVaultSecrets(secrets)
   enableMutationTest()
   enablePerformanceTest()
-  enableSecurityScan()
+//  enableSecurityScan()
   enableSlackNotifications('#am-master-builds')
 
   after('checkout') {

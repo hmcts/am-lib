@@ -8,5 +8,5 @@ object Environment {
 
   val s2sname : String = scala.util.Properties.envOrElse("S2S_MICROSERVICE","am_accessmgmt_api")
 
-  val s2sSecret : String = scala.util.Properties.envOrElse("S2S_SECRET","GJNMFGFAAO4FCVD4")
+  val s2sSecret : String = scala.util.Properties.envOrElse("S2S_SECRET","AAAAAAAAAAAAAAAB")
 }

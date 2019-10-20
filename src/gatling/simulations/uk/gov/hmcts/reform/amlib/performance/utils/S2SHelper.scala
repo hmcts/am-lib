@@ -10,9 +10,7 @@ object  S2SHelper {
     exec(
       session => {
         val otp: String = String.valueOf(new GoogleAuthenticator().getTotpPassword(Environment.s2sSecret))
-        print("otp:::" + otp + "s2s secret::" + Environment.s2sSecret)
         session.set("OTP", otp)
-
       })
 
   val otpp = "${OTP}"

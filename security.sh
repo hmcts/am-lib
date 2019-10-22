@@ -8,5 +8,4 @@ export LANG=C.UTF-8
 zap-cli --zap-url http://0.0.0.0 -p 1001 report -o /zap/api-report.html -f html
 mkdir -p functional-output
 chmod a+wx functional-output
-curl --fail http://0.0.0.0:1001/OTHER/core/other/jsonreport/?formMethod=GET --output report.json
-cp *.* functional-output/
+cp /zap/api-report.html functional-output/

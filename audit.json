@@ -1,7 +1,4 @@
 {
 
-  "10023_Information Disclosure - Debug Error Messages_http://am-accessmgmt-api-aat.service.core-compute-aat.internal/v2/api-docs_GET": "ignore",
-  "90028_Insecure HTTP Method - DELETE_http://am-accessmgmt-api-aat.service.core-compute-aat.internal/api/v1/access-resource_OPTIONS": "ignore",
-  "10021_X-Content-Type-Options Header Missing_http://am-accessmgmt-api-aat.service.core-compute-aat.internal/v2/api-docs_GET": "ignore",
-  "100001_Unexpected Content-Type was returned_http://am-accessmgmt-api-aat.service.core-compute-aat.internal/_GET": "ignore"
+
 }

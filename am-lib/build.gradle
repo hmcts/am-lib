@@ -101,7 +101,7 @@ dependencies {
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.13.2'
     testCompile group: 'org.flywaydb', name: 'flyway-core', version: '6.0.6'
     testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.12.2'
-    testCompile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+    testCompile group: 'com.google.guava', name: 'guava', version: '28.2-jre'
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: '5.0.1'
 

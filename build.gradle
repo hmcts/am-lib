@@ -246,7 +246,7 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: versions.reformHealthStarter
   compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.0.4'
 
-  compile group: 'org.postgresql', name: 'postgresql', version: '42.2.8'
+  compile group: 'org.postgresql', name: 'postgresql', version: '42.2.10'
   compile group: 'org.flywaydb', name: 'flyway-core', version: versions.flyway
 
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'

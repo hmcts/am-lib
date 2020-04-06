@@ -255,7 +255,7 @@ dependencies {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
   }
 
-  testCompile group: 'com.warrenstrange', name: 'googleauth', version: '1.2.0'
+  testCompile group: 'com.warrenstrange', name: 'googleauth', version: '1.5.0'
 
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.2'
   testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
@@ -286,7 +286,7 @@ dependencies {
   functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
   functionalTestCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 
-  gatlingCompile group: 'com.warrenstrange', name: 'googleauth', version: '1.1.5'
+  gatlingCompile group: 'com.warrenstrange', name: 'googleauth', version: '1.5.0'
   gatling group: 'org.scala-lang', name:'scala-library', version:'2.12.8'
   gatling group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0.pr3'
 }

@@ -96,7 +96,7 @@ dependencies {
     compile group: 'io.swagger', name: 'swagger-annotations', version: '1.5.24'
     compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
     compile group: 'org.springframework', name: 'spring-jdbc', version: '5.2.0.RELEASE'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.2'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.6.2'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.1.0'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.13.2'
     testCompile group: 'org.flywaydb', name: 'flyway-core', version: '6.0.6'
@@ -107,7 +107,7 @@ dependencies {
 
     benchmarkAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.21'
 
-    benchmarkImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
+    benchmarkImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.6.2'
     benchmarkCompile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
     benchmarkCompile sourceSets.main.runtimeClasspath
     benchmarkCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'

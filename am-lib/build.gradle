@@ -81,13 +81,13 @@ repositories {
 
 configurations.all {
   resolutionStrategy {
-    force 'com.fasterxml.jackson.core:jackson-databind:2.10.0'
+    force 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
     force 'commons-beanutils:commons-beanutils:1.9.4'
   }
 }
 
 dependencies {
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0.pr3'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.1'
     compile group: 'org.jdbi', name: 'jdbi3-core', version: '3.10.1'
     compile group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.10.1'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.8'

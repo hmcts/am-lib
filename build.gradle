@@ -287,7 +287,7 @@ dependencies {
   functionalTestCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 
   gatlingCompile group: 'com.warrenstrange', name: 'googleauth', version: '1.1.5'
-  gatling group: 'org.scala-lang', name:'scala-library', version:'2.12.8'
+  gatling group: 'org.scala-lang', name:'scala-library', version:'2.13.3'
   gatling group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0.pr3'
 }
 

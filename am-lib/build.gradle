@@ -92,7 +92,7 @@ dependencies {
     compile group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.10.1'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.8'
     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.17.Final'
-    compile group: 'org.aspectj', name: 'aspectjrt', version: '1.9.4'
+    compile group: 'org.aspectj', name: 'aspectjrt', version: '1.9.6'
     compile group: 'io.swagger', name: 'swagger-annotations', version: '1.5.24'
     compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
     compile group: 'org.springframework', name: 'spring-jdbc', version: '5.2.0.RELEASE'

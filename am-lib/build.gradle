@@ -108,7 +108,7 @@ dependencies {
     benchmarkAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.21'
 
     benchmarkImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
-    benchmarkCompile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
+    benchmarkCompile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.26'
     benchmarkCompile sourceSets.main.runtimeClasspath
     benchmarkCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'
     benchmarkCompile group: 'com.google.guava', name: 'guava', version: '28.1-jre'

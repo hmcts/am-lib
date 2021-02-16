@@ -215,10 +215,10 @@ configurations.all {
 dependencies {
   compile project(':am-lib')
 
-  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
+  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.18'
   compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
 
-  testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
+  testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.18'
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
   integrationTestCompile group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
   integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
@@ -278,7 +278,7 @@ dependencies {
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-  functionalTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+  functionalTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.18'
   functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
   functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
   functionalTestCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity

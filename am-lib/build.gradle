@@ -105,7 +105,7 @@ dependencies {
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: '5.0.1'
     testCompile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: '5.0.1'
 
-    benchmarkAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.21'
+    benchmarkAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.29'
 
     benchmarkImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
     benchmarkCompile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
